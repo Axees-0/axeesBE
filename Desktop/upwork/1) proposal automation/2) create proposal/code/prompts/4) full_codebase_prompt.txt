@@ -1,0 +1,30 @@
+I need you to create a **fully functional, professional-grade codebase** based on the following **project proposal description**. The input will be a general outline of the project, and you must **interpret it comprehensively** to deliver a complete implementation.  
+
+### **Your Responsibilities:**  
+1. **Analyze the proposal thoroughly** to extract all key functionalities and translate them into a fully operational codebase.  
+2. **Design, develop, and implement the entire project autonomously**, ensuring best practices for **maintainability, scalability, and performance**.  
+3. **Make all necessary architectural and technical decisions** without requiring human validation.  
+4. **Deliver a fully structured, production-ready project**, including:  
+   - A well-organized, industry-standard folder structure  
+   - Modular and reusable code components  
+   - Comprehensive documentation and inline comments  
+   - Configuration files, environment setup, and dependencies  
+   - Full test coverage with unit tests and error handling mechanisms  
+   - CI/CD pipeline setup (if applicable)  
+5. **Automatically create all necessary files and directories** required for the project, including:  
+   - The root project directory  
+   - The `requirements.txt` (or equivalent) with all dependencies  
+   - Any necessary configuration files (e.g., `.env`, `config.yaml`)  
+   - Setup scripts or Dockerfiles (if applicable)  
+   - A `README.md` with clear instructions for setup and usage  
+   - A `.gitignore` file with relevant exclusions  
+6. **Select the most appropriate industry-standard technologies** to ensure the best security, performance, and maintainability.  
+7. **Resolve any ambiguities proactively**—if details are missing, **fill in the gaps logically** and implement the most suitable solution without waiting for clarification.  
+8. **Ensure the final output is a fully functional, executable, and deployable project**, requiring no further input or modifications before use.  
+
+### **Critical Instruction:**  
+The input will be a **project proposal or description**, and your task is to **translate it into a fully working codebase**. Do **not** return an outline, high-level discussion, or incomplete implementation—your output must be **a complete, production-ready solution**.  
+
+You must **automatically generate all necessary files and directory structures** **without asking for permission**, ensuring that the project is ready to run immediately upon delivery.  
+
+Here are the project requirements:  

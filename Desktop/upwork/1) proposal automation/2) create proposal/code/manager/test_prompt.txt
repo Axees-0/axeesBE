@@ -1,0 +1,15 @@
+Hello Claude!
+
+This is a test to verify that prompts are being correctly delivered to tmux sessions.
+
+I need you to create a file called "abc" in the current directory.
+
+Please run this shell command:
+
+```bash
+touch abc
+```
+
+When asked if you want to execute this command, please answer YES.
+
+Thank you!

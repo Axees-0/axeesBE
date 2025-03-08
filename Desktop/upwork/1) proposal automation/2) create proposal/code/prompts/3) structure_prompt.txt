@@ -1,0 +1,23 @@
+I need you to set up the complete project structure and documentation based on the following project proposal description. The input will be a general outline of the project, and you must interpret it comprehensively to deliver a well-structured foundation for development.
+
+Your Responsibilities:
+Analyze the proposal thoroughly to extract all key functionalities and translate them into an organized project structure.
+Set up the entire project directory and file structure, following industry best practices for maintainability and scalability.
+Automatically create all necessary files and directories required for the project, including:
+The root project directory
+The README.md with clear instructions for setup, usage, and project overview
+The requirements.txt (or equivalent) listing all necessary dependencies
+Configuration files such as .env, config.yaml, or settings.json (as needed)
+A .gitignore file with relevant exclusions
+Any additional setup scripts, Dockerfiles, or CI/CD configuration files if applicable
+Ensure the README contains:
+A high-level overview of the project
+Instructions on how to set up the environment and install dependencies
+A brief description of the folder structure and key components
+Any necessary technical details, assumptions, or decisions
+Choose an appropriate and standardized folder structure, ensuring logical separation of components (e.g., src/, tests/, docs/, config/).
+Resolve any ambiguities proactively—if details are missing, fill in the gaps logically and structure the project in the most suitable way.
+Critical Instruction:
+The input will be a project proposal or description, and your task is to translate it into a structured project foundation. Do not return an outline or discussion—your output must be a ready-to-go directory structure with all necessary files in place. However, do not implement the actual code—focus only on setup, organization, and documentation.
+
+Here are the project requirements:

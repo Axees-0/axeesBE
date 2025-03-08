@@ -1,0 +1,75 @@
+**File: PROMPT_01_UI_DESIGN.txt**
+
+**Objective:**  
+Design a **fully functional, clean, and simple** front-end for a **desktop-only** web application using **HTML, CSS, and vanilla JavaScript**. The application must be **100% operational**, with all buttons, forms, menus, and interactions **working flawlessly**. Demo data should be preloaded to simulate real functionality. The focus is on **a well-structured, intuitive, and perfectly working interface**—not unnecessary complexity.  
+
+**Output File Naming Convention:**
+Your deliverable should use this naming convention for consistency across all components and be placed in a "/demo" folder:
+- Main HTML file: `/demo/PROJECT_UI_MAIN.html`
+- CSS stylesheet: `/demo/PROJECT_UI_STYLES.css`
+- JavaScript file: `/demo/PROJECT_UI_SCRIPT.js`
+- Any additional assets should follow the pattern: `/demo/PROJECT_UI_[PURPOSE].[ext]`
+
+---
+
+### **1. Layout & Design (Desktop-Only, Clean, and Simple)**  
+- **Fixed-width layout** (centered on the screen) optimized for **desktop resolutions** (no need for mobile responsiveness).  
+- **Minimalistic and modern UI**, with a clean structure and **intuitive content hierarchy**.  
+- **Simple color scheme and typography** for a **professional** and **easy-to-read** interface.  
+- **Smooth transitions and animations** where necessary, but **no excessive effects**.  
+- **Logical and structured layout**, ensuring clear visibility of all sections and functions.  
+
+---
+
+### **2. Fully Functional Features & Interactions**  
+
+#### **Navigation & Page Switching**  
+- A **fixed navigation bar** with clearly labeled sections.  
+- **JavaScript-powered page switching** (no full-page reloads).  
+
+#### **Buttons & Clickable Elements**  
+- **All buttons must work perfectly**, triggering the correct actions.  
+- **Clear hover, click, and active states** to provide user feedback.  
+
+#### **Forms & Inputs**  
+- Forms must be **fully interactive**, handling **real-time validation** and **error messages**.  
+- **Demo data auto-filled** for testing purposes.  
+- Forms should update the UI dynamically after submission (e.g., add/edit items in a list).  
+
+#### **Dynamic Data & Preloaded Demo Content**  
+- The UI should **load demo data automatically** for a realistic experience.  
+- **Interactive lists, tables, or dashboards** should reflect user actions dynamically.  
+- **Sorting, filtering, and searching** should work smoothly where applicable.  
+
+#### **Modals, Tooltips, and Popups**  
+- **Modals for forms, alerts, or confirmations** should work as expected.  
+- **Tooltips on hover** to provide additional information.  
+
+#### **Toggles, Dropdowns & UI Controls**  
+- **Checkboxes, switches, and dropdowns** should all be fully operational.  
+- **No broken elements—every interaction should respond correctly.**  
+
+---
+
+### **3. User Experience Enhancements**  
+- **Simple, clean, and no clutter**—every element must serve a purpose.  
+- **Logical user flow**—users should instantly understand how to navigate and use the app.  
+- **Fast and responsive performance**—the app should feel snappy without lag.  
+
+---
+
+### **4. Technical Requirements & Constraints**  
+- **Desktop-only** (no mobile responsiveness needed).  
+- **Vanilla HTML, CSS, and JavaScript only**—no frameworks or external dependencies.  
+- **All features and interactions must be functional—nothing should be non-working or placeholder.**  
+- **Simple folder structure** (easy to deploy and modify).  
+- **Optimized for quick loading and smooth interaction.**  
+
+---
+
+### **Final Deliverable:**  
+- A **fully operational, polished front-end application** with **zero broken elements**.  
+- **A clean, simple, and perfectly working UI** for a **desktop-only** experience.  
+- **Preloaded demo data** for a realistic feel, ensuring all interactions are testable.  
+
+**The #1 priority is that EVERYTHING WORKS FLAWLESSLY.** The design should be **simple yet professional**, without unnecessary complexity.

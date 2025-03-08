@@ -1,0 +1,26 @@
+2025-03-07 19:44:57,700 - test_instance - INFO - Using instance file: /Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/claude_instances.json
+2025-03-07 19:44:57,731 - test_instance - INFO - Found 6 potential Claude tmux sessions.
+2025-03-07 19:44:57,731 - test_instance - INFO - Instance 5f4db06a already exists in manager, skipping.
+2025-03-07 19:44:57,731 - test_instance - INFO - Instance 65201d8c already exists in manager, skipping.
+2025-03-07 19:44:57,731 - test_instance - INFO - Instance 88505e80 already exists in manager, skipping.
+2025-03-07 19:44:57,731 - test_instance - INFO - Instance 9fb4626c already exists in manager, skipping.
+2025-03-07 19:44:57,732 - test_instance - INFO - Instance adbda913 already exists in manager, skipping.
+2025-03-07 19:44:57,732 - test_instance - INFO - Instance d7b30e5c already exists in manager, skipping.
+2025-03-07 19:44:57,732 - test_instance - INFO - Using instance file: /Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/claude_instances.json
+2025-03-07 19:44:57,732 - test_instance - INFO - Prompt is direct text, creating temporary file...
+2025-03-07 19:44:57,734 - test_instance - INFO - Created temporary prompt file: /var/folders/g1/7y3w2j8s2qd7qmvkpd8byklw0000gp/T/tmpw0vki4e1.txt
+2025-03-07 19:44:57,734 - test_instance - INFO - Creating Claude instance with:
+2025-03-07 19:44:57,734 - test_instance - INFO -   • Project directory: /Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager
+2025-03-07 19:44:57,734 - test_instance - INFO -   • Prompt path: /var/folders/g1/7y3w2j8s2qd7qmvkpd8byklw0000gp/T/tmpw0vki4e1.txt
+2025-03-07 19:44:57,734 - test_instance - INFO -   • Runtime type: tmux
+2025-03-07 19:44:57,734 - ClaudeTaskManager - INFO - Starting Claude with tmux for instance 3b692d94
+2025-03-07 19:44:57,734 - ClaudeTaskManager - INFO - Launching Claude with tmux in project dir: /Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager, prompt: /var/folders/g1/7y3w2j8s2qd7qmvkpd8byklw0000gp/T/tmpw0vki4e1.txt
+2025-03-07 19:44:57,734 - ClaudeTaskManager - INFO - Creating tmux session: claude_3b692d94
+2025-03-07 19:44:57,774 - ClaudeTaskManager - INFO - Running claude in tmux session claude_3b692d94
+2025-03-07 19:44:59,738 - ClaudeTaskManager - INFO - Starting monitoring for tmux session claude_3b692d94 for instance 3b692d94
+2025-03-07 19:44:59,742 - test_instance - INFO - Successfully created instance with ID: 3b692d94
+2025-03-07 19:44:59,742 - test_instance - INFO - Note: Temporary prompt file /var/folders/g1/7y3w2j8s2qd7qmvkpd8byklw0000gp/T/tmpw0vki4e1.txt will not be deleted automatically
+Loaded 6 instance(s) from /Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/claude_instances.json
+Loaded 6 instance(s) from /Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/claude_instances.json
+Successfully created instance with ID: 3b692d94
+You can now view this instance in the Claude Task Manager dashboard
