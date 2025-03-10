@@ -791,9 +791,9 @@ DASHBOARD_TEMPLATE = '''
             transform: scale(1.2);
         }
         
-        /* Drag and drop styles */
-        .dropzone {
-            border: 2px dashed var(--border-color);
+        /* Input styles */
+        .input-container {
+            border: 2px solid var(--border-color);
             border-radius: 6px;
             padding: 20px;
             text-align: center;
@@ -802,13 +802,7 @@ DASHBOARD_TEMPLATE = '''
             transition: all 0.3s;
         }
         
-        .dropzone.dragover {
-            border-color: var(--accent-green);
-            background-color: rgba(46, 139, 87, 0.2);
-            transform: scale(1.01);
-        }
-        
-        .dropzone p {
+        .input-container p {
             margin: 0;
             color: var(--text-secondary);
         }
@@ -1418,8 +1412,8 @@ DASHBOARD_TEMPLATE = '''
                     
                     <div class="form-group">
                         <label class="form-label" for="project_dir">Project Directory or ID:</label>
-                        <div id="dir-dropzone" class="dropzone">
-                            <p>Drag & drop folder here or just enter project ID</p>
+                        <div id="dir-input" class="input-container">
+                            <p>Enter project ID or directory path</p>
                         </div>
                         <input type="text" id="project_dir" name="project_dir" class="form-control" required>
                         <p class="modal-note">For IDs, we'll search for matching projects in proposals and current projects folders</p>
@@ -1430,8 +1424,8 @@ DASHBOARD_TEMPLATE = '''
                         <div class="autocomplete-container" style="margin-bottom: 10px;">
                             <input type="text" id="add_prompt_file_path" class="form-control" placeholder="Type to search prompt files..." autocomplete="off">
                         </div>
-                        <div id="file-dropzone" class="dropzone">
-                            <p>Drag & drop prompt file here or enter prompt text directly</p>
+                        <div id="file-input" class="input-container">
+                            <p>Enter prompt file path or text directly</p>
                         </div>
                         <input type="text" id="prompt_path" name="prompt_path" class="form-control" required>
                         <p class="modal-note">If this isn't a valid file path, it will be treated as prompt text</p>
@@ -1494,8 +1488,8 @@ DASHBOARD_TEMPLATE = '''
                         <div class="autocomplete-container" style="margin-bottom: 10px;">
                             <input type="text" id="prompt_file_path" class="form-control" placeholder="Type to search prompt files..." autocomplete="off">
                         </div>
-                        <div id="prompt-file-dropzone" class="dropzone">
-                            <p>Drag & drop prompt file here or enter prompt text directly below</p>
+                        <div id="prompt-file-input" class="input-container">
+                            <p>Enter prompt text directly below</p>
                         </div>
                     </div>
                     
@@ -2142,223 +2136,15 @@ DASHBOARD_TEMPLATE = '''
             return cleaned;
         }
         
-        // Drag and drop functionality
+        // Input element setup
         document.addEventListener('DOMContentLoaded', function() {
-            const dirDropzone = document.getElementById('dir-dropzone');
-            const fileDropzone = document.getElementById('file-dropzone');
-            const promptFileDropzone = document.getElementById('prompt-file-dropzone');
             const dirInput = document.getElementById('project_dir');
             const fileInput = document.getElementById('prompt_path');
             const promptTextArea = document.getElementById('prompt_text');
             
-            // Directory dropzone
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                dirDropzone.addEventListener(eventName, preventDefaults, false);
-            });
-            
-            ['dragenter', 'dragover'].forEach(eventName => {
-                dirDropzone.addEventListener(eventName, () => {
-                    dirDropzone.classList.add('dragover');
-                }, false);
-            });
-            
-            ['dragleave', 'drop'].forEach(eventName => {
-                dirDropzone.addEventListener(eventName, () => {
-                    dirDropzone.classList.remove('dragover');
-                }, false);
-            });
-            
-            dirDropzone.addEventListener('drop', e => {
-                // We need to extract the file paths from the drop event
-                handleDroppedFiles(e, true, dirInput);
-            }, false);
-            
-            // File dropzone
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                fileDropzone.addEventListener(eventName, preventDefaults, false);
-            });
-            
-            ['dragenter', 'dragover'].forEach(eventName => {
-                fileDropzone.addEventListener(eventName, () => {
-                    fileDropzone.classList.add('dragover');
-                }, false);
-            });
-            
-            ['dragleave', 'drop'].forEach(eventName => {
-                fileDropzone.addEventListener(eventName, () => {
-                    fileDropzone.classList.remove('dragover');
-                }, false);
-            });
-            
-            fileDropzone.addEventListener('drop', e => {
-                // We need to extract the file paths from the drop event
-                handleDroppedFiles(e, false, fileInput);
-            }, false);
-            
-            // Prompt file dropzone in the send prompt modal
-            if (promptFileDropzone) {
-                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                    promptFileDropzone.addEventListener(eventName, preventDefaults, false);
-                });
-                
-                ['dragenter', 'dragover'].forEach(eventName => {
-                    promptFileDropzone.addEventListener(eventName, () => {
-                        promptFileDropzone.classList.add('dragover');
-                    }, false);
-                });
-                
-                ['dragleave', 'drop'].forEach(eventName => {
-                    promptFileDropzone.addEventListener(eventName, () => {
-                        promptFileDropzone.classList.remove('dragover');
-                    }, false);
-                });
-                
-                promptFileDropzone.addEventListener('drop', e => {
-                    // When a file is dropped, load its content into the prompt text area
-                    const dt = e.dataTransfer;
-                    const files = dt.files;
-                    
-                    if (files && files.length > 0) {
-                        const file = files[0];
-                        const reader = new FileReader();
-                        
-                        reader.onload = function(event) {
-                            // Set the prompt text to the file content
-                            promptTextArea.value = event.target.result;
-                            
-                            // Also set the file path for reference
-                            document.getElementById('prompt_file_path').value = file.name;
-                            
-                            showToast(`Loaded content from ${file.name}`);
-                        };
-                        
-                        reader.onerror = function(error) {
-                            console.error('Error reading file:', error);
-                            showToast('Error reading file', true);
-                        };
-                        
-                        reader.readAsText(file);
-                    }
-                }, false);
-            }
-            
             function preventDefaults(e) {
                 e.preventDefault();
                 e.stopPropagation();
-            }
-            
-            // Function to handle dropped files and extract paths
-            function handleDroppedFiles(e, isDirectory, inputElement) {
-                const dt = e.dataTransfer;
-                const files = dt.files;
-                
-                if (!files || files.length === 0) {
-                    return;
-                }
-                
-                try {
-                    // For directory drops, check if any entry is a directory
-                    if (isDirectory && dt.items && dt.items.length > 0) {
-                        for (let i = 0; i < dt.items.length; i++) {
-                            const item = dt.items[i];
-                            if (item.kind === 'file' && typeof item.webkitGetAsEntry === 'function') {
-                                const entry = item.webkitGetAsEntry();
-                                if (entry && entry.isDirectory) {
-                                    // This is a directory drop - we need to handle it differently
-                                    console.log("Directory detected:", entry.name);
-                                    
-                                    // For directories, check for getAs methods
-                                    if (typeof item.getAsFile === 'function') {
-                                        const file = item.getAsFile();
-                                        if (file) {
-                                            // Get the directory path - some browsers may support this
-                                            console.log("Directory file info:", file);
-                                            
-                                            const formData = new FormData();
-                                            formData.append('file', file);
-                                            formData.append('is_directory', '1');
-                                            formData.append('directory_name', entry.name);
-                                            
-                                            // Let the server try to locate this directory
-                                            fetch('/find_directory', {
-                                                method: 'POST',
-                                                body: formData
-                                            })
-                                            .then(response => response.json())
-                                            .then(data => {
-                                                if (data.path) {
-                                                    inputElement.value = parsePath(data.path);
-                                                } else {
-                                                    // Just use directory name as fallback
-                                                    inputElement.value = entry.name;
-                                                    console.log("Could not determine full directory path");
-                                                }
-                                            })
-                                            .catch(error => {
-                                                console.error('Error finding directory:', error);
-                                                inputElement.value = entry.name;
-                                            });
-                                            
-                                            return;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    
-                    // For regular files or as a fallback for directories
-                    const reader = new FileReader();
-                    
-                    reader.onload = function(event) {
-                        try {
-                            // Extract just the name for the UI
-                            const filename = files[0].name;
-                            
-                            // We need to send this file to the server to handle the path extraction
-                            // This is because browsers restrict access to real file paths
-                            const formData = new FormData();
-                            formData.append('file', files[0]);
-                            formData.append('is_directory', isDirectory ? '1' : '0');
-                            
-                            fetch('/upload_file', {
-                                method: 'POST',
-                                body: formData
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.path) {
-                                    inputElement.value = parsePath(data.path);
-                                } else {
-                                    // If server couldn't determine path, just use filename
-                                    inputElement.value = filename;
-                                    if (isDirectory) {
-                                        showToast('Please enter the full directory path. We could only extract the folder name.', true);
-                                    }
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error uploading file:', error);
-                                // If upload fails, just use filename
-                                inputElement.value = filename;
-                            });
-                        } catch (error) {
-                            console.error('Error in reader.onload:', error);
-                            inputElement.value = files[0].name;
-                        }
-                    };
-                    
-                    reader.onerror = function(error) {
-                        console.error('Error reading file:', error);
-                        inputElement.value = files[0].name;
-                    };
-                    
-                    // Start reading the file
-                    reader.readAsDataURL(files[0]);
-                } catch (error) {
-                    console.error('Error setting up file reader:', error);
-                    inputElement.value = files[0].name;
-                }
             }
             
             // Handle form submission
