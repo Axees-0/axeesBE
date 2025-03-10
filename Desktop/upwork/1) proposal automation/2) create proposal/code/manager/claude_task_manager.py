@@ -20,27 +20,43 @@ class ClaudeInstance:
     project_dir: str
     prompt_path: str
     start_time: float
-    status: str = "running"  # running, stopped, completed
+    status: str = "initializing"  # initializing, running, stopped, completed, standby
     yes_count: int = 0
     last_yes_time: Optional[float] = None
     terminal_id: Optional[str] = None
     tmux_session_name: Optional[str] = None  # Name of tmux session for direct method
     use_tmux: bool = True  # Whether to use tmux-based approach or terminal-based approach
     open_terminal: bool = False  # Whether to automatically open a terminal window
+    detailed_status: str = "ready"  # ready or running (actively generating)
+    active_since: Optional[float] = None  # When the current active generation started
+    ready_since: Optional[float] = None  # When the instance last entered ready state
+    generation_time: str = "0s"  # String representation of current generation time
+    tmux_content: Optional[str] = None  # Content captured from tmux session for display in dashboard
 
 
 class ClaudeTaskManager:
     def __init__(self, save_file="claude_instances.json"):
         # Set up debug logging first so it's available throughout initialization
         import logging
+        
+        # Create a formatter that includes microseconds for more precise debugging
+        formatter = logging.Formatter('%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s', 
+                                     datefmt='%Y-%m-%d %H:%M:%S')
+        
+        # Create file handler
+        file_handler = logging.FileHandler('claude_manager.log')
+        file_handler.setFormatter(formatter)
+        
+        # Create console handler
+        console_handler = logging.StreamHandler()
+        console_handler.setFormatter(formatter)
+        
+        # Configure the root logger
         logging.basicConfig(
             level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.StreamHandler(),
-                logging.FileHandler('claude_manager.log')
-            ]
+            handlers=[console_handler, file_handler]
         )
+        
         self.logger = logging.getLogger('ClaudeTaskManager')
         
         # Initialize other attributes
@@ -93,7 +109,8 @@ class ClaudeTaskManager:
                     # Make sure the tmux_session_name is set correctly
                     instance.tmux_session_name = canonical_session_name
                     
-                    if instance.status != "running":
+                    # Only update status to running if not in standby or completed state
+                    if instance.status != "running" and instance.status != "standby" and instance.status != "completed":
                         self.logger.info(f"Correcting loaded instance {instance_id} status from '{instance.status}' to 'running'")
                         instance.status = "running"
                         self.save_instances()
@@ -191,17 +208,29 @@ class ClaudeTaskManager:
     def save_instances(self):
         """Save instances to file."""
         try:
+            # Create a copy of instances for more reliable saving
+            instances_to_save = []
+            for instance in self.instances.values():
+                # Convert to dict with proper handling of None values
+                instance_dict = asdict(instance)
+                instances_to_save.append(instance_dict)
+            
             with open(self.save_file, 'w') as f:
-                json.dump([asdict(instance) for instance in self.instances.values()], f, indent=2)
+                json.dump(instances_to_save, f, indent=2)
+            
+            # Log successful save
+            self.logger.info(f"Saved {len(instances_to_save)} instances to {self.save_file}")
+            
         except Exception as e:
-            print(f"Error saving instances: {e}")
+            self.logger.error(f"Error saving instances: {e}")
 
-    def start_instance(self, project_dir, prompt_path, use_tmux=True, open_terminal=False):
-        """Start a new Claude instance.
+    def start_instance(self, project_dir, prompt_path=None, prompt_text=None, use_tmux=True, open_terminal=False):
+        """Start a new Claude instance or reuse an existing one in the same directory.
         
         Args:
             project_dir (str): Path to the project directory
-            prompt_path (str): Path to the prompt file
+            prompt_path (str, optional): Path to the prompt file. Either prompt_path or prompt_text must be provided.
+            prompt_text (str, optional): Direct prompt text to send. Either prompt_path or prompt_text must be provided.
             use_tmux (bool, optional): Whether to use tmux-based approach. Defaults to True.
                 If True, uses claude_monitor_direct (tmux)
                 If False, uses claude_monitor (Terminal.app)
@@ -210,18 +239,102 @@ class ClaudeTaskManager:
                 If True, a terminal window will be opened for the user to view the session.
         
         Returns:
-            str: ID of the created instance
+            str: ID of the created or reused instance
         """
-        # Generate a unique ID for this instance
+        # Normalize the project directory path to handle any trailing slashes or case differences
+        project_dir = os.path.normpath(project_dir)
+        
+        # Handle direct prompt text by writing to a temporary file if needed
+        if prompt_text and not prompt_path:
+            self.logger.info(f"Direct prompt text provided, writing to temporary file")
+            # Create a temporary file for the prompt text
+            fd, temp_path = tempfile.mkstemp(suffix='.txt', prefix='claude_prompt_')
+            try:
+                with os.fdopen(fd, 'w') as f:
+                    f.write(prompt_text)
+                prompt_path = temp_path
+                self.logger.info(f"Wrote prompt text to temporary file: {prompt_path}")
+            except Exception as e:
+                self.logger.error(f"Error writing prompt text to file: {e}")
+                return None
+        
+        # Ensure we have a prompt path
+        if not prompt_path:
+            self.logger.error("No prompt path or text provided")
+            return None
+        
+        # ALWAYS create a new instance if project directory is provided (don't reuse)
+        if project_dir and os.path.exists(project_dir):
+            self.logger.info(f"Project directory provided and valid: {project_dir}, creating new instance")
+            # Don't try to reuse instances - always create a new one with the provided directory
+            # Code will continue to the "new instance" section below
+        else:
+            # Only try to reuse an instance if no valid project directory was provided
+            self.logger.info(f"No valid project directory provided, checking for existing instances")
+            
+            # Check if there's an existing instance in the same directory
+            existing_instance_id = None
+            for instance_id, instance in self.instances.items():
+                # Normalize the instance directory for comparison
+                instance_project_dir = os.path.normpath(instance.project_dir)
+                
+                if (instance_project_dir == project_dir and 
+                    (instance.status == "running" or instance.status == "standby")):
+                    self.logger.info(f"Found existing instance {instance_id} in the same directory")
+                    existing_instance_id = instance_id
+                    break
+            
+            if existing_instance_id:
+                # Reuse the existing instance
+                instance = self.instances[existing_instance_id]
+                self.logger.info(f"Reusing existing instance {existing_instance_id} in directory: {project_dir}")
+                
+                # If this is direct prompt text, store it in the prompt_path field
+                if prompt_text:
+                    # Store the first 200 characters for reference
+                    preview = prompt_text[:200] + ("..." if len(prompt_text) > 200 else "")
+                    instance.prompt_path = preview
+                    self.logger.info(f"Updated instance prompt with direct text (preview): {preview[:50]}...")
+                else:
+                    # Update the prompt path
+                    instance.prompt_path = prompt_path
+                    self.logger.info(f"Updated instance prompt path to: {prompt_path}")
+                
+                # Send the prompt to the existing instance
+                if instance.use_tmux:
+                    # Use tmux to send the prompt
+                    thread = threading.Thread(
+                        target=self._send_prompt_to_existing_tmux,
+                        args=(instance, prompt_path),
+                        daemon=True
+                    )
+                    thread.start()
+                else:
+                    # Use Terminal.app to send the prompt
+                    self._send_prompt_to_existing_terminal(instance, prompt_path)
+                
+                # Save instances
+                self.save_instances()
+                
+                return existing_instance_id
+        
+        # No existing instance found, create a new one
         instance_id = str(uuid.uuid4())[:8]
+        
+        # For direct prompt text, store a preview in the prompt_path field
+        prompt_display = prompt_path
+        if prompt_text:
+            # Store the first 200 characters for reference
+            prompt_display = prompt_text[:200] + ("..." if len(prompt_text) > 200 else "")
+            self.logger.info(f"Setting instance prompt to direct text preview: {prompt_display[:50]}...")
         
         # Create the instance object
         instance = ClaudeInstance(
             id=instance_id,
             project_dir=project_dir,
-            prompt_path=prompt_path,
+            prompt_path=prompt_display,
             start_time=time.time(),
-            status="running",  # Explicitly set status to running
+            status="initializing",  # Explicitly set status to initializing
             use_tmux=use_tmux,
             open_terminal=open_terminal
         )
@@ -262,9 +375,11 @@ class ClaudeTaskManager:
             # Start monitoring thread
             self._start_monitor_thread(instance_id)
         
-        # Final status check to ensure still running
-        if instance.status != "running":
-            self.logger.info(f"Correcting instance {instance_id} status from '{instance.status}' to 'running' before returning")
+        # If instance has been in initializing state for too long, change to running before returning
+        # (don't change status if already in another state like standby, completed, or already running)
+        current_time = time.time()
+        if instance.status == "initializing" and current_time - instance.start_time > 20:
+            self.logger.info(f"Instance {instance_id} has been initializing for over 20 seconds, changing to 'running' state")
             instance.status = "running"
         
         # Save instances
@@ -361,10 +476,18 @@ class ClaudeTaskManager:
                         self.logger.info(f"Sending chunk {i//chunk_size + 1} of {(len(prompt_content) + chunk_size - 1)//chunk_size} to tmux session {instance.tmux_session_name}")
                         
                         # Send the chunk as literal text to the tmux session
-                        subprocess.run([
-                            "tmux", "send-keys", "-l", "-t", instance.tmux_session_name, 
-                            chunk
-                        ], check=True)
+                        # Handle the case where text starts with a dash that might be interpreted as a flag
+                        if chunk.startswith('-'):
+                            # Add -- to indicate end of options
+                            subprocess.run([
+                                "tmux", "send-keys", "-l", "-t", instance.tmux_session_name, "--",
+                                chunk
+                            ], check=True)
+                        else:
+                            subprocess.run([
+                                "tmux", "send-keys", "-l", "-t", instance.tmux_session_name, 
+                                chunk
+                            ], check=True)
                         
                         # Brief pause between chunks
                         time.sleep(0.2)
@@ -372,8 +495,11 @@ class ClaudeTaskManager:
                     self.logger.info(f"Successfully sent complete prompt to tmux session {instance.tmux_session_name}")
                     
                     # Ensure status is set to running after successful prompt delivery
-                    instance.status = "running"
-                    self.save_instances()
+                    # (Only if not already in standby or completed state)
+                    if instance.status != "standby" and instance.status != "completed":
+                        instance.status = "running"
+                        self.logger.info(f"Changing instance {instance.id} status from 'initializing' to 'running' after prompt delivery")
+                        self.save_instances()
                 except Exception as e:
                     self.logger.error(f"Failed to send prompt via tmux send-keys: {e}")
                     instance.status = "error"
@@ -421,9 +547,10 @@ class ClaudeTaskManager:
                 ], check=True, capture_output=True)
                 self.logger.info(f"Sent second Enter to ensure prompt submission in session {instance.tmux_session_name}")
                 
-                # Ensure status is set to running
-                instance.status = "running"
-                self.save_instances()
+                # Ensure status is set to running (only if not in standby or completed)
+                if instance.status != "standby" and instance.status != "completed":
+                    instance.status = "running"
+                    self.save_instances()
                 
             except Exception as e:
                 self.logger.error(f"Error sending prompt content: {e}")
@@ -441,10 +568,11 @@ class ClaudeTaskManager:
             else:
                 self.logger.info(f"Not opening terminal window (open_terminal=False)")
             
-            # Final status update to ensure it's running
-            instance.status = "running"
-            self.save_instances()
-            self.logger.info(f"Successfully launched Claude in tmux session {instance.tmux_session_name}, status set to running")
+            # Final status update to ensure it's running (if not in standby or completed)
+            if instance.status != "standby" and instance.status != "completed":
+                instance.status = "running"
+                self.save_instances()
+                self.logger.info(f"Successfully launched Claude in tmux session {instance.tmux_session_name}, status changed from 'initializing' to 'running'")
             
             return True
         
@@ -543,17 +671,17 @@ class ClaudeTaskManager:
             self.logger.info(f"Starting monitoring for terminal {instance.terminal_id} for instance {instance_id}")
             self.logger.info(f"Instance {instance_id} status at start of monitoring: {instance.status}")
         
-        # Ensure status is running at the start of monitoring
-        if instance.status != "running":
+        # Ensure status is running at the start of monitoring if not in standby or completed state
+        if instance.status != "running" and instance.status != "standby" and instance.status != "completed":
             self.logger.info(f"Correcting instance {instance_id} status from '{instance.status}' to 'running' at start of monitoring")
             instance.status = "running"
             self.save_instances()
             
         # Log monitoring parameters for debugging
         self.logger.info(f"Monitoring parameters: check_interval={check_interval}s, max_runtime={max_runtime}s")
-        self.logger.info(f"Will monitor for up to {max_monitor_minutes} minutes or until status changes from 'running'")
+        self.logger.info(f"Will monitor for up to {max_monitor_minutes} minutes or until status changes from 'running' or 'standby'")
         
-        while instance.status == "running":
+        while instance.status == "running" or instance.status == "standby":
             # Check if we've exceeded max runtime
             if time.time() - start_time > max_runtime:
                 self.logger.info(f"Instance {instance_id}: Reached maximum monitoring time of 3 hours")
@@ -581,12 +709,57 @@ class ClaudeTaskManager:
                 if content:
                     preview = content[:150] + "..." if len(content) > 150 else content
                     self.logger.info(f"Checking content for instance {instance_id} (preview): {preview}")
+                '''
+                # Check for completion keywords first
+                completion_keywords = ["complete", "key improvements", "success", "successfully", "summary", "summarize" 
+                                     "key takeaways", "in conclusion", "final result", "completion"]
+                
+                # Check for standby keywords
+                standby_keywords = ["created", "implemented"]
+                
+                # Convert content to lowercase for case-insensitive matching
+                content_lower = content.lower()
+                
+                # Check for completion patterns in the content
+                if any(keyword.lower() in content_lower for keyword in completion_keywords):
+                    self.logger.info(f"Instance {instance_id}: Detected completion keyword, setting status to standby")
+                    instance.status = "standby"
+                    self.save_instances()
                     
+                # Check for standby keywords in the content
+                elif any(keyword in content for keyword in standby_keywords):
+                    self.logger.info(f"Instance {instance_id}: Detected standby keyword, setting status to standby")
+                    instance.status = "standby"
+                    self.save_instances()
+                '''
                 # Check for prompts and respond to them
                 if content:
+
+                    # Then check for the standard prompts
+                    if "Yes, and don't ask again for" in content:
+                        self.logger.info(f"Instance {instance_id}: Found 'Yes, and don't ask again for' prompt")
+                        
+                        if instance.use_tmux:
+                            # Select the second option (down arrow + enter)
+                            subprocess.run([
+                                "tmux", "send-keys", "-t", instance.tmux_session_name, 
+                                "Down"
+                            ], check=True)
+                            subprocess.run([
+                                "tmux", "send-keys", "-t", instance.tmux_session_name, 
+                                "Enter"
+                            ], check=True)
+                        else:
+                            # Use the terminal approach
+                            claude_monitor.highlight_terminal(terminal_id=instance.terminal_id)
+                            subprocess.run(["osascript", "-e", 'tell application "System Events" to key code 125'])
+                            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
+                        
+                        responded = True
+
                     # First check for special arrow-based UI prompts - these need direct handling
-                    if "Yes" in content:
-                        self.logger.info(f"Instance {instance_id}: Found arrow-based selection menu with '❯ Yes' option")
+                    elif "Yes" in content or "❯ Yes" in content:
+                        self.logger.info(f"Instance {instance_id}: Found arrow-based selection menu with Yes option")
                         
                         if instance.use_tmux:
                             # For the arrow key menu, we need to be more aggressive
@@ -606,7 +779,7 @@ class ClaudeTaskManager:
                             updated_content = result.stdout
                             
                             # If the menu is still there, try a different approach
-                            if "❯ Yes" in updated_content:
+                            if "Yes" in updated_content or "❯ Yes" in updated_content:
                                 self.logger.info(f"Menu still detected, sending C-m instead (attempt 2)")
                                 subprocess.run([
                                     "tmux", "send-keys", "-t", instance.tmux_session_name, 
@@ -621,7 +794,7 @@ class ClaudeTaskManager:
                                 )
                                 updated_content = result.stdout
                                 
-                                if "❯ Yes" in updated_content:
+                                if "❯ Yes" in updated_content or "Yes" in updated_content:
                                     self.logger.info(f"Menu still detected, trying space key (attempt 3)")
                                     subprocess.run([
                                         "tmux", "send-keys", "-t", instance.tmux_session_name, 
@@ -632,32 +805,7 @@ class ClaudeTaskManager:
                             claude_monitor.highlight_terminal(terminal_id=instance.terminal_id)
                             subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
                         
-                        # Update metrics 
-                        instance.yes_count += 1
-                        instance.last_yes_time = time.time()
-                        self.save_instances()
-                        responded = True
-                    
-                    # Then check for the standard prompts
-                    elif "Yes, and don't ask again for" in content:
-                        self.logger.info(f"Instance {instance_id}: Found 'Yes, and don't ask again for' prompt")
-                        
-                        if instance.use_tmux:
-                            # Select the second option (down arrow + enter)
-                            subprocess.run([
-                                "tmux", "send-keys", "-t", instance.tmux_session_name, 
-                                "Down"
-                            ], check=True)
-                            subprocess.run([
-                                "tmux", "send-keys", "-t", instance.tmux_session_name, 
-                                "Enter"
-                            ], check=True)
-                        else:
-                            # Use the terminal approach
-                            claude_monitor.highlight_terminal(terminal_id=instance.terminal_id)
-                            subprocess.run(["osascript", "-e", 'tell application "System Events" to key code 125'])
-                            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
-                        
+                        # We no longer increment yes_count here - it's now handled only in the final block
                         responded = True
                         
                     # Enhanced detection for all variations of shell command execution prompts
@@ -698,10 +846,7 @@ class ClaudeTaskManager:
                     ]):
                         self.logger.info(f"Instance {instance_id}: Found shell command execution prompt")
                         
-                        # Update yes count metrics
-                        instance.yes_count += 1
-                        instance.last_yes_time = time.time()
-                        self.save_instances()
+                        # We no longer increment yes_count here - it's now handled only in the final block
                         
                         if instance.use_tmux:
                             # Using the exact approach from claude_monitor_direct.py which is proven to work
@@ -876,6 +1021,7 @@ class ClaudeTaskManager:
                             claude_monitor.highlight_terminal(terminal_id=instance.terminal_id)
                             subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
                         
+                        # We no longer increment yes_count here - it's now handled only in the final block
                         responded = True
                         
                     elif "Do you trust the files in this folder?" in content:
@@ -892,14 +1038,29 @@ class ClaudeTaskManager:
                             claude_monitor.highlight_terminal(terminal_id=instance.terminal_id)
                             subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
                         
+                        # Trust prompts should not increment the yes_count as they're not user interactions
+                        # but we still set responded=True to log the response
                         responded = True
+                        self.logger.info(f"Responded to trust prompt for instance {instance_id} (not counting in yes_count)")
                         
-                    # Update counter if we responded to something
+                    # For any prompt we responded to, ALWAYS increment the yes count
+                    # This is a complete rewrite of the counting logic to fix the issue
                     if responded:
-                        instance.yes_count += 1
-                        instance.last_yes_time = time.time()
-                        self.save_instances()
-                        self.logger.info(f"Successfully responded to prompt. Yes count: {instance.yes_count}")
+                        # Special case: Don't count trust prompts
+                        if "Do you trust the files in this folder?" in content:
+                            self.logger.info(f"Not incrementing yes_count for trust prompt for instance {instance_id}")
+                        else:
+                            # For ALL other responses, increment yes_count
+                            # Remove all specific counter incrementing in the individual handlers
+                            old_count = instance.yes_count
+                            instance.yes_count += 1
+                            instance.last_yes_time = time.time()
+                            self.logger.info(f"⭐ YES COUNT: Incremented from {old_count} to {instance.yes_count} for instance {instance_id}")
+                            
+                            # Save after EVERY increment to ensure it's persisted
+                            self.save_instances()
+                        
+                        self.logger.info(f"Successfully responded to prompt. Current yes count: {instance.yes_count}")
             except Exception as e:
                 self.logger.error(f"Error during monitoring: {e}")
             
@@ -912,7 +1073,7 @@ class ClaudeTaskManager:
             
             # Update instance in case it was modified externally
             instance = self.instances.get(instance_id)
-            if not instance or instance.status != "running":
+            if not instance or (instance.status != "running" and instance.status != "standby"):
                 break
 
     def stop_instance(self, instance_id):
@@ -1041,6 +1202,40 @@ class ClaudeTaskManager:
         self.save_instances()
         return success
 
+    def delete_instance(self, instance_id):
+        """Delete an instance from the manager.
+        
+        Args:
+            instance_id (str): ID of the instance to delete
+            
+        Returns:
+            bool: True if instance was deleted, False otherwise
+        """
+        # Check if the instance exists
+        if instance_id not in self.instances:
+            self.logger.error(f"Instance {instance_id} not found for deletion")
+            return False
+            
+        # Get the instance
+        instance = self.instances.get(instance_id)
+        
+        # If instance is running, stop it first
+        if instance.status == "running":
+            self.logger.info(f"Stopping running instance {instance_id} before deletion")
+            self.stop_instance(instance_id)
+        
+        # Remove the instance from the manager
+        try:
+            del self.instances[instance_id]
+            self.logger.info(f"Successfully deleted instance {instance_id} from manager")
+            
+            # Save changes
+            self.save_instances()
+            return True
+        except Exception as e:
+            self.logger.error(f"Error deleting instance {instance_id}: {e}")
+            return False
+    
     def list_instances(self):
         """List all instances and their status, ensuring consistency with tmux ls."""
         instances_list = []
@@ -1087,18 +1282,40 @@ class ClaudeTaskManager:
                 tmux_status = "Active" if session_active else "Inactive"
                 
                 # Ensure instance status reflects the tmux session status
-                if session_active and instance.status != "running":
+                # Only update to running if it's not in standby or completed state
+                if session_active and instance.status != "running" and instance.status != "standby" and instance.status != "completed":
                     instance.status = "running"
                     self.logger.info(f"Updating instance {instance_id} status to running based on active tmux session")
                 elif not session_active and instance.status == "running":
                     instance.status = "stopped" 
                     self.logger.info(f"Updating instance {instance_id} status to stopped due to inactive tmux session")
             
+            # For prompt display, always read the actual content if it's a file path
+            # and show the first 100 characters regardless of whether it's a file or direct text
+            prompt_display = ""
+            if os.path.exists(instance.prompt_path) and os.path.isfile(instance.prompt_path):
+                # This is a file path, read the actual content
+                try:
+                    with open(instance.prompt_path, 'r') as f:
+                        content = f.read()
+                        prompt_display = content[:100] + ("..." if len(content) > 100 else "")
+                        self.logger.debug(f"Read prompt file for instance {instance_id}, showing first 100 chars")
+                except Exception as e:
+                    # If we can't read the file for any reason, fall back to showing the path
+                    prompt_display = f"File: {instance.prompt_path}"
+                    self.logger.warning(f"Could not read prompt file for instance {instance_id}: {e}")
+            elif not os.path.exists(instance.prompt_path):
+                # Not a file path, probably direct text - show first 100 chars
+                prompt_display = instance.prompt_path[:100] + ("..." if len(instance.prompt_path) > 100 else "")
+            else:
+                # Fallback, just show the path
+                prompt_display = instance.prompt_path
+            
             instances_list.append({
                 "id": instance_id,
                 "status": instance.status,
                 "project_dir": instance.project_dir,
-                "prompt_path": instance.prompt_path,
+                "prompt_path": prompt_display,
                 "uptime": uptime_str,
                 "yes_count": instance.yes_count,
                 "last_yes": last_yes_ago,
@@ -1229,6 +1446,144 @@ class ClaudeTaskManager:
             hours = int(seconds / 3600)
             minutes = int((seconds % 3600) / 60)
             return f"{hours}h {minutes}m"
+            
+    def _send_prompt_to_existing_tmux(self, instance, prompt_path):
+        """Send a prompt to an existing tmux session."""
+        self.logger.info(f"Sending prompt to existing tmux session {instance.tmux_session_name}")
+        
+        # Check if prompt file exists
+        if not os.path.exists(prompt_path):
+            self.logger.error(f"ERROR: Prompt file not found at: {prompt_path}")
+            return False
+            
+        # Check if tmux session exists
+        if not self.is_tmux_session_active(instance.tmux_session_name):
+            self.logger.error(f"ERROR: tmux session {instance.tmux_session_name} not found")
+            return False
+            
+        # First, send Ctrl+C to interrupt any ongoing operation
+        try:
+            subprocess.run([
+                "tmux", "send-keys", "-t", instance.tmux_session_name, 
+                "C-c"
+            ], check=False)
+            time.sleep(0.5)
+            
+            # Read the prompt content
+            with open(prompt_path, 'r') as f:
+                prompt_content = f.read()
+            
+            if not prompt_content.strip():
+                self.logger.error(f"ERROR: Prompt file is empty: {prompt_path}")
+                return False
+                
+            # Log the prompt size to debug
+            self.logger.info(f"Read prompt file. Size: {len(prompt_content)} bytes")
+            self.logger.info(f"Prompt preview: {prompt_content[:100]}...")
+            
+            # Since we're reusing an existing instance, we just need to prepare
+            # the session to receive a new prompt - no need to restart Claude
+            # Just send Enter to ensure we're at a prompt
+            self.logger.info("Reusing existing Claude session, sending prompt directly")
+            subprocess.run([
+                "tmux", "send-keys", "-t", instance.tmux_session_name, 
+                "Enter"
+            ], check=True)
+            time.sleep(1)
+            
+            # Send the prompt content in manageable chunks
+            chunk_size = 500  # Send in 500 character chunks
+            self.logger.info(f"Beginning to send prompt in chunks (total length: {len(prompt_content)})")
+            
+            for i in range(0, len(prompt_content), chunk_size):
+                chunk = prompt_content[i:i+chunk_size]
+                self.logger.info(f"Sending chunk {i//chunk_size + 1} of {(len(prompt_content) + chunk_size - 1)//chunk_size} to tmux session {instance.tmux_session_name}")
+                
+                # Send the chunk as literal text to the tmux session
+                # Handle the case where text starts with a dash that might be interpreted as a flag
+                if chunk.startswith('-'):
+                    # Add -- to indicate end of options
+                    subprocess.run([
+                        "tmux", "send-keys", "-l", "-t", instance.tmux_session_name, "--",
+                        chunk
+                    ], check=True)
+                else:
+                    subprocess.run([
+                        "tmux", "send-keys", "-l", "-t", instance.tmux_session_name, 
+                        chunk
+                    ], check=True)
+                
+                # Brief pause between chunks
+                time.sleep(0.2)
+            
+            self.logger.info(f"Successfully sent complete prompt to tmux session {instance.tmux_session_name}")
+            
+            # Wait before submitting prompt
+            time.sleep(2)
+            
+            # Send Enter to submit the prompt
+            self.logger.info(f"Sending Enter key to submit prompt in session {instance.tmux_session_name}...")
+            subprocess.run([
+                "tmux", "send-keys", "-t", instance.tmux_session_name, 
+                "Enter"
+            ], check=True)
+            
+            # Send second Enter for good measure
+            time.sleep(1)
+            subprocess.run([
+                "tmux", "send-keys", "-t", instance.tmux_session_name, 
+                "Enter"
+            ], check=True)
+            
+            # Update instance status to running
+            instance.status = "running"
+            self.save_instances()
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Error sending prompt to existing tmux session: {e}")
+            return False
+    
+    def _send_prompt_to_existing_terminal(self, instance, prompt_path):
+        """Send a prompt to an existing Terminal.app window."""
+        self.logger.info(f"Sending prompt to existing terminal session with ID: {instance.terminal_id}")
+        
+        # Check if prompt file exists
+        if not os.path.exists(prompt_path):
+            self.logger.error(f"ERROR: Prompt file not found at: {prompt_path}")
+            return False
+            
+        try:
+            # First, try to interrupt the current operation
+            claude_monitor.highlight_terminal(terminal_id=instance.terminal_id)
+            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke "c" using control down'])
+            time.sleep(0.5)
+            
+            # Start a new Claude instance
+            claude_monitor.highlight_terminal(terminal_id=instance.terminal_id)
+            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke "claude"'])
+            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
+            
+            # Wait for Claude to initialize
+            time.sleep(5)
+            
+            # Handle the trust prompt
+            claude_monitor.monitor_trust_prompt(terminal_id=instance.terminal_id)
+            
+            # Send the prompt content
+            self.logger.info(f"Sending prompt content from: {prompt_path}")
+            claude_monitor.send_clipboard_content(prompt_path, terminal_id=instance.terminal_id)
+            
+            # Update instance status to running
+            instance.status = "running"
+            self.save_instances()
+            
+            return True
+            
+        except Exception as e:
+            self.logger.error(f"Error sending prompt to existing terminal: {e}")
+            return False
 
 
 def main():

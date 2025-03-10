@@ -194,10 +194,18 @@ def create_claude_instance(prompt, project_dir=None, use_tmux=True, save_prompt=
                     logger.info(f"Sending chunk {i//chunk_size + 1} of {(len(prompt_content) + chunk_size - 1)//chunk_size}")
                     
                     # Send the chunk as literal text to the tmux session
-                    subprocess.run([
-                        "tmux", "send-keys", "-l", "-t", tmux_session_name, 
-                        chunk
-                    ], check=True)
+                    # Handle the case where the text starts with a dash that might be interpreted as a flag
+                    if chunk.startswith('-'):
+                        # Add -- to indicate end of options
+                        subprocess.run([
+                            "tmux", "send-keys", "-l", "-t", tmux_session_name, "--",
+                            chunk
+                        ], check=True)
+                    else:
+                        subprocess.run([
+                            "tmux", "send-keys", "-l", "-t", tmux_session_name, 
+                            chunk
+                        ], check=True)
                     
                     # Brief pause between chunks
                     time.sleep(0.2)

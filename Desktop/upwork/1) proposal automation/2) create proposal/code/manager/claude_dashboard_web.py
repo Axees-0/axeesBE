@@ -6,7 +6,7 @@ import json
 import re
 from datetime import datetime
 import threading
-from flask import Flask, render_template_string, redirect, url_for, request, jsonify
+from flask import Flask, render_template_string, redirect, url_for, request, jsonify, send_file
 from claude_task_manager import ClaudeTaskManager
 
 # Initialize task manager with absolute path to ensure consistency with test_instance.py
@@ -16,8 +16,9 @@ save_file = os.path.join(manager_dir, "claude_instances.json")
 print(f"Web dashboard using instance file: {save_file}")
 manager = ClaudeTaskManager(save_file=save_file)
 
-# Create Flask app
-app = Flask(__name__)
+# Create Flask app with static folder
+static_folder = os.path.join(manager_dir, "static")
+app = Flask(__name__, static_folder=static_folder, static_url_path='/static')
 
 # HTML template for dashboard
 DASHBOARD_TEMPLATE = '''
@@ -62,12 +63,16 @@ DASHBOARD_TEMPLATE = '''
             color: var(--text-primary);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            width: 100vw;
+            overflow-x: hidden;
         }
         
         .container {
-            max-width: 1400px;
+            width: calc(100vw - 40px);
+            max-width: calc(100vw - 40px);
             margin: 0 auto;
             padding: 20px;
+            overflow-x: auto;
         }
         
         h1 {
@@ -90,26 +95,29 @@ DASHBOARD_TEMPLATE = '''
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
+            margin-bottom: 2.5rem;  /* Increased from 1.5rem */
+            padding-bottom: 1.5rem;  /* Increased from 1rem */
             border-bottom: 1px solid var(--border-color);
         }
         
         .app-logo {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 1.5rem;  /* Increased from 0.75rem */
         }
         
         .app-logo svg {
             color: var(--accent-blue);
-            height: 2rem;
-            width: 2rem;
+            height: 4rem;  /* Doubled from 2rem to 4rem */
+            width: 4rem;   /* Doubled from 2rem to 4rem */
         }
         
         .app-logo h1 {
             margin: 0;
             text-align: left;
+            font-size: 2.5rem;  /* Increased from default */
+            letter-spacing: -0.5px;
+            font-weight: 800;
         }
         
         .header-actions {
@@ -125,6 +133,52 @@ DASHBOARD_TEMPLATE = '''
             box-shadow: var(--card-shadow);
         }
         
+        table {
+            background-color: var(--bg-darker);
+            border-radius: 0.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+        
+        /* Tab styles for Settings */
+        .tabs {
+            display: flex;
+            margin-bottom: 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            background-color: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .tab:hover {
+            color: var(--text-primary);
+            background-color: rgba(75, 85, 99, 0.1);
+        }
+        
+        .tab.active {
+            color: var(--accent-blue);
+            border-bottom: 2px solid var(--accent-blue);
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 1.5rem;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
         .quick-add {
             display: grid;
             grid-template-columns: 1fr 1fr auto auto;
@@ -134,6 +188,7 @@ DASHBOARD_TEMPLATE = '''
         
         .input-group {
             position: relative;
+            margin-bottom: 1rem;
         }
         
         .input-group label {
@@ -144,6 +199,7 @@ DASHBOARD_TEMPLATE = '''
             padding: 0 0.25rem;
             font-size: 0.75rem;
             color: var(--text-secondary);
+            z-index: 10;
         }
         
         .input-field {
@@ -155,6 +211,70 @@ DASHBOARD_TEMPLATE = '''
             border-radius: 0.375rem;
             font-family: inherit;
             font-size: 0.875rem;
+        }
+        
+        .prompt-selector {
+            position: relative;
+            width: 100%;
+        }
+        
+        .prompt-dropdown {
+            position: absolute;
+            right: 0;
+            top: 0;
+            height: 100%;
+            padding: 0.75rem 1rem;
+            background-color: var(--accent-blue);
+            color: white;
+            border: 1px solid var(--accent-blue);
+            border-top-right-radius: 0.375rem;
+            border-bottom-right-radius: 0.375rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+            cursor: pointer;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Autocomplete styles */
+        .autocomplete-container {
+            position: relative;
+            width: 100%;
+            margin-top: 0;
+        }
+        
+        .autocomplete-items {
+            position: absolute;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            z-index: 99;
+            top: 100%;
+            left: 0;
+            right: 0;
+            border-radius: 0 0 0.375rem 0.375rem;
+            background-color: var(--bg-darker);
+            max-height: 200px;
+            overflow-y: auto;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .autocomplete-items div {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .autocomplete-items div:hover,
+        .autocomplete-items div.autocomplete-active {
+            background-color: var(--hover-color);
+        }
+        
+        .autocomplete-items .highlight {
+            font-weight: bold;
+            color: var(--accent-blue);
         }
         
         .input-field:focus {
@@ -221,21 +341,24 @@ DASHBOARD_TEMPLATE = '''
         
         .filters {
             display: flex;
-            gap: 1rem;
-            margin-bottom: 1rem;
+            gap: 1.5rem;
+            margin: 2rem 0 1.5rem;
             align-items: center;
             flex-wrap: wrap;
+            padding: 0.5rem 0;
         }
         
         .search-box {
-            padding: 0.75rem 1rem;
+            padding: 0.85rem 1.2rem;
             background-color: var(--input-bg);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
-            min-width: 250px;
+            border-radius: 0.5rem;
+            min-width: 300px;
             font-family: inherit;
-            font-size: 0.875rem;
+            font-size: 1rem;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .search-box:focus {
@@ -245,14 +368,17 @@ DASHBOARD_TEMPLATE = '''
         }
         
         .filter-dropdown {
-            padding: 0.75rem 1rem;
+            padding: 0.85rem 1.2rem;
             background-color: var(--input-bg);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
-            border-radius: 0.375rem;
+            border-radius: 0.5rem;
             cursor: pointer;
             font-family: inherit;
-            font-size: 0.875rem;
+            font-size: 1rem;
+            min-width: 180px;
+            font-weight: 500;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
         
         .filter-dropdown:focus {
@@ -262,19 +388,20 @@ DASHBOARD_TEMPLATE = '''
         }
         
         .btn {
-            padding: 0.75rem 1rem;
+            padding: 0.85rem 1.2rem;
             background-color: var(--accent-green);
             border: none;
             color: white;
             cursor: pointer;
-            border-radius: 0.375rem;
-            font-weight: 500;
+            border-radius: 0.5rem;
+            font-weight: 600;
             transition: all 0.2s ease;
-            font-size: 0.875rem;
+            font-size: 1rem;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
         
         .btn:hover {
@@ -283,8 +410,8 @@ DASHBOARD_TEMPLATE = '''
         }
         
         .btn svg {
-            width: 1rem;
-            height: 1rem;
+            width: 1.25rem;
+            height: 1.25rem;
         }
         
         .btn-blue {
@@ -322,6 +449,17 @@ DASHBOARD_TEMPLATE = '''
             flex-wrap: wrap;
         }
         
+        .send-prompt-container {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1rem;
+            align-items: center;
+            background-color: var(--bg-darker);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            box-shadow: var(--card-shadow);
+        }
+        
         .spacer {
             flex-grow: 1;
         }
@@ -349,32 +487,46 @@ DASHBOARD_TEMPLATE = '''
         
         table {
             width: 100%;
+            max-width: 100%;
             border-collapse: separate;
             border-spacing: 0;
             margin-top: 1rem;
-            background-color: var(--bg-darker);
-            box-shadow: var(--card-shadow);
-            border-radius: 0.5rem;
             overflow: hidden;
+            table-layout: fixed;
+            padding: 1rem;
         }
         
         th, td {
-            padding: 1rem;
+            padding: 1.25rem;  /* Increased from 1rem */
             text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Specific overrides for project and prompt columns to allow text wrapping */
+        td:nth-child(5), td:nth-child(6), td:nth-child(7) {
+            white-space: normal;
+            word-break: break-word;
+            box-sizing: border-box;
+            padding-right: 0.75rem;
         }
         
         th {
             background-color: var(--header-bg);
             color: var(--text-secondary);
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.9rem;  /* Increased from 0.75rem */
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
         
         td {
             border-bottom: 1px solid var(--border-color);
-            font-size: 0.875rem;
+            font-size: 1rem;  /* Increased from 0.875rem */
+            line-height: 1.6;  /* Added for better readability */
+            max-width: 0; /* This forces td to respect the table layout */
+            box-sizing: border-box;
         }
         
         tr:last-child td {
@@ -398,11 +550,78 @@ DASHBOARD_TEMPLATE = '''
         .status-badge {
             display: inline-flex;
             align-items: center;
-            padding: 0.25rem 0.5rem;
+            padding: 0.4rem 0.8rem;  /* Increased from 0.25rem 0.5rem */
             border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 500;
-            line-height: 1;
+            font-size: 0.9rem;  /* Increased from 0.75rem */
+            font-weight: 600;  /* Increased from 500 */
+            line-height: 1.2;  /* Increased from 1 */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);  /* Added subtle shadow */
+            width: 90px;
+            justify-content: center;
+        }
+        
+        /* Row action buttons */
+        .row-actions {
+            display: none;
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--bg-card);
+            padding: 0.25rem;
+            border-radius: 0.375rem;
+            box-shadow: var(--card-shadow);
+            z-index: 5;
+        }
+        
+        tr:hover .row-actions {
+            display: flex;
+            gap: 0.25rem;
+        }
+        
+        .row-action-btn {
+            width: 32px;
+            height: 32px;
+            padding: 0.25rem;
+            border: none;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+        }
+        
+        .row-action-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.2);
+        }
+        
+        .row-action-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+        
+        .view-btn {
+            background-color: var(--accent-purple);
+        }
+        
+        .interrupt-btn {
+            background-color: var(--accent-orange);
+        }
+        
+        .stop-btn {
+            background-color: var(--accent-red);
+        }
+        
+        .delete-btn {
+            background-color: #444;
+        }
+        
+        /* Ensure table rows have relative positioning for absolute positioning of buttons */
+        tbody tr {
+            position: relative;
         }
         
         .running {
@@ -413,6 +632,16 @@ DASHBOARD_TEMPLATE = '''
         .stopped {
             background-color: rgba(239, 68, 68, 0.2);
             color: var(--accent-red);
+        }
+        
+        .ready {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green); /* Green color */
+        }
+        
+        .running {
+            background-color: rgba(234, 179, 8, 0.2);
+            color: #EAB308; /* Yellow color */
         }
         
         .error {
@@ -507,6 +736,8 @@ DASHBOARD_TEMPLATE = '''
             font-size: 0.875rem;
             font-weight: 500;
             color: var(--text-secondary);
+            z-index: 10;
+            position: relative;
         }
         
         .form-control {
@@ -632,6 +863,152 @@ DASHBOARD_TEMPLATE = '''
             border: 1px solid rgba(33, 150, 243, 0.3);
         }
         
+        /* Response styles */
+        .response-container {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent-blue) var(--bg-darker);
+            /* Prevent scroll flash during refresh */
+            contain: paint;
+            content-visibility: auto;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background-color: var(--bg-darker);
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .response-preview {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            background-color: var(--bg-card);
+            border-radius: 0.375rem;
+            margin-bottom: 0.5rem;
+            border: 1px solid var(--border-color);
+            position: relative;
+            width: calc(100% - 10px);
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .preview-text-container {
+            flex-grow: 1;
+            overflow: hidden;
+            margin-right: 10px;
+        }
+
+        .preview-text {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            width: 100%;
+            display: inline-block;
+        }
+        
+        .expand-btn, .collapse-btn {
+            margin-left: 0.5rem;
+            font-size: 0.8rem;
+            padding: 0.25rem 0.5rem;
+            background-color: var(--accent-green);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            display: inline-block;
+            flex-shrink: 0;
+            white-space: nowrap;
+            font-weight: 600;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            min-width: 75px;
+        }
+        
+        .expand-btn:hover, .collapse-btn:hover {
+            background-color: var(--accent-indigo);
+        }
+        
+        /* Response modal popup styles */
+        .response-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .response-popup-content {
+            background-color: var(--bg-darker);
+            padding: 2rem;
+            border-radius: 0.5rem;
+            width: 95%;
+            max-width: 95vw;
+            max-height: 90%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            position: relative;
+            box-shadow: var(--card-shadow);
+        }
+        
+        .close-popup {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        
+        .close-popup:hover {
+            color: var(--accent-red);
+        }
+        
+        .popup-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--accent-blue);
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        /* Prevents flash of unstyled content during refresh */
+        .refreshing .response-container {
+            opacity: 0.6;
+            transition: opacity 0.05s ease;
+        }
+        
+        .response-container::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .response-container::-webkit-scrollbar-track {
+            background: var(--bg-darker);
+            border-radius: 4px;
+        }
+        
+        .response-container::-webkit-scrollbar-thumb {
+            background-color: var(--accent-blue);
+            border-radius: 4px;
+            border: 2px solid var(--bg-darker);
+        }
+        
+        .response-container::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-indigo);
+        }
+        
         /* Toast notification */
         #toast {
             visibility: hidden;
@@ -700,6 +1077,13 @@ DASHBOARD_TEMPLATE = '''
                 <h1>CLAUDE TASK MANAGER</h1>
             </div>
             <div class="header-actions">
+                <button class="btn btn-purple" onclick="showSettingsModal()">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Settings
+                </button>
                 <button class="btn btn-blue" onclick="manualRefresh()">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -711,14 +1095,16 @@ DASHBOARD_TEMPLATE = '''
         
         <!-- Quick Add Card -->
         <div class="card">
-            <form id="quick-add-form" class="quick-add" onsubmit="event.preventDefault(); addInstanceFromQuickForm();">
+            <form id="quick-add-form" class="quick-add" onsubmit="event.preventDefault(); smartSubmitAction();">
                 <div class="input-group">
                     <label for="quick-project-dir">Project Directory or ID</label>
-                    <input type="text" id="quick-project-dir" class="input-field" placeholder="Project path or just ID number" required>
+                    <input type="text" id="quick-project-dir" class="input-field" placeholder="Project path or just ID number">
                 </div>
                 <div class="input-group">
                     <label for="quick-prompt-path">Prompt File or Text</label>
-                    <input type="text" id="quick-prompt-path" class="input-field" placeholder="Prompt file path or direct text" required>
+                    <div class="autocomplete-container">
+                        <input type="text" id="quick-prompt-path" class="input-field" placeholder="Prompt file path or direct text" required autocomplete="off">
+                    </div>
                 </div>
                 <div class="runtime-toggle">
                     <label class="switch">
@@ -727,112 +1113,266 @@ DASHBOARD_TEMPLATE = '''
                     </label>
                     <label for="quick-use-tmux">Use tmux</label>
                 </div>
+                <div class="runtime-toggle">
+                    <label class="switch">
+                        <input type="checkbox" id="quick-open-window">
+                        <span class="slider"></span>
+                    </label>
+                    <label for="quick-open-window">Open terminal</label>
+                </div>
                 <button type="submit" class="btn btn-green">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                     </svg>
-                    Add Instance
+                    <span id="submit-button-text">Create Instance</span>
                 </button>
             </form>
         </div>
         
         <!-- Filters & Actions -->
         <div class="filters">
-            <input type="text" class="search-box" id="instance-search" placeholder="Search instances..." oninput="filterInstances()">
+            <input type="text" class="search-box" id="instance-search" placeholder="Search projects, prompts..." oninput="filterInstances()">
             
             <select class="filter-dropdown" id="status-filter" onchange="filterInstances()">
                 <option value="all">All Statuses</option>
+                <option value="ready">Ready Only</option>
                 <option value="running">Running Only</option>
                 <option value="stopped">Stopped Only</option>
             </select>
             
             <select class="filter-dropdown" id="runtime-filter" onchange="filterInstances()">
-                <option value="all">All Runtimes</option>
+                <option value="all">All Types</option>
                 <option value="tmux">tmux Only</option>
                 <option value="terminal">Terminal Only</option>
             </select>
             
-            <div class="checkbox-container">
-                <input type="checkbox" id="multi-select" onchange="toggleMultiSelect()">
-                <label for="multi-select">Multi-select</label>
-            </div>
-            
-            <button class="btn btn-gray" onclick="selectAll()" id="select-all-btn" style="display: none;">
-                Select All
-            </button>
+            <!-- Multi-select and Select All options removed -->
+            <div></div>
         </div>
         
-        <div class="actions-bar">
-            <button class="btn btn-red" onclick="stopInstance()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Stop Instance
-            </button>
-            <button class="btn btn-red" onclick="deleteSelected()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-                Delete Selected
-            </button>
-            
-            <div class="spacer"></div>
-            
-            <button class="btn btn-orange" onclick="interruptTask()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                </svg>
-                Interrupt Task
-            </button>
-            <button class="btn btn-purple" onclick="viewTerminal()">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-                View Terminal
-            </button>
-        </div>
+        <!-- Action buttons removed from toolbar since they're now available per row -->
         
         <table id="instance-table">
             <thead>
                 <tr>
-                    <th class="sortable" data-sort="id">ID ↕</th>
-                    <th class="sortable" data-sort="status">Status ↕</th>
-                    <th class="sortable" data-sort="runtime">Runtime Type ↕</th>
-                    <th class="sortable" data-sort="uptime">Uptime ↕</th>
-                    <th class="sortable" data-sort="yes_count">Yes Count ↕</th>
-                    <th class="sortable" data-sort="last_yes">Last Yes ↕</th>
-                    <th class="sortable" data-sort="directory">Directory ↕</th>
-                    <th class="sortable" data-sort="prompt_file">Prompt File ↕</th>
+                    <th class="sortable" data-sort="id" style="display:none;">ID ↕</th>
+                    <th class="sortable" data-sort="status" style="width:120px;">Status ↕</th>
+                    <th class="sortable" data-sort="active_time" style="width:90px;">Time ↕</th>
+                    <th class="sortable" data-sort="yes_count" style="width:80px;">Count ↕</th>
+                    <th class="sortable" data-sort="directory" style="width:25%;">Project ↕</th>
+                    <th class="sortable" data-sort="prompt_file" style="width:25%;">Prompt ↕</th>
+                    <th class="sortable" data-sort="response" style="width:30%;">Response ↕</th>
                 </tr>
             </thead>
             <tbody id="instance-list">
                 {% for instance in instances %}
-                {% set instance_obj = manager.instances.get(instance.id) %}
-                {% set use_tmux = instance_obj.use_tmux if instance_obj and 'use_tmux' in instance_obj.__dict__ else False %}
+                {% set instance_obj = manager.instances.get(instance.get('id', '')) %}
+                {% set use_tmux = instance_obj.__dict__.get('use_tmux', False) if instance_obj else False %}
                 {% set runtime_type = "tmux" if use_tmux else "terminal" %}
-                <tr data-id="{{ instance.id }}" data-runtime="{{ runtime_type }}">
-                    <td>{{ instance.id }}</td>
-                    <td>
-                        <span class="status-badge {{ instance.status }}">{{ instance.status }}</span>
-                    </td>
-                    <td>
-                        <span class="runtime-tag {% if runtime_type == 'tmux' %}tmux-tag{% else %}terminal-tag{% endif %}">
-                            {{ runtime_type }}
-                            {% if runtime_type == 'tmux' and instance.tmux_status is defined %}
-                            ({{ instance.tmux_status }})
-                            {% endif %}
-                        </span>
-                        {% if runtime_type == 'tmux' and instance.tmux_session is defined %}
-                        <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">
-                            {{ instance.tmux_session }}
+                {# Get the detailed status directly from the instance dictionary #}
+                {% set detailed_status = instance.get('detailed_status', 'ready') %}
+                <tr data-id="{{ instance.get('id', '') }}" data-runtime="{{ runtime_type }}">
+                    <td style="display:none;">{{ instance.get('id', '') }}</td>
+                    <td style="width:120px;">
+                        <!-- Row action buttons that appear on hover -->
+                        <div class="row-actions">
+                            <!-- View Terminal -->
+                            <button class="row-action-btn view-btn" onclick="viewTerminalForRow('{{ instance.get('id', '') }}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                            </button>
+                            
+                            <!-- Stop Instance -->
+                            <button class="row-action-btn stop-btn" onclick="stopInstanceForRow('{{ instance.get('id', '') }}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                            
+                            <!-- Delete Instance -->
+                            <button class="row-action-btn delete-btn" onclick="deleteInstanceForRow('{{ instance.get('id', '') }}')">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                            </button>
                         </div>
+                    
+                        {% if instance.get('status', '') == 'running' %}
+                            {% if detailed_status == 'running' %}
+                                <span class="status-badge running">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                        <circle cx="12" cy="12" r="12" />
+                                    </svg>
+                                    running
+                                </span>
+                            {% else %}
+                                <span class="status-badge ready">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                        <circle cx="12" cy="12" r="12" />
+                                    </svg>
+                                    ready
+                                </span>
+                            {% endif %}
+                        {% else %}
+                            <span class="status-badge {{ instance.get('status', 'stopped') }}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                    <circle cx="12" cy="12" r="12" />
+                                </svg>
+                                {{ instance.get('status', 'stopped') }}
+                            </span>
                         {% endif %}
                     </td>
-                    <td>{{ instance.uptime }}</td>
-                    <td>{{ instance.yes_count }}</td>
-                    <td>{{ instance.last_yes }}</td>
-                    <td>{{ instance.project_dir }}</td>
-                    <td>{{ instance.prompt_path }}</td>
+                    <td style="width:90px;">
+                        {% if detailed_status == 'running' and instance.get('generation_time', '') and instance.get('generation_time', '') != '0s' %}
+                            <span style="color: #EAB308; font-size: 1.1rem; font-weight: 600;">{{ instance.get('generation_time', '') }}</span>
+                        {% else %}
+                            {% set ready_time = '' %}
+                            {% set instance_obj = manager.instances.get(instance.get('id', '')) %}
+                            {% if instance_obj and instance_obj.ready_since %}
+                                {% set elapsed_seconds = current_timestamp - instance_obj.ready_since %}
+                                {% if elapsed_seconds < 60 %}
+                                    {% set ready_time = '%ds' % elapsed_seconds %}
+                                {% elif elapsed_seconds < 3600 %}
+                                    {% set minutes = elapsed_seconds // 60 %}
+                                    {% set seconds = elapsed_seconds % 60 %}
+                                    {% set ready_time = '%dm %ds' % (minutes, seconds) %}
+                                {% else %}
+                                    {% set hours = elapsed_seconds // 3600 %}
+                                    {% set minutes = (elapsed_seconds % 3600) // 60 %}
+                                    {% set ready_time = '%dh %dm' % (hours, minutes) %}
+                                {% endif %}
+                                <span style="color: var(--text-primary); font-size: 1.1rem;">{{ ready_time }}</span>
+                            {% else %}
+                                <span style="color: var(--text-primary); font-size: 1.1rem;">0s</span>
+                            {% endif %}
+                        {% endif %}
+                    </td>
+                    <td style="width:80px;"><span style="font-size: 1.1rem; font-weight: 500;">{{ instance.get('yes_count', 0) }}</span></td>
+                    <td style="width:25%;">
+                        {% if instance_obj and instance_obj.__dict__.get('project_dir', '') %}
+                            {% set project_dir = instance_obj.__dict__.get('project_dir', '') %}
+                            {% set project_logo = None %}
+                            
+                            {# Check for logo in demo subdirectory first (most common location) #}
+                            {% set demo_path = os.path.join(project_dir, 'demo') %}
+                            {% if os.path.isdir(demo_path) %}
+                                {% set demo_logo = os.path.join(demo_path, "PROJECT_UI_LOGO.svg") %}
+                                {% if os.path.exists(demo_logo) %}
+                                    {% set project_logo = demo_logo %}
+                                {% endif %}
+                            {% endif %}
+                            
+                            {# If not found in demo, check directly in project directory #}
+                            {% if not project_logo %}
+                                {% set direct_logo = os.path.join(project_dir, "PROJECT_UI_LOGO.svg") %}
+                                {% if os.path.exists(direct_logo) %}
+                                    {% set project_logo = direct_logo %}
+                                {% endif %}
+                            {% endif %}
+                            
+                            {# If not found in either location, check other subdirectories #}
+                            {% if not project_logo %}
+                                {% set found_logo = false %}
+                                {% for item in os.listdir(project_dir) if os.path.isdir(os.path.join(project_dir, item)) and not found_logo %}
+                                    {% set subdir_path = os.path.join(project_dir, item) %}
+                                    {% if subdir_path != demo_path %}  {# Skip demo if already checked #}
+                                        {% set subdir_logo = os.path.join(subdir_path, "PROJECT_UI_LOGO.svg") %}
+                                        {% if os.path.exists(subdir_logo) and not found_logo %}
+                                            {% set project_logo = subdir_logo %}
+                                            {% set found_logo = true %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            
+                            {% if project_logo %}
+                                <div style="display: flex; align-items: center;">
+                                    <div style="width: 36px; height: 36px; margin-right: 12px; display: flex; align-items: center; justify-content: center;">
+                                        <img src="{{ url_for('serve_svg', svg_path=project_logo[1:]) }}" 
+                                             width="36" height="36" alt="Project Logo"
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+                                             style="max-width: 36px; max-height: 36px;">
+                                             
+                                        <!-- Fallback SVG that displays only if the image fails to load -->
+                                        {% set dir_name = os.path.basename(project_dir) %}
+                                        {% set first_letter = dir_name[0]|upper if dir_name else 'P' %}
+                                        <svg width="36" height="36" viewBox="0 0 36 36" style="display: none;">
+                                            <rect width="36" height="36" rx="6" fill="#3b82f6" />
+                                            <text x="18" y="24" text-anchor="middle" fill="white" font-weight="bold" font-size="20" font-family="Arial, sans-serif">{{ first_letter }}</text>
+                                        </svg>
+                                    </div>
+                                    {{ project_dir }}
+                                </div>
+                            {% else %}
+                                {{ project_dir }}
+                            {% endif %}
+                        {% else %}
+                            {{ instance.get('project_dir', '') }}
+                        {% endif %}
+                    </td>
+                    <td style="width:25%;">{{ instance.get('prompt_path', '') }}</td>
+                    <td style="width:30%;">
+                        {% if instance_obj and use_tmux and instance.get('status', '') == 'running' %}
+                            {% set tmux_content = "" %}
+                            
+                            {# First try to get content from instance dict (passed in context) #}
+                            {% if instance.get('tmux_content') %}
+                                {% set tmux_content = instance.get('tmux_content') %}
+                            {# Then try instance_obj (in-memory object) #}
+                            {% elif hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content %}
+                                {% set tmux_content = instance_obj.tmux_content %}
+                            {# Fallback to direct tmux fetch if necessary #}
+                            {% elif instance_obj.tmux_session_name %}
+                                {% set capture_cmd = "tmux capture-pane -p -t " + instance_obj.tmux_session_name %}
+                                {% set capture_result = "" %}
+                                
+                                {# Use a simpler approach without try/except: call the command and use the result if successful #}
+                                {% set temp = os.popen(capture_cmd) %}
+                                {% set capture_result = temp.read() %}
+                                {% set rc = temp.close() %}
+                                
+                                {% if capture_result %}
+                                    {% set tmux_content = capture_result %}
+                                {% endif %}
+                            {% endif %}
+                            
+                            {% if tmux_content %}
+                                {# Only show content if we are in ready state (not running) #}
+                                {% if detailed_status != 'running' %}
+                                    {# Store the response - everything before the ready state #}
+                                    {% if '╭──────────────────────────────────────────────────────────────────────────────╮' in tmux_content %}
+                                        {% set cutoff_index = tmux_content.find('╭──────────────────────────────────────────────────────────────────────────────╮') %}
+                                        {% set response_snippet = tmux_content[:cutoff_index] %}
+                                    {% else %}
+                                        {% set response_snippet = tmux_content %}
+                                    {% endif %}
+                                    
+                                    {% if response_snippet %}
+                                        {% set short_text = response_snippet[:150].replace('\n', ' ').strip() %}
+                                        
+                                        <div class="response-preview" data-instance-id="{{ instance.get('id', '') }}">
+                                            <div class="preview-text-container">
+                                                <span class="preview-text">{{ short_text }}{% if response_snippet|length > 150 %}...{% endif %}</span>
+                                            </div>
+                                            <button class="expand-btn" data-full-content="{{ response_snippet|replace('\n', ' ')|replace('<', '&lt;')|replace('>', '&gt;')|replace('"', '&quot;')|replace("'", '&#39;') }}" onclick="showResponsePopup(event, '{{ instance.get('id', '') }}', this.getAttribute('data-full-content'))">Show more</button>
+                                        </div>
+                                    {% else %}
+                                        <span style="font-style: italic; color: var(--text-secondary);">No response content</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="generating-indicator" data-instance-id="{{ instance.get('id', '') }}" style="font-style: italic; color: var(--text-secondary);">Generating response...</span>
+                                {% endif %}
+                            {% else %}
+                                <span style="font-style: italic; color: var(--text-secondary);">Unable to retrieve content</span>
+                            {% endif %}
+                        {% elif instance.get('status', '') != 'running' %}
+                            <span style="font-style: italic; color: var(--text-secondary);">Instance not running</span>
+                        {% else %}
+                            <span style="font-style: italic; color: var(--text-secondary);">Not available</span>
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -840,10 +1380,29 @@ DASHBOARD_TEMPLATE = '''
         
         <div class="status-bar" id="status-bar">
             <span>
+                {% set active_count = 0 %}
+                {% set standby_count = 0 %}
+                {% set stopped_count = 0 %}
+                
+                {% for inst in instances %}
+                    {% set status = inst.get('status', 'stopped') %}
+                    {% set detailed = inst.get('detailed_status', '') %}
+                    
+                    {% if status == 'running' %}
+                        {% if detailed == 'running' %}
+                            {% set active_count = active_count + 1 %}
+                        {% else %}
+                            {% set standby_count = standby_count + 1 %}
+                        {% endif %}
+                    {% else %}
+                        {% set stopped_count = stopped_count + 1 %}
+                    {% endif %}
+                {% endfor %}
+                
                 Total instances: {{ instances|length }} | 
-                Active: {{ instances|selectattr('status', 'equalto', 'running')|list|length }} | 
-                tmux: {{ instances|selectattr('tmux_status', 'defined')|list|length }} |
-                terminal: {{ instances|length - (instances|selectattr('tmux_status', 'defined')|list|length) }}
+                Running: {{ active_count }} | 
+                Ready: {{ standby_count }} | 
+                Stopped: {{ stopped_count }}
             </span>
             <span>Last updated: {{ current_time }}</span>
         </div>
@@ -868,6 +1427,9 @@ DASHBOARD_TEMPLATE = '''
                     
                     <div class="form-group">
                         <label class="form-label" for="prompt_path">Prompt File Path or Direct Text:</label>
+                        <div class="autocomplete-container" style="margin-bottom: 10px;">
+                            <input type="text" id="add_prompt_file_path" class="form-control" placeholder="Type to search prompt files..." autocomplete="off">
+                        </div>
                         <div id="file-dropzone" class="dropzone">
                             <p>Drag & drop prompt file here or enter prompt text directly</p>
                         </div>
@@ -876,7 +1438,7 @@ DASHBOARD_TEMPLATE = '''
                     </div>
                     
                     <div class="checkbox-container">
-                        <input type="checkbox" id="open_window" name="open_window" checked>
+                        <input type="checkbox" id="open_window" name="open_window">
                         <label for="open_window">Open terminal window when done</label>
                     </div>
                     
@@ -918,32 +1480,191 @@ DASHBOARD_TEMPLATE = '''
             </div>
         </div>
         
-        <!-- Interrupt Task Modal -->
-        <div id="interrupt-modal" class="modal">
+        <!-- Send Prompt Modal -->
+        <div id="send-prompt-modal" class="modal">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3 class="modal-title">Interrupt Claude Task</h3>
+                    <h3 class="modal-title">Send Prompt to Instance</h3>
                 </div>
-                <p>Send interrupt signal (ESC key) to instance <span id="interrupt-instance-id" class="font-medium"></span>?</p>
-                <p class="modal-note">This will send an ESC key to the terminal, which may interrupt Claude's current generation.</p>
+                <form id="send-prompt-form" onsubmit="event.preventDefault(); sendPrompt();">
+                    <input type="hidden" id="prompt-instance-id" name="instance_id" value="">
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="prompt_file_path">Prompt File Path (Optional):</label>
+                        <div class="autocomplete-container" style="margin-bottom: 10px;">
+                            <input type="text" id="prompt_file_path" class="form-control" placeholder="Type to search prompt files..." autocomplete="off">
+                        </div>
+                        <div id="prompt-file-dropzone" class="dropzone">
+                            <p>Drag & drop prompt file here or enter prompt text directly below</p>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="prompt_text">Prompt Text:</label>
+                        <textarea id="prompt_text" name="prompt_text" class="form-control" rows="8" style="resize: vertical;"></textarea>
+                        <p class="modal-note">Enter prompt text directly or load from a file using the field above</p>
+                    </div>
+                    
+                    <div class="checkbox-container">
+                        <input type="checkbox" id="submit_prompt" name="submit_prompt" checked>
+                        <label for="submit_prompt">Submit prompt (press Enter after sending)</label>
+                    </div>
+                    
+                    <div class="modal-actions">
+                        <button type="button" class="btn btn-gray" onclick="closeSendPromptModal()">Cancel</button>
+                        <button type="submit" class="btn btn-blue">Send Prompt</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- Settings Modal -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Settings</h3>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab active" onclick="openTab(event, 'general-settings')">General</button>
+                    <button class="tab" onclick="openTab(event, 'interruption-settings')">Auto Interruption</button>
+                </div>
+
+                <div id="general-settings" class="tab-content active">
+                    <h4 style="margin-bottom: 1rem; color: var(--text-primary);">General Settings</h4>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="refresh-interval">Dashboard Auto-Refresh Interval (seconds)</label>
+                        <input type="number" id="refresh-interval" class="form-control" min="1" max="60" value="3">
+                        <p class="modal-note">How often the dashboard automatically refreshes (1-60 seconds)</p>
+                    </div>
+                </div>
+                
+                <div id="interruption-settings" class="tab-content">
+                    <h4 style="margin-bottom: 1rem; color: var(--text-primary);">Auto Interruption Settings</h4>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="max-active-time">Max Active Time Before Action (minutes)</label>
+                        <input type="number" id="max-active-time" class="form-control" min="0" max="240" value="240">
+                        <p class="modal-note">Maximum time Claude can be continuously generating before taking action (0 = disabled)</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="timeout-action">Action After Timeout</label>
+                        <select id="timeout-action" class="form-control">
+                            <option value="interrupt">Interrupt (send ESC)</option>
+                            <option value="stop">Stop instance</option>
+                            <option value="delete">Delete instance</option>
+                        </select>
+                        <p class="modal-note">What action to take when an instance exceeds the max active time</p>
+                    </div>
+                    
+                    <div class="checkbox-container" style="margin-top: 1rem;">
+                        <input type="checkbox" id="interrupt-active-enabled">
+                        <label for="interrupt-active-enabled">Enable timeout actions for active generations</label>
+                    </div>
+                </div>
+                
                 <div class="modal-actions">
-                    <button type="button" class="btn btn-gray" onclick="closeInterruptModal()">Cancel</button>
-                    <button type="button" class="btn btn-orange" onclick="confirmInterrupt()">Send Interrupt</button>
+                    <button type="button" class="btn btn-gray" onclick="closeSettingsModal()">Cancel</button>
+                    <button type="button" class="btn btn-green" onclick="saveSettings()">Save Settings</button>
                 </div>
             </div>
         </div>
-        
+
         <!-- Toast notification -->
         <div id="toast"></div>
     </div>
     
     <script>
+        // App settings
+        let appSettings = {
+            refreshInterval: 3, // seconds
+            maxActiveTime: 0, // minutes (0 = disabled)
+            interruptActiveEnabled: false, // disabled by default
+            timeoutAction: 'interrupt', // interrupt, stop, or delete
+        };
+        
+        // Track instance states to detect changes
+        let instanceStates = {};
+        
+        // Selection state that will be persisted
         let selectedInstanceId = null;
         let selectedRuntimeType = null;
         let selectedInstances = new Set();
-        let multiSelectEnabled = false;
+        let multiSelectEnabled = true; // Always enabled, no UI toggle needed
         let currentSortColumn = null;
         let sortDirection = 'asc';
+        
+        // Function to save selection state to localStorage
+        function saveSelectionState() {
+            try {
+                const selectionState = {
+                    selectedInstanceId,
+                    selectedRuntimeType,
+                    selectedInstances: Array.from(selectedInstances),
+                    multiSelectEnabled,
+                    currentSortColumn,
+                    sortDirection
+                };
+                localStorage.setItem('claudeManagerSelectionState', JSON.stringify(selectionState));
+                console.log('Saved selection state to localStorage:', selectionState);
+            } catch (e) {
+                console.error('Failed to save selection state to localStorage:', e);
+            }
+        }
+        
+        // Function to load selection state from localStorage
+        function loadSelectionState() {
+            try {
+                const savedState = localStorage.getItem('claudeManagerSelectionState');
+                if (savedState) {
+                    const state = JSON.parse(savedState);
+                    console.log('Loaded selection state from localStorage:', state);
+                    
+                    // Restore simple values
+                    selectedInstanceId = state.selectedInstanceId;
+                    selectedRuntimeType = state.selectedRuntimeType;
+                    multiSelectEnabled = state.multiSelectEnabled;
+                    currentSortColumn = state.currentSortColumn;
+                    sortDirection = state.sortDirection;
+                    
+                    // Restore selected instances set
+                    selectedInstances = new Set(state.selectedInstances || []);
+                    
+                    // Update checkbox state
+                    const multiSelectCheckbox = document.getElementById('multi-select');
+                    if (multiSelectCheckbox) {
+                        multiSelectCheckbox.checked = multiSelectEnabled;
+                    }
+                    
+                    // Call toggleMultiSelect to update UI based on checkbox
+                    toggleMultiSelect();
+                    
+                    // If we have a sort column, sort the table
+                    if (currentSortColumn) {
+                        setTimeout(() => {
+                            sortInstances(currentSortColumn, sortDirection);
+                        }, 100);
+                    }
+                    
+                    return true;
+                }
+            } catch (e) {
+                console.error('Failed to load selection state from localStorage:', e);
+            }
+            return false;
+        }
+        
+        // Try to load settings from localStorage
+        try {
+            const savedSettings = localStorage.getItem('claudeManagerSettings');
+            if (savedSettings) {
+                appSettings = {...appSettings, ...JSON.parse(savedSettings)};
+                console.log('Loaded settings from localStorage:', appSettings);
+            }
+        } catch (e) {
+            console.error('Failed to load settings from localStorage:', e);
+        }
         
         // Toast notification function
         function showToast(message, isError = false) {
@@ -964,85 +1685,224 @@ DASHBOARD_TEMPLATE = '''
             }, 3000);
         }
         
-        // Toggle multi-select mode
-        function toggleMultiSelect() {
-            multiSelectEnabled = document.getElementById('multi-select').checked;
-            const selectAllBtn = document.getElementById('select-all-btn');
-            
-            if (multiSelectEnabled) {
-                selectAllBtn.style.display = 'inline-block';
-            } else {
-                selectAllBtn.style.display = 'none';
-                // Clear selected instances when turning off multi-select
-                selectedInstances.clear();
-                
-                // Remove selected class from all rows
-                document.querySelectorAll('tbody tr').forEach(row => {
-                    if (row.dataset.id !== selectedInstanceId) {
-                        row.classList.remove('selected');
-                    }
-                });
-            }
+        // Multi-select mode is now always enabled by default, so these functions are removed
+        
+        
+        // DEBUG: Add a global variable to track control key state for debugging
+        window.controlKeyState = {
+            bodyHasClass: false,
+            keyDown: false,
+            eventCtrl: false
+        };
+        
+        // Update debug info
+        function updateControlDebug(source, ctrlKey, metaKey, bodyClass) {
+            window.controlKeyState = {
+                bodyHasClass: bodyClass,
+                keyDown: window.controlKeyState.keyDown,
+                eventCtrl: ctrlKey || metaKey
+            };
+            console.log(`[${source}] Control state:`, 
+                `ctrlKey=${ctrlKey}`, 
+                `metaKey=${metaKey}`, 
+                `bodyClass=${bodyClass}`,
+                `time=${new Date().toISOString().substr(11, 12)}`);
         }
         
-        // Select all visible instances
-        function selectAll() {
-            if (!multiSelectEnabled) return;
-            
-            const visibleRows = Array.from(document.querySelectorAll('tbody tr')).filter(row => 
-                row.style.display !== 'none'
-            );
-            
-            // If all visible rows are already selected, deselect all
-            const allSelected = visibleRows.every(row => selectedInstances.has(row.dataset.id));
-            
-            if (allSelected) {
-                // Deselect all
-                selectedInstances.clear();
-                visibleRows.forEach(row => {
-                    row.classList.remove('selected');
-                });
-            } else {
-                // Select all visible
-                visibleRows.forEach(row => {
-                    row.classList.add('selected');
-                    selectedInstances.add(row.dataset.id);
-                });
+        // Prevent default behavior for control key to avoid Chrome's context menu
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey || e.metaKey) {
+                console.log("KEYDOWN: Control key pressed!", e.type, e.ctrlKey, e.metaKey);
+                document.body.classList.add('ctrl-pressed');
+                window.controlKeyState.keyDown = true;
+                updateControlDebug('keydown', e.ctrlKey, e.metaKey, document.body.classList.contains('ctrl-pressed'));
             }
-        }
+        }, true);
+        
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'Control' || e.key === 'Meta') {
+                console.log("KEYUP: Control key released!", e.type, e.key);
+                document.body.classList.remove('ctrl-pressed');
+                window.controlKeyState.keyDown = false;
+                updateControlDebug('keyup', false, false, document.body.classList.contains('ctrl-pressed'));
+            }
+        }, true);
+        
+        // DEBUG: Add mousedown event to catch control+click more reliably
+        document.addEventListener('mousedown', function(e) {
+            console.log("MOUSEDOWN:", e.type, "ctrlKey:", e.ctrlKey, "metaKey:", e.metaKey);
+            if (e.ctrlKey || e.metaKey) {
+                console.log("MOUSEDOWN with Control/Meta key!");
+                document.body.classList.add('ctrl-pressed');
+                updateControlDebug('mousedown', e.ctrlKey, e.metaKey, document.body.classList.contains('ctrl-pressed'));
+            }
+        }, true);
+        
+        // Prevent context menu on table rows when we're in selection mode
+        document.querySelector('#instance-table tbody').addEventListener('contextmenu', function(e) {
+            console.log("CONTEXT MENU:", "ctrl-pressed class =", document.body.classList.contains('ctrl-pressed'));
+            if (document.body.classList.contains('ctrl-pressed')) {
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+        
+        // Force update control key status when clicking with control
+        document.addEventListener('click', function(e) {
+            console.log("CLICK EVENT:", e.type, "ctrlKey:", e.ctrlKey, "metaKey:", e.metaKey, 
+                       "bodyClass:", document.body.classList.contains('ctrl-pressed'));
+            
+            if (e.ctrlKey || e.metaKey) {
+                console.log("CLICK with Control key detected! Adding ctrl-pressed class");
+                document.body.classList.add('ctrl-pressed');
+                updateControlDebug('click', e.ctrlKey, e.metaKey, document.body.classList.contains('ctrl-pressed'));
+                
+                // Remove the class after a short delay to prevent state issues
+                setTimeout(function() {
+                    if (!e.ctrlKey && !e.metaKey) {
+                        document.body.classList.remove('ctrl-pressed');
+                        updateControlDebug('click-timeout', false, false, document.body.classList.contains('ctrl-pressed'));
+                    }
+                }, 200);
+            }
+        }, true);
         
         // Select a row in the table
         document.addEventListener('click', function(e) {
+            // Skip if clicking on action buttons to prevent double selection
+            if (e.target.closest('.row-action-btn')) {
+                return;
+            }
+            
             const row = e.target.closest('tr');
             if (row && row.parentNode.tagName === 'TBODY') {
                 const instanceId = row.dataset.id;
                 const runtimeType = row.dataset.runtime;
                 
-                if (multiSelectEnabled) {
-                    // Toggle selection for this row
+                // DEBUG: Log selection info
+                console.log("ROW SELECTION:", 
+                    "e.ctrlKey =", e.ctrlKey, 
+                    "e.metaKey =", e.metaKey, 
+                    "bodyClass =", document.body.classList.contains('ctrl-pressed'),
+                    "for row ID:", instanceId);
+                
+                // Get the control key state from multiple sources to be extra sure
+                const ctrlKey = e.ctrlKey;
+                const metaKey = e.metaKey;
+                const bodyHasClass = document.body.classList.contains('ctrl-pressed');
+                const globalKeyDown = window.controlKeyState?.keyDown || false;
+                
+                // Try every possible way to detect the control key
+                const ctrlPressed = ctrlKey || metaKey || bodyHasClass || globalKeyDown;
+                
+                // Check which selection mode to use based on modifier keys
+                if ((ctrlPressed) && !e.shiftKey) {
+                    // Control key pressed: Toggle selection of this row
+                    console.log("🎯 CONTROL+CLICK - toggling selection for row", instanceId);
+                    
                     if (selectedInstances.has(instanceId)) {
+                        // Deselect if already selected
                         selectedInstances.delete(instanceId);
                         row.classList.remove('selected');
                     } else {
+                        // Select if not already selected
                         selectedInstances.add(instanceId);
                         row.classList.add('selected');
                     }
-                } else {
-                    // Single selection mode
-                    // Remove selected class from all rows
+                } 
+                else if (e.shiftKey && selectedInstanceId) {
+                    // Shift key pressed: Select a range of rows
+                    console.log("SHIFT+CLICK - selecting range");
+                    
+                    const rows = Array.from(document.querySelectorAll('tbody tr'));
+                    const visibleRows = rows.filter(r => r.style.display !== 'none');
+                    
+                    // Find indices of the previously selected row and current row
+                    const lastSelectedIndex = visibleRows.findIndex(r => r.dataset.id === selectedInstanceId);
+                    const currentIndex = visibleRows.findIndex(r => r.dataset.id === instanceId);
+                    
+                    if (lastSelectedIndex > -1 && currentIndex > -1) {
+                        // Determine start and end indices for the range
+                        const startIdx = Math.min(lastSelectedIndex, currentIndex);
+                        const endIdx = Math.max(lastSelectedIndex, currentIndex);
+                        
+                        // Clear previous selections unless Ctrl/Cmd is also pressed
+                        if (!ctrlPressed) {
+                            selectedInstances.clear();
+                            rows.forEach(r => r.classList.remove('selected'));
+                        }
+                        
+                        // Select all rows in the range
+                        for (let i = startIdx; i <= endIdx; i++) {
+                            const rowInRange = visibleRows[i];
+                            rowInRange.classList.add('selected');
+                            selectedInstances.add(rowInRange.dataset.id);
+                        }
+                    }
+                } 
+                else {
+                    // Regular click (no modifier keys): Single selection
+                    console.log("REGULAR CLICK - selecting single row");
+                    
+                    // Clear all current selections
                     document.querySelectorAll('tbody tr').forEach(r => {
                         r.classList.remove('selected');
                     });
+                    selectedInstances.clear();
                     
-                    // Add selected class to clicked row
+                    // Select only this row
                     row.classList.add('selected');
-                    
-                    // Store the selected instance ID and runtime type
-                    selectedInstanceId = instanceId;
-                    selectedRuntimeType = runtimeType;
+                    selectedInstances.add(instanceId);
                 }
                 
-                console.log(`Selected instance: ${instanceId}, Runtime: ${runtimeType}`);
+                // Always update the last selected ID
+                selectedInstanceId = instanceId;
+                selectedRuntimeType = runtimeType;
+                
+                console.log(`Selected instance: ${instanceId}, Runtime: ${runtimeType}, Total selected: ${selectedInstances.size}`);
+                
+                // Save selection state after any click selection
+                saveSelectionState();
+            }
+        });
+        
+        // Additional event listener for mousedown to prevent text selection
+        // and handle ctrl+click more reliably
+        document.addEventListener('mousedown', function(e) {
+            if (e.shiftKey || e.ctrlKey || e.metaKey) {
+                const row = e.target.closest('tr');
+                if (row && row.parentNode.tagName === 'TBODY') {
+                    // Prevent text selection when using modifier keys
+                    e.preventDefault();
+                    
+                    // DIRECT HANDLING: For Ctrl+click, immediately handle the row selection
+                    // right at mousedown time, which may be more reliable than waiting for click
+                    if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
+                        console.log("🔴 DIRECT MOUSEDOWN CONTROL+CLICK HANDLING for row", row.dataset.id);
+                        
+                        // Toggle selection directly here
+                        const instanceId = row.dataset.id;
+                        if (selectedInstances.has(instanceId)) {
+                            console.log("Directly removing instance from selection:", instanceId);
+                            selectedInstances.delete(instanceId);
+                            row.classList.remove('selected');
+                        } else {
+                            console.log("Directly adding instance to selection:", instanceId);
+                            selectedInstances.add(instanceId);
+                            row.classList.add('selected');
+                        }
+                        
+                        // Store the selected instance ID (just like in the click handler)
+                        selectedInstanceId = instanceId;
+                        selectedRuntimeType = row.dataset.runtime;
+                        
+                        // Save selection state
+                        saveSelectionState();
+                        
+                        // Stop propagation to prevent the click event from also handling this
+                        e.stopPropagation();
+                    }
+                }
             }
         });
         
@@ -1065,17 +1925,13 @@ DASHBOARD_TEMPLATE = '''
             }
         });
         
-        // Double-click to view terminal
-        document.addEventListener('dblclick', function(e) {
-            const row = e.target.closest('tr');
-            if (row && row.parentNode.tagName === 'TBODY') {
-                // Get the instance ID from the row
-                const instanceId = row.dataset.id;
-                const runtimeType = row.dataset.runtime;
-                
-                // Make sure the instance is selected
-                selectedInstanceId = instanceId;
-                selectedRuntimeType = runtimeType;
+        // Functions for row action buttons
+        function viewTerminalForRow(instanceId) {
+            // Set this instance as selected
+            selectedInstanceId = instanceId;
+            const row = document.querySelector(`tr[data-id="${instanceId}"]`);
+            if (row) {
+                selectedRuntimeType = row.dataset.runtime;
                 
                 // Visually select the row
                 document.querySelectorAll('tbody tr').forEach(r => {
@@ -1086,25 +1942,81 @@ DASHBOARD_TEMPLATE = '''
                 // Open the terminal window
                 viewTerminal();
             }
-        });
+        }
         
-        // Add instance from quick form
-        function addInstanceFromQuickForm() {
+        
+        function stopInstanceForRow(instanceId) {
+            // Set this instance as selected
+            selectedInstanceId = instanceId;
+            const row = document.querySelector(`tr[data-id="${instanceId}"]`);
+            if (row) {
+                selectedRuntimeType = row.dataset.runtime;
+                
+                // Visually select the row
+                document.querySelectorAll('tbody tr').forEach(r => {
+                    r.classList.remove('selected');
+                });
+                row.classList.add('selected');
+                
+                // Stop the instance
+                stopInstance();
+            }
+        }
+        
+        function deleteInstanceForRow(instanceId) {
+            // Set this instance as selected
+            selectedInstanceId = instanceId;
+            const row = document.querySelector(`tr[data-id="${instanceId}"]`);
+            if (row) {
+                selectedRuntimeType = row.dataset.runtime;
+                
+                // Visually select the row
+                document.querySelectorAll('tbody tr').forEach(r => {
+                    r.classList.remove('selected');
+                });
+                row.classList.add('selected');
+                
+                // Delete the instance
+                deleteSelected();
+            }
+        }
+        
+        // Create a new instance with the entered prompt
+        function smartSubmitAction() {
+            // Get form values
             const projectDir = document.getElementById('quick-project-dir').value;
             const promptPath = document.getElementById('quick-prompt-path').value;
             const useTmux = document.getElementById('quick-use-tmux').checked;
+            const openWindow = document.getElementById('quick-open-window').checked;
             
-            if (!projectDir || !promptPath) {
-                showToast('Please fill in all fields', true);
+            // Validate inputs
+            if (!promptPath) {
+                showToast('Please enter a prompt', true);
                 return;
             }
             
+            if (!projectDir) {
+                showToast('Please enter a project directory', true);
+                return;
+            }
+            
+            // Always create a new instance regardless of whether an instance is selected
+            createNewInstance(projectDir, promptPath, useTmux, openWindow);
+        }
+        
+        
+        // Function to create a new instance
+        function createNewInstance(projectDir, promptPath, useTmux, openWindow) {
             // Create form data
             const formData = new FormData();
             formData.append('project_dir', projectDir);
             formData.append('prompt_path', promptPath);
             formData.append('runtime_type', useTmux ? 'tmux' : 'terminal');
-            formData.append('open_window', 'on'); // Always open window for quick add
+            
+            // Only add open_window if it's checked
+            if (openWindow) {
+                formData.append('open_window', 'on');
+            }
             
             // Send request
             fetch('/add', {
@@ -1113,8 +2025,7 @@ DASHBOARD_TEMPLATE = '''
             })
             .then(response => {
                 if (response.ok) {
-                    // Clear form
-                    document.getElementById('quick-project-dir').value = '';
+                    // Clear the prompt field but keep the project dir for easy reuse
                     document.getElementById('quick-prompt-path').value = '';
                     
                     // Refresh instances
@@ -1194,47 +2105,6 @@ DASHBOARD_TEMPLATE = '''
                 });
         }
         
-        // Interrupt task modal
-        function interruptTask() {
-            if (!selectedInstanceId) {
-                showToast('Please select an instance to interrupt', true);
-                return;
-            }
-            
-            // Check if instance is running
-            const row = document.querySelector(`tr[data-id="${selectedInstanceId}"]`);
-            const statusCell = row.querySelector('td:nth-child(2)');
-            
-            if (statusCell.textContent.trim().toLowerCase() !== 'running') {
-                showToast('Cannot interrupt a non-running instance', true);
-                return;
-            }
-            
-            document.getElementById('interrupt-instance-id').textContent = selectedInstanceId;
-            document.getElementById('interrupt-modal').style.display = 'block';
-        }
-        
-        function closeInterruptModal() {
-            document.getElementById('interrupt-modal').style.display = 'none';
-        }
-        
-        function confirmInterrupt() {
-            fetch('/interrupt/' + selectedInstanceId, { method: 'POST' })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        closeInterruptModal();
-                        showToast(`Interrupt signal sent to instance ${selectedInstanceId}`);
-                    } else {
-                        showToast('Failed to interrupt: ' + data.error, true);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    showToast('An error occurred while sending interrupt', true);
-                });
-        }
-        
         // View terminal function
         function viewTerminal() {
             if (!selectedInstanceId) {
@@ -1263,15 +2133,23 @@ DASHBOARD_TEMPLATE = '''
             let cleaned = path.replace(/\\([^)]*\\)/g, '');
             // Remove single quotes
             cleaned = cleaned.replace(/['ʼ]/g, '');
-            return cleaned.trim();
+            // Trim whitespace
+            cleaned = cleaned.trim();
+            // Remove trailing slashes (similar to os.path.normpath in Python)
+            while (cleaned.endsWith('/') && cleaned.length > 1) {
+                cleaned = cleaned.slice(0, -1);
+            }
+            return cleaned;
         }
         
         // Drag and drop functionality
         document.addEventListener('DOMContentLoaded', function() {
             const dirDropzone = document.getElementById('dir-dropzone');
             const fileDropzone = document.getElementById('file-dropzone');
+            const promptFileDropzone = document.getElementById('prompt-file-dropzone');
             const dirInput = document.getElementById('project_dir');
             const fileInput = document.getElementById('prompt_path');
+            const promptTextArea = document.getElementById('prompt_text');
             
             // Directory dropzone
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
@@ -1316,6 +2194,53 @@ DASHBOARD_TEMPLATE = '''
                 // We need to extract the file paths from the drop event
                 handleDroppedFiles(e, false, fileInput);
             }, false);
+            
+            // Prompt file dropzone in the send prompt modal
+            if (promptFileDropzone) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    promptFileDropzone.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    promptFileDropzone.addEventListener(eventName, () => {
+                        promptFileDropzone.classList.add('dragover');
+                    }, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    promptFileDropzone.addEventListener(eventName, () => {
+                        promptFileDropzone.classList.remove('dragover');
+                    }, false);
+                });
+                
+                promptFileDropzone.addEventListener('drop', e => {
+                    // When a file is dropped, load its content into the prompt text area
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    
+                    if (files && files.length > 0) {
+                        const file = files[0];
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(event) {
+                            // Set the prompt text to the file content
+                            promptTextArea.value = event.target.result;
+                            
+                            // Also set the file path for reference
+                            document.getElementById('prompt_file_path').value = file.name;
+                            
+                            showToast(`Loaded content from ${file.name}`);
+                        };
+                        
+                        reader.onerror = function(error) {
+                            console.error('Error reading file:', error);
+                            showToast('Error reading file', true);
+                        };
+                        
+                        reader.readAsText(file);
+                    }
+                }, false);
+            }
             
             function preventDefaults(e) {
                 e.preventDefault();
@@ -1466,33 +2391,481 @@ DASHBOARD_TEMPLATE = '''
         
         // Refresh instances
         function refreshInstances() {
+            // We no longer need to save ready state times since we're using consistent state tracking
+            // that persists across refreshes
+            
+            // Add a class to the body during refresh to control styling during refresh
+            document.body.classList.add('refreshing');
+            
+            // 🔒 CRITICAL FIX: Save selection state BEFORE refreshing
+            const selectedRows = [];
+            document.querySelectorAll('tbody tr.selected').forEach(row => {
+                selectedRows.push(row.dataset.id);
+            });
+            console.log("🔒 PRE-REFRESH: Saving selection state for", selectedRows.length, "rows:", selectedRows);
+            
+            // Save scroll positions of response containers
+            const scrollPositions = {};
+            document.querySelectorAll('tbody tr').forEach(row => {
+                const id = row.dataset.id;
+                const responseContainer = row.querySelector('td:last-child div.response-container');
+                if (responseContainer && responseContainer.scrollHeight > responseContainer.clientHeight) {
+                    scrollPositions[id] = {
+                        scrollTop: responseContainer.scrollTop,
+                        scrollLeft: responseContainer.scrollLeft
+                    };
+                }
+            });
+            console.log("Saved scroll positions for response containers:", Object.keys(scrollPositions).length);
+            
             fetch('/refresh')
                 .then(response => response.text())
                 .then(html => {
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(html, 'text/html');
                     
-                    // Update table content
-                    document.getElementById('instance-list').innerHTML = doc.getElementById('instance-list').innerHTML;
+                    // Instead of replacing the entire table content, update only what's changed
+                    // Get all rows from both the current table and the new table
+                    const currentRows = document.querySelectorAll('#instance-list tr');
+                    const newRows = doc.querySelectorAll('#instance-list tr');
+                    
+                    // Create a map of current row elements by ID
+                    const currentRowsMap = {};
+                    currentRows.forEach(row => {
+                        if (row.dataset.id) {
+                            currentRowsMap[row.dataset.id] = row;
+                        }
+                    });
+                    
+                    // First pass: Update existing rows in place without replacing response cells
+                    // that haven't changed, to avoid text glitching
+                    let instanceListUpdated = false;
+                    
+                    newRows.forEach(newRow => {
+                        const rowId = newRow.dataset.id;
+                        if (rowId && currentRowsMap[rowId]) {
+                            // This row exists in both tables
+                            const currentRow = currentRowsMap[rowId];
+                            
+                            // Get all cells except the last one (response column)
+                            const currentCells = Array.from(currentRow.querySelectorAll('td:not(:last-child)'));
+                            const newCells = Array.from(newRow.querySelectorAll('td:not(:last-child)'));
+                            
+                            // Update all cells except the response column
+                            for (let i = 0; i < Math.min(currentCells.length, newCells.length); i++) {
+                                // Only update if content has changed
+                                if (currentCells[i].innerHTML !== newCells[i].innerHTML) {
+                                    currentCells[i].innerHTML = newCells[i].innerHTML;
+                                    instanceListUpdated = true;
+                                }
+                            }
+                            
+                            // For the response column, only update if the instance is no longer running or the content has changed
+                            const currentResponseCell = currentRow.querySelector('td:last-child');
+                            const newResponseCell = newRow.querySelector('td:last-child');
+                            
+                            if (currentResponseCell && newResponseCell) {
+                                // Check if we have a generating indicator in the current cell
+                                const currentGeneratingIndicator = currentResponseCell.querySelector('.generating-indicator');
+                                
+                                // Check if we have a preview in the current cell
+                                const currentPreview = currentResponseCell.querySelector('.response-preview');
+                                
+                                // Check if we have a generating indicator in the new cell
+                                const newGeneratingIndicator = newResponseCell.querySelector('.generating-indicator');
+                                
+                                // Check if we have a preview in the new cell
+                                const newPreview = newResponseCell.querySelector('.response-preview');
+                                
+                                // Case 1: Status changed from generating to ready (showing preview)
+                                if (currentGeneratingIndicator && newPreview) {
+                                    console.log(`Instance ${rowId} changed from generating to ready with preview`);
+                                    currentResponseCell.innerHTML = newResponseCell.innerHTML;
+                                    instanceListUpdated = true;
+                                }
+                                // Case 2: Status changed from ready to generating
+                                else if (currentPreview && newGeneratingIndicator) {
+                                    console.log(`Instance ${rowId} changed from ready to generating`);
+                                    currentResponseCell.innerHTML = newResponseCell.innerHTML;
+                                    instanceListUpdated = true;
+                                }
+                                // Case 3: Response content changed while staying in ready state
+                                else if (currentPreview && newPreview && 
+                                         currentPreview.innerHTML !== newPreview.innerHTML) {
+                                    console.log(`Instance ${rowId} got updated response content`);
+                                    
+                                    // Only update the preview-text span to preserve the button
+                                    const currentPreviewText = currentPreview.querySelector('.preview-text');
+                                    const newPreviewText = newPreview.querySelector('.preview-text');
+                                    
+                                    if (currentPreviewText && newPreviewText) {
+                                        // Update the text content
+                                        currentPreviewText.innerHTML = newPreviewText.innerHTML;
+                                        
+                                        // Also update the data attribute of the expand button
+                                        const currentExpandBtn = currentPreview.querySelector('.expand-btn');
+                                        const newExpandBtn = newPreview.querySelector('.expand-btn');
+                                        
+                                        if (currentExpandBtn && newExpandBtn) {
+                                            // Update the data attribute containing the full response
+                                            const newResponseContent = newExpandBtn.getAttribute('data-full-content');
+                                            if (newResponseContent) {
+                                                currentExpandBtn.setAttribute('data-full-content', newResponseContent);
+                                                
+                                                // Also ensure the onclick attribute uses the updated data
+                                                currentExpandBtn.setAttribute('onclick', 
+                                                    `showResponsePopup(event, '${rowId}', this.getAttribute('data-full-content'))`);
+                                            }
+                                            
+                                            console.log(`Updated response text content for ${rowId}`);
+                                        }
+                                    } else {
+                                        // Fallback to replacing the entire cell if we can't find the elements
+                                        console.log(`Fallback: replacing entire response cell for ${rowId}`);
+                                        currentResponseCell.innerHTML = newResponseCell.innerHTML;
+                                    }
+                                    
+                                    instanceListUpdated = true;
+                                }
+                                // Case 4: Any other state change
+                                else if (currentResponseCell.innerHTML !== newResponseCell.innerHTML &&
+                                        !currentResponseCell.querySelector('.response-container')) {
+                                    console.log(`Instance ${rowId} other content change`);
+                                    currentResponseCell.innerHTML = newResponseCell.innerHTML;
+                                    instanceListUpdated = true;
+                                }
+                            }
+                            
+                            // Remove the row from the map to track which ones have been processed
+                            delete currentRowsMap[rowId];
+                        } else {
+                            // This is a new row - it will be added in the second pass
+                            instanceListUpdated = true;
+                        }
+                    });
+                    
+                    // If nothing was updated in the first pass, and we don't have new or removed rows,
+                    // skip the second pass to avoid unnecessary DOM operations
+                    if (!instanceListUpdated && Object.keys(currentRowsMap).length === 0) {
+                        console.log("No changes detected in instance list, skipping DOM update");
+                    } else {
+                        // Second pass: Full update of the table content
+                        // Only do this if we detected changes or have new/removed rows
+                        document.getElementById('instance-list').innerHTML = doc.getElementById('instance-list').innerHTML;
+                    }
+                    
+                    // 🔑 DIRECT FIX: Immediately re-apply selections to maintain multi-select
+                    console.log("🔑 POST-REFRESH: Restoring", selectedRows.length, "selections");
+                    selectedRows.forEach(id => {
+                        const row = document.querySelector(`tr[data-id="${id}"]`);
+                        if (row) {
+                            row.classList.add('selected');
+                            console.log(`✅ Restored selection for row ${id}`);
+                            // Also ensure it's in the selectedInstances set
+                            selectedInstances.add(id);
+                        } else {
+                            console.log(`❌ Row ${id} no longer exists in DOM after refresh`);
+                        }
+                    });
                     
                     // Update status bar
                     document.getElementById('status-bar').innerHTML = doc.getElementById('status-bar').innerHTML;
                     
-                    // Reselect instance if still exists
-                    if (selectedInstanceId) {
-                        const row = document.querySelector(`tr[data-id="${selectedInstanceId}"]`);
-                        if (row) {
-                            row.classList.add('selected');
+                    // Get all current visible rows after refresh
+                    const currentIds = new Set();
+                    document.querySelectorAll('tr[data-id]').forEach(row => {
+                        currentIds.add(row.dataset.id);
+                    });
+                    
+                    // Restore scroll positions for response containers - this needs to happen
+                    // regardless of whether we did a full update or incremental update
+                    setTimeout(() => {
+                        for (const id in scrollPositions) {
+                            const row = document.querySelector(`tr[data-id="${id}"]`);
+                            if (row) {
+                                const responseContainer = row.querySelector('td:last-child div.response-container');
+                                if (responseContainer) {
+                                    responseContainer.scrollTop = scrollPositions[id].scrollTop;
+                                    responseContainer.scrollLeft = scrollPositions[id].scrollLeft;
+                                }
+                            }
+                        }
+                        console.log("Restored scroll positions for response containers");
+                        
+                        // Remove the refreshing class to complete the refresh
+                        document.body.classList.remove('refreshing');
+                        
+                        // Make sure scrollbars are properly restored
+                        setTimeout(() => {
+                            // First restore overflow property to enable scrollbars
+                            document.querySelectorAll('.response-container').forEach(container => {
+                                // Force a reflow to ensure scrollbars are shown if needed
+                                container.style.overflow = '';
+                                void container.offsetHeight; // Trigger reflow
+                                
+                                // Find the container's ID and restore properties if we have them
+                                const instanceId = container.getAttribute('data-instance-id');
+                                if (instanceId && visibleContainers[instanceId]) {
+                                    // Restore saved properties
+                                    const savedProps = visibleContainers[instanceId];
+                                    container.scrollTop = savedProps.scrollTop;
+                                    container.scrollLeft = savedProps.scrollLeft;
+                                }
+                            });
+                        }, 20);
+                    }, 50);
+                    
+                    // Remove any tracked instances that no longer exist
+                    Object.keys(instanceStates).forEach(id => {
+                        if (!currentIds.has(id)) {
+                            console.log(`Instance ${id} is no longer in the table, removing from tracking`);
+                            delete instanceStates[id];
+                        }
+                    });
+                    
+                    // Multi-select is always enabled now, so no need to check or set it
+                    
+                    // Keep selectedInstanceId updated (use first selected row if available)
+                    if (selectedInstances.size > 0) {
+                        const firstSelectedId = Array.from(selectedInstances)[0];
+                        const rowExists = document.querySelector(`tr[data-id="${firstSelectedId}"]`);
+                        if (rowExists) {
+                            selectedInstanceId = firstSelectedId;
+                            selectedRuntimeType = rowExists.dataset.runtime;
                         } else {
-                            selectedInstanceId = null;
-                            selectedRuntimeType = null;
+                            // If first row disappeared, use another
+                            const existingSelectedIds = Array.from(selectedInstances)
+                                .filter(id => document.querySelector(`tr[data-id="${id}"]`));
+                            
+                            if (existingSelectedIds.length > 0) {
+                                selectedInstanceId = existingSelectedIds[0];
+                                const row = document.querySelector(`tr[data-id="${selectedInstanceId}"]`);
+                                selectedRuntimeType = row ? row.dataset.runtime : null;
+                            } else {
+                                // No selected rows exist anymore
+                                selectedInstanceId = null;
+                                selectedRuntimeType = null;
+                                selectedInstances.clear();
+                            }
                         }
                     }
+                    
+                    // Run checkForLongGenerations to update time displays consistently
+                    setTimeout(checkForLongGenerations, 100);
+                    
+                    // After restoring selections, find the runtime type if needed
+                    if (selectedInstanceId && !selectedRuntimeType) {
+                        const row = document.querySelector(`tr[data-id="${selectedInstanceId}"]`);
+                        if (row) {
+                            selectedRuntimeType = row.dataset.runtime;
+                        }
+                    }
+                    
+                    console.log("Selections after restore:", 
+                        "selectedInstanceId =", selectedInstanceId,
+                        "selectedInstances =", Array.from(selectedInstances));
+                    
+                    // Save the updated selection state after refresh
+                    saveSelectionState();
                 })
                 .catch(error => {
                     console.error('Error:', error);
                     showToast('Error refreshing data', true);
                 });
+        }
+        
+        // Set up autocomplete fields
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set up autocomplete for quick prompt path
+            setupAutocomplete(document.getElementById('quick-prompt-path'), function(selectedFile) {
+                document.getElementById('quick-prompt-path').value = selectedFile.path;
+            });
+            
+            // Set up autocomplete for add instance modal
+            setupAutocomplete(document.getElementById('add_prompt_file_path'), function(selectedFile) {
+                document.getElementById('prompt_path').value = selectedFile.path;
+            });
+            
+            // Set up autocomplete for send prompt modal
+            setupAutocomplete(document.getElementById('prompt_file_path'), function(selectedFile) {
+                // Load the file content automatically
+                loadPromptFileContent(selectedFile.path);
+            });
+        });
+        
+        // Function to set up autocomplete on an input element
+        function setupAutocomplete(inputElement, onSelectCallback) {
+            if (!inputElement) return;
+            
+            let currentFocus = -1;
+            let files = [];
+            
+            // Function to fetch matching prompt files
+            function fetchPromptFiles(searchTerm) {
+                fetch('/api/prompt_files?q=' + encodeURIComponent(searchTerm))
+                    .then(response => response.json())
+                    .then(data => {
+                        files = data;
+                        showAutocompleteItems(files, searchTerm);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching prompt files:', error);
+                    });
+            }
+            
+            // Function to show autocomplete items
+            function showAutocompleteItems(files, searchTerm) {
+                // Clear existing items
+                closeAllLists();
+                
+                if (!files.length) return;
+                
+                // Create container for items
+                const itemsContainer = document.createElement('div');
+                itemsContainer.setAttribute('id', inputElement.id + '-autocomplete-list');
+                itemsContainer.setAttribute('class', 'autocomplete-items');
+                inputElement.parentNode.appendChild(itemsContainer);
+                
+                // Add each matching file as an item
+                files.forEach(file => {
+                    // Create item element
+                    const item = document.createElement('div');
+                    
+                    // Highlight the matching part
+                    let displayName = file.name;
+                    if (searchTerm) {
+                        const startIndex = displayName.toLowerCase().indexOf(searchTerm.toLowerCase());
+                        if (startIndex > -1) {
+                            const endIndex = startIndex + searchTerm.length;
+                            displayName = 
+                                displayName.substring(0, startIndex) + 
+                                '<span class="highlight">' + 
+                                displayName.substring(startIndex, endIndex) + 
+                                '</span>' + 
+                                displayName.substring(endIndex);
+                        }
+                    }
+                    
+                    // Set item content
+                    item.innerHTML = displayName;
+                    
+                    // Add click event
+                    item.addEventListener('click', function() {
+                        onSelectCallback(file);
+                        closeAllLists();
+                    });
+                    
+                    // Add item to container
+                    itemsContainer.appendChild(item);
+                });
+            }
+            
+            // Function to close all autocomplete lists
+            function closeAllLists(excludeElement) {
+                const items = document.getElementsByClassName('autocomplete-items');
+                for (let i = 0; i < items.length; i++) {
+                    if (excludeElement != items[i] && excludeElement != inputElement) {
+                        items[i].parentNode.removeChild(items[i]);
+                    }
+                }
+            }
+            
+            // Input event - fetch files when typing
+            inputElement.addEventListener('input', function() {
+                const searchTerm = this.value;
+                fetchPromptFiles(searchTerm);
+            });
+            
+            // Focus event - show all files when focusing
+            inputElement.addEventListener('focus', function() {
+                fetchPromptFiles(this.value);
+            });
+            
+            // Keyboard navigation
+            inputElement.addEventListener('keydown', function(e) {
+                let items = document.getElementById(this.id + '-autocomplete-list');
+                if (!items) return;
+                
+                items = items.getElementsByTagName('div');
+                
+                if (e.key === 'ArrowDown') {
+                    // Down key
+                    currentFocus++;
+                    addActive(items);
+                    e.preventDefault();
+                } else if (e.key === 'ArrowUp') {
+                    // Up key
+                    currentFocus--;
+                    addActive(items);
+                    e.preventDefault();
+                } else if (e.key === 'Enter') {
+                    // Enter key
+                    e.preventDefault();
+                    if (currentFocus > -1 && items) {
+                        items[currentFocus].click();
+                    }
+                }
+            });
+            
+            // Function to highlight the active item
+            function addActive(items) {
+                if (!items) return;
+                
+                // Remove active class from all items
+                for (let i = 0; i < items.length; i++) {
+                    items[i].classList.remove('autocomplete-active');
+                }
+                
+                // Set limits for currentFocus
+                if (currentFocus >= items.length) currentFocus = 0;
+                if (currentFocus < 0) currentFocus = items.length - 1;
+                
+                // Add active class to current item
+                items[currentFocus].classList.add('autocomplete-active');
+            }
+            
+            // Close lists when clicking elsewhere
+            document.addEventListener('click', function(e) {
+                closeAllLists(e.target);
+            });
+        }
+        
+        // Load prompt file content
+        function loadPromptFileContent(filePath) {
+            if (!filePath) return;
+            
+            console.log("Loading prompt file: " + filePath);
+            
+            fetch('/load_prompt_file?path=' + encodeURIComponent(filePath))
+                .then(response => {
+                    console.log("Response status: " + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log("Got response data:", data);
+                    if (data.success) {
+                        document.getElementById('prompt_text').value = data.content;
+                        
+                        // Also set the prompt_path for the main form if we're in the modal
+                        if (document.getElementById('prompt_path')) {
+                            document.getElementById('prompt_path').value = filePath;
+                        }
+                        
+                        showToast('Prompt file loaded successfully');
+                    } else {
+                        showToast('Failed to load prompt file: ' + data.error, true);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading prompt file:', error);
+                    showToast('Error loading prompt file', true);
+                });
+        }
+        
+        // Override default behavior - the function is disabled
+        function showAllPromptFiles() {
+            // Do nothing - deliberately empty
+            return false;
         }
         
         // Add keyboard shortcuts
@@ -1509,16 +2882,10 @@ DASHBOARD_TEMPLATE = '''
                 stopInstance();
             }
             
-            // Interrupt - Escape key with selected row
-            if (e.key === 'Escape' && selectedInstanceId) {
-                e.preventDefault();
-                interruptTask();
-            }
-            
-            // View terminal - Enter key with selected row
+            // Send prompt - Enter key with selected row
             if (e.key === 'Enter' && selectedInstanceId) {
                 e.preventDefault();
-                viewTerminal();
+                showSendPromptModal();
             }
         });
         
@@ -1531,23 +2898,40 @@ DASHBOARD_TEMPLATE = '''
             const rows = document.querySelectorAll('#instance-table tbody tr');
             
             rows.forEach(row => {
-                const id = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-                const status = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
-                const runtime = row.querySelector('td:nth-child(3)').textContent.trim().toLowerCase();
-                const directory = row.querySelector('td:nth-child(7)').textContent.toLowerCase();
-                const promptFile = row.querySelector('td:nth-child(8)').textContent.toLowerCase();
+                // Get the status badge text which contains "running", "ready", or "stopped"
+                const statusBadge = row.querySelector('td:nth-child(2) .status-badge');
+                const statusText = statusBadge ? statusBadge.textContent.trim().toLowerCase() : '';
+                
+                // Status can be inside different elements, so extract carefully
+                let status = '';
+                if (statusText.includes('running')) status = 'running';
+                else if (statusText.includes('ready')) status = 'ready';
+                else if (statusText.includes('stopped')) status = 'stopped';
+                else if (statusText.includes('error')) status = 'error';
+                
+                // Get data for searching
+                const directory = row.querySelector('td:nth-child(5)').textContent.toLowerCase().trim();
+                const promptFile = row.querySelector('td:nth-child(6)').textContent.toLowerCase().trim();
+                const id = row.dataset.id.toLowerCase(); // Get ID from data attribute
                 
                 // Apply status filter
                 const statusMatch = statusFilter === 'all' || status === statusFilter;
                 
-                // Apply runtime filter
+                // Apply runtime filter - now using data attribute
+                const runtime = row.dataset.runtime.toLowerCase();
                 const runtimeMatch = runtimeFilter === 'all' || runtime === runtimeFilter;
                 
-                // Apply search filter
+                // Apply search filter - improved to search in all columns
+                const timeText = row.querySelector('td:nth-child(3)').textContent.toLowerCase().trim();
+                const countText = row.querySelector('td:nth-child(4)').textContent.toLowerCase().trim();
+                
                 const searchMatch = searchText === '' || 
                     id.includes(searchText) || 
                     directory.includes(searchText) || 
-                    promptFile.includes(searchText);
+                    promptFile.includes(searchText) ||
+                    status.includes(searchText) ||
+                    timeText.includes(searchText) ||
+                    countText.includes(searchText);
                 
                 // Show/hide row based on all filters
                 row.style.display = (statusMatch && runtimeMatch && searchMatch) ? '' : 'none';
@@ -1565,13 +2949,11 @@ DASHBOARD_TEMPLATE = '''
                 // Map column to index and type
                 const columnMap = {
                     'id': { index: 0, type: 'string' },
-                    'status': { index: 1, type: 'string' },
-                    'runtime': { index: 2, type: 'string' },
-                    'uptime': { index: 3, type: 'time' },
-                    'yes_count': { index: 4, type: 'number' },
-                    'last_yes': { index: 5, type: 'time' },
-                    'directory': { index: 6, type: 'string' },
-                    'prompt_file': { index: 7, type: 'string' }
+                    'status': { index: 1, type: 'status' },
+                    'active_time': { index: 2, type: 'time' },
+                    'yes_count': { index: 3, type: 'number' },
+                    'directory': { index: 4, type: 'string' },
+                    'prompt_file': { index: 5, type: 'string' }
                 };
                 
                 const colInfo = columnMap[col];
@@ -1603,6 +2985,14 @@ DASHBOARD_TEMPLATE = '''
                         seconds += secs;
                     }
                     return seconds;
+                } else if (colInfo.type === 'status') {
+                    // Convert status to numeric order for sorting: running=3, ready=2, stopped=1, error=0
+                    const statusText = value.toLowerCase();
+                    if (statusText.includes('running')) return 3;
+                    if (statusText.includes('ready')) return 2;
+                    if (statusText.includes('stopped')) return 1;
+                    if (statusText.includes('error')) return 0;
+                    return -1; // Unknown status
                 } else {
                     return value.toLowerCase();
                 }
@@ -1656,6 +3046,83 @@ DASHBOARD_TEMPLATE = '''
             document.getElementById('delete-modal').style.display = 'none';
         }
         
+        // Send prompt modal functions
+        function showSendPromptModal() {
+            if (!selectedInstanceId) {
+                showToast('Please select an instance to send a prompt to', true);
+                return;
+            }
+            
+            // Check if instance is running
+            const row = document.querySelector(`tr[data-id="${selectedInstanceId}"]`);
+            if (row) {
+                const statusCell = row.querySelector('td:nth-child(2)');
+                const statusText = statusCell ? statusCell.textContent.trim().toLowerCase() : '';
+                
+                if (!statusText.includes('running')) {
+                    showToast('Selected instance is not running', true);
+                    return;
+                }
+                
+                // Set the instance ID in the form
+                document.getElementById('prompt-instance-id').value = selectedInstanceId;
+                
+                // Clear any previous values
+                document.getElementById('prompt_file_path').value = '';
+                document.getElementById('prompt_text').value = '';
+                
+                // Display the modal
+                document.getElementById('send-prompt-modal').style.display = 'block';
+            } else {
+                showToast('Failed to find the selected instance row', true);
+            }
+        }
+        
+        function closeSendPromptModal() {
+            document.getElementById('send-prompt-modal').style.display = 'none';
+        }
+        
+        function sendPrompt() {
+            const instanceId = document.getElementById('prompt-instance-id').value;
+            const promptText = document.getElementById('prompt_text').value;
+            const shouldSubmit = document.getElementById('submit_prompt').checked;
+            
+            if (!instanceId) {
+                showToast('No instance selected', true);
+                return;
+            }
+            
+            if (!promptText || promptText.trim() === '') {
+                showToast('Please enter prompt text', true);
+                return;
+            }
+            
+            // Send the prompt to the instance
+            fetch(`/send_prompt/${instanceId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    prompt: promptText,
+                    submit: shouldSubmit
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeSendPromptModal();
+                    showToast('Prompt sent successfully');
+                } else {
+                    showToast('Failed to send prompt: ' + data.error, true);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('An error occurred while sending prompt', true);
+            });
+        }
+        
         function confirmDelete() {
             let instancesToDelete = multiSelectEnabled && selectedInstances.size > 0 
                 ? Array.from(selectedInstances)
@@ -1678,13 +3145,42 @@ DASHBOARD_TEMPLATE = '''
             .then(data => {
                 if (data.success) {
                     closeDeleteModal();
-                    refreshInstances();
-                    showToast(`Successfully deleted ${instancesToDelete.length} instance(s)`);
                     
-                    // Clear selections
-                    selectedInstanceId = null;
-                    selectedRuntimeType = null;
-                    selectedInstances.clear();
+                    // Use the returned deleted_ids to ensure we only clear what was actually deleted
+                    if (data.deleted_ids && data.deleted_ids.length > 0) {
+                        // If the currently selected instance was deleted, clear the selection
+                        if (selectedInstanceId && data.deleted_ids.includes(selectedInstanceId)) {
+                            selectedInstanceId = null;
+                            selectedRuntimeType = null;
+                        }
+                        
+                        // Remove any deleted instances from multi-select
+                        if (multiSelectEnabled && selectedInstances.size > 0) {
+                            data.deleted_ids.forEach(id => {
+                                selectedInstances.delete(id);
+                            });
+                        }
+                        
+                        // Immediately remove the deleted rows from the table for a faster visual response
+                        data.deleted_ids.forEach(id => {
+                            const row = document.querySelector(`tr[data-id="${id}"]`);
+                            if (row) {
+                                row.remove();
+                            }
+                        });
+                    }
+                    
+                    // Log the deletion status for debugging
+                    console.log(`Delete operation completed. Deleted IDs: ${JSON.stringify(data.deleted_ids)}`);
+                    console.log(`Remaining IDs: ${JSON.stringify(data.remaining_ids)}`);
+                    
+                    // Force a complete refresh of instances with sync first
+                    manualRefresh();
+                    
+                    // Show success message after brief delay to ensure UI is updated
+                    setTimeout(() => {
+                        showToast(`Successfully deleted ${data.deleted_ids ? data.deleted_ids.length : instancesToDelete.length} instance(s)`);
+                    }, 500);
                 } else {
                     showToast('Failed to delete instances: ' + data.error, true);
                 }
@@ -1703,6 +3199,12 @@ DASHBOARD_TEMPLATE = '''
                 refreshBtn.innerHTML = '<svg class="animate-spin h-5 w-5 mr-3" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Syncing...';
             }
             
+            // Log current selection state for comparison
+            console.log("Selection before manual refresh:", 
+                "selectedInstanceId =", selectedInstanceId,
+                "multiSelectEnabled =", multiSelectEnabled,
+                "selectedInstances =", Array.from(selectedInstances));
+            
             // Run a full sync first
             fetch('/sync_tmux')
                 .then(response => response.json())
@@ -1713,6 +3215,14 @@ DASHBOARD_TEMPLATE = '''
                     
                     // Then refresh the UI
                     refreshInstances();
+                    
+                    // Add a small delay to ensure everything is updated
+                    setTimeout(() => {
+                        console.log("Selection after manual refresh:", 
+                            "selectedInstanceId =", selectedInstanceId,
+                            "multiSelectEnabled =", multiSelectEnabled,
+                            "selectedInstances =", Array.from(selectedInstances));
+                    }, 300);
                     
                     // Reset button
                     if (refreshBtn) {
@@ -1735,15 +3245,78 @@ DASHBOARD_TEMPLATE = '''
                 });
         }
         
-        // Auto refresh every 3 seconds with a more robust refresh
+        // Auto refresh with a more robust refresh using configured interval
         function autoRefresh() {
+            // 🛑 SUPER SIMPLE DIRECT APPROACH
+            // Directly read the selected rows from the DOM before refresh
+            const selectedRowIds = [];
+            document.querySelectorAll('tbody tr.selected').forEach(row => {
+                selectedRowIds.push(row.dataset.id);
+            });
+            
+            // Minimize logging - only log if we have selections
+            if (selectedRowIds.length > 0) {
+                console.log("💾 Auto-refresh: Saving", selectedRowIds.length, "selected row IDs");
+            }
+            
             fetch('/sync_tmux')
                 .then(response => response.json())
                 .then(data => {
-                    if (data.updated) {
+                    if (data.updated && data.count > 0) {
                         console.log("Updated instances from tmux sessions: " + data.count);
                     }
+                    
+                    // The refreshInstances function has been fixed to preserve selections
                     refreshInstances();
+                    
+                    // After refresh, check for any new instances for tracking
+                    setTimeout(() => {
+                        // Verify any selections were preserved
+                        if (selectedRowIds.length > 0) {
+                            const currentSelectedCount = document.querySelectorAll('tbody tr.selected').length;
+                            
+                            // If we've actually lost selections, force them back
+                            if (currentSelectedCount < selectedRowIds.length) {
+                                console.log(`⚠️ Lost selections! Should have ${selectedRowIds.length}, but only have ${currentSelectedCount}`);
+                                
+                                // Multi-select is always enabled now
+                                
+                                // Force every selected ID to be selected again
+                                selectedRowIds.forEach(id => {
+                                    const row = document.querySelector(`tr[data-id="${id}"]`);
+                                    if (row) {
+                                        // Force selection on this row
+                                        row.classList.add('selected');
+                                        selectedInstances.add(id);
+                                    }
+                                });
+                                
+                                console.log("🔄 Selections restored. Now have:", selectedInstances.size);
+                            }
+                        }
+                        
+                        // Initialize tracking for any new instances
+                        document.querySelectorAll('tr[data-id]').forEach(row => {
+                            const instanceId = row.dataset.id;
+                            if (!instanceStates[instanceId]) {
+                                const statusCell = row.querySelector('td:nth-child(2)');
+                                if (statusCell) {
+                                    const statusBadge = statusCell.querySelector('.status-badge');
+                                    const statusText = statusBadge ? statusBadge.textContent.trim().toLowerCase() : statusCell.textContent.trim().toLowerCase();
+                                    
+                                    // Initialize tracking for new instance
+                                    instanceStates[instanceId] = {
+                                        status: statusText,
+                                        startTime: Date.now(),
+                                        activeSeconds: 0
+                                    };
+                                }
+                            }
+                        });
+                        
+                        // Run a check to update ready state times
+                        checkForLongGenerations();
+                    }, 100);
                 })
                 .catch(error => {
                     console.error("Sync error:", error);
@@ -1751,7 +3324,316 @@ DASHBOARD_TEMPLATE = '''
                 });
         }
         
-        setInterval(autoRefresh, 3000);
+        // Settings modal functions
+        function showSettingsModal() {
+            // Load current settings into form
+            document.getElementById('refresh-interval').value = appSettings.refreshInterval;
+            document.getElementById('max-active-time').value = appSettings.maxActiveTime;
+            document.getElementById('interrupt-active-enabled').checked = appSettings.interruptActiveEnabled;
+            document.getElementById('timeout-action').value = appSettings.timeoutAction || 'interrupt';
+            
+            // Show the modal
+            document.getElementById('settings-modal').style.display = 'block';
+        }
+        
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+        
+        function saveSettings() {
+            // Get values from form
+            const refreshInterval = parseInt(document.getElementById('refresh-interval').value);
+            const maxActiveTime = parseInt(document.getElementById('max-active-time').value);
+            const interruptActiveEnabled = document.getElementById('interrupt-active-enabled').checked;
+            const timeoutAction = document.getElementById('timeout-action').value;
+            
+            // Validate
+            if (refreshInterval < 1 || refreshInterval > 60) {
+                showToast('Refresh interval must be between 1 and 60 seconds', true);
+                return;
+            }
+            
+            if (maxActiveTime < 0 || maxActiveTime > 240) {
+                showToast('Max active time must be between 0 and 240 minutes', true);
+                return;
+            }
+            
+            // Validate timeout action
+            if (!['interrupt', 'stop', 'delete'].includes(timeoutAction)) {
+                showToast('Invalid timeout action', true);
+                return;
+            }
+            
+            // Update settings
+            appSettings.refreshInterval = refreshInterval;
+            appSettings.maxActiveTime = maxActiveTime;
+            appSettings.interruptActiveEnabled = interruptActiveEnabled;
+            appSettings.timeoutAction = timeoutAction;
+            
+            // Save to localStorage
+            try {
+                localStorage.setItem('claudeManagerSettings', JSON.stringify(appSettings));
+                console.log('Saved settings to localStorage:', appSettings);
+            } catch (e) {
+                console.error('Failed to save settings to localStorage:', e);
+            }
+            
+            // Update refresh interval if it changed
+            clearInterval(autoRefreshIntervalId);
+            autoRefreshIntervalId = setInterval(autoRefresh, appSettings.refreshInterval * 1000);
+            
+            // Close modal
+            closeSettingsModal();
+            showToast('Settings saved successfully');
+        }
+        
+        function openTab(evt, tabName) {
+            // Hide all tab content
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            // Remove active class from all tabs
+            const tabs = document.getElementsByClassName('tab');
+            for (let i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+            }
+            
+            // Show the selected tab content and mark the button as active
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
+        
+        // Function to check state times and take appropriate action
+        function checkForLongGenerations() {
+            // Bypass the automated interrupts but still update timers
+            updateReadyTimes();
+            
+            // Exit early if interruption is disabled (which is the default now)
+            if (!appSettings.interruptActiveEnabled || appSettings.maxActiveTime <= 0) {
+                return; // Auto timeout action is disabled
+            }
+        }
+        
+        // Function to just update instance ready times without taking any actions
+        function updateReadyTimes() {
+            const currentTime = Date.now();
+            
+            // Check each running instance
+            const instances = document.querySelectorAll('tr[data-id]');
+            instances.forEach(row => {
+                const instanceId = row.dataset.id;
+                
+                // Check instance status
+                const statusCell = row.querySelector('td:nth-child(2)');
+                const timeCell = row.querySelector('td:nth-child(3)');
+                
+                if (statusCell && timeCell) {
+                    const statusBadge = statusCell.querySelector('.status-badge');
+                    const statusText = statusBadge ? statusBadge.textContent.trim().toLowerCase() : statusCell.textContent.trim().toLowerCase();
+                    
+                    // Initialize instance state if needed
+                    if (!instanceStates[instanceId]) {
+                        instanceStates[instanceId] = {
+                            status: statusText,
+                            startTime: currentTime,
+                            activeSeconds: 0, 
+                            lastUpdated: currentTime,
+                            readyStartTime: currentTime // Add ready start time
+                        };
+                    }
+                    
+                    // Check for state change
+                    if (instanceStates[instanceId].status !== statusText) {
+                        console.log(`Instance ${instanceId} state changed from ${instanceStates[instanceId].status} to ${statusText}`);
+                        
+                        // If changing from running to ready, record the ready start time
+                        if (statusText.includes('ready')) {
+                            console.log(`Instance ${instanceId} entered ready state, recording readyStartTime`);
+                            instanceStates[instanceId].readyStartTime = currentTime;
+                        }
+                        
+                        // Update status but preserve readyStartTime
+                        const readyStartTime = instanceStates[instanceId].readyStartTime;
+                        instanceStates[instanceId] = {
+                            status: statusText,
+                            startTime: currentTime,
+                            activeSeconds: 0,
+                            lastUpdated: currentTime,
+                            readyStartTime: statusText.includes('ready') ? currentTime : readyStartTime
+                        };
+                    }
+                    
+                    // Calculate elapsed time since the last update
+                    const elapsedSinceLastUpdate = currentTime - instanceStates[instanceId].lastUpdated;
+                    
+                    // Only update the actual elapsed time if it's been at least 1 second
+                    if (elapsedSinceLastUpdate >= 1000) {
+                        // Update active time for this instance incrementally based on real elapsed time
+                        instanceStates[instanceId].activeSeconds += Math.floor(elapsedSinceLastUpdate / 1000);
+                        instanceStates[instanceId].lastUpdated = currentTime;
+                        
+                        // If in ready state, update the time display
+                        if (statusText.includes('ready') && !statusText.includes('running') && instanceStates[instanceId].readyStartTime) {
+                            const readySeconds = Math.floor((currentTime - instanceStates[instanceId].readyStartTime) / 1000);
+                            const readyTimeFormatted = formatSeconds(readySeconds);
+                            timeCell.innerHTML = `<span style="color: var(--text-primary);">${readyTimeFormatted}</span>`;
+                        }
+                    }
+                }
+            });
+        
+        // Helper function to format seconds to a readable string
+        function formatSeconds(seconds) {
+            if (seconds < 60) {
+                return `${seconds}s`;
+            } else if (seconds < 3600) {
+                const minutes = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                return `${minutes}m ${secs}s`;
+            } else {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                const secs = seconds % 60;
+                return `${hours}h ${minutes}m ${secs}s`;
+            }
+        }
+        
+        // Function to initialize instance tracking on page load
+        function initializeInstanceTracking() {
+            // Initialize tracking for all instances
+            document.querySelectorAll('tr[data-id]').forEach(row => {
+                const instanceId = row.dataset.id;
+                const statusCell = row.querySelector('td:nth-child(2)');
+                
+                if (statusCell) {
+                    const statusBadge = statusCell.querySelector('.status-badge');
+                    const statusText = statusBadge ? statusBadge.textContent.trim().toLowerCase() : statusCell.textContent.trim().toLowerCase();
+                    
+                    // Initialize state tracking
+                    instanceStates[instanceId] = {
+                        status: statusText,
+                        startTime: Date.now(),
+                        activeSeconds: 0
+                    };
+                }
+            });
+            
+            // Run initial check to set up ready state times
+            checkForLongGenerations();
+        }
+        
+        // Check for control key state on page load
+        function checkControlKeyState() {
+            document.addEventListener('mousemove', function onFirstMove(e) {
+                // Check if control key is pressed (useful when page loads with Ctrl already pressed)
+                if (e.ctrlKey || e.metaKey) {
+                    document.body.classList.add('ctrl-pressed');
+                    console.log("Control key detected during initial mouse move");
+                }
+                document.removeEventListener('mousemove', onFirstMove); // Only run once
+            });
+        }
+        
+        // Run initialization after DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize instance tracking first
+            initializeInstanceTracking();
+            
+            // Load saved selection state from localStorage
+            loadSelectionState();
+            
+            // Check control key state
+            checkControlKeyState();
+            
+            console.log("DOM loaded - initialization complete");
+        });
+        
+        // Also initialize right away in case DOMContentLoaded already fired
+        if (document.readyState === 'interactive' || document.readyState === 'complete') {
+            initializeInstanceTracking();
+            loadSelectionState();
+            checkControlKeyState();
+            console.log("DOM already loaded - initialization complete");
+        }
+        
+        // Response popup function
+        function showResponsePopup(event, instanceId, content) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Create popup if it doesn't exist yet
+            let popup = document.getElementById('response-popup');
+            if (!popup) {
+                popup = document.createElement('div');
+                popup.id = 'response-popup';
+                popup.className = 'response-popup';
+                
+                const popupContent = document.createElement('div');
+                popupContent.className = 'response-popup-content';
+                
+                const closeBtn = document.createElement('button');
+                closeBtn.className = 'close-popup';
+                closeBtn.innerHTML = '×';
+                closeBtn.onclick = closeResponsePopup;
+                
+                const contentDiv = document.createElement('div');
+                contentDiv.id = 'popup-content';
+                
+                popupContent.appendChild(closeBtn);
+                popupContent.appendChild(contentDiv);
+                popup.appendChild(popupContent);
+                
+                // Add click event to close when clicking outside
+                popup.addEventListener('click', function(e) {
+                    if (e.target === popup) {
+                        closeResponsePopup();
+                    }
+                });
+                
+                document.body.appendChild(popup);
+            }
+            
+            // Set the content
+            const contentDiv = document.getElementById('popup-content');
+            
+            // Properly decode the HTML entities
+            let decodedContent = content.replace(/&lt;/g, '<')
+                                        .replace(/&gt;/g, '>')
+                                        .replace(/&quot;/g, '"')
+                                        .replace(/&#39;/g, "'")
+                                        .replace(/&amp;/g, '&');
+            
+            // Replace spaces with actual line breaks
+            decodedContent = decodedContent.replace(/ {2,}/g, '<br>');
+            
+            // Create a container for the response that ensures line breaks at word boundaries
+            const formattedContent = `<div style="white-space: pre-wrap; word-break: break-word; width: 100%;">${decodedContent}</div>`;
+            contentDiv.innerHTML = formattedContent;
+            
+            // Add title with instance ID
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'popup-title';
+            titleDiv.textContent = `Response from instance ${instanceId}`;
+            contentDiv.insertBefore(titleDiv, contentDiv.firstChild);
+            
+            // Show the popup
+            popup.style.display = 'flex';
+        }
+        
+        function closeResponsePopup() {
+            const popup = document.getElementById('response-popup');
+            if (popup) {
+                popup.style.display = 'none';
+            }
+        }
+        
+        // Initialize auto-refresh interval with settings
+        let autoRefreshIntervalId = setInterval(autoRefresh, appSettings.refreshInterval * 1000);
+        
+        // Update instance timers every 5 seconds (but don't interrupt)
+        setInterval(updateReadyTimes, 5000);
     </script>
 </body>
 </html>
@@ -1768,14 +3650,48 @@ def dashboard():
     manager._verify_loaded_instances()
     manager._import_unregistered_tmux_sessions()
     
-    # Get fresh instance list with accurate tmux status
-    instances = manager.list_instances()
+    # Get fresh instance list with accurate tmux status and content previews
+    instance_list = manager.list_instances()
+    
+    # Process the instance list to add any additional UI-specific fields
+    instances = []
+    for instance_dict in instance_list:
+        instance_id = instance_dict['id']
+        instance_obj = manager.instances.get(instance_id)
+        
+        # Add detailed_status if available
+        if instance_obj and hasattr(instance_obj, 'detailed_status'):
+            instance_dict['detailed_status'] = instance_obj.detailed_status
+        else:
+            instance_dict['detailed_status'] = 'ready'
+            
+        # Add generation_time if available
+        if instance_obj and hasattr(instance_obj, 'generation_time'):
+            instance_dict['generation_time'] = instance_obj.generation_time
+            
+        # Add tmux_content if available - this is used for the response column
+        if instance_obj and hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content:
+            # Truncate to avoid huge JSON payloads
+            instance_dict['tmux_content'] = instance_obj.tmux_content[:2000]
+            
+        instances.append(instance_dict)
+    
     current_time = datetime.now().strftime("%H:%M:%S")
+    
+    # Get list of prompt files for the dropdown
+    prompt_files = get_prompt_files()
+    
+    # Add current timestamp for time calculations
+    current_timestamp = time.time()
+    
     return render_template_string(
         DASHBOARD_TEMPLATE, 
         instances=instances,
         current_time=current_time,
-        manager=manager
+        current_timestamp=current_timestamp,
+        manager=manager,
+        os=os,
+        prompt_files=prompt_files
     )
 
 def get_tmux_sessions():
@@ -1857,7 +3773,7 @@ def get_tmux_sessions():
                                 # Try alternative formats
                                 try:
                                     # In case we're missing specific format details, try a more tolerant parser
-                                    import time as pytime
+                                    import time, os as pytime
                                     parsed_time = pytime.strptime(created_str, "%a %b %d %H:%M:%S %Y")
                                     creation_timestamp = pytime.mktime(parsed_time)
                                     print(f"Parsed using time.strptime: {pytime.strftime('%Y-%m-%d %H:%M:%S', parsed_time)}")
@@ -2034,6 +3950,146 @@ def sync_tmux():
         if imported_count > 0:
             updates_count += imported_count
             print(f"=== SYNC: Imported {imported_count} new tmux sessions")
+        
+        # Check active status for each running instance
+        for instance_id, instance in manager.instances.items():
+            if instance.status == "running" and hasattr(instance, 'use_tmux') and instance.use_tmux:
+                # Only check tmux instances
+                try:
+                    # Capture the visible content of the tmux session
+                    session_name = instance.tmux_session_name
+                    result = subprocess.run(
+                        ["tmux", "capture-pane", "-p", "-t", session_name],
+                        capture_output=True, text=True, check=False
+                    )
+                    
+                    if result.returncode == 0:
+                        output = result.stdout
+                        
+                        # Store the full tmux output for display in the response column
+                        if not hasattr(instance, 'tmux_content'):
+                            instance.tmux_content = output
+                        else:
+                            # Only update if different to avoid unnecessary updates
+                            if instance.tmux_content != output:
+                                instance.tmux_content = output
+                                updates_count += 1
+                        
+                        # Check for the pattern (###s · esc to interrupt) indicating active generation
+                        detailed_status = instance.__dict__.get('detailed_status', '')
+                        
+                        # STEP 1: Default to READY
+                        # Always set to ready first, then only change if we 100% detect running
+                        is_active = False
+                        generation_seconds = None
+                        current_time = time.time()
+                        
+                        try:
+                            # Try to check directly with a simpler command first
+                            simple_check = subprocess.run(
+                                ["tmux", "capture-pane", "-p", "-t", session_name], 
+                                capture_output=True, text=True
+                            )
+                            print(f"=== Direct capture for {instance_id} session {session_name}: {simple_check.returncode}")
+                            
+                            # Check if command succeeded and has content
+                            if simple_check.returncode == 0 and simple_check.stdout:
+                                direct_output = simple_check.stdout
+                                
+                                # Log a sample of the output
+                                sample = direct_output[:100].replace('\n', ' ')
+                                print(f"=== Sample from {instance_id}: {sample}")
+                                
+                                # STEP 2: Check for active generation by looking for common Claude generation indicators
+                                if '█' in direct_output or '▓' in direct_output or '░' in direct_output or '···' in direct_output:
+                                    # Mark as active if we found any generation indicators
+                                    is_active = True
+                                    print(f"=== Instance {instance_id}: RUNNING - found generation indicators")
+                                    
+                                    # If state changed from ready to running, record the time
+                                    old_status = getattr(instance, 'detailed_status', 'ready')
+                                    if old_status != 'running':
+                                        instance.active_since = current_time
+                                        print(f"=== Instance {instance_id}: State changed from {old_status} to running, recording active_since={current_time}")
+                                    
+                                    # Extract the seconds if available
+                                    # Look for digits followed by 's' in the text
+                                    seconds_pattern = re.search(r'(\d+)s', direct_output)
+                                    if seconds_pattern:
+                                        generation_seconds = seconds_pattern.group(1)
+                                        print(f"=== Instance {instance_id}: Generation time: {generation_seconds}s")
+                                else:
+                                    print(f"=== Instance {instance_id}: READY - no generation indicators found")
+                                    
+                                    # If state changed from running to ready, record the time
+                                    old_status = getattr(instance, 'detailed_status', 'ready')
+                                    if old_status != 'ready':
+                                        instance.ready_since = current_time
+                                        print(f"=== Instance {instance_id}: State changed from {old_status} to ready, recording ready_since={current_time}")
+                                        
+                                    # Initialize ready_since if it doesn't exist yet
+                                    if not hasattr(instance, 'ready_since') or instance.ready_since is None:
+                                        instance.ready_since = current_time
+                                    
+                                # ADDITIONAL FEATURE: Auto-respond to various common prompts
+                                auto_respond_phrases = [
+                                    'Do you want to',
+                                    'Would you like to',
+                                    'Shall I proceed',
+                                    'Continue?',
+                                    'Proceed?',
+                                    'Press Enter to continue',
+                                    'Press any key to continue'
+                                ]
+                                
+                                # Check if any of the auto-respond phrases are in the output
+                                should_respond = False
+                                detected_phrase = None
+                                
+                                for phrase in auto_respond_phrases:
+                                    if phrase in direct_output:
+                                        should_respond = True
+                                        detected_phrase = phrase
+                                        break
+                                        
+                                if should_respond:
+                                    print(f"=== Instance {instance_id}: Detected '{detected_phrase}' prompt - sending Enter")
+                                    try:
+                                        # Send an Enter key to automatically confirm
+                                        subprocess.run([
+                                            "tmux", "send-keys", "-t", session_name, 
+                                            "Enter"
+                                        ], check=True)
+                                        print(f"=== Instance {instance_id}: Successfully sent Enter key")
+                                    except Exception as e:
+                                        print(f"=== Instance {instance_id}: Error sending Enter key: {e}")
+                        except Exception as e:
+                            print(f"=== Error during direct status check for {instance_id}: {e}")
+                            
+                        # STEP 4: Update the instance properties
+                        if is_active:
+                            # Mark as running and record generation time
+                            instance.detailed_status = 'running'
+                            if generation_seconds:
+                                instance.generation_time = f"{generation_seconds}s"
+                            else:
+                                instance.generation_time = "?"
+                            updates_count += 1
+                        else:
+                            # Default to ready
+                            if getattr(instance, 'detailed_status', '') != 'ready':
+                                instance.detailed_status = 'ready'
+                                # Initialize ready_since when changing to ready state
+                                instance.ready_since = current_time
+                                updates_count += 1
+                            # Make sure ready_since is always initialized
+                            if not hasattr(instance, 'ready_since') or instance.ready_since is None:
+                                instance.ready_since = current_time
+                                
+                        # Print state for debugging
+                        print(f"=== Instance {instance_id} final status: {getattr(instance, 'detailed_status', 'none')}")
+                except Exception as e:
+                    print(f"=== SYNC: Error checking active status for instance {instance_id}: {e}")
             
         # Get the current state of all instances for logging
         instances = manager.instances
@@ -2065,22 +4121,113 @@ def sync_tmux():
 @app.route('/refresh')
 def refresh():
     """Refresh instances data."""
-    # Just reload instances from file - syncing is done separately
+    # Force a complete re-sync every time a refresh is requested to get latest status
+    print("======== PERFORMING COMPLETE REFRESH AND SYNC ========")
+    
+    # Step 1: Force reload from disk
     manager.load_instances()
     
-    # Get fresh instance list
-    instances = manager.list_instances()
+    # Step 2: Run a sync to check all tmux sessions and update statuses
+    sync_tmux()
+    
+    # Step 3: Save any changes to disk
+    manager.save_instances()
+    
+    # Step 4: Use the list_instances method to get properly formatted instances 
+    # This ensures we get the first 100 chars of the prompt content
+    instance_list = manager.list_instances()
+    
+    # Process the instance list to add any additional UI-specific fields
+    instances = []
+    for instance_dict in instance_list:
+        instance_id = instance_dict['id']
+        instance_obj = manager.instances.get(instance_id)
+        
+        # Add detailed_status if available
+        if instance_obj and hasattr(instance_obj, 'detailed_status'):
+            instance_dict['detailed_status'] = instance_obj.detailed_status
+        else:
+            instance_dict['detailed_status'] = 'ready'
+            
+        # Add generation_time if available
+        if instance_obj and hasattr(instance_obj, 'generation_time'):
+            instance_dict['generation_time'] = instance_obj.generation_time
+            
+        # Add tmux_content if available - this is used for the response column
+        if instance_obj and hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content:
+            # Truncate to avoid huge JSON payloads
+            instance_dict['tmux_content'] = instance_obj.tmux_content[:2000]
+            
+        instances.append(instance_dict)
+    
+    # Sort by start time if available
+    instances.sort(key=lambda x: manager.instances[x['id']].start_time if x['id'] in manager.instances else 0, reverse=True)
+    
+    print(f"Refreshed {len(instances)} instances")
+    
+    # Get list of prompt files for the dropdown
+    prompt_files = get_prompt_files()
+    
+    # Use the clean instance list of dictionaries
     current_time = datetime.now().strftime("%H:%M:%S")
+    
+    # Add current timestamp for time calculations
+    current_timestamp = time.time()
+    
     return render_template_string(
         DASHBOARD_TEMPLATE, 
         instances=instances,
         current_time=current_time,
-        manager=manager
+        current_timestamp=current_timestamp,
+        manager=manager,
+        os=os,
+        prompt_files=prompt_files
     )
+
+@app.route('/api/prompt_files')
+def api_prompt_files():
+    """Get list of prompt files that match a search term."""
+    search_term = request.args.get('q', '').lower()
+    prompt_files = get_prompt_files()
+    
+    # Filter files based on search term
+    if search_term:
+        filtered_files = []
+        for file in prompt_files:
+            if search_term in file['name'].lower() or search_term in file['path'].lower():
+                filtered_files.append(file)
+        return jsonify(filtered_files)
+    else:
+        return jsonify(prompt_files)
+
+@app.route('/load_prompt_file')
+def load_prompt_file():
+    """Load a prompt file's content."""
+    import os  # Explicitly import os here to fix the reference issue
+    
+    file_path = request.args.get('path')
+    if not file_path:
+        return jsonify({"success": False, "error": "No file path provided"})
+    
+    try:
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            with open(file_path, 'r') as f:
+                content = f.read()
+            return jsonify({"success": True, "content": content})
+        else:
+            return jsonify({"success": False, "error": f"File not found: {file_path}"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 @app.route('/add', methods=['POST'])
 def add_instance():
     """Add a new Claude instance."""
+    # Import necessary modules explicitly to avoid reference issues
+    import os
+    import re
+    import tempfile
+    import glob
+    
     # Sync with tmux sessions first to ensure consistent state
     import_tmux_sessions()
     
@@ -2089,11 +4236,9 @@ def add_instance():
     runtime_type = request.form.get('runtime_type', 'tmux').strip().lower()
     open_window = request.form.get('open_window') == 'on'
     
-    # Parse out parentheses and single quotes
-    import re
-    import tempfile
-    import glob
+    print(f"Received form data: proj_dir={proj_dir}, prompt_path={prompt_path}, runtime_type={runtime_type}, open_window={open_window}")
     
+    # Parse out parentheses and single quotes
     # Remove parentheses and their content
     proj_dir = re.sub(r'\([^)]*\)', '', proj_dir).strip()
     prompt_path = re.sub(r'\([^)]*\)', '', prompt_path).strip()
@@ -2105,6 +4250,12 @@ def add_instance():
     # Clean up any extra spaces
     proj_dir = proj_dir.strip()
     prompt_path = prompt_path.strip()
+    
+    print(f"After cleaning: proj_dir={proj_dir}, prompt_path={prompt_path}")
+    
+    # Normalize paths to match exactly how the task manager will normalize them
+    # This ensures consistent comparison for instance reuse
+    proj_dir = os.path.normpath(proj_dir)
     
     # Check if project directory is just an ID number
     if re.match(r'^\d+$', proj_dir):
@@ -2172,23 +4323,16 @@ def add_instance():
     # Determine whether to use tmux
     use_tmux = runtime_type == 'tmux'
     
-    # Start the instance
-    instance_id = manager.start_instance(proj_dir, prompt_path, use_tmux=use_tmux)
-    
-    # If open_window is checked and it's a tmux instance, open a terminal window
-    if open_window and use_tmux:
-        instance = manager.instances.get(instance_id)
-        if instance and instance.tmux_session_name:
-            # Open a terminal window attached to the tmux session
-            try:
-                subprocess.run([
-                    "osascript", "-e", 
-                    f'tell application "Terminal" to do script "tmux attach -t {instance.tmux_session_name}"'
-                ], check=True)
-            except Exception as e:
-                print(f"Error opening tmux window: {e}")
-    
-    return redirect(url_for('dashboard'))
+    try:
+        # Start the instance - let the start_instance method handle opening the terminal
+        instance_id = manager.start_instance(proj_dir, prompt_path, use_tmux=use_tmux, open_terminal=open_window)
+        print(f"Successfully started instance {instance_id}")
+        return redirect(url_for('dashboard'))
+    except Exception as e:
+        print(f"Error starting instance: {e}")
+        import traceback
+        traceback.print_exc()
+        return f"Error starting instance: {str(e)}", 500
 
 def ensure_tmux_session_exists(instance):
     """Ensure that the tmux session for an instance exists."""
@@ -2287,98 +4431,166 @@ def delete_instances():
     errors = []
     
     for instance_id in instance_ids:
+        # Use the new method in the manager that properly handles deletion
         if instance_id in manager.instances:
-            # Check if instance is running and stop it first
-            instance = manager.instances[instance_id]
-            if instance.status == "running":
-                # Stop the running instance and its processes
-                success = manager.stop_instance(instance_id)
-                if not success:
-                    errors.append(f"Failed to stop running instance {instance_id}")
-                    continue
-            
-            # Ensure tmux sessions are forcefully killed
-            try:
-                if hasattr(instance, 'tmux_session_name') and instance.tmux_session_name:
-                    session_name = instance.tmux_session_name
-                    try:
-                        # First try gentle kill
-                        app.logger.info(f"Killing tmux session for instance {instance_id}: {session_name}")
-                        subprocess.run(["tmux", "kill-session", "-t", session_name], 
-                                      check=False, stderr=subprocess.PIPE)
-                        
-                        # Check if the session still exists
-                        check_result = subprocess.run(
-                            ["tmux", "has-session", "-t", session_name],
-                            capture_output=True, 
-                            check=False
-                        )
-                        
-                        # If session still exists, use more aggressive measures
-                        if check_result.returncode == 0:
-                            app.logger.info(f"Session {session_name} still exists, using forceful kill")
-                            
-                            # Safer approach to checking tmux sessions with output redirected
-                            subprocess.run(
-                                ["bash", "-c", "tmux list-sessions 2>/dev/null || echo 'No sessions'"],
-                                check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-                            )
-                            
-                            # Try pkill to kill any processes related to this tmux session
-                            subprocess.run([
-                                "pkill", "-f", f"tmux.*{session_name}"
-                            ], check=False)
-                            
-                            # Kill any claude processes related to this session
-                            subprocess.run([
-                                "pkill", "-f", f"claude.*{session_name}"
-                            ], check=False)
-                    except Exception as tmux_error:
-                        app.logger.error(f"Error killing tmux session: {tmux_error}")
-                        
-                # For terminal-based instances, ensure terminal is closed
-                elif hasattr(instance, 'terminal_id') and instance.terminal_id:
-                    terminal_id = instance.terminal_id
-                    try:
-                        # Close the terminal window
-                        close_script = f'''
-                        tell application "Terminal"
-                            try
-                                close (first tab of first window whose id is {terminal_id})
-                            end try
-                        end tell
-                        '''
-                        subprocess.run(["osascript", "-e", close_script], capture_output=True, check=False)
-                    except Exception as term_error:
-                        app.logger.error(f"Error closing terminal window: {term_error}")
-            except Exception as e:
-                app.logger.error(f"Error cleaning up session resources: {e}")
-            
-            # Delete the instance from the manager
-            try:
-                # Remove from instances dictionary
-                del manager.instances[instance_id]
+            success = manager.delete_instance(instance_id)
+            if success:
                 deleted_count += 1
-                app.logger.info(f"Successfully deleted instance {instance_id} from manager")
-            except Exception as e:
-                errors.append(f"Error deleting instance {instance_id}: {str(e)}")
+                app.logger.info(f"Successfully deleted instance {instance_id}")
+            else:
+                errors.append(f"Failed to delete instance {instance_id}")
         else:
             errors.append(f"Instance {instance_id} not found")
     
     # Save updated instances to persist the changes
     manager.save_instances()
     
+    # Force a reload of instances from file to ensure we have a clean state
+    manager.load_instances()
+    
+    # Return detailed information
     if errors:
         return jsonify({
             "success": True,
             "message": f"Deleted {deleted_count} instances with {len(errors)} errors",
+            "deleted_ids": [id for id in instance_ids if id not in manager.instances],
+            "remaining_ids": list(manager.instances.keys()),
             "errors": errors
         })
     else:
         return jsonify({
             "success": True,
-            "message": f"Successfully deleted {deleted_count} instances from dashboard and system"
+            "message": f"Successfully deleted {deleted_count} instances from dashboard and system",
+            "deleted_ids": instance_ids,
+            "remaining_ids": list(manager.instances.keys())
         })
+
+@app.route('/send_prompt/<instance_id>', methods=['POST'])
+def send_prompt(instance_id):
+    """Send a prompt to a running Claude instance."""
+    # Import necessary modules explicitly to avoid reference issues
+    import os
+    
+    # Get the instance
+    instance = manager.instances.get(instance_id)
+    if not instance:
+        return jsonify({"success": False, "error": f"Instance {instance_id} not found"})
+    
+    # Check if instance is running
+    if instance.status != "running":
+        return jsonify({"success": False, "error": f"Instance {instance_id} is not running"})
+    
+    # Get the prompt text and submit flag from the request
+    data = request.json
+    prompt_text = data.get('prompt', '')
+    should_submit = data.get('submit', True)
+    
+    try:
+        print(f"Sending prompt to instance {instance_id}: {prompt_text[:50]}...")
+        
+        # Check if prompt_text is a file path
+        if prompt_text.startswith('/') or prompt_text.startswith('~'):
+            # Expand home directory if needed
+            if prompt_text.startswith('~'):
+                prompt_text = os.path.expanduser(prompt_text)
+                
+            # Check if the file exists
+            if not os.path.exists(prompt_text):
+                return jsonify({"success": False, "error": f"File not found: {prompt_text}"})
+                
+            # Read the file content
+            try:
+                with open(prompt_text, 'r') as f:
+                    file_content = f.read()
+                prompt_text = file_content
+                print(f"Read file content ({len(file_content)} chars) from {prompt_text}")
+            except Exception as e:
+                return jsonify({"success": False, "error": f"Error reading file: {e}"})
+        
+        # Send the prompt to the instance based on its runtime type
+        if hasattr(instance, 'use_tmux') and instance.use_tmux and instance.tmux_session_name:
+            # For tmux sessions, use tmux send-keys
+            session_name = instance.tmux_session_name
+            
+            # Break the prompt into manageable chunks to avoid issues with long lines
+            chunk_size = 100  # Smaller chunks to avoid tmux issues
+            for i in range(0, len(prompt_text), chunk_size):
+                chunk = prompt_text[i:i+chunk_size]
+                
+                try:
+                    # Handle special characters by creating a temporary file and using loadb
+                    with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt') as tmp:
+                        tmp.write(chunk)
+                        tmp_path = tmp.name
+                    
+                    # Use paste-buffer approach which is more reliable for special characters
+                    subprocess.run(["tmux", "load-buffer", tmp_path], check=True)
+                    subprocess.run(["tmux", "paste-buffer", "-t", session_name], check=True)
+                    
+                    # Clean up temp file
+                    os.unlink(tmp_path)
+                    
+                    # Brief pause between chunks
+                    time.sleep(0.1)
+                except Exception as e:
+                    print(f"Error sending chunk: {e}")
+                    
+                    # Fallback to direct send-keys if load-buffer fails
+                    try:
+                        # Try without the -l flag which can cause issues with special chars
+                        print(f"Trying fallback method without -l flag, chunk length: {len(chunk)}")
+                        subprocess.run([
+                            "tmux", "send-keys", "-t", session_name,
+                            chunk
+                        ], check=True)
+                    except Exception as nested_e:
+                        print(f"Fallback also failed: {nested_e}")
+                        # If both methods fail, just log it but continue with next chunk
+                        print(f"WARNING: Could not send chunk: {chunk[:20]}...")
+                        # Don't raise the exception, try to continue
+                
+            
+            # If requested, submit the prompt by sending Enter
+            if should_submit:
+                time.sleep(0.5)  # Wait a bit before sending Enter
+                subprocess.run([
+                    "tmux", "send-keys", "-t", session_name, 
+                    "Enter"
+                ], check=True)
+                
+            return jsonify({"success": True})
+        else:
+            # For terminal sessions, use AppleScript
+            if instance.terminal_id:
+                # First activate the terminal
+                activate_cmd = f'''
+                tell application "Terminal"
+                    activate
+                    set frontmost of (first window whose id is {instance.terminal_id}) to true
+                end tell
+                '''
+                subprocess.run(["osascript", "-e", activate_cmd])
+                
+                # Then send the text using AppleScript
+                text_escaped = prompt_text.replace('"', '\\"').replace('\\', '\\\\')
+                send_text_cmd = f'''
+                tell application "System Events"
+                    keystroke "{text_escaped}"
+                end tell
+                '''
+                subprocess.run(["osascript", "-e", send_text_cmd])
+                
+                # If requested, submit the prompt by sending Enter
+                if should_submit:
+                    time.sleep(0.5)  # Wait a bit before sending Enter
+                    subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
+                
+                return jsonify({"success": True})
+            else:
+                return jsonify({"success": False, "error": f"Terminal ID not found for instance {instance_id}"})
+    except Exception as e:
+        print(f"Error sending prompt: {e}")
+        return jsonify({"success": False, "error": str(e)})
 
 @app.route('/view_terminal/<instance_id>', methods=['POST'])
 def view_terminal(instance_id):
@@ -2594,20 +4806,20 @@ def upload_file():
                             home_dir = str(Path.home())
                             for p in dir_paths:
                                 if p.startswith(home_dir):
-                                    return jsonify({"path": p})
+                                    return jsonify({"path": os.path.normpath(p)})
                             
                             # If no match in home dir, just return the first directory
-                            return jsonify({"path": dir_paths[0]})
+                            return jsonify({"path": os.path.normpath(dir_paths[0])})
                     
                     # Otherwise handle like a regular file
                     # If multiple results, try to find the most relevant one (e.g., home directory)
                     home_dir = str(Path.home())
                     for p in paths:
                         if p.startswith(home_dir):
-                            return jsonify({"path": p})
+                            return jsonify({"path": os.path.normpath(p)})
                     
                     # If no match in home dir, just return the first match
-                    return jsonify({"path": paths[0]})
+                    return jsonify({"path": os.path.normpath(paths[0])})
             except Exception as e:
                 print(f"Error using mdfind: {e}")
         
@@ -2623,12 +4835,12 @@ def upload_file():
             
             for dir_path in potential_dirs:
                 if os.path.isdir(dir_path):
-                    return jsonify({"path": dir_path})
+                    return jsonify({"path": os.path.normpath(dir_path)})
             
             # Last resort, return a placeholder with the directory name
-            return jsonify({"path": f"/path/to/{file.filename}"})
+            return jsonify({"path": os.path.normpath(f"/path/to/{file.filename}")})
         else:
-            # For files, return the filename
+            # For files, return the filename (no need to normalize non-path filenames)
             return jsonify({"path": file.filename})
     
     finally:
@@ -2673,7 +4885,7 @@ def find_directory():
     
     # Method 0: If we can directly check the path and it exists, return it
     if os.path.isdir(dir_name):
-        return jsonify({"path": dir_name})
+        return jsonify({"path": os.path.normpath(dir_name)})
     
     # Method 1: Check if directory exists in common locations (fastest method)
     # This is now our first method because it's fastest and most reliable
@@ -2689,8 +4901,9 @@ def find_directory():
     
     for loc in common_locations:
         if os.path.isdir(loc):
-            print(f"Found directory in common location: {loc}")
-            return jsonify({"path": loc})
+            normalized_path = os.path.normpath(loc)
+            print(f"Found directory in common location: {normalized_path}")
+            return jsonify({"path": normalized_path})
     
     # Method 2: Use find command to locate the directory
     try:
@@ -2716,8 +4929,9 @@ def find_directory():
             
             if paths:
                 # Return the first matching directory
-                print(f"Found directory using find: {paths[0]}")
-                return jsonify({"path": paths[0]})
+                normalized_path = os.path.normpath(paths[0])
+                print(f"Found directory using find: {normalized_path}")
+                return jsonify({"path": normalized_path})
     except Exception as e:
         print(f"Error using find command: {e}")
     
@@ -2738,14 +4952,16 @@ def find_directory():
             
             if dir_paths:
                 # Return the first matching directory
-                print(f"Found directory using mdfind: {dir_paths[0]}")
-                return jsonify({"path": dir_paths[0]})
+                normalized_path = os.path.normpath(dir_paths[0])
+                print(f"Found directory using mdfind: {normalized_path}")
+                return jsonify({"path": normalized_path})
     except Exception as e:
         print(f"Error using mdfind: {e}")
     
     # If we couldn't find a match, return the directory name as fallback
-    print(f"No match found, returning directory name: {dir_name}")
-    return jsonify({"path": dir_name})
+    normalized_path = os.path.normpath(dir_name)
+    print(f"No match found, returning normalized directory name: {normalized_path}")
+    return jsonify({"path": normalized_path})
 
 def open_browser():
     """Open the web browser after a short delay."""
@@ -2798,13 +5014,48 @@ def shutdown_existing_server():
         print("Attempting to shut down existing server...")
         requests.get("http://127.0.0.1:5000/shutdown", timeout=2)
         # Wait a moment for the server to shut down
-        import time
+        import time, os
         time.sleep(2)
         return True
     except:
         return False
 
 # Add a shutdown route to the Flask app
+def get_svg_content(file_path):
+    """Helper function to read SVG file content safely."""
+    try:
+        with open(file_path, 'r') as f:
+            return f.read()
+    except Exception as e:
+        print(f"Error reading SVG file {file_path}: {e}")
+        return None
+
+@app.route('/svg/<path:svg_path>')
+def serve_svg(svg_path):
+    """Serve SVG content with proper encoding of path."""
+    # Decode the path which may contain spaces and special characters
+    import urllib.parse
+    decoded_path = urllib.parse.unquote(svg_path)
+    full_path = f"/{decoded_path}"  # Add the leading slash back
+    
+    print(f"Attempting to serve SVG from: {full_path}")
+    
+    if not os.path.exists(full_path):
+        print(f"SVG file not found: {full_path}")
+        return "", 404
+    
+    try:
+        # Read the SVG file
+        with open(full_path, 'rb') as f:
+            svg_data = f.read()
+        
+        # Return the SVG with the correct MIME type
+        from flask import Response
+        return Response(svg_data, mimetype='image/svg+xml')
+    except Exception as e:
+        print(f"Error serving SVG: {e}")
+        return "", 500
+
 @app.route('/shutdown')
 def shutdown():
     """Shutdown the server."""
@@ -2813,6 +5064,25 @@ def shutdown():
     print("Server shutting down...")
     os._exit(0)
     return "Server shutting down..."
+
+def get_prompt_files():
+    """Get a list of prompt files from the prompts directory."""
+    prompt_dir = "/Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/prompts"
+    prompt_files = []
+    
+    if os.path.exists(prompt_dir) and os.path.isdir(prompt_dir):
+        for file in os.listdir(prompt_dir):
+            if file.endswith('.txt'):
+                file_path = os.path.join(prompt_dir, file)
+                # Create an object with both path and name
+                prompt_files.append({
+                    "path": file_path,
+                    "name": file
+                })
+    
+    # Sort files by name
+    prompt_files.sort(key=lambda x: x["name"])
+    return prompt_files
 
 def main():
     """Start the web dashboard."""
@@ -2843,7 +5113,7 @@ def main():
             print(f"Error checking for running processes: {e}")
     
     # Wait for the port to be freed
-    import time
+    import time, os
     import socket
     for _ in range(5):  # Try up to 5 times
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
