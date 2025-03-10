@@ -1,55 +1,56 @@
 # Claude Task Manager
 
-A management system for automating and monitoring Claude CLI tasks.
+A comprehensive management system for Claude AI tasks and sessions.
 
-## Core Components
+## Overview
 
-- **claude_task_manager.py**: Core library for managing Claude instances
-- **claude_dashboard_web.py**: Web dashboard for monitoring and controlling instances
-- **claude_monitor.py**: Terminal-based monitor for Claude CLI instances
-- **claude_monitor_direct.py**: tmux-based monitor for Claude CLI instances
-- **quick_start.py**: Command-line utility for quickly starting new Claude instances
+The Claude Task Manager provides a web-based dashboard and CLI tools to:
+- Create and manage Claude instances
+- Monitor running Claude sessions
+- Send prompts to Claude
+- View and interact with Claude responses
+- Organize Claude tasks by project
+
+## Installation
+
+1. Clone the repository
+2. Install dependencies:
+```
+pip install -r requirements.txt
+```
 
 ## Usage
 
-### Starting the Web Dashboard
+### Launch Web Dashboard
 
-```bash
-python3 claude_dashboard_web.py
+```
+./manage.py dashboard
+```
+or simply:
+```
+./manage.py
 ```
 
-### Quick Start from Command Line
+### Launch Claude Monitor
 
-```bash
-python3 quick_start.py --project-dir /path/to/project --prompt-path /path/to/prompt.txt
+```
+./manage.py monitor
 ```
 
-### Using the Core Library
+## Project Structure
 
-```python
-from claude_task_manager import ClaudeTaskManager
+- `src/` - Core application code
+- `docs/` - Documentation
+- `examples/` - Example scripts and usage
+- `tests/` - Test suites
+- `config/` - Configuration files
+- `logs/` - Log files
+- `static/` - Static assets for the web dashboard
 
-# Initialize manager
-manager = ClaudeTaskManager()
+## Configuration
 
-# Start a new instance
-instance_id = manager.start_instance(
-    project_dir="/path/to/project", 
-    prompt_path="/path/to/prompt.txt",
-    use_tmux=True  # Use tmux for better reliability
-)
+Configuration is stored in `config/claude_instances.json`.
 
-# Stop an instance
-manager.stop_instance(instance_id)
+## License
 
-# List all instances
-instances = manager.list_instances()
-```
-
-## Features
-
-- Support for both tmux and Terminal.app based Claude sessions
-- Auto-detection of "yes/no" prompts and statistics tracking
-- Web dashboard with filtering, sorting, and multi-select capabilities
-- Project ID lookup (automatically finds projects with matching ID numbers)
-- Direct text input for prompts (automatically creates temp files)
+See the LICENSE file for details.
