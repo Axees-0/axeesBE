@@ -3,6 +3,7 @@ let refreshInterval = null;
 let refreshIntervalTime = 10; // Default refresh interval in seconds
 let selectedInstances = [];
 let sortDirection = {};
+let viewMode = 'table'; // Default view mode: 'table' or 'card'
 
 // Toast notification function
 function showToast(message, isError = false) {
@@ -33,6 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize instance selection
     initializeInstanceSelection();
     
+    // Initialize card view functionality
+    initializeCardView();
+    
     // Initialize sorting
     initializeTableSorting();
     
@@ -44,6 +48,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up event listeners
     setupEventListeners();
+    
+    // Load view mode preference
+    loadViewMode();
 });
 
 // Initialize instance selection
@@ -249,52 +256,106 @@ function filterInstances() {
     const statusValue = statusFilter ? statusFilter.value : 'all';
     const runtimeValue = runtimeFilter ? runtimeFilter.value : 'all';
     
-    // Get all instance rows
-    const instanceRows = document.querySelectorAll('#instance-list tr');
-    
-    // Filter rows based on criteria
-    instanceRows.forEach(row => {
-        let matchesSearch = true;
-        let matchesStatus = true;
-        let matchesRuntime = true;
+    // Filter based on current view mode
+    if (viewMode === 'table') {
+        // Get all instance rows
+        const instanceRows = document.querySelectorAll('#instance-list tr');
         
-        // Check search term
-        if (searchTerm) {
-            try {
-                // Get the right cell indices based on the hidden ID column
-                const projectDir = row.cells[4] ? row.cells[4].textContent.toLowerCase() : '';
-                const promptPath = row.cells[5] ? row.cells[5].textContent.toLowerCase() : '';
-                const response = row.cells[6] ? row.cells[6].textContent.toLowerCase() : '';
-                
-                matchesSearch = projectDir.includes(searchTerm) || 
-                               promptPath.includes(searchTerm) || 
-                               response.includes(searchTerm);
-            } catch (error) {
-                console.error('Error during search filtering:', error);
-                matchesSearch = true; // Default to showing the row on error
+        // Filter rows based on criteria
+        instanceRows.forEach(row => {
+            let matchesSearch = true;
+            let matchesStatus = true;
+            let matchesRuntime = true;
+            
+            // Check search term
+            if (searchTerm) {
+                try {
+                    // Get the right cell indices based on the hidden ID column
+                    const projectDir = row.cells[4] ? row.cells[4].textContent.toLowerCase() : '';
+                    const promptPath = row.cells[5] ? row.cells[5].textContent.toLowerCase() : '';
+                    const response = row.cells[6] ? row.cells[6].textContent.toLowerCase() : '';
+                    
+                    matchesSearch = projectDir.includes(searchTerm) || 
+                                   promptPath.includes(searchTerm) || 
+                                   response.includes(searchTerm);
+                } catch (error) {
+                    console.error('Error during search filtering:', error);
+                    matchesSearch = true; // Default to showing the row on error
+                }
             }
-        }
+            
+            // Check status filter
+            if (statusValue !== 'all') {
+                const statusElement = row.querySelector('.status-badge');
+                const status = statusElement ? statusElement.textContent.trim().toLowerCase() : '';
+                matchesStatus = status === statusValue;
+            }
+            
+            // Check runtime filter
+            if (runtimeValue !== 'all') {
+                const runtime = row.getAttribute('data-runtime') || '';
+                matchesRuntime = runtime.toLowerCase() === runtimeValue.toLowerCase();
+            }
+            
+            // Show or hide row based on filter results
+            if (matchesSearch && matchesStatus && matchesRuntime) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    } else if (viewMode === 'card') {
+        // Get all instance cards
+        const cards = document.querySelectorAll('.instance-card');
         
-        // Check status filter
-        if (statusValue !== 'all') {
-            const statusElement = row.querySelector('.status-badge');
-            const status = statusElement ? statusElement.textContent.trim().toLowerCase() : '';
-            matchesStatus = status === statusValue;
-        }
-        
-        // Check runtime filter
-        if (runtimeValue !== 'all') {
-            const runtime = row.getAttribute('data-runtime') || '';
-            matchesRuntime = runtime.toLowerCase() === runtimeValue.toLowerCase();
-        }
-        
-        // Show or hide row based on filter results
-        if (matchesSearch && matchesStatus && matchesRuntime) {
-            row.style.display = '';
-        } else {
-            row.style.display = 'none';
-        }
-    });
+        // Filter cards based on criteria
+        cards.forEach(card => {
+            let matchesSearch = true;
+            let matchesStatus = true;
+            let matchesRuntime = true;
+            
+            // Check search term
+            if (searchTerm) {
+                try {
+                    // Get content from card elements
+                    const projectEl = card.querySelector('.card-project');
+                    const promptEl = card.querySelector('.card-prompt');
+                    const responseEl = card.querySelector('.card-response');
+                    
+                    const projectDir = projectEl ? projectEl.textContent.toLowerCase() : '';
+                    const promptPath = promptEl ? promptEl.textContent.toLowerCase() : '';
+                    const response = responseEl ? responseEl.textContent.toLowerCase() : '';
+                    
+                    matchesSearch = projectDir.includes(searchTerm) || 
+                                  promptPath.includes(searchTerm) || 
+                                  response.includes(searchTerm);
+                } catch (error) {
+                    console.error('Error during card search filtering:', error);
+                    matchesSearch = true; // Default to showing the card on error
+                }
+            }
+            
+            // Check status filter
+            if (statusValue !== 'all') {
+                const statusElement = card.querySelector('.status-badge');
+                const status = statusElement ? statusElement.textContent.trim().toLowerCase() : '';
+                matchesStatus = status === statusValue;
+            }
+            
+            // Check runtime filter
+            if (runtimeValue !== 'all') {
+                const runtime = card.getAttribute('data-runtime') || '';
+                matchesRuntime = runtime.toLowerCase() === runtimeValue.toLowerCase();
+            }
+            
+            // Show or hide card based on filter results
+            if (matchesSearch && matchesStatus && matchesRuntime) {
+                card.style.display = '';
+            } else {
+                card.style.display = 'none';
+            }
+        });
+    }
 }
 
 // Start auto-refresh
@@ -386,6 +447,7 @@ function refreshInstanceData() {
 // Update instance table with new data
 function updateInstanceTable(instances) {
     try {
+        // Update table view
         const tbody = document.getElementById('instance-list');
         if (!tbody) {
             console.error('Could not find instance-list tbody');
@@ -405,7 +467,7 @@ function updateInstanceTable(instances) {
         // Clear existing rows
         tbody.innerHTML = '';
         
-        // Add new rows
+        // Add new rows to table
         instances.forEach(instance => {
             try {
                 const row = document.createElement('tr');
@@ -468,6 +530,81 @@ function updateInstanceTable(instances) {
             }
         });
         
+        // Update card view
+        const cardContainer = document.getElementById('instance-cards');
+        if (cardContainer) {
+            // Clear existing cards
+            cardContainer.innerHTML = '';
+            
+            // Add new cards
+            instances.forEach(instance => {
+                try {
+                    const card = document.createElement('div');
+                    card.className = 'instance-card';
+                    card.setAttribute('data-id', instance.id);
+                    card.setAttribute('data-runtime', instance.runtime_type_display || 'unknown');
+                    
+                    card.innerHTML = `
+                        <input type="checkbox" class="card-select" aria-label="Select instance">
+                        
+                        <div class="card-header">
+                            <span class="status-badge ${instance.status}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                                    <circle cx="12" cy="12" r="12" />
+                                </svg>
+                                ${instance.status}
+                            </span>
+                            ${instance.detailed_status === 'running' && instance.generation_time 
+                                ? `<span style="color: var(--status-running-text); font-size: 1.1rem; font-weight: 600;">${instance.generation_time}</span>`
+                                : `<span style="color: var(--text-primary); font-size: 1.1rem;">0s</span>`}
+                        </div>
+                        
+                        <div class="card-info">
+                            <div class="card-info-section">
+                                <span class="card-info-label">Project</span>
+                                <span class="card-info-value card-project">${instance.project_dir || ''}</span>
+                            </div>
+                            <div class="card-info-section">
+                                <span class="card-info-label">Prompt</span>
+                                <span class="card-info-value card-prompt">${instance.prompt_path || ''}</span>
+                            </div>
+                            <div class="card-info-section">
+                                <span class="card-info-label">Type</span>
+                                <span class="card-info-value">${instance.runtime_type_display || ''}</span>
+                            </div>
+                            <div class="card-info-section">
+                                <span class="card-info-label">Count</span>
+                                <span class="card-info-value">${instance.yes_count || 0}</span>
+                            </div>
+                        </div>
+                        
+                        <button class="card-expand" aria-label="Expand card" title="Show details">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="6 9 12 15 18 9"></polyline>
+                            </svg>
+                        </button>
+                        
+                        <div class="card-details">
+                            <div class="card-response">
+                                ${instance.response || 'No response available'}
+                            </div>
+                            <div class="card-actions">
+                                <button class="btn btn-blue card-action" onclick="viewInstance('${instance.id}')">View</button>
+                                <button class="btn btn-purple card-action" onclick="sendPromptToInstance('${instance.id}')">Send Prompt</button>
+                                <button class="btn btn-warning card-action" onclick="stopInstance('${instance.id}')">Stop</button>
+                                <button class="btn btn-danger card-action" onclick="deleteInstance('${instance.id}')">Delete</button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add card to container
+                    cardContainer.appendChild(card);
+                } catch (error) {
+                    console.error(`Error adding instance ${instance.id} to card view:`, error);
+                }
+            });
+        }
+        
         // Restore selection
         restoreInstanceSelection();
         
@@ -479,12 +616,13 @@ function updateInstanceTable(instances) {
         
         // Re-initialize event listeners
         initializeInstanceSelection();
+        initializeCardView();
         
-        console.log(`Successfully updated table with ${instances.length} instances`);
+        console.log(`Successfully updated with ${instances.length} instances`);
     } catch (error) {
-        console.error('Error updating instance table:', error);
+        console.error('Error updating instances:', error);
         // In case of critical error, try reload as fallback
-        showToast('Error updating table, please refresh manually', true);
+        showToast('Error updating data, please refresh manually', true);
     }
 }
 
@@ -492,12 +630,27 @@ function updateInstanceTable(instances) {
 function restoreInstanceSelection() {
     if (selectedInstances.length === 0) return;
     
+    // Restore selection in table view
     const rows = document.querySelectorAll('#instance-list tr');
     rows.forEach(row => {
         const instanceId = row.getAttribute('data-id');
         if (selectedInstances.includes(instanceId)) {
             row.classList.add('selected');
             console.log(`Restored selection for row ${instanceId}`);
+        }
+    });
+    
+    // Restore selection in card view
+    const cards = document.querySelectorAll('.instance-card');
+    cards.forEach(card => {
+        const instanceId = card.getAttribute('data-id');
+        if (selectedInstances.includes(instanceId)) {
+            card.classList.add('selected');
+            const checkbox = card.querySelector('.card-select');
+            if (checkbox) {
+                checkbox.checked = true;
+            }
+            console.log(`Restored selection for card ${instanceId}`);
         }
     });
     
@@ -779,6 +932,185 @@ function loadSettings() {
     }
 }
 
+// Initialize card view functionality
+function initializeCardView() {
+    // Add event listeners to card expansion buttons
+    document.querySelectorAll('.card-expand').forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const card = this.closest('.instance-card');
+            const details = card.querySelector('.card-details');
+            
+            // Toggle expanded class on details element
+            details.classList.toggle('expanded');
+            
+            // Toggle expanded class on button for rotation animation
+            this.classList.toggle('expanded');
+        });
+    });
+    
+    // Add event listeners to card selection checkboxes
+    document.querySelectorAll('.card-select').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            const card = this.closest('.instance-card');
+            const instanceId = card.getAttribute('data-id');
+            
+            if (this.checked) {
+                // Add to selection
+                card.classList.add('selected');
+                if (!selectedInstances.includes(instanceId)) {
+                    selectedInstances.push(instanceId);
+                }
+            } else {
+                // Remove from selection
+                card.classList.remove('selected');
+                selectedInstances = selectedInstances.filter(id => id !== instanceId);
+            }
+            
+            // Update action buttons based on selection
+            updateActionButtons();
+        });
+    });
+}
+
+// Toggle between table and card view modes
+function toggleViewMode() {
+    const tableContainer = document.getElementById('instance-table');
+    const cardContainer = document.getElementById('instance-cards');
+    const toggleButton = document.getElementById('view-toggle');
+    
+    if (viewMode === 'table') {
+        // Switch to card view
+        tableContainer.style.display = 'none';
+        cardContainer.style.display = 'grid';
+        viewMode = 'card';
+        
+        // Update toggle button text
+        toggleButton.querySelector('span').textContent = 'Table View';
+        
+        // Update icon to table icon
+        toggleButton.querySelector('svg').innerHTML = `
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="3" y1="9" x2="21" y2="9"></line>
+            <line x1="3" y1="15" x2="21" y2="15"></line>
+        `;
+    } else {
+        // Switch to table view
+        tableContainer.style.display = 'table';
+        cardContainer.style.display = 'none';
+        viewMode = 'table';
+        
+        // Update toggle button text
+        toggleButton.querySelector('span').textContent = 'Card View';
+        
+        // Update icon to grid icon
+        toggleButton.querySelector('svg').innerHTML = `
+            <rect x="3" y="3" width="7" height="7"></rect>
+            <rect x="14" y="3" width="7" height="7"></rect>
+            <rect x="14" y="14" width="7" height="7"></rect>
+            <rect x="3" y="14" width="7" height="7"></rect>
+        `;
+    }
+    
+    // Save view mode preference
+    localStorage.setItem('viewMode', viewMode);
+    
+    // Reapply filtering for the new view
+    filterInstances();
+}
+
+// Load view mode preference from localStorage
+function loadViewMode() {
+    const savedViewMode = localStorage.getItem('viewMode');
+    if (savedViewMode && savedViewMode !== viewMode) {
+        // If saved view mode is different from default, toggle to match it
+        toggleViewMode();
+    }
+}
+
+// View instance details
+function viewInstance(instanceId) {
+    console.log(`Viewing instance ${instanceId}`);
+    fetch(`/api/instances/${instanceId}/view`, {
+        method: 'POST'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast(`Opened terminal for instance ${instanceId}`);
+        } else {
+            showToast(`Error opening terminal: ${data.error}`, true);
+        }
+    })
+    .catch(error => {
+        console.error(`Error viewing instance ${instanceId}:`, error);
+        showToast(`Error viewing instance: ${error.message}`, true);
+    });
+}
+
+// Stop instance
+function stopInstance(instanceId) {
+    if (!confirm(`Are you sure you want to stop instance ${instanceId}?`)) {
+        return;
+    }
+    
+    fetch(`/api/instances/${instanceId}/stop`, {
+        method: 'POST'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast(`Stopped instance ${instanceId}`);
+            setTimeout(() => refreshInstanceData(), 1000);
+        } else {
+            showToast(`Error stopping instance: ${data.error}`, true);
+        }
+    })
+    .catch(error => {
+        console.error(`Error stopping instance ${instanceId}:`, error);
+        showToast(`Error stopping instance: ${error.message}`, true);
+    });
+}
+
+// Delete instance
+function deleteInstance(instanceId) {
+    if (!confirm(`Are you sure you want to delete instance ${instanceId}?`)) {
+        return;
+    }
+    
+    fetch(`/api/instances/${instanceId}`, {
+        method: 'DELETE'
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            showToast(`Deleted instance ${instanceId}`);
+            setTimeout(() => refreshInstanceData(), 1000);
+        } else {
+            showToast(`Error deleting instance: ${data.error}`, true);
+        }
+    })
+    .catch(error => {
+        console.error(`Error deleting instance ${instanceId}:`, error);
+        showToast(`Error deleting instance: ${error.message}`, true);
+    });
+}
+
 // Set up event listeners
 function setupEventListeners() {
     // Listen for batch operations
@@ -786,6 +1118,13 @@ function setupEventListeners() {
         // Delete key for batch delete
         if (e.key === 'Delete' && selectedInstances.length > 0) {
             deleteSelectedInstances();
+        }
+        
+        // Ctrl+K for command palette (to be implemented)
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            // TODO: Implement command palette
+            showToast('Command palette coming soon!', false);
         }
     });
     

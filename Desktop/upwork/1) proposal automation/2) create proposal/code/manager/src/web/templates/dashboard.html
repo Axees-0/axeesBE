@@ -269,6 +269,16 @@
             <option value="tmux">tmux Only</option>
             <option value="terminal">Terminal Only</option>
         </select>
+        
+        <button class="btn btn-gray" id="view-toggle" onclick="toggleViewMode()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"></rect>
+                <rect x="14" y="3" width="7" height="7"></rect>
+                <rect x="14" y="14" width="7" height="7"></rect>
+                <rect x="3" y="14" width="7" height="7"></rect>
+            </svg>
+            <span>Toggle View</span>
+        </button>
     </div>
     
     <!-- Instances Table -->
@@ -313,6 +323,66 @@
             {% endfor %}
         </tbody>
     </table>
+    
+    <!-- Card View Container -->
+    <div id="instance-cards">
+        {% for instance in instances %}
+        <div class="instance-card" data-id="{{ instance.id }}" data-runtime="{{ instance.runtime_type_display }}">
+            <input type="checkbox" class="card-select" aria-label="Select instance">
+            
+            <div class="card-header">
+                <span class="status-badge {{ instance.status }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                        <circle cx="12" cy="12" r="12" />
+                    </svg>
+                    {{ instance.status }}
+                </span>
+                {% if instance.detailed_status == 'running' and instance.generation_time %}
+                    <span style="color: var(--status-running-text); font-size: 1.1rem; font-weight: 600;">{{ instance.generation_time }}</span>
+                {% else %}
+                    <span style="color: var(--text-primary); font-size: 1.1rem;">0s</span>
+                {% endif %}
+            </div>
+            
+            <div class="card-info">
+                <div class="card-info-section">
+                    <span class="card-info-label">Project</span>
+                    <span class="card-info-value card-project">{{ instance.project_dir }}</span>
+                </div>
+                <div class="card-info-section">
+                    <span class="card-info-label">Prompt</span>
+                    <span class="card-info-value card-prompt">{{ instance.prompt_path }}</span>
+                </div>
+                <div class="card-info-section">
+                    <span class="card-info-label">Type</span>
+                    <span class="card-info-value">{{ instance.runtime_type_display }}</span>
+                </div>
+                <div class="card-info-section">
+                    <span class="card-info-label">Count</span>
+                    <span class="card-info-value">{{ instance.yes_count|default(0) }}</span>
+                </div>
+            </div>
+            
+            <button class="card-expand" aria-label="Expand card" title="Show details">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </button>
+            
+            <div class="card-details">
+                <div class="card-response">
+                    {{ instance.response|default('No response available') }}
+                </div>
+                <div class="card-actions">
+                    <button class="btn btn-blue card-action" onclick="viewInstance('{{ instance.id }}')">View</button>
+                    <button class="btn btn-purple card-action" onclick="sendPromptToInstance('{{ instance.id }}')">Send Prompt</button>
+                    <button class="btn btn-warning card-action" onclick="stopInstance('{{ instance.id }}')">Stop</button>
+                    <button class="btn btn-danger card-action" onclick="deleteInstance('{{ instance.id }}')">Delete</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
 
