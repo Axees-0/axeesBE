@@ -56,17 +56,94 @@ def monitor_trust_prompt(timeout=60, terminal_id=None):
     Returns:
         bool: True if trust prompt was found and handled, False otherwise.
     """
-    print("Monitoring terminal for 'Do you trust the files in this folder?' prompt...")
+    print("Monitoring terminal for trust and permission prompts...")
+    
+    # Define all patterns that might indicate a trust dialog
+    trust_patterns = [
+        "Do you trust the files in this folder?",
+        "Trust this folder?",
+        "Do you want to allow",
+        "Would you like to trust",
+        "Authorize access to",
+        "Permission requested",
+        "Allow access to"
+    ]
+    
     elapsed = 0
     while elapsed < timeout:
-        content = get_terminal_content(terminal_id)
-        if content and "Do you trust the files in this folder?" in content:
-            print("Found trust prompt, sending return key")
-            highlight_terminal(terminal_id)
-            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
-            return True
-        time.sleep(1)
-        elapsed += 1
+        try:
+            content = get_terminal_content(terminal_id)
+        except Exception as e:
+            print(f"Error getting terminal content: {e}, will retry")
+            content = None
+            
+        if content:
+            # Check for all different trust prompts
+            for pattern in trust_patterns:
+                if pattern in content:
+                    print(f"Found trust pattern: '{pattern}', sending return key")
+                    
+                    # Try multiple methods to ensure we respond successfully
+                    response_success = False
+                    
+                    # Method 1: AppleScript using highlight and keystroke return
+                    try:
+                        highlight_terminal(terminal_id)
+                        subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
+                        response_success = True
+                        print("Successfully sent return key (method 1)")
+                    except Exception as e1:
+                        print(f"Primary method failed: {e1}")
+                        
+                        # Method 2: AppleScript using key code
+                        try:
+                            highlight_terminal(terminal_id)
+                            # Key code 36 is return/enter
+                            subprocess.run(["osascript", "-e", 'tell application "System Events" to key code 36'])
+                            response_success = True
+                            print("Successfully sent return key (method 2)")
+                        except Exception as e2:
+                            print(f"Fallback method 2 failed: {e2}")
+                            
+                            # Method 3: Using tmux if possible
+                            try:
+                                # Try to detect if we're in a tmux session from terminal title
+                                title_cmd = '''
+                                tell application "Terminal"
+                                    get custom title of front window
+                                end tell
+                                '''
+                                result = subprocess.run(["osascript", "-e", title_cmd], 
+                                                       capture_output=True, text=True, check=False)
+                                title = result.stdout.strip()
+                                
+                                if "tmux" in title.lower():
+                                    # Try to extract session name from title (common format: "tmux:session_name")
+                                    if ":" in title:
+                                        session_name = title.split(":")[-1].strip()
+                                        if session_name:
+                                            # Send return key to the tmux session
+                                            subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=False)
+                                            response_success = True
+                                            print(f"Successfully sent Enter key to tmux session '{session_name}' (method 3)")
+                            except Exception as e3:
+                                print(f"All fallback methods failed: {e3}")
+                    
+                    # If any of our methods succeeded, return true
+                    if response_success:
+                        print("Successfully responded to trust prompt")
+                        return True
+                    else:
+                        print("WARNING: Failed to respond to trust prompt with all methods")
+                    
+        # Wait before checking again, with shorter intervals for better responsiveness
+        time.sleep(0.5)
+        elapsed += 0.5
+        
+        # Print progress update periodically
+        if elapsed % 10 == 0:
+            print(f"Still monitoring for trust prompts ({elapsed}/{timeout} seconds elapsed)")
+    
     print("Trust prompt not found within timeout.")
     return False
 
@@ -129,59 +206,174 @@ def monitor_yes_prompts(timeout=600, max_minutes=3, terminal_id=None):
     """
     elapsed = 0
     responded = False
+    responses_count = 0
+    
+    # Define all the patterns we want to respond to
+    yes_patterns = [
+        # Trust prompts
+        "Do you trust the files in this folder?",
+        "Trust this folder?",
+        
+        # Permission requests
+        "Yes, and don't ask again for",
+        "Yes, allow",
+        "Would you like to allow",
+        "Permit access",
+        "Allow access to",
+        "Give permission to",
+        "Authorize Claude to",
+        
+        # Confirmation prompts
+        "Yes,",
+        "Do you want to",
+        "Would you like to",
+        "Continue?",
+        "Proceed?",
+        "Shall I proceed",
+        "Continue with",
+        "Press Enter to continue",
+        "Press any key to continue",
+        "Type 'yes' to continue",
+        
+        # Specific Claude prompts
+        "I'd be happy to help with that. ",
+        "I'll analyze this",
+        "Would you like me to",
+        "Should I proceed with",
+        "Is there anything else you'd like me to",
+        
+        # Terminal prompts
+        "terminate running processes in this window",
+        "closing this window will terminate",
+        "Do you want to kill"
+    ]
+    
+    print(f"Monitoring for {len(yes_patterns)} different prompt patterns...")
+    
     while elapsed < timeout:
-        content = get_terminal_content(terminal_id)
+        # Get terminal content with fallback
+        try:
+            content = get_terminal_content(terminal_id)
+        except Exception as e:
+            print(f"Error getting terminal content: {e}, will retry in 5 seconds")
+            time.sleep(5)
+            elapsed += 5
+            continue
+            
         if not content:
             time.sleep(5)
             elapsed += 5
             print(f"Monitoring terminal for phrases ({elapsed} seconds elapsed)")
             continue
-            
+        
         # Check for all the different prompts we want to automatically respond to
+        matched_pattern = None
+        for pattern in yes_patterns:
+            if pattern in content:
+                matched_pattern = pattern
+                break
+                
+        # If we found a match, respond appropriately
+        if matched_pattern:
+            # Special case for the dropdown that needs arrow key first
+            if matched_pattern == "Yes, and don't ask again for":
+                print(f"Found '{matched_pattern}' prompt, sending down key and return")
+                try:
+                    highlight_terminal(terminal_id)
+                    # Press down arrow key first to select the option
+                    subprocess.run(["osascript", "-e", 'tell application "System Events" to key code 125'])
+                    time.sleep(0.5)
+                    # Then press Enter to confirm
+                    subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
+                    responded = True
+                    responses_count += 1
+                except Exception as response_error:
+                    print(f"Error responding to '{matched_pattern}': {response_error}")
+                    # Try alternative approach
+                    try:
+                        # Alternative: try to use key code for return
+                        highlight_terminal(terminal_id)
+                        subprocess.run(["osascript", "-e", 'tell application "System Events" to key code 36'])
+                    except:
+                        print("Alternative approach also failed")
+            
+            # Handle "Type 'yes' to continue" pattern
+            elif "Type 'yes' to continue" in matched_pattern:
+                print(f"Found '{matched_pattern}' prompt, typing 'yes' and Enter")
+                try:
+                    highlight_terminal(terminal_id)
+                    # Type "yes"
+                    subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke "yes"'])
+                    time.sleep(0.5)
+                    # Press Enter
+                    subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
+                    responded = True
+                    responses_count += 1
+                except Exception as response_error:
+                    print(f"Error responding to '{matched_pattern}': {response_error}")
+            
+            # Default handler for most patterns: just press Enter
+            else:
+                print(f"Found '{matched_pattern}' prompt, sending return key")
+                try:
+                    # Try primary method - highlight and press Enter
+                    highlight_terminal(terminal_id)
+                    subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
+                    responded = True
+                    responses_count += 1
+                except Exception as primary_error:
+                    print(f"Primary response method failed: {primary_error}")
+                    # Try fallback method 1 - using key code instead
+                    try:
+                        print("Trying fallback method 1: Using key code for return")
+                        highlight_terminal(terminal_id)
+                        subprocess.run(["osascript", "-e", 'tell application "System Events" to key code 36'])
+                        responded = True
+                        responses_count += 1
+                    except Exception as fallback1_error:
+                        print(f"Fallback method 1 failed: {fallback1_error}")
+                        # Try fallback method 2 - using tmux send-keys
+                        try:
+                            print("Trying fallback method 2: Using tmux send-keys")
+                            # Get the tmux session name from the terminal title
+                            title_cmd = f'''
+                            tell application "Terminal"
+                                get custom title of window 1
+                            end tell
+                            '''
+                            title_result = subprocess.run(["osascript", "-e", title_cmd], 
+                                                         capture_output=True, text=True, check=False)
+                            if title_result.stdout.strip():
+                                # Extract potential tmux session name from title
+                                title = title_result.stdout.strip()
+                                # Common format: "tmux: session_name" or similar
+                                if "tmux" in title.lower() and ":" in title:
+                                    session_name = title.split(":")[-1].strip()
+                                    if session_name:
+                                        subprocess.run(["tmux", "send-keys", "-t", session_name, "Enter"], check=False)
+                                        print(f"Sent Enter key to tmux session '{session_name}'")
+                                        responded = True
+                                        responses_count += 1
+                        except Exception as fallback2_error:
+                            print(f"All fallback methods failed: {fallback2_error}")
         
-        # Check for "Yes, and don't ask again for"
-        if "Yes, and don't ask again for" in content:
-            print("Found 'Yes, and don't ask again for' prompt, sending down key and return")
-            highlight_terminal(terminal_id)
-            subprocess.run(["osascript", "-e", 'tell application "System Events" to key code 125'])
-            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
-            responded = True
-            
-        # Check for "Yes," from Claude prompts
-        elif "Yes," in content:
-            print("Found 'Yes,' prompt, sending return key")
-            highlight_terminal(terminal_id)
-            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
-            responded = True
-            
-        # Check for "Do you want to..." prompts
-        elif "Do you want to " in content:
-            print("Found 'Do you want to' prompt, sending return key")
-            highlight_terminal(terminal_id)
-            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
-            responded = True
-            
-        # Terminal process termination prompts
-        elif "terminate running processes in this window" in content.lower():
-            print("Found 'terminate running processes' prompt, sending return key")
-            highlight_terminal(terminal_id)
-            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
-            responded = True
-            
-        # Terminal will terminate prompt
-        elif "closing this window will terminate" in content.lower():
-            print("Found 'closing this window will terminate' prompt, sending return key")
-            highlight_terminal(terminal_id)
-            subprocess.run(["osascript", "-e", 'tell application "System Events" to keystroke return'])
-            responded = True
+        # Always include a slight delay between checks to avoid high CPU
+        time.sleep(3)
+        elapsed += 3
         
-        time.sleep(5)
-        elapsed += 5
-        print(f"Monitoring terminal for phrases ({elapsed} seconds elapsed)")
+        # Only log progress occasionally to reduce output
+        if elapsed % 30 == 0:
+            print(f"Monitoring terminal for phrases ({elapsed} seconds elapsed)")
+            if responses_count > 0:
+                print(f"Responded to {responses_count} prompts so far")
+        
+        # Check for early exit if we've reached the maximum time
         if elapsed >= max_minutes * 60:
-            print("Reached maximum monitoring time")
+            print(f"Reached maximum monitoring time ({max_minutes} minutes)")
             break
-    return responded
+    
+    print(f"Monitoring complete. Responded to {responses_count} prompts in {elapsed} seconds.")
+    return responded if responses_count == 0 else responses_count
 
 def execute_claude_cli(project_dir, prompt_path, max_minutes=3, timeout=600):
     """

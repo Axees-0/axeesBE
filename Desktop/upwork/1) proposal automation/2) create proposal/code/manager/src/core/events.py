@@ -58,6 +58,7 @@ class EventBus:
             
     def publish(self, event: Event) -> None:
         """Publish an event to all subscribers."""
+        subscribers = []
         with self._lock:
             if event.type in self._subscribers:
                 # Make a copy to avoid modification during iteration

@@ -9,6 +9,7 @@ import sys
 import time
 import argparse
 from src.claude_task_manager import ClaudeTaskManager
+from src.core.models.instance import RuntimeType
 
 def main():
     # Set up argument parser
@@ -19,8 +20,8 @@ def main():
                         help='Path to the prompt file')
     parser.add_argument('--prompt-text', type=str, required=False,
                         help='Direct prompt text to send (alternative to prompt-path)')
-    parser.add_argument('--use-tmux', action='store_true', default=True,
-                        help='Use tmux-based approach (default: True)')
+    parser.add_argument('--runtime-type', type=str, choices=['tmux', 'terminal'], default='tmux',
+                        help='Runtime type to use (tmux or terminal, default: tmux)')
     parser.add_argument('--open-terminal', action='store_true', default=False,
                         help='Open terminal window to view session (default: False)')
     
@@ -49,11 +50,14 @@ def main():
     # Determine prompt source to display in log
     prompt_source = args.prompt_path if args.prompt_path else f"Direct text ({len(args.prompt_text)} chars)"
     
+    # Convert runtime_type string to enum
+    runtime_type = RuntimeType.TMUX if args.runtime_type == 'tmux' else RuntimeType.TERMINAL
+    
     # Start a new Claude instance
     print(f"Starting Claude instance:")
     print(f"  Project directory: {args.project_dir}")
     print(f"  Prompt source: {prompt_source}")
-    print(f"  Use tmux: {args.use_tmux}")
+    print(f"  Runtime type: {args.runtime_type}")
     print(f"  Open terminal: {args.open_terminal}")
     
     try:
@@ -63,7 +67,7 @@ def main():
             project_dir=args.project_dir,
             prompt_path=args.prompt_path,
             prompt_text=args.prompt_text,
-            use_tmux=args.use_tmux,
+            runtime_type=runtime_type,
             open_terminal=args.open_terminal
         )
         
@@ -87,6 +91,7 @@ def main():
             print(f"  Directory: {instance['project_dir']}")
             print(f"  Prompt: {instance['prompt_path']}")
             print(f"  Uptime: {instance['uptime']}")
+            print(f"  Runtime: {instance.get('runtime_type_display', 'Unknown')}")
             print("-" * 80)
             
         return 0

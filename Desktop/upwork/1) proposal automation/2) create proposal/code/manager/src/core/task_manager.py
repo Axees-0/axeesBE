@@ -55,8 +55,9 @@ class ClaudeTaskManager(TaskManagerInterface):
                        runtime_type: RuntimeType = RuntimeType.TMUX,
                        open_terminal: bool = False) -> str:
         """Start a new Claude instance."""
-        # Normalize project directory
-        project_dir = os.path.normpath(project_dir)
+        # Use our enhanced path normalization for project directory
+        from src.utils.path_utils import normalize_path
+        project_dir = normalize_path(project_dir)
         
         # Create a new instance
         instance = ClaudeInstance.create(
@@ -270,7 +271,7 @@ class ClaudeTaskManager(TaskManagerInterface):
                 status_info = process_manager.get_process_status(instance)
                 
                 # Update instance status
-                if status_info["detailed_status"] \!= instance.detailed_status:
+                if status_info["detailed_status"] != instance.detailed_status:
                     instance.detailed_status = status_info["detailed_status"]
                     updated_count += 1
                     
@@ -282,7 +283,7 @@ class ClaudeTaskManager(TaskManagerInterface):
                 # Update instance content if needed
                 content = process_manager.get_process_content(instance)
                 if content and (not hasattr(instance, 'tmux_content') or 
-                              getattr(instance, 'tmux_content', '') \!= content):
+                              getattr(instance, 'tmux_content', '') != content):
                     instance.tmux_content = content
                     updated_count += 1
                     
@@ -309,6 +310,57 @@ class ClaudeTaskManager(TaskManagerInterface):
             
         return updated_count
         
+    def find_project_id(self, project_dir: str) -> Optional[str]:
+        """
+        Find a project ID by directory path.
+        
+        Args:
+            project_dir: Directory path to look up
+            
+        Returns:
+            Project ID if found, None otherwise
+        """
+        from src.utils.path_utils import find_project_id_by_path
+        
+        # Get instances as dictionaries for compatibility with our utility function
+        instances = self.list_instances()
+        
+        # Use our utility function to find the project ID
+        return find_project_id_by_path(instances, project_dir)
+    
+    def find_instances_by_project_dir(self, project_dir: str) -> List[Dict[str, Any]]:
+        """
+        Find instances by project directory.
+        
+        Args:
+            project_dir: Directory path to match
+            
+        Returns:
+            List of matching instances as dictionaries
+        """
+        from src.utils.path_utils import find_instances_by_project_dir
+        
+        # Get instances as dictionaries for compatibility with our utility function
+        instances = self.list_instances()
+        
+        # Use our utility function to find matching instances
+        return find_instances_by_project_dir(instances, project_dir)
+    
+    def find_project_dir_by_id(self, project_id: str) -> Optional[str]:
+        """
+        Find a project directory by its ID.
+        
+        Args:
+            project_id: Project ID to look up
+            
+        Returns:
+            Project directory path if found, None otherwise
+        """
+        from src.utils.path_utils import find_project_dir_by_id
+        
+        # Use our utility function to find the project directory
+        return find_project_dir_by_id(project_id)
+    
     def load_instances(self) -> None:
         """Load instances from storage."""
         with self.lock:

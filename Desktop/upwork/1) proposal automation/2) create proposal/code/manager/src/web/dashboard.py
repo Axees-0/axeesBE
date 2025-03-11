@@ -1245,7 +1245,7 @@ DASHBOARD_TEMPLATE = '''
                     </td>
                     <td style="width:80px;"><span style="font-size: 1.1rem; font-weight: 500;">{{ instance.get('yes_count', 0) }}</span></td>
                     <td style="width:25%;">
-                        {% if instance_obj and instance_obj.__dict__.get('project_dir', '') %}
+                        {% if instance_obj is defined and instance_obj.__dict__.get('project_dir', '') %}
                             {% set project_dir = instance_obj.__dict__.get('project_dir', '') %}
                             {% set project_logo = None %}
                             
@@ -1308,17 +1308,17 @@ DASHBOARD_TEMPLATE = '''
                     </td>
                     <td style="width:25%;">{{ instance.get('prompt_path', '') }}</td>
                     <td style="width:30%;">
-                        {% if instance_obj and use_tmux and instance.get('status', '') == 'running' %}
+                        {% if instance_obj is defined and use_tmux and instance.get('status', '') == 'running' %}
                             {% set tmux_content = "" %}
                             
                             {# First try to get content from instance dict (passed in context) #}
                             {% if instance.get('tmux_content') %}
                                 {% set tmux_content = instance.get('tmux_content') %}
                             {# Then try instance_obj (in-memory object) #}
-                            {% elif hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content %}
+                            {% elif instance_obj is defined and instance_obj.__dict__.get('tmux_content') %}
                                 {% set tmux_content = instance_obj.tmux_content %}
                             {# Fallback to direct tmux fetch if necessary #}
-                            {% elif instance_obj.tmux_session_name %}
+                            {% elif instance_obj is defined and instance_obj.__dict__.get('tmux_session_name') %}
                                 {% set capture_cmd = "tmux capture-pane -p -t " + instance_obj.tmux_session_name %}
                                 {% set capture_result = "" %}
                                 
@@ -3427,17 +3427,53 @@ DASHBOARD_TEMPLATE = '''
 
 @app.route('/')
 def dashboard():
-    """Main dashboard page."""
-    # Reload instances from file first
+    """Main dashboard page.
+    
+    This is the primary entry point to the dashboard UI, which must always
+    accurately reflect the state of all tmux sessions. The UI and tmux sessions
+    must be perfectly in sync at all times.
+    
+    Returns:
+        str: Rendered HTML template with current instance data
+    """
+    print("======== DASHBOARD MAIN PAGE: BEGIN ========")
+    # Step 1: Reload instances from file first
+    print("DASHBOARD STEP 1: Loading instances from disk")
     manager.load_instances()
     
-    # Run a synchronization to ensure we're showing the latest state
-    # This now runs both verification and import in one step
-    manager._verify_loaded_instances()
-    manager._import_unregistered_tmux_sessions()
+    # Step 2: Run a full synchronization with tmux to ensure perfect sync
+    print("DASHBOARD STEP 2: Running complete tmux sync")
     
-    # Get fresh instance list with accurate tmux status and content previews
+    # First get the current tmux sessions directly to use as ground truth
+    tmux_sessions = []
+    try:
+        result = subprocess.run(["tmux", "ls"], capture_output=True, text=True, check=False)
+        if result.returncode == 0:
+            for line in result.stdout.strip().split('\n'):
+                if ':' in line:
+                    session_name = line.split(':')[0].strip()
+                    tmux_sessions.append(session_name)
+            print(f"Found {len(tmux_sessions)} tmux sessions: {tmux_sessions}")
+        else:
+            print("No tmux sessions found")
+    except Exception as e:
+        print(f"Error getting tmux sessions: {e}")
+    
+    # Run a synchronization to ensure we're showing the latest state
+    # This runs both verification and import in one step
+    print("Running verification and import of tmux sessions")
+    import_count = import_tmux_sessions()
+    print(f"Imported/updated {import_count} tmux sessions")
+    
+    # Step 3: Get fresh instance list with all metadata
+    print("DASHBOARD STEP 3: Building final instance list")
     instance_list = manager.list_instances()
+    
+    # Track statistics
+    tmux_running_count = 0
+    tmux_ready_count = 0
+    tmux_generating_count = 0
+    tmux_stopped_count = 0
     
     # Process the instance list to add any additional UI-specific fields
     instances = []
@@ -3445,31 +3481,86 @@ def dashboard():
         instance_id = instance_dict['id']
         instance_obj = manager.instances.get(instance_id)
         
+        if not instance_obj:
+            print(f"WARNING: Instance {instance_id} from list_instances not found in manager.instances")
+            continue
+        
         # Add detailed_status if available
-        if instance_obj and hasattr(instance_obj, 'detailed_status'):
-            instance_dict['detailed_status'] = instance_obj.detailed_status
-        else:
-            instance_dict['detailed_status'] = 'ready'
-            
+        detailed_status = 'ready'
+        if hasattr(instance_obj, 'detailed_status'):
+            detailed_status = instance_obj.detailed_status
+        instance_dict['detailed_status'] = detailed_status
+        
+        # Count by status for reporting
+        if instance_obj.status == 'stopped':
+            tmux_stopped_count += 1
+        elif hasattr(instance_obj, 'use_tmux') and instance_obj.use_tmux:
+            if instance_obj.status == 'running':
+                tmux_running_count += 1
+                # Further categorize by detailed status
+                if detailed_status == 'running':
+                    tmux_generating_count += 1
+                else:
+                    tmux_ready_count += 1
+        
         # Add generation_time if available
-        if instance_obj and hasattr(instance_obj, 'generation_time'):
+        if hasattr(instance_obj, 'generation_time'):
             instance_dict['generation_time'] = instance_obj.generation_time
-            
+        
         # Add tmux_content if available - this is used for the response column
-        if instance_obj and hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content:
+        if hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content:
             # Truncate to avoid huge JSON payloads
             instance_dict['tmux_content'] = instance_obj.tmux_content[:2000]
+        
+        # Verify tmux session consistency for all running instances
+        if (instance_obj.status == 'running' and 
+            hasattr(instance_obj, 'use_tmux') and instance_obj.use_tmux and
+            hasattr(instance_obj, 'tmux_session_name') and instance_obj.tmux_session_name):
             
+            session_exists = instance_obj.tmux_session_name in tmux_sessions
+            
+            if not session_exists:
+                print(f"CRITICAL: Instance {instance_id} status is 'running' but tmux session {instance_obj.tmux_session_name} not found")
+                # Fix the inconsistency immediately
+                instance_obj.status = 'stopped'
+                instance_obj.detailed_status = 'ready'
+                instance_dict['status'] = 'stopped'
+                instance_dict['detailed_status'] = 'ready'
+                tmux_running_count -= 1
+                if detailed_status == 'running':
+                    tmux_generating_count -= 1
+                else:
+                    tmux_ready_count -= 1
+                tmux_stopped_count += 1
+                # Save changes
+                manager.save_instances()
+        
         instances.append(instance_dict)
     
-    current_time = datetime.now().strftime("%H:%M:%S")
+    # Step 4: Final data preparation
+    print("DASHBOARD STEP 4: Final preparation")
+    
+    # Sort by start time if available (most recent first)
+    instances.sort(key=lambda x: manager.instances[x['id']].start_time if x['id'] in manager.instances else 0, reverse=True)
     
     # Get list of prompt files for the dropdown
     prompt_files = get_prompt_files()
     
+    # Get current time for display
+    current_time = datetime.now().strftime("%H:%M:%S")
+    
     # Add current timestamp for time calculations
     current_timestamp = time.time()
     
+    # Print statistics
+    print(f"DASHBOARD COMPLETE: {len(instances)} total instances")
+    print(f"- {tmux_running_count} tmux running instances")
+    print(f"- {tmux_generating_count} actively generating")
+    print(f"- {tmux_ready_count} in ready state")
+    print(f"- {tmux_stopped_count} stopped instances")
+    print("======== DASHBOARD MAIN PAGE: COMPLETE ========")
+    
+    # Render the template with all our data
     return render_template_string(
         DASHBOARD_TEMPLATE, 
         instances=instances,
@@ -3481,9 +3572,16 @@ def dashboard():
     )
 
 def get_tmux_sessions():
-    """Get all existing tmux sessions for Claude."""
+    """Get all existing tmux sessions for Claude.
+    
+    This is a critical core function for ensuring UI and tmux sessions are always
+    perfectly in sync. It gets the raw list of tmux sessions directly from tmux ls.
+    
+    Returns:
+        list: List of dictionaries with session information for all available sessions
+    """
     try:
-        # Run tmux ls to get all sessions
+        # Run tmux ls to get all sessions with error handling
         result = subprocess.run(
             ["tmux", "ls"], 
             capture_output=True, 
@@ -3496,91 +3594,149 @@ def get_tmux_sessions():
             print("No tmux sessions found or tmux not running")
             return []
         
-        print(f"Raw tmux output: {result.stdout.strip()}")
+        # Save raw output for debugging
+        raw_output = result.stdout.strip()
+        print(f"Raw tmux output: {raw_output}")
         
         # Parse the output to extract session names and creation times
         sessions = []
-        for line in result.stdout.strip().split('\n'):
+        for line in raw_output.split('\n'):
+            # Skip empty lines
+            if not line.strip():
+                continue
+                
             # First extract any session name (anything before the first colon)
             session_match = re.search(r'^([^:]+):', line)
-            if session_match:
-                session_name = session_match.group(1).strip()
-                print(f"Processing tmux session: {session_name}")
+            if not session_match:
+                print(f"Warning: Could not extract session name from line: {line}")
+                continue
                 
-                # For any session, capture it (not just those with claude_ prefix)
-                instance_id = session_name
-                
-                # If session has claude_ prefix, extract the ID part
-                if session_name.startswith('claude_'):
-                    instance_id = session_name[7:]  # Remove 'claude_' prefix
-                    print(f"Extracted instance ID from claude_ prefix: {instance_id}")
-                
+            session_name = session_match.group(1).strip()
+            print(f"Processing tmux session: {session_name}")
+            
+            # For any session, first use the full name as the instance ID
+            instance_id = session_name
+            
+            # If session has claude_ prefix, extract the ID part
+            if session_name.startswith('claude_'):
+                instance_id = session_name[7:]  # Remove 'claude_' prefix
+                print(f"Extracted instance ID from claude_ prefix: {instance_id}")
+            
+            # Store the original line for debugging
+            session_info = line
+            
+            # Extract creation time info from the session line
+            creation_timestamp = None
+            try:
                 # Extract full date pattern from "created" portion of the tmux output
                 time_match = re.search(r'created ((?:\w+\s+\w+\s+\d+\s+\d+:\d+:\d+\s+\d+))', line)
                 
-                # If the full pattern doesn't match, try a generic pattern and check for relative times
+                # If the full pattern doesn't match, try a generic pattern for relative times
                 if not time_match:
-                    # Try the older generic pattern
                     time_match = re.search(r'created (.+?)(?:\)|\s*$)', line)
                 
                 if time_match:
                     # Parse the creation time from the tmux output
-                    try:
-                        created_str = time_match.group(1)
-                        self_time = time.time()
-                        
-                        # Extract actual timestamp instead of using heuristics
-                        if "second" in created_str:
-                            # Few seconds ago - extract the number
-                            seconds_match = re.search(r'(\d+) seconds?', created_str)
-                            seconds = int(seconds_match.group(1)) if seconds_match else 5
-                            creation_timestamp = self_time - seconds
-                        elif "minute" in created_str:
-                            # Few minutes ago - extract the number
-                            minutes_match = re.search(r'(\d+) minutes?', created_str)
-                            minutes = int(minutes_match.group(1)) if minutes_match else 1
-                            creation_timestamp = self_time - (minutes * 60)
-                        elif "hour" in created_str:
-                            # Few hours ago - extract the number
-                            hours_match = re.search(r'(\d+) hours?', created_str)
-                            hours = int(hours_match.group(1)) if hours_match else 1
-                            creation_timestamp = self_time - (hours * 3600)
-                        else:
-                            # Try to parse date directly like "Fri Mar 7 19:53:52 2025"
+                    created_str = time_match.group(1)
+                    current_time = time.time()
+                    
+                    # Parse different time formats
+                    if "second" in created_str:
+                        # Few seconds ago - extract the number
+                        seconds_match = re.search(r'(\d+) seconds?', created_str)
+                        seconds = int(seconds_match.group(1)) if seconds_match else 5
+                        creation_timestamp = current_time - seconds
+                        print(f"  Time: {seconds} seconds ago")
+                    elif "minute" in created_str:
+                        # Few minutes ago - extract the number
+                        minutes_match = re.search(r'(\d+) minutes?', created_str)
+                        minutes = int(minutes_match.group(1)) if minutes_match else 1
+                        creation_timestamp = current_time - (minutes * 60)
+                        print(f"  Time: {minutes} minutes ago")
+                    elif "hour" in created_str:
+                        # Few hours ago - extract the number
+                        hours_match = re.search(r'(\d+) hours?', created_str)
+                        hours = int(hours_match.group(1)) if hours_match else 1
+                        creation_timestamp = current_time - (hours * 3600)
+                        print(f"  Time: {hours} hours ago")
+                    else:
+                        # Try to parse absolute date directly
+                        try:
+                            # Format: "Day Month DD HH:MM:SS YYYY"
+                            creation_time = datetime.strptime(created_str, "%a %b %d %H:%M:%S %Y")
+                            creation_timestamp = creation_time.timestamp()
+                            print(f"  Time: {creation_time.strftime('%Y-%m-%d %H:%M:%S')}")
+                        except Exception as parse_error:
+                            # Try alternative formats
                             try:
-                                # Format: "Day Month DD HH:MM:SS YYYY"
-                                creation_time = datetime.strptime(created_str, "%a %b %d %H:%M:%S %Y")
-                                creation_timestamp = creation_time.timestamp()
-                                print(f"Parsed absolute date: {created_str} -> {creation_time.strftime('%Y-%m-%d %H:%M:%S')}")
-                            except Exception as parse_error:
-                                # Log error for debugging
-                                print(f"Failed to parse date: '{created_str}' - Error: {parse_error}")
-                                
-                                # Try alternative formats
-                                try:
-                                    # In case we're missing specific format details, try a more tolerant parser
-                                    import time, os as pytime
-                                    parsed_time = pytime.strptime(created_str, "%a %b %d %H:%M:%S %Y")
-                                    creation_timestamp = pytime.mktime(parsed_time)
-                                    print(f"Parsed using time.strptime: {pytime.strftime('%Y-%m-%d %H:%M:%S', parsed_time)}")
-                                except Exception as alt_error:
-                                    print(f"Alternative parsing also failed: {alt_error}")
-                                    # Default - assume very recent (5 seconds ago)
-                                    print(f"WARNING: Using recent timestamp for {session_name} - couldn't parse date format")
-                                    creation_timestamp = self_time - 5
-                    except Exception as e:
-                        print(f"Error parsing creation time for {session_name}: {e}, using recent timestamp")
-                        creation_timestamp = time.time() - 5  # Just 5 seconds ago
+                                # Use a more tolerant parser
+                                parsed_time = time.strptime(created_str, "%a %b %d %H:%M:%S %Y")
+                                creation_timestamp = time.mktime(parsed_time)
+                                print(f"  Time: {time.strftime('%Y-%m-%d %H:%M:%S', parsed_time)} (alt parser)")
+                            except Exception:
+                                # Default to recent (5 seconds ago)
+                                print(f"  Warning: Using default time for {session_name}")
+                                creation_timestamp = current_time - 5
                 else:
-                    # Default - assume very recently created (5 seconds ago)
-                    print(f"WARNING: No time info found for {session_name}, using recent timestamp")
+                    # If no creation time info is found, default to recent
                     creation_timestamp = time.time() - 5
-                
+                    print(f"  Warning: No time info found for {session_name}")
+            except Exception as e:
+                # If time parsing fails, default to recent
+                creation_timestamp = time.time() - 5
+                print(f"  Error parsing time for {session_name}: {e}")
+            
+            # Double-check that the session still exists before adding it
+            verify_result = subprocess.run(
+                ["tmux", "has-session", "-t", session_name],
+                capture_output=True, check=False
+            )
+            
+            if verify_result.returncode == 0:
+                # Session exists, add it to our list
                 sessions.append({
                     'session_name': session_name,
                     'instance_id': instance_id,
-                    'creation_time': creation_timestamp
+                    'creation_time': creation_timestamp,
+                    'raw_info': session_info
                 })
+                print(f"  Added session {session_name} to list")
+            else:
+                print(f"  Warning: Session {session_name} no longer exists, skipping")
+        
+        # Verify the list against tmux ls again to ensure perfect sync
+        # This guarantees that no sessions have been added or removed during processing
+        final_check = subprocess.run(
+            ["tmux", "ls"], 
+            capture_output=True, 
+            text=True, 
+            check=False
+        )
+        
+        if final_check.returncode == 0:
+            final_sessions = []
+            for line in final_check.stdout.strip().split('\n'):
+                if ':' in line:
+                    name = line.split(':')[0].strip()
+                    final_sessions.append(name)
+            
+            # Check for any discrepancies
+            session_names = [s['session_name'] for s in sessions]
+            
+            # Sessions that disappeared during processing
+            disappeared = [name for name in session_names if name not in final_sessions]
+            # Sessions that appeared during processing
+            appeared = [name for name in final_sessions if name not in session_names]
+            
+            if disappeared or appeared:
+                print(f"Warning: Tmux sessions changed during processing!")
+                if disappeared:
+                    print(f"  Sessions disappeared: {', '.join(disappeared)}")
+                    # Remove disappeared sessions from our list
+                    sessions = [s for s in sessions if s['session_name'] not in disappeared]
+                if appeared:
+                    print(f"  Sessions appeared: {', '.join(appeared)}")
+                    # We'll handle new sessions on the next refresh
         
         return sessions
     
@@ -3589,13 +3745,37 @@ def get_tmux_sessions():
         return []
 
 def import_tmux_sessions():
-    """Import all detected Claude tmux sessions into the task manager."""
+    """Import all detected Claude tmux sessions into the task manager.
+    
+    This function is responsible for syncing the state between tmux sessions
+    and the Claude Task Manager. It ensures UI and tmux are always in perfect sync.
+    
+    It performs the following key tasks:
+    1. Gets the actual tmux sessions directly from tmux
+    2. Updates existing instances in the manager to match tmux state
+    3. Creates new instances for tmux sessions not already tracked
+    4. Marks stopped instances that no longer have tmux sessions
+    
+    Returns:
+        int: Count of imported or updated sessions
+    """
     # First run direct tmux ls command to see actual sessions
+    print("======== TMUX-UI SYNC: Start Import Process ========")
     print("Running direct tmux ls command...")
+    
+    # Capture the raw tmux session state
+    raw_tmux_sessions = []
     try:
         result = subprocess.run(["tmux", "ls"], capture_output=True, text=True, check=False)
         if result.returncode == 0:
-            print(f"Direct tmux ls result: {result.stdout.strip()}")
+            raw_output = result.stdout.strip()
+            print(f"Raw tmux ls result: {raw_output}")
+            
+            # Store the raw session names
+            for line in raw_output.split('\n'):
+                if ':' in line:
+                    session_name = line.split(':')[0].strip()
+                    raw_tmux_sessions.append(session_name)
         else:
             print("No direct tmux sessions found")
     except Exception as e:
@@ -3604,10 +3784,79 @@ def import_tmux_sessions():
     # Get existing tmux sessions through our parser
     tmux_sessions = get_tmux_sessions()
     
-    print(f"Parsed tmux sessions: {[s['session_name'] for s in tmux_sessions]}")
+    # Double verify that our parser results match the raw results
+    parser_session_names = [s['session_name'] for s in tmux_sessions]
+    
+    # Check for any discrepancies between raw names and parser results
+    missing_in_parser = [name for name in raw_tmux_sessions if name not in parser_session_names]
+    extra_in_parser = [name for name in parser_session_names if name not in raw_tmux_sessions]
+    
+    if missing_in_parser:
+        print(f"WARNING: {len(missing_in_parser)} sessions in raw tmux ls but missed by parser:")
+        print(f"  Missing: {', '.join(missing_in_parser)}")
+        
+        # Try to recover missing sessions by directly checking them
+        for session_name in missing_in_parser:
+            # Verify it really exists
+            try:
+                verify_result = subprocess.run(
+                    ["tmux", "has-session", "-t", session_name],
+                    capture_output=True, check=False
+                )
+                
+                if verify_result.returncode == 0:
+                    # Session exists but was missed - create a minimal entry
+                    instance_id = session_name
+                    if session_name.startswith('claude_'):
+                        instance_id = session_name[7:]  # Remove 'claude_' prefix
+                        
+                    # Add it with minimal information
+                    tmux_sessions.append({
+                        'session_name': session_name,
+                        'instance_id': instance_id,
+                        'creation_time': time.time() - 10,  # Default to 10 seconds ago
+                        'raw_info': f"{session_name}: (recovered missing session)",
+                        'recovered': True
+                    })
+                    print(f"  Recovered missing session: {session_name}")
+            except Exception as e:
+                print(f"  Error verifying missing session {session_name}: {e}")
+    
+    if extra_in_parser:
+        print(f"WARNING: {len(extra_in_parser)} sessions in parser but not in raw tmux ls:")
+        print(f"  Extra: {', '.join(extra_in_parser)}")
+        
+        # Remove the extra sessions from our list
+        tmux_sessions = [s for s in tmux_sessions if s['session_name'] not in extra_in_parser]
+        print(f"  Removed extra sessions from parser results")
+    
+    # Final verification of parser sessions - check one-by-one that each exists
+    verified_sessions = []
+    for session in tmux_sessions:
+        session_name = session['session_name']
+        try:
+            verify_result = subprocess.run(
+                ["tmux", "has-session", "-t", session_name],
+                capture_output=True, check=False
+            )
+            
+            if verify_result.returncode == 0:
+                # Session exists, keep it
+                verified_sessions.append(session)
+                print(f"Verified session exists: {session_name}")
+            else:
+                print(f"WARNING: Session {session_name} failed verification, will be excluded")
+        except Exception as e:
+            print(f"Error verifying session {session_name}: {e}")
+    
+    # Replace our sessions list with only verified sessions
+    tmux_sessions = verified_sessions
+    
+    print(f"Final verified tmux sessions: {[s['session_name'] for s in tmux_sessions]}")
     
     # Create a set of active session IDs for status checking
     active_session_ids = {session['instance_id'] for session in tmux_sessions}
+    active_session_names = {session['session_name'] for session in tmux_sessions}
     
     if not tmux_sessions:
         print("No Claude tmux sessions detected.")
@@ -3615,7 +3864,7 @@ def import_tmux_sessions():
         update_count = _update_terminated_instances(active_session_ids)
         return 0
     
-    print(f"Found {len(tmux_sessions)} potential Claude tmux sessions.")
+    print(f"Found {len(tmux_sessions)} verified tmux sessions.")
     
     # Current working directory 
     cwd = os.getcwd()
@@ -3626,7 +3875,7 @@ def import_tmux_sessions():
         session_name = session['session_name']
         instance_id = session['instance_id']
         
-        print(f"Importing session: {session_name}, ID: {instance_id}")
+        print(f"Processing session: {session_name}, ID: {instance_id}")
         
         # Look for direct matches and also session-within-ID matches
         matched_instance = None
@@ -3691,17 +3940,43 @@ def import_tmux_sessions():
             imported_count += 1
             print(f"Imported session {session_name} as instance {new_id}")
     
-    # Update status of any instances that may have been terminated outside
-    update_count = _update_terminated_instances(active_session_ids)
-    if update_count > 0:
-        imported_count += update_count
+    # Comprehensive update of instance status based on tmux state
+    # This ensures that ANY instance with a tmux_session_name will have its
+    # status correctly set based on whether the tmux session exists
+    updated_count = 0
+    for instance_id, instance in manager.instances.items():
+        # Only check instances that use tmux
+        if hasattr(instance, 'use_tmux') and instance.use_tmux:
+            tmux_session_name = None
+            
+            # Get the tmux session name
+            if hasattr(instance, 'tmux_session_name') and instance.tmux_session_name:
+                tmux_session_name = instance.tmux_session_name
+            
+            if tmux_session_name:
+                # Check if this session exists in active sessions
+                session_exists = tmux_session_name in active_session_names
+                
+                # Update status based on session existence
+                if session_exists and instance.status != "running":
+                    # Session exists but instance isn't running - update to running
+                    instance.status = "running"
+                    print(f"Updated instance {instance_id} status to 'running' (session exists)")
+                    updated_count += 1
+                elif not session_exists and instance.status == "running":
+                    # Session doesn't exist but instance is running - update to stopped
+                    instance.status = "stopped"
+                    print(f"Updated instance {instance_id} status to 'stopped' (session gone)")
+                    updated_count += 1
     
     # Save the updated instances
-    if imported_count > 0:
+    total_changes = imported_count + updated_count
+    if total_changes > 0:
         manager.save_instances()
-        print(f"Successfully imported/updated {imported_count} tmux sessions.")
+        print(f"Successfully imported/updated {total_changes} tmux sessions.")
     
-    return imported_count
+    print("======== TMUX-UI SYNC: Import Process Complete ========")
+    return total_changes
 
 def _update_terminated_instances(active_session_ids):
     """Update status of instances whose tmux sessions no longer exist."""
@@ -3718,248 +3993,396 @@ def _update_terminated_instances(active_session_ids):
 
 @app.route('/sync_tmux')
 def sync_tmux():
-    """Synchronize the dashboard with existing tmux sessions using improved methods."""
-    # Force reload from disk first
-    manager.load_instances()
+    """Synchronize the dashboard with existing tmux sessions using improved methods.
     
-    # Track how many updates were made
-    updates_count = 0
+    This is the API endpoint that ensures UI and tmux sessions are always in sync.
+    It performs both full verification of existing instances and imports any new
+    tmux sessions that might have been created outside the manager.
     
+    Always returns JSON indicating success and count of updates.
+    """
     try:
-        # First verify and update existing instances against actual tmux sessions
-        print("=== SYNC: Verifying existing instances against tmux sessions")
-        manager._verify_loaded_instances()
+        # Begin sync process
+        print("======== DASHBOARD TMUX SYNC: BEGIN ========")
         
-        # Next import any unregistered tmux sessions
-        print("=== SYNC: Importing any unregistered tmux sessions")
-        imported_count = manager._import_unregistered_tmux_sessions()
-        if imported_count > 0:
-            updates_count += imported_count
-            print(f"=== SYNC: Imported {imported_count} new tmux sessions")
+        # First, force reload instances from disk
+        manager.load_instances()
         
-        # Check active status for each running instance
+        # Get the original state - used to determine if any changes were made
+        original_instances = {id: instance.status for id, instance in manager.instances.items()}
+        original_tmux_count = len([i for i in manager.instances.values() 
+                                  if hasattr(i, 'use_tmux') and i.use_tmux and i.status == "running"])
+        
+        # Step 1: Run the enhanced importer that fully verifies tmux state and UI
+        print("SYNC STEP 1: Running enhanced import_tmux_sessions()")
+        import_count = import_tmux_sessions()
+        
+        # Step 2: Verify remaining session content and update detailed status
+        print("SYNC STEP 2: Updating content and detailed status")
+        content_updates = 0
+        
+        # Only update content for instances with active tmux sessions
         for instance_id, instance in manager.instances.items():
-            if instance.status == "running" and hasattr(instance, 'use_tmux') and instance.use_tmux:
-                # Only check tmux instances
+            if (instance.status == "running" and 
+                hasattr(instance, 'use_tmux') and instance.use_tmux and 
+                hasattr(instance, 'tmux_session_name') and instance.tmux_session_name):
+                
+                # First verify session still exists (redundant but crucial)
                 try:
-                    # Capture the visible content of the tmux session
-                    session_name = instance.tmux_session_name
-                    result = subprocess.run(
-                        ["tmux", "capture-pane", "-p", "-t", session_name],
+                    verify_result = subprocess.run(
+                        ["tmux", "has-session", "-t", instance.tmux_session_name],
+                        capture_output=True, check=False
+                    )
+                    
+                    if verify_result.returncode != 0:
+                        print(f"WARNING: Instance {instance_id} session {instance.tmux_session_name} no longer exists")
+                        instance.status = "stopped"
+                        instance.detailed_status = "ready"  # Reset detailed status as well
+                        content_updates += 1
+                        continue  # Skip to next instance
+                    
+                    # Session exists, capture content
+                    capture_result = subprocess.run(
+                        ["tmux", "capture-pane", "-p", "-t", instance.tmux_session_name],
                         capture_output=True, text=True, check=False
                     )
                     
-                    if result.returncode == 0:
-                        output = result.stdout
+                    if capture_result.returncode == 0:
+                        output = capture_result.stdout
                         
                         # Store the full tmux output for display in the response column
+                        output_changed = False
                         if not hasattr(instance, 'tmux_content'):
                             instance.tmux_content = output
-                        else:
-                            # Only update if different to avoid unnecessary updates
-                            if instance.tmux_content != output:
-                                instance.tmux_content = output
-                                updates_count += 1
+                            output_changed = True
+                        elif instance.tmux_content != output:
+                            instance.tmux_content = output
+                            output_changed = True
                         
-                        # Check for the pattern (###s · esc to interrupt) indicating active generation
-                        detailed_status = instance.__dict__.get('detailed_status', '')
+                        if output_changed:
+                            content_updates += 1
+                            print(f"Updated content for instance {instance_id}")
                         
-                        # STEP 1: Default to READY
-                        # Always set to ready first, then only change if we 100% detect running
+                        # Check for active generation indicators
+                        current_time = time.time()
                         is_active = False
                         generation_seconds = None
-                        current_time = time.time()
                         
-                        try:
-                            # Try to check directly with a simpler command first
-                            simple_check = subprocess.run(
-                                ["tmux", "capture-pane", "-p", "-t", session_name], 
-                                capture_output=True, text=True
-                            )
-                            print(f"=== Direct capture for {instance_id} session {session_name}: {simple_check.returncode}")
+                        # Check for common Claude generation indicators
+                        if '█' in output or '▓' in output or '░' in output or '···' in output:
+                            # Mark as active if we found any generation indicators
+                            is_active = True
+                            print(f"Instance {instance_id}: RUNNING - found generation indicators")
                             
-                            # Check if command succeeded and has content
-                            if simple_check.returncode == 0 and simple_check.stdout:
-                                direct_output = simple_check.stdout
-                                
-                                # Log a sample of the output
-                                sample = direct_output[:100].replace('\n', ' ')
-                                print(f"=== Sample from {instance_id}: {sample}")
-                                
-                                # STEP 2: Check for active generation by looking for common Claude generation indicators
-                                if '█' in direct_output or '▓' in direct_output or '░' in direct_output or '···' in direct_output:
-                                    # Mark as active if we found any generation indicators
-                                    is_active = True
-                                    print(f"=== Instance {instance_id}: RUNNING - found generation indicators")
-                                    
-                                    # If state changed from ready to running, record the time
-                                    old_status = getattr(instance, 'detailed_status', 'ready')
-                                    if old_status != 'running':
-                                        instance.active_since = current_time
-                                        print(f"=== Instance {instance_id}: State changed from {old_status} to running, recording active_since={current_time}")
-                                    
-                                    # Extract the seconds if available
-                                    # Look for digits followed by 's' in the text
-                                    seconds_pattern = re.search(r'(\d+)s', direct_output)
-                                    if seconds_pattern:
-                                        generation_seconds = seconds_pattern.group(1)
-                                        print(f"=== Instance {instance_id}: Generation time: {generation_seconds}s")
-                                else:
-                                    print(f"=== Instance {instance_id}: READY - no generation indicators found")
-                                    
-                                    # If state changed from running to ready, record the time
-                                    old_status = getattr(instance, 'detailed_status', 'ready')
-                                    if old_status != 'ready':
-                                        instance.ready_since = current_time
-                                        print(f"=== Instance {instance_id}: State changed from {old_status} to ready, recording ready_since={current_time}")
-                                        
-                                    # Initialize ready_since if it doesn't exist yet
-                                    if not hasattr(instance, 'ready_since') or instance.ready_since is None:
-                                        instance.ready_since = current_time
-                                    
-                                # ADDITIONAL FEATURE: Auto-respond to various common prompts
-                                auto_respond_phrases = [
-                                    'Do you want to',
-                                    'Would you like to',
-                                    'Shall I proceed',
-                                    'Continue?',
-                                    'Proceed?',
-                                    'Press Enter to continue',
-                                    'Press any key to continue'
-                                ]
-                                
-                                # Check if any of the auto-respond phrases are in the output
-                                should_respond = False
-                                detected_phrase = None
-                                
-                                for phrase in auto_respond_phrases:
-                                    if phrase in direct_output:
-                                        should_respond = True
-                                        detected_phrase = phrase
-                                        break
-                                        
-                                if should_respond:
-                                    print(f"=== Instance {instance_id}: Detected '{detected_phrase}' prompt - sending Enter")
-                                    try:
-                                        # Send an Enter key to automatically confirm
-                                        subprocess.run([
-                                            "tmux", "send-keys", "-t", session_name, 
-                                            "Enter"
-                                        ], check=True)
-                                        print(f"=== Instance {instance_id}: Successfully sent Enter key")
-                                    except Exception as e:
-                                        print(f"=== Instance {instance_id}: Error sending Enter key: {e}")
-                        except Exception as e:
-                            print(f"=== Error during direct status check for {instance_id}: {e}")
+                            # If state changed from ready to running, record the time
+                            old_status = getattr(instance, 'detailed_status', 'ready')
+                            if old_status != 'running':
+                                instance.active_since = current_time
+                                print(f"Instance {instance_id}: State changed from {old_status} to running, recording active_since={current_time}")
+                                content_updates += 1
                             
-                        # STEP 4: Update the instance properties
-                        if is_active:
-                            # Mark as running and record generation time
-                            instance.detailed_status = 'running'
-                            if generation_seconds:
+                            # Extract the seconds if available
+                            seconds_pattern = re.search(r'(\d+)s', output)
+                            if seconds_pattern:
+                                generation_seconds = seconds_pattern.group(1)
+                                print(f"Instance {instance_id}: Generation time: {generation_seconds}s")
                                 instance.generation_time = f"{generation_seconds}s"
-                            else:
-                                instance.generation_time = "?"
-                            updates_count += 1
+                                content_updates += 1
                         else:
-                            # Default to ready
-                            if getattr(instance, 'detailed_status', '') != 'ready':
-                                instance.detailed_status = 'ready'
-                                # Initialize ready_since when changing to ready state
+                            print(f"Instance {instance_id}: READY - no generation indicators found")
+                            
+                            # If state changed from running to ready, record the time
+                            old_status = getattr(instance, 'detailed_status', 'ready')
+                            if old_status != 'ready':
                                 instance.ready_since = current_time
-                                updates_count += 1
-                            # Make sure ready_since is always initialized
+                                print(f"Instance {instance_id}: State changed from {old_status} to ready, recording ready_since={current_time}")
+                                content_updates += 1
+                                
+                            # Initialize ready_since if it doesn't exist yet
                             if not hasattr(instance, 'ready_since') or instance.ready_since is None:
                                 instance.ready_since = current_time
-                                
-                        # Print state for debugging
-                        print(f"=== Instance {instance_id} final status: {getattr(instance, 'detailed_status', 'none')}")
+                        
+                        # Update detailed status based on generation indicators
+                        if is_active:
+                            instance.detailed_status = 'running'
+                        else:
+                            instance.detailed_status = 'ready'
+                        
+                        # ADDITIONAL FEATURE: Auto-respond to common prompts
+                        auto_respond_phrases = [
+                            'Do you want to',
+                            'Would you like to',
+                            'Shall I proceed',
+                            'Continue?',
+                            'Proceed?',
+                            'Press Enter to continue',
+                            'Press any key to continue'
+                        ]
+                        
+                        for phrase in auto_respond_phrases:
+                            if phrase in output:
+                                print(f"Instance {instance_id}: Detected '{phrase}' prompt - sending Enter")
+                                try:
+                                    # Send an Enter key to automatically confirm
+                                    subprocess.run([
+                                        "tmux", "send-keys", "-t", instance.tmux_session_name, 
+                                        "Enter"
+                                    ], check=True)
+                                    print(f"Instance {instance_id}: Successfully sent Enter key")
+                                    break  # Only respond to the first matching phrase
+                                except Exception as e:
+                                    print(f"Instance {instance_id}: Error sending Enter key: {e}")
+                
                 except Exception as e:
-                    print(f"=== SYNC: Error checking active status for instance {instance_id}: {e}")
-            
-        # Get the current state of all instances for logging
-        instances = manager.instances
-        active_instances = [id for id, instance in instances.items() 
-                          if instance.status == "running"]
+                    print(f"Error processing instance {instance_id}: {e}")
         
-        print(f"=== SYNC: Current state: {len(instances)} total instances, {len(active_instances)} active")
+        # Step 3: Do one final verification of all tmux sessions to ensure perfect sync
+        print("SYNC STEP 3: Final verification")
         
-    except Exception as e:
-        print(f"=== SYNC: Error during synchronization: {e}")
-        # Still return success=True to avoid breaking the UI, but indicate no updates
+        # Get current tmux sessions directly
+        final_check = subprocess.run(["tmux", "ls"], capture_output=True, text=True, check=False)
+        final_tmux_sessions = set()
+        
+        if final_check.returncode == 0:
+            for line in final_check.stdout.strip().split('\n'):
+                if ':' in line:
+                    session_name = line.split(':')[0].strip()
+                    final_tmux_sessions.add(session_name)
+        
+        # Check that all running instances have existing tmux sessions
+        for instance_id, instance in manager.instances.items():
+            if (instance.status == "running" and 
+                hasattr(instance, 'use_tmux') and instance.use_tmux and
+                hasattr(instance, 'tmux_session_name') and instance.tmux_session_name):
+                
+                if instance.tmux_session_name not in final_tmux_sessions:
+                    print(f"CRITICAL: Final check found instance {instance_id} tmux session {instance.tmux_session_name} is gone")
+                    instance.status = "stopped"
+                    instance.detailed_status = "ready"
+                    content_updates += 1
+        
+        # Save all changes to ensure persistence
+        manager.save_instances()
+        
+        # Calculate total updates
+        total_updates = import_count + content_updates
+        
+        # Compare with original state to detect changes
+        changed_instances = 0
+        for id, instance in manager.instances.items():
+            if id in original_instances and original_instances[id] != instance.status:
+                changed_instances += 1
+        
+        new_tmux_count = len([i for i in manager.instances.values() 
+                              if hasattr(i, 'use_tmux') and i.use_tmux and i.status == "running"])
+        
+        print(f"DASHBOARD TMUX SYNC: Complete with {total_updates} updates")
+        print(f"- Imported/updated: {import_count} sessions")
+        print(f"- Content changes: {content_updates} instances")
+        print(f"- Status changes: {changed_instances} instances")
+        print(f"- Tmux sessions: {original_tmux_count} → {new_tmux_count}")
+        print("======== DASHBOARD TMUX SYNC: COMPLETE ========")
+        
+        # Return success response with count of updated instances
         return jsonify({
             "success": True,
+            "updated": total_updates > 0,
+            "count": total_updates,
+            "tmux_count": new_tmux_count,
+            "status_changes": changed_instances
+        })
+        
+    except Exception as e:
+        print(f"CRITICAL ERROR during tmux sync: {e}")
+        # Include error details but still return success=True to avoid breaking the UI
+        return jsonify({
+            "success": True,  # Keep UI working
             "updated": False,
             "count": 0,
             "error": str(e)
         })
-    
-    # Save instances after synchronization
-    manager.save_instances()
-    
-    # Return success response with count of updated instances
-    return jsonify({
-        "success": True,
-        "updated": updates_count > 0,
-        "count": updates_count
-    })
 
 @app.route('/refresh')
 def refresh():
-    """Refresh instances data."""
-    # Force a complete re-sync every time a refresh is requested to get latest status
-    print("======== PERFORMING COMPLETE REFRESH AND SYNC ========")
+    """Refresh instances data for the dashboard UI.
     
-    # Step 1: Force reload from disk
+    This endpoint is called when the user manually refreshes the dashboard
+    or when the automatic refresh occurs. It ensures that the dashboard
+    accurately reflects the current state of all tmux sessions.
+    
+    Returns:
+        str: Rendered HTML template with updated instance data
+    """
+    print("======== DASHBOARD REFRESH: BEGIN ========")
+    
+    # Step 1: Force reload from disk to get latest state
+    print("REFRESH STEP 1: Loading instances from disk")
     manager.load_instances()
     
-    # Step 2: Run a sync to check all tmux sessions and update statuses
-    sync_tmux()
+    # Step 2: Run a full synchronization with tmux
+    print("REFRESH STEP 2: Running complete tmux sync")
+    # Call the sync_tmux function directly instead of the endpoint
+    # This gives us more control and avoids HTTP overhead
+    try:
+        # Get current tmux sessions
+        tmux_before = subprocess.run(["tmux", "ls"], capture_output=True, text=True, check=False)
+        if tmux_before.returncode == 0:
+            tmux_sessions_before = set()
+            for line in tmux_before.stdout.strip().split('\n'):
+                if ':' in line:
+                    session_name = line.split(':')[0].strip()
+                    tmux_sessions_before.add(session_name)
+            print(f"Current tmux sessions before sync: {len(tmux_sessions_before)}")
+        else:
+            tmux_sessions_before = set()
+            print("No tmux sessions found before sync")
+        
+        # Force a complete import_tmux_sessions operation to sync everything
+        print("Running full import_tmux_sessions to sync all tmux state")
+        import_count = import_tmux_sessions()
+        print(f"Tmux sync complete: {import_count} updates")
+        
+        # Verify that all tmux sessions are now properly represented
+        tmux_after = subprocess.run(["tmux", "ls"], capture_output=True, text=True, check=False)
+        if tmux_after.returncode == 0:
+            tmux_sessions_after = set()
+            for line in tmux_after.stdout.strip().split('\n'):
+                if ':' in line:
+                    session_name = line.split(':')[0].strip()
+                    tmux_sessions_after.add(session_name)
+            print(f"Current tmux sessions after sync: {len(tmux_sessions_after)}")
+        else:
+            tmux_sessions_after = set()
+            print("No tmux sessions found after sync")
+        
+        # Detect any session changes during the sync process
+        if tmux_sessions_before != tmux_sessions_after:
+            print("Tmux sessions changed during sync!")
+            added = tmux_sessions_after - tmux_sessions_before
+            removed = tmux_sessions_before - tmux_sessions_after
+            
+            if added:
+                print(f"New sessions: {', '.join(added)}")
+            if removed:
+                print(f"Removed sessions: {', '.join(removed)}")
+                
+            # If sessions were added, run another import to catch them
+            if added:
+                print("Running additional sync to catch new sessions")
+                import_tmux_sessions()
+    except Exception as e:
+        print(f"Error during tmux sync: {e}")
     
     # Step 3: Save any changes to disk
+    print("REFRESH STEP 3: Saving instances to disk")
     manager.save_instances()
     
-    # Step 4: Use the list_instances method to get properly formatted instances 
-    # This ensures we get the first 100 chars of the prompt content
+    # Step 4: Get properly formatted instance list with all UI fields
+    print("REFRESH STEP 4: Building instance list for UI")
+    # Use list_instances which triggers another verification pass
     instance_list = manager.list_instances()
     
     # Process the instance list to add any additional UI-specific fields
     instances = []
+    
+    # Track statistics for reporting
+    tmux_running_count = 0
+    stopped_count = 0
+    ready_count = 0
+    generating_count = 0
+    
     for instance_dict in instance_list:
         instance_id = instance_dict['id']
         instance_obj = manager.instances.get(instance_id)
         
+        if not instance_obj:
+            print(f"Warning: Instance {instance_id} not found in manager")
+            continue
+            
         # Add detailed_status if available
-        if instance_obj and hasattr(instance_obj, 'detailed_status'):
+        if hasattr(instance_obj, 'detailed_status'):
             instance_dict['detailed_status'] = instance_obj.detailed_status
+            if instance_obj.detailed_status == 'running':
+                generating_count += 1
+            elif instance_obj.detailed_status == 'ready' and instance_obj.status == 'running':
+                ready_count += 1
         else:
             instance_dict['detailed_status'] = 'ready'
+            if instance_obj.status == 'running':
+                ready_count += 1
+        
+        # Count statuses
+        if instance_obj.status == 'stopped':
+            stopped_count += 1
+        elif hasattr(instance_obj, 'use_tmux') and instance_obj.use_tmux and instance_obj.status == 'running':
+            tmux_running_count += 1
             
         # Add generation_time if available
-        if instance_obj and hasattr(instance_obj, 'generation_time'):
+        if hasattr(instance_obj, 'generation_time'):
             instance_dict['generation_time'] = instance_obj.generation_time
+        
+        # Only include tmux content for tmux-based instances that are running
+        tmux_content = None
+        if (hasattr(instance_obj, 'use_tmux') and instance_obj.use_tmux and 
+            instance_obj.status == 'running' and hasattr(instance_obj, 'tmux_session_name')):
             
-        # Add tmux_content if available - this is used for the response column
-        if instance_obj and hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content:
-            # Truncate to avoid huge JSON payloads
-            instance_dict['tmux_content'] = instance_obj.tmux_content[:2000]
-            
+            # First check if we have cached content
+            if hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content:
+                tmux_content = instance_obj.tmux_content[:2000]  # Truncate to avoid huge payloads
+            else:
+                # Try to fetch fresh content
+                try:
+                    # Verify the session exists before trying to capture
+                    verify_result = subprocess.run(
+                        ["tmux", "has-session", "-t", instance_obj.tmux_session_name],
+                        capture_output=True, check=False
+                    )
+                    
+                    if verify_result.returncode == 0:
+                        # Session exists, capture content
+                        capture_result = subprocess.run(
+                            ["tmux", "capture-pane", "-p", "-t", instance_obj.tmux_session_name],
+                            capture_output=True, text=True, check=False
+                        )
+                        
+                        if capture_result.returncode == 0:
+                            tmux_content = capture_result.stdout[:2000]  # Truncate to avoid huge payloads
+                            instance_obj.tmux_content = tmux_content  # Cache the content
+                    else:
+                        # Session no longer exists
+                        print(f"Warning: Tmux session {instance_obj.tmux_session_name} for instance {instance_id} not found")
+                        instance_obj.status = "stopped"
+                        manager.save_instances()
+                except Exception as e:
+                    print(f"Error capturing tmux content for {instance_id}: {e}")
+        
+        # Add tmux content to the dictionary if available
+        if tmux_content:
+            instance_dict['tmux_content'] = tmux_content
+        
         instances.append(instance_dict)
     
-    # Sort by start time if available
+    # Sort by start time if available (most recent first)
     instances.sort(key=lambda x: manager.instances[x['id']].start_time if x['id'] in manager.instances else 0, reverse=True)
     
-    print(f"Refreshed {len(instances)} instances")
+    # Print statistics
+    print(f"REFRESH COMPLETE: {len(instances)} total instances")
+    print(f"- {tmux_running_count} tmux running instances")
+    print(f"- {generating_count} actively generating")
+    print(f"- {ready_count} in ready state")
+    print(f"- {stopped_count} stopped instances")
+    print("======== DASHBOARD REFRESH: COMPLETE ========")
     
     # Get list of prompt files for the dropdown
     prompt_files = get_prompt_files()
     
-    # Use the clean instance list of dictionaries
+    # Get current time for display
     current_time = datetime.now().strftime("%H:%M:%S")
     
     # Add current timestamp for time calculations
     current_timestamp = time.time()
     
+    # Render the template with all our data
     return render_template_string(
         DASHBOARD_TEMPLATE, 
         instances=instances,
@@ -4046,12 +4469,11 @@ def add_instance():
     # Check if project directory is just an ID number
     if re.match(r'^\d+$', proj_dir):
         project_id = proj_dir
-        # Define search paths
-        search_paths = [
-            '/Users/Mike/Desktop/upwork/3) current projects',
-            '/Users/Mike/Desktop/upwork/2) proposals'
-        ]
+        # Get search paths from config
+        from src.utils.config import get_search_paths
+        search_paths = get_search_paths()
         
+        print(f"Searching for project ID {project_id} in configured paths: {search_paths}")
         found_dir = None
         
         # Search for a directory containing the ID in its name
@@ -4071,7 +4493,9 @@ def add_instance():
             proj_dir = found_dir
             print(f"Found project directory: {proj_dir} for ID: {project_id}")
         else:
-            return f"Could not find a project directory containing ID: {project_id}", 400
+            # Format the error message with the search paths to make it more helpful
+            paths_str = ", ".join(search_paths)
+            return f"Could not find a project directory containing ID: {project_id}\nSearched in: {paths_str}", 400
     
     # Check if prompt_path is a file or just text
     is_prompt_text = False
