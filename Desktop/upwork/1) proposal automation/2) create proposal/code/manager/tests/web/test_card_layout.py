@@ -41,27 +41,11 @@ class CardLayoutTestCase(unittest.TestCase):
         # Find the parent directory (project root)
         cls.root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         
-        # Use a different port to avoid conflicts
-        test_port = 5005
+        # Use dashboard on port 7865
+        print("Using dashboard on port 7865...")
         
-        # Start the dashboard in a separate process with a different port
-        dashboard_cmd = f"python -c \"import sys; sys.path.append('{cls.root_dir}'); from src.web.app import run_dashboard; run_dashboard(port={test_port})\""
-        try:
-            import subprocess
-            cls.dashboard_process = subprocess.Popen(
-                dashboard_cmd,
-                shell=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                cwd=cls.root_dir
-            )
-            print(f"Starting dashboard on port {test_port}...")
-        except Exception as e:
-            print(f"Failed to start dashboard: {e}")
-            raise
-        
-        # Wait for the dashboard to start
-        time.sleep(5)
+        # No need to start dashboard since it's already running
+        cls.server_thread = None
         
         # Set up the Selenium WebDriver
         chrome_options = Options()
@@ -83,7 +67,7 @@ class CardLayoutTestCase(unittest.TestCase):
             raise
         
         # URL of the dashboard
-        cls.base_url = f"http://localhost:{test_port}"
+        cls.base_url = "http://localhost:7865"
         
         # Ensure the dashboard is running
         try:
@@ -105,11 +89,8 @@ class CardLayoutTestCase(unittest.TestCase):
         if hasattr(cls, 'driver'):
             cls.driver.quit()
         
-        # Stop the dashboard process
-        if hasattr(cls, 'dashboard_process'):
-            cls.dashboard_process.terminate()
-            cls.dashboard_process.wait()
-            print("Dashboard stopped")
+        # The server thread doesn't need explicit cleanup since it's a daemon thread
+        print("Dashboard thread will terminate with the test process")
 
     @classmethod
     def create_test_instances(cls):

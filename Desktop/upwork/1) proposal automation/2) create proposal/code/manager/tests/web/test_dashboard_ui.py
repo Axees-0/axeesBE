@@ -47,15 +47,11 @@ class DashboardUITestCase(unittest.TestCase):
         # Find the parent directory (project root)
         cls.root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         
-        # Start the dashboard in a separate process
-        dashboard_script = os.path.join(cls.root_dir, "src", "start_dashboard.py")
-        cls.dashboard_process = subprocess.Popen(
-            ["python3", dashboard_script],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            cwd=cls.root_dir
-        )
-        print("Starting dashboard...")
+        # Use existing dashboard started on port 7865
+        # We won't start a new process, since we're already running the dashboard
+        # in another process
+        cls.dashboard_process = None
+        print("Using existing dashboard on port 7865...")
         
         # Wait for the dashboard to start
         time.sleep(5)
@@ -75,7 +71,7 @@ class DashboardUITestCase(unittest.TestCase):
         cls.driver.implicitly_wait(10)
         
         # URL of the dashboard
-        cls.base_url = "http://localhost:7864"
+        cls.base_url = "http://localhost:7865"
         
         # Ensure the dashboard is running
         try:
@@ -96,10 +92,9 @@ class DashboardUITestCase(unittest.TestCase):
         # Close the WebDriver
         cls.driver.quit()
         
-        # Stop the dashboard process
-        cls.dashboard_process.terminate()
-        cls.dashboard_process.wait()
-        print("Dashboard stopped")
+        # Don't stop the dashboard since it was started externally
+        # This allows us to run multiple tests against the same dashboard instance
+        print("Test complete - dashboard still running")
 
     @classmethod
     def create_test_instances(cls):
