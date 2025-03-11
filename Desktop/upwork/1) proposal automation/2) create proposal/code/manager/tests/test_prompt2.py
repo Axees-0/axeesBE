@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Direct test script to verify the file creation dialog detection.
-This directly creates a tmux session and runs Claude with a file creation task.
+Direct test script to create a Claude instance with Prompt 2 for card layout testing.
 """
 
 import os
@@ -48,11 +47,11 @@ def main():
     # Wait for Claude to finish initializing
     time.sleep(2)
     
-    # Send the command to create a file
-    print("Sending file creation request...")
+    # Send Prompt 2 for card layout testing
+    print("Sending Prompt 2 for card layout testing...")
     subprocess.run([
         "tmux", "send-keys", "-t", session_name, 
-        "Please create a file named test_file.txt with the content 'Hello World'", "Enter"
+        "Test prompt 2 for card layout testing", "Enter"
     ], check=True)
     
     # Open terminal window so user can observe
@@ -62,21 +61,18 @@ def main():
         f'tell application "Terminal" to do script "tmux attach -t {session_name}"'
     ], check=True)
     
-    print("\nTest running! Watch the terminal window to see if:")
-    print("1. Claude asks permission to create the file")
-    print("2. The Task Manager automatically responds to the dialog")
-    print("\nPress Ctrl+C when done observing...")
+    print("\nTest running! Claude instance created with Prompt 2 for card layout testing.")
+    print(f"Session name: {session_name}")
+    print("Please run the card layout test now in a separate terminal.")
     
+    # Keep the script running
     try:
         while True:
             time.sleep(1)
     except KeyboardInterrupt:
         print("\nTest interrupted by user")
     
-    # Don't close the session so user can continue to observe if needed
-    print("Test complete! The session will remain open for further observation.")
-    print(f"Session name: {session_name}")
-    print("You can close it manually when done.")
+    print("Test complete! The session will remain open for further testing.")
 
 if __name__ == "__main__":
     main()

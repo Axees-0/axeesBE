@@ -40,12 +40,22 @@ or simply:
 ## Project Structure
 
 - `src/` - Core application code
+  - `cli/` - Command-line interface implementation
+  - `core/` - Core business logic
+  - `infrastructure/` - Infrastructure services
+  - `monitoring/` - Monitoring scripts and tools
+  - `utils/` - Utility functions
+  - `web/` - Web dashboard implementation
 - `docs/` - Documentation
 - `examples/` - Example scripts and usage
-- `tests/` - Test suites
+- `tests/` - Test suites and test data
 - `config/` - Configuration files
 - `logs/` - Log files
-- `static/` - Static assets for the web dashboard
+- `data/` - Data storage
+- `run/` - Runtime files
+- `patches/` - Patch files
+- `scripts/` - Utility scripts
+- `archive/` - Archived code
 
 ## Configuration
 

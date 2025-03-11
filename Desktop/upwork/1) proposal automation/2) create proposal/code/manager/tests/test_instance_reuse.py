@@ -11,7 +11,14 @@ import os
 import sys
 import tempfile
 import time
-from claude_task_manager import ClaudeTaskManager
+import logging
+
+# Import from the new module structure
+from src.core.task_manager import ClaudeTaskManager
+from src.infrastructure.persistence.json_store import JSONInstanceStorage
+from src.infrastructure.process.tmux import TmuxProcessManager
+from src.infrastructure.process.terminal import TerminalProcessManager
+from src.core.models.instance import RuntimeType
 
 def test_instance_reuse():
     # Create a temporary directory for our test
@@ -34,16 +41,35 @@ def test_instance_reuse():
     
     print("Created two different prompt files")
     
-    # Initialize the task manager
-    manager = ClaudeTaskManager()
-    print("Initialized Claude Task Manager")
+    # Set up logger
+    logger = logging.getLogger("test_instance_reuse")
+    logger.setLevel(logging.INFO)
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+    logger.addHandler(handler)
+    
+    # Set up storage and process managers
+    config_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    instance_file = os.path.join(config_dir, "config", "claude_instances.json")
+    storage = JSONInstanceStorage(instance_file, logger)
+    tmux_manager = TmuxProcessManager(logger)
+    terminal_manager = TerminalProcessManager(logger)
+    
+    # Initialize the task manager with the new structure
+    manager = ClaudeTaskManager(
+        storage=storage,
+        tmux_manager=tmux_manager,
+        terminal_manager=terminal_manager,
+        logger=logger
+    )
+    print("Initialized Claude Task Manager with new API")
     
     # Step 1: Create the first instance
     print("\n=== STEP 1: Creating first instance ===")
     instance1_id = manager.start_instance(
         project_dir=test_dir,
         prompt_path=prompt1_file,
-        use_tmux=True,
+        runtime_type=RuntimeType.TMUX,
         open_terminal=True  # Set this to True to see the Claude output for debugging
     )
     print(f"Created first instance with ID: {instance1_id}")
@@ -61,7 +87,8 @@ def test_instance_reuse():
     print(f"  Status: {instance1_info['status']}")
     print(f"  Directory: {instance1_info['project_dir']}")
     print(f"  Prompt: {instance1_info['prompt_path']}")
-    print(f"  tmux session: {instance1_info['tmux_session']}")
+    print(f"  Runtime type: {instance1_info['runtime_type']}")
+    print(f"  Runtime ID: {instance1_info.get('runtime_id') or instance1_info.get('tmux_session_name')}")
     
     # Wait for the first instance to be fully initialized
     print("Waiting for first instance to initialize fully...")
@@ -80,7 +107,7 @@ def test_instance_reuse():
     instance2_id = manager.start_instance(
         project_dir=test_dir_with_slash,  # Using the directory with trailing slash
         prompt_path=prompt2_file,
-        use_tmux=True,
+        runtime_type=RuntimeType.TMUX,
         open_terminal=False
     )
     print(f"Got instance ID: {instance2_id}")
@@ -98,7 +125,8 @@ def test_instance_reuse():
     print(f"  Status: {instance2_info['status']}")
     print(f"  Directory: {instance2_info['project_dir']}")
     print(f"  Prompt: {instance2_info['prompt_path']}")
-    print(f"  tmux session: {instance2_info['tmux_session']}")
+    print(f"  Runtime type: {instance2_info['runtime_type']}")
+    print(f"  Runtime ID: {instance2_info.get('runtime_id') or instance2_info.get('tmux_session_name')}")
     
     # Step 3: Verify that the second attempt reused the first instance
     print("\n=== STEP 3: Verifying reuse ===")
@@ -123,11 +151,29 @@ def test_instance_reuse():
 
 def cleanup_test_instances():
     """Clean up any test instances that might be left running"""
-    manager = ClaudeTaskManager()
+    # Set up logger
+    logger = logging.getLogger("cleanup")
+    logger.setLevel(logging.INFO)
+    
+    # Set up storage and process managers
+    config_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    instance_file = os.path.join(config_dir, "config", "claude_instances.json")
+    storage = JSONInstanceStorage(instance_file, logger)
+    tmux_manager = TmuxProcessManager(logger)
+    terminal_manager = TerminalProcessManager(logger)
+    
+    # Initialize the task manager with the new structure
+    manager = ClaudeTaskManager(
+        storage=storage,
+        tmux_manager=tmux_manager,
+        terminal_manager=terminal_manager,
+        logger=logger
+    )
+    
     instances = manager.list_instances()
     
     for instance in instances:
-        if instance['status'] in ['running', 'standby']:
+        if instance['status'] in ['running', 'standby', 'initializing']:
             print(f"Stopping instance {instance['id']}...")
             manager.stop_instance(instance['id'])
 

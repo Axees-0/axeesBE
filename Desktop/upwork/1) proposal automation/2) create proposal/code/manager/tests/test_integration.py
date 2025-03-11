@@ -68,21 +68,58 @@ def check_module_imports():
         
         # Try importing ClaudeTaskManager
         try:
-            from claude_task_manager import ClaudeTaskManager
-            logger.info("✅ Successfully imported ClaudeTaskManager")
-            
-            # Try initializing the manager
+            # Try from src.core.task_manager first
             try:
-                manager = ClaudeTaskManager()
-                logger.info("✅ Successfully initialized ClaudeTaskManager")
-                return manager
-            except Exception as e:
-                logger.error(f"❌ Failed to initialize ClaudeTaskManager: {e}")
-                logger.error(traceback.format_exc())
-                imports_ok = False
+                from src.core.task_manager import ClaudeTaskManager
+                from src.infrastructure.persistence.json_store import JSONInstanceStorage
+                from src.infrastructure.process.tmux import TmuxProcessManager
+                from src.infrastructure.process.terminal import TerminalProcessManager
+                
+                logger.info("✅ Successfully imported ClaudeTaskManager from src.core.task_manager")
+                
+                # Try initializing the manager properly with required params
+                try:
+                    # Set up logger
+                    task_logger = logging.getLogger("ClaudeTaskManager")
+                    task_logger.setLevel(logging.INFO)
+                    
+                    # Set up storage and process managers
+                    storage = JSONInstanceStorage("config/claude_instances.json", task_logger)
+                    tmux_manager = TmuxProcessManager(task_logger)
+                    terminal_manager = TerminalProcessManager(task_logger)
+                    
+                    # Initialize the manager
+                    manager = ClaudeTaskManager(
+                        storage=storage,
+                        tmux_manager=tmux_manager,
+                        terminal_manager=terminal_manager,
+                        logger=task_logger
+                    )
+                    logger.info("✅ Successfully initialized ClaudeTaskManager")
+                    return manager
+                except Exception as e:
+                    logger.error(f"❌ Failed to initialize ClaudeTaskManager: {e}")
+                    logger.error(traceback.format_exc())
+                    imports_ok = False
+            
+            # Fallback to old import path
+            except ImportError:
+                logger.warning("Could not import from src.core.task_manager, trying legacy import...")
+                from claude_task_manager import ClaudeTaskManager
+                logger.info("✅ Successfully imported ClaudeTaskManager from legacy path")
+                
+                # Try initializing the manager
+                try:
+                    manager = ClaudeTaskManager()
+                    logger.info("✅ Successfully initialized ClaudeTaskManager from legacy path")
+                    return manager
+                except Exception as e:
+                    logger.error(f"❌ Failed to initialize ClaudeTaskManager from legacy path: {e}")
+                    logger.error(traceback.format_exc())
+                    imports_ok = False
                 
         except ImportError as e:
-            logger.error(f"❌ Failed to import ClaudeTaskManager: {e}")
+            logger.error(f"❌ Failed to import ClaudeTaskManager from any location: {e}")
             logger.error(traceback.format_exc())
             imports_ok = False
             
@@ -147,11 +184,57 @@ def test_integration(manager, proposal_dir):
         logger.info(f"✅ Created test prompt file: {prompt_path}")
         
         # Start Claude instance
-        instance_id = manager.start_instance(
-            project_dir=proposal_dir,
-            prompt_path=prompt_path,
-            use_tmux=True
-        )
+        try:
+            # Import the RuntimeType enum
+            logger.info("Importing RuntimeType from src.core.models.instance")
+            from src.core.models.instance import RuntimeType
+            
+            # Try with new API signature
+            logger.info("Starting instance with new API signature")
+            instance_id = manager.start_instance(
+                project_dir=proposal_dir,
+                prompt_path=prompt_path,
+                runtime_type=RuntimeType.TMUX
+            )
+        except Exception as e:
+            logger.error(f"Error using new API: {e}")
+            
+            # Try with string directly 
+            try:
+                logger.warning("Trying with string runtime_type")
+                instance_id = manager.start_instance(
+                    project_dir=proposal_dir,
+                    prompt_path=prompt_path,
+                    runtime_type="tmux"  # Lowercase string
+                )
+            except Exception as e:
+                logger.error(f"Error using string runtime_type: {e}")
+                
+                # Fallback to last resort direct attribute access
+                try:
+                    logger.warning("Using last resort direct attribute access")
+                    import inspect
+                    sig = inspect.signature(manager.start_instance)
+                    params = list(sig.parameters.keys())
+                    
+                    logger.info(f"start_instance parameters: {params}")
+                    
+                    if 'use_tmux' in params:
+                        instance_id = manager.start_instance(
+                            project_dir=proposal_dir,
+                            prompt_path=prompt_path,
+                            use_tmux=True
+                        )
+                    else:
+                        # Try kwargs approach as absolute last resort
+                        kwargs = {
+                            'project_dir': proposal_dir,
+                            'prompt_path': prompt_path
+                        }
+                        instance_id = manager.start_instance(**kwargs)
+                except Exception as e:
+                    logger.error(f"All approaches failed: {e}")
+                    raise e
         
         logger.info(f"✅ Successfully created Claude instance with ID: {instance_id}")
         
@@ -200,7 +283,15 @@ def fix_filter_listings_integration():
         issues = []
         
         # Check if ClaudeTaskManager is properly imported
-        if "from claude_task_manager import ClaudeTaskManager" not in filter_listings_content:
+        claude_task_import_patterns = [
+            "from claude_task_manager import ClaudeTaskManager",
+            "from src.core.task_manager import ClaudeTaskManager",
+            "import claude_task_manager",
+            "from src.core import task_manager"
+        ]
+        
+        has_valid_import = any(pattern in filter_listings_content for pattern in claude_task_import_patterns)
+        if not has_valid_import:
             issues.append("ClaudeTaskManager import missing or incorrect")
         
         # Check if sys.path is properly set

@@ -1,0 +1,26 @@
+--- claude_dashboard_web.py	2025-03-09 22:20:13.000000000 -0700
++++ claude_dashboard_web.py.new	2025-03-09 22:20:13.000000000 -0700
+@@ -3252,6 +3252,11 @@
+         if instance_obj and hasattr(instance_obj, 'generation_time'):
+             instance_dict['generation_time'] = instance_obj.generation_time
+             
++        # Add tmux_content if available - this is used for the response column
++        if instance_obj and hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content:
++            # Truncate to avoid huge JSON payloads
++            instance_dict['tmux_content'] = instance_obj.tmux_content[:2000]
++            
+         instances.append(instance_dict)
+     
+     current_time = datetime.now().strftime("%H:%M:%S")
+@@ -3731,6 +3736,11 @@
+         if instance_obj and hasattr(instance_obj, 'generation_time'):
+             instance_dict['generation_time'] = instance_obj.generation_time
+             
++        # Add tmux_content if available - this is used for the response column
++        if instance_obj and hasattr(instance_obj, 'tmux_content') and instance_obj.tmux_content:
++            # Truncate to avoid huge JSON payloads
++            instance_dict['tmux_content'] = instance_obj.tmux_content[:2000]
++            
+         instances.append(instance_dict)
+     
+     # Sort by start time if available

@@ -1,0 +1,212 @@
+{
+  "sessions": {
+    "claude_2745c66e-2c79-4e9c-87ba-76e594b3b641": {
+      "started_monitoring": "2025-03-10T16:04:27.048589",
+      "status": "active"
+    },
+    "claude_c6ddda2a-a293-47c1-a277-123ddb132cf2": {
+      "started_monitoring": "2025-03-10T17:10:05.316196",
+      "status": "ended",
+      "prompts_responded": 1,
+      "last_response": "2025-03-10T17:11:05.773103",
+      "end_time": "2025-03-10T17:15:07.366107"
+    },
+    "claude_2137673f-5f47-49e5-a490-a5d903ed225f": {
+      "started_monitoring": "2025-03-10T17:12:26.215677",
+      "status": "ended",
+      "end_time": "2025-03-10T17:15:27.245941"
+    },
+    "claude_2487d813": {
+      "started_monitoring": "2025-03-10T17:20:28.197179",
+      "status": "ended",
+      "prompts_responded": 1,
+      "last_response": "2025-03-10T17:21:28.592005",
+      "end_time": "2025-03-10T17:21:28.609853"
+    },
+    "claude_e23e636d": {
+      "started_monitoring": "2025-03-10T17:20:58.309429",
+      "status": "ended",
+      "end_time": "2025-03-10T17:21:58.622712"
+    },
+    "claude_b5299bcb-93ea-428d-b530-00b5503cab14": {
+      "started_monitoring": "2025-03-10T17:28:29.994542",
+      "status": "ended",
+      "prompts_responded": 1,
+      "last_response": "2025-03-10T17:29:30.441765",
+      "end_time": "2025-03-10T17:31:31.298861"
+    },
+    "claude_1608fb1a-b242-492b-ac15-b998b8b54883": {
+      "started_monitoring": "2025-03-10T17:35:31.199018",
+      "status": "ended",
+      "prompts_responded": 1,
+      "last_response": "2025-03-10T17:36:31.727994",
+      "end_time": "2025-03-10T17:36:31.747857"
+    },
+    "claude_2540f74d": {
+      "started_monitoring": "2025-03-10T17:36:31.388322",
+      "status": "ended",
+      "end_time": "2025-03-10T17:37:31.900488"
+    },
+    "claude_6b0e0184": {
+      "started_monitoring": "2025-03-10T17:36:51.454613",
+      "status": "ended",
+      "end_time": "2025-03-10T18:10:09.355878"
+    },
+    "claude_44a0f39d-96dd-4a2d-83ad-fcb761b25785": {
+      "started_monitoring": "2025-03-10T17:45:43.932717",
+      "status": "ended",
+      "end_time": "2025-03-10T17:46:44.518912"
+    },
+    "claude_4ec03b72-7b24-4c88-8349-4fcecdb52489": {
+      "started_monitoring": "2025-03-10T17:46:44.299046",
+      "status": "ended",
+      "end_time": "2025-03-10T17:47:44.978361"
+    },
+    "claude_23e367af-588a-4ee6-b326-23c92e0d8d5f": {
+      "started_monitoring": "2025-03-10T17:47:04.412022",
+      "status": "ended",
+      "end_time": "2025-03-10T17:48:04.974859"
+    },
+    "claude_6235147e": {
+      "started_monitoring": "2025-03-10T17:48:44.924390",
+      "status": "ended",
+      "prompts_responded": 1,
+      "last_response": "2025-03-10T17:49:45.465939",
+      "end_time": "2025-03-10T17:49:45.486084"
+    },
+    "claude_b98bd999-534c-4ded-a8da-8bfd55c72a2a": {
+      "started_monitoring": "2025-03-10T17:49:15.108260",
+      "status": "ended",
+      "end_time": "2025-03-10T17:50:15.769087"
+    },
+    "claude_07d92e51": {
+      "started_monitoring": "2025-03-10T17:49:55.341435",
+      "status": "ended",
+      "end_time": "2025-03-10T18:10:06.293813"
+    },
+    "claude_81f8487b": {
+      "started_monitoring": "2025-03-10T18:03:10.614181",
+      "status": "ended",
+      "end_time": "2025-03-10T18:04:11.120919"
+    },
+    "claude_b61cd151": {
+      "started_monitoring": "2025-03-10T18:03:30.897772",
+      "status": "ended",
+      "prompts_responded": 1,
+      "last_response": "2025-03-10T18:04:31.389093",
+      "end_time": "2025-03-10T18:09:34.419035"
+    },
+    "claude_b1f7fb8e": {
+      "started_monitoring": "2025-03-10T18:03:51.130857",
+      "status": "ended",
+      "end_time": "2025-03-10T18:09:54.855068"
+    },
+    "claude_34d0aa6d": {
+      "started_monitoring": "2025-03-10T18:04:01.306974",
+      "status": "ended",
+      "end_time": "2025-03-10T18:10:04.994199"
+    },
+    "claude_96cc6aca": {
+      "started_monitoring": "2025-03-10T18:04:11.509847",
+      "status": "ended",
+      "prompts_responded": 1,
+      "last_response": "2025-03-10T18:05:12.051369",
+      "end_time": "2025-03-10T18:10:15.298215"
+    },
+    "claude_cc769cc5": {
+      "started_monitoring": "2025-03-10T18:04:11.514078",
+      "status": "ended",
+      "end_time": "2025-03-10T18:10:15.296585"
+    },
+    "claude_2196a475": {
+      "started_monitoring": "2025-03-10T18:04:31.906905",
+      "status": "ended",
+      "end_time": "2025-03-10T18:09:34.710033"
+    },
+    "claude_b91edf55": {
+      "started_monitoring": "2025-03-10T18:05:02.640598",
+      "status": "ended",
+      "end_time": "2025-03-10T18:10:05.497481"
+    },
+    "claude_dada3a4c": {
+      "started_monitoring": "2025-03-10T18:05:13.023734",
+      "status": "ended",
+      "end_time": "2025-03-10T18:10:16.325336"
+    },
+    "claude_bf230174": {
+      "started_monitoring": "2025-03-10T18:05:23.330984",
+      "status": "ended",
+      "end_time": "2025-03-10T18:09:26.221283"
+    },
+    "claude_c2445a4e": {
+      "started_monitoring": "2025-03-10T18:09:10.867340",
+      "status": "ended",
+      "end_time": "2025-03-10T18:10:11.213491"
+    },
+    "claude_d4e7ab4b-e5ff-4dc1-90a7-98be124a047a": {
+      "started_monitoring": "2025-03-10T18:51:17.751971",
+      "status": "active"
+    },
+    "claude_6a91c434-fbb2-49d5-8844-69b1ed964518": {
+      "started_monitoring": "2025-03-10T18:51:37.942117",
+      "status": "active"
+    },
+    "claude_b98f78d5-cfe2-46d3-969f-58c58ec5f0af": {
+      "started_monitoring": "2025-03-10T18:52:08.526651",
+      "status": "active",
+      "prompts_responded": 4,
+      "last_response": "2025-03-10T18:57:11.434169"
+    },
+    "claude_bb38a5eb-220a-4caf-86b5-8fa515877623": {
+      "started_monitoring": "2025-03-10T18:52:29.290279",
+      "status": "active"
+    },
+    "claude_045af1dc-8436-49dd-9aad-24e0b466ab3a": {
+      "started_monitoring": "2025-03-10T18:52:50.193066",
+      "status": "active"
+    },
+    "claude_7c4851bb-db85-474b-9e51-2c480fbba72e": {
+      "started_monitoring": "2025-03-10T18:53:00.735708",
+      "status": "active",
+      "prompts_responded": 3,
+      "last_response": "2025-03-10T18:58:04.507013"
+    },
+    "claude_1e94dca4": {
+      "started_monitoring": "2025-03-10T18:54:02.821017",
+      "status": "ended",
+      "end_time": "2025-03-10T18:55:03.710394"
+    },
+    "claude_07709115-59f0-42c9-a218-70d281b4e9c5": {
+      "started_monitoring": "2025-03-10T18:54:23.553242",
+      "status": "active"
+    },
+    "claude_8dc9a717": {
+      "started_monitoring": "2025-03-10T18:54:23.559073",
+      "status": "active"
+    },
+    "claude_998f09f1-0456-448c-a7e4-e1f0d489b6cb": {
+      "started_monitoring": "2025-03-10T18:54:44.442859",
+      "status": "active",
+      "prompts_responded": 1,
+      "last_response": "2025-03-10T18:55:44.542203"
+    },
+    "claude_3861e25b": {
+      "started_monitoring": "2025-03-10T18:55:36.708997",
+      "status": "active"
+    },
+    "claude_4a035e68-9c0f-469f-b133-a95037282ef6": {
+      "started_monitoring": "2025-03-10T18:56:08.763361",
+      "status": "active",
+      "prompts_responded": 1,
+      "last_response": "2025-03-10T18:57:09.518677"
+    },
+    "claude_afda6942-3054-4e24-bf7d-4f1d0d2e7a55": {
+      "started_monitoring": "2025-03-10T18:56:08.773434",
+      "status": "active"
+    },
+    "claude_3aa750a6-c544-4300-b42e-bf4af1e3c992": {
+      "started_monitoring": "2025-03-10T18:56:29.957502",
+      "status": "active"
+    }
+  }
+}

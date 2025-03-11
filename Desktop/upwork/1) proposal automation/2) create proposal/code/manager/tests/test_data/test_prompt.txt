@@ -1,0 +1,12 @@
+Hello Claude! This is test prompt 0 for card layout testing.
+
+This prompt is used to verify the card view functionality in the dashboard UI.
+
+Please generate some sample content that would be displayed in a card:
+- Project: Card Layout Test 0
+- Status: Active
+- Description: Testing the card-based display of Claude instances in the dashboard
+- Priority: High
+- Tags: UI, Testing, Dashboard
+
+The UI should render this with proper formatting in a card view that can be expanded to show more details.

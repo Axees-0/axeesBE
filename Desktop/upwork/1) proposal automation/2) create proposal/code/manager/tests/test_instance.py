@@ -19,7 +19,12 @@ import argparse
 import logging
 import subprocess
 import re
-from claude_task_manager import ClaudeTaskManager, ClaudeInstance
+import sys
+import os
+
+# Add the parent directory to the path so we can import modules from there
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from src.claude_task_manager import ClaudeTaskManager, ClaudeInstance
 
 # Configure logging
 logging.basicConfig(
@@ -52,7 +57,7 @@ def create_claude_instance(prompt, project_dir=None, use_tmux=True, save_prompt=
         str: Instance ID of the created Claude instance
     """
     import uuid
-    from claude_task_manager import ClaudeInstance
+    from src.claude_task_manager import ClaudeInstance
     
     # Initialize the task manager
     manager = get_task_manager()
