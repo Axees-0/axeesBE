@@ -80,10 +80,8 @@ def open_browser(port):
     """Open a web browser to the dashboard."""
     import webbrowser
     import socket
-    import time
     
-    # Wait for server to start
-    time.sleep(1.5)
+    # No sleep needed - we're using a separate thread
     
     # Get the computer's hostname for a more reliable connection
     hostname = socket.gethostname()

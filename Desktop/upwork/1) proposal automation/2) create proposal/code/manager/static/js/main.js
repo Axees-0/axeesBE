@@ -348,8 +348,13 @@ function refreshInstanceData() {
         setTimeout(() => reject(new Error('Request timed out')), timeout);
     });
     
-    // Create the fetch promise
-    const fetchPromise = fetch('/api/instances');
+    // Determine if we need a full sync
+    // Full sync every 5 refreshes (approximately every 50 seconds)
+    const needsSync = (window.refreshCount || 0) % 5 === 0;
+    window.refreshCount = (window.refreshCount || 0) + 1;
+    
+    // Create the fetch promise with sync parameter when needed
+    const fetchPromise = fetch(`/api/instances${needsSync ? '?sync=true' : ''}`);
     
     // Race the fetch against the timeout
     Promise.race([fetchPromise, timeoutPromise])
@@ -362,7 +367,7 @@ function refreshInstanceData() {
         .then(data => {
             // Log performance
             const endTime = performance.now();
-            console.log(`Refreshed data: ${data.length} instances (took ${(endTime - startTime).toFixed(0)}ms)`);
+            console.log(`Refreshed data: ${data.length} instances (took ${(endTime - startTime).toFixed(0)}ms)${needsSync ? ' with sync' : ''}`);
             
             // Update the UI with new data
             updateInstanceTable(data);
@@ -639,21 +644,27 @@ function manualRefresh() {
         refreshBtn.disabled = true;
         refreshBtn.innerHTML = '<svg class="animate-spin" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Refreshing...';
         
-        // Request a refresh via API
-        fetch('/api/sync', {
-            method: 'POST'
+        // For manual refresh, always use the sync parameter to get full sync
+        const startTime = performance.now();
+        
+        // Request immediate data refresh from API
+        fetch('/api/instances?sync=true')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error ${response.status}`);
+            }
+            return response.json();
         })
-        .then(response => response.json())
         .then(data => {
-            // Reload the instance data
-            refreshInstanceData();
+            // Log performance
+            const endTime = performance.now();
+            console.log(`Manual refresh: ${data.length} instances (took ${(endTime - startTime).toFixed(0)}ms)`);
+            
+            // Update the UI with the new data
+            updateInstanceTable(data);
             
             // Show success message
-            if (data.updated) {
-                showToast(`Refreshed successfully, updated ${data.count} instances`);
-            } else {
-                showToast('Refreshed successfully, no changes detected');
-            }
+            showToast(`Refreshed successfully with ${data.length} instances`);
         })
         .catch(error => {
             console.error('Error refreshing:', error);
