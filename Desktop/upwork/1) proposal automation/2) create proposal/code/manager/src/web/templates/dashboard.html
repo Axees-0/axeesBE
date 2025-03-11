@@ -1,0 +1,558 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block head %}
+<style>
+    /* Placeholder for dashboard-specific styles */
+    .dashboard-content {
+        margin-top: 20px;
+    }
+    
+    .card {
+        background-color: var(--bg-darker);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--card-shadow);
+    }
+    
+    .instances-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+    
+    .instances-table th, .instances-table td {
+        padding: 1rem;
+        text-align: left;
+    }
+    
+    .instances-table th {
+        background-color: var(--header-bg);
+        color: var(--text-secondary);
+        font-weight: 600;
+    }
+    
+    .instances-table tbody tr:hover {
+        background-color: var(--hover-color);
+    }
+    
+    .instances-table tr.selected {
+        background-color: rgba(59, 130, 246, 0.15);
+    }
+    
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.4rem 0.8rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        width: 90px;
+        justify-content: center;
+    }
+    
+    .running {
+        background-color: rgba(234, 179, 8, 0.2);
+        color: #EAB308;
+    }
+    
+    .ready {
+        background-color: rgba(16, 185, 129, 0.2);
+        color: #10B981;
+    }
+    
+    .stopped {
+        background-color: rgba(239, 68, 68, 0.2);
+        color: #EF4444;
+    }
+    
+    .error {
+        background-color: rgba(249, 115, 22, 0.2);
+        color: #F97316;
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+    
+    .modal-content {
+        position: relative;
+        background-color: var(--bg-darker);
+        margin: 10% auto;
+        padding: 0;
+        border-radius: 0.5rem;
+        box-shadow: var(--card-shadow);
+        width: 80%;
+        max-width: 600px;
+        animation: modalSlideIn 0.3s ease-out;
+    }
+    
+    @keyframes modalSlideIn {
+        from {
+            transform: translateY(-50px);
+            opacity: 0;
+        }
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+    
+    .modal-header {
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+    }
+    
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-footer {
+        padding: 1rem 1.5rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.5rem;
+    }
+    
+    .close-button {
+        border: none;
+        background: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-secondary);
+    }
+    
+    .close-button:hover {
+        color: var(--text-primary);
+    }
+
+    /* Toast notification */
+    .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        padding: 1rem 1.5rem;
+        background-color: var(--success-bg);
+        color: var(--success-text);
+        border-radius: 0.5rem;
+        box-shadow: var(--card-shadow);
+        z-index: 200;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        max-width: 400px;
+    }
+    
+    .toast.show {
+        opacity: 1;
+    }
+    
+    .toast.error {
+        background-color: var(--error-bg);
+        color: var(--error-text);
+    }
+
+    /* Action buttons */
+    .action-buttons {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 1rem;
+        background-color: var(--bg-darker);
+        border-top: 1px solid var(--border-color);
+        box-shadow: var(--card-shadow);
+        display: flex;
+        gap: 0.5rem;
+        justify-content: flex-end;
+        align-items: center;
+        z-index: 50;
+    }
+    
+    .selected-count-container {
+        margin-right: auto;
+        font-weight: 600;
+    }
+    
+    .selected-count {
+        color: var(--primary-color);
+        font-weight: 700;
+    }
+</style>
+{% endblock %}
+
+{% block header_actions %}
+<button class="btn btn-purple" onclick="showSettingsModal()">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" width="18" height="18">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+    </svg>
+    Settings
+</button>
+<button class="btn btn-blue" onclick="manualRefresh()">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+    </svg>
+    Refresh
+</button>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-content">
+    <!-- Quick Add Card -->
+    <div class="card">
+        <form id="quick-add-form" class="quick-add" onsubmit="event.preventDefault(); createInstance();">
+            <div class="input-group">
+                <label for="quick-project-dir">Project Directory or ID</label>
+                <input type="text" id="quick-project-dir" class="input-field" placeholder="Full project path or just numeric ID">
+            </div>
+            <div class="input-group">
+                <label for="quick-prompt-path">Prompt File or Text</label>
+                <div class="autocomplete-container">
+                    <input type="text" id="quick-prompt-path" class="input-field" placeholder="Prompt file path or direct text" required autocomplete="off">
+                </div>
+            </div>
+            <div class="runtime-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="quick-use-tmux" checked>
+                    <span class="slider"></span>
+                </label>
+                <label for="quick-use-tmux">Use tmux</label>
+            </div>
+            <div class="runtime-toggle">
+                <label class="switch">
+                    <input type="checkbox" id="quick-open-window">
+                    <span class="slider"></span>
+                </label>
+                <label for="quick-open-window">Open terminal</label>
+            </div>
+            <button type="submit" class="btn btn-green">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <span id="submit-button-text">Create Instance</span>
+            </button>
+        </form>
+    </div>
+    
+    <!-- Filters & Actions -->
+    <div class="filters">
+        <input type="text" class="search-box" id="instance-search" placeholder="Search projects, prompts..." oninput="filterInstances()">
+        
+        <select class="filter-dropdown" id="status-filter" onchange="filterInstances()">
+            <option value="all">All Statuses</option>
+            <option value="ready">Ready Only</option>
+            <option value="running">Running Only</option>
+            <option value="stopped">Stopped Only</option>
+        </select>
+        
+        <select class="filter-dropdown" id="runtime-filter" onchange="filterInstances()">
+            <option value="all">All Types</option>
+            <option value="tmux">tmux Only</option>
+            <option value="terminal">Terminal Only</option>
+        </select>
+    </div>
+    
+    <!-- Instances Table -->
+    <table class="instances-table" id="instance-table">
+        <thead>
+            <tr>
+                <th class="sortable" data-sort="id" style="display:none;">ID ↕</th>
+                <th class="sortable" data-sort="status" style="width:120px;">Status ↕</th>
+                <th class="sortable" data-sort="active_time" style="width:90px;">Time ↕</th>
+                <th class="sortable" data-sort="yes_count" style="width:80px;">Count ↕</th>
+                <th class="sortable" data-sort="directory" style="width:25%;">Project ↕</th>
+                <th class="sortable" data-sort="prompt_file" style="width:25%;">Prompt ↕</th>
+                <th class="sortable" data-sort="response" style="width:30%;">Response ↕</th>
+            </tr>
+        </thead>
+        <tbody id="instance-list">
+            {% for instance in instances %}
+            <tr data-id="{{ instance.id }}" data-runtime="{{ instance.runtime_type_display }}">
+                <td style="display:none;">{{ instance.id }}</td>
+                <td style="width:120px;">
+                    <span class="status-badge {{ instance.status }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 6px;">
+                            <circle cx="12" cy="12" r="12" />
+                        </svg>
+                        {{ instance.status }}
+                    </span>
+                </td>
+                <td style="width:90px;">
+                    {% if instance.detailed_status == 'running' and instance.generation_time %}
+                        <span style="color: #EAB308; font-size: 1.1rem; font-weight: 600;">{{ instance.generation_time }}</span>
+                    {% else %}
+                        <span style="color: var(--text-primary); font-size: 1.1rem;">0s</span>
+                    {% endif %}
+                </td>
+                <td style="width:80px;"><span style="font-size: 1.1rem; font-weight: 500;">{{ instance.yes_count|default(0) }}</span></td>
+                <td style="width:25%;">{{ instance.project_dir }}</td>
+                <td style="width:25%;">{{ instance.prompt_path }}</td>
+                <td style="width:30%;">
+                    <span style="font-style: italic; color: var(--text-secondary);">No response available</span>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block modals %}
+<!-- Settings Modal -->
+<div id="settings-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Dashboard Settings</h2>
+            <button class="close-button" onclick="closeModal('settings-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="refresh-interval">Auto-refresh interval (seconds)</label>
+                <input type="number" id="refresh-interval" class="input-field" value="10" min="5" max="300">
+            </div>
+            <div class="form-group">
+                <label for="theme-select">Theme</label>
+                <select id="theme-select" class="input-field">
+                    <option value="dark">Dark</option>
+                    <option value="light">Light</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeModal('settings-modal')">Cancel</button>
+            <button class="btn btn-save" onclick="saveSettings()">Save</button>
+        </div>
+    </div>
+</div>
+
+<!-- Send Prompt Modal -->
+<div id="send-prompt-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Send Prompt</h2>
+            <button class="close-button" onclick="closeModal('send-prompt-modal')">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="form-group">
+                <label for="prompt-text">Prompt Text</label>
+                <textarea id="prompt-text" class="input-field" rows="10" placeholder="Enter prompt text..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="submit-prompt">
+                    <input type="checkbox" id="submit-prompt" checked>
+                    Submit automatically
+                </label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeModal('send-prompt-modal')">Cancel</button>
+            <button class="btn btn-primary" onclick="submitPrompt()">Send</button>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
+<!-- Action Buttons for Multi-select -->
+<div class="action-buttons" style="display: none;">
+    <div class="selected-count-container">
+        <span class="selected-count">0</span> instances selected
+    </div>
+    <button class="btn btn-blue" onclick="viewSelectedInstances()">View</button>
+    <button class="btn btn-purple" onclick="sendPromptToSelected()">Send Prompt</button>
+    <button class="btn btn-warning" onclick="stopSelectedInstances()">Stop</button>
+    <button class="btn btn-danger" onclick="deleteSelectedInstances()">Delete</button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Additional functions for dashboard.html
+    
+    // View selected instances
+    function viewSelectedInstances() {
+        if (selectedInstances.length === 0) return;
+        
+        // If multiple instances are selected, confirm with user
+        if (selectedInstances.length > 1) {
+            if (!confirm(`Open terminal windows for ${selectedInstances.length} instances?`)) {
+                return;
+            }
+        }
+        
+        // Show loading toast
+        showToast(`Opening terminals for ${selectedInstances.length} instance(s)...`);
+        
+        // Process each selected instance
+        let successCount = 0;
+        let errorCount = 0;
+        
+        // Use Promise.all to process all instances in parallel
+        Promise.all(selectedInstances.map(instanceId => {
+            return fetch(`/api/instances/${instanceId}/view`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            })
+            .catch(() => {
+                errorCount++;
+            });
+        }))
+        .then(() => {
+            // Show result toast
+            if (errorCount === 0) {
+                showToast(`Opened terminals for ${successCount} instance(s)`);
+            } else {
+                showToast(`Opened ${successCount} terminals, ${errorCount} failed`, true);
+            }
+        });
+    }
+    
+    // Send prompt to selected instances
+    function sendPromptToSelected() {
+        if (selectedInstances.length === 0) return;
+        
+        // Store the selected instance IDs in a data attribute
+        const modal = document.getElementById('send-prompt-modal');
+        modal.setAttribute('data-instances', JSON.stringify(selectedInstances));
+        
+        // Show the send prompt modal
+        modal.style.display = 'block';
+    }
+    
+    // Submit prompt from modal
+    function submitPrompt() {
+        const modal = document.getElementById('send-prompt-modal');
+        const promptText = document.getElementById('prompt-text').value;
+        const submit = document.getElementById('submit-prompt').checked;
+        const instanceIds = JSON.parse(modal.getAttribute('data-instances') || '[]');
+        
+        if (!promptText || instanceIds.length === 0) {
+            showToast('Please enter prompt text', true);
+            return;
+        }
+        
+        // Close the modal
+        closeModal('send-prompt-modal');
+        
+        // Show loading toast
+        showToast(`Sending prompt to ${instanceIds.length} instance(s)...`);
+        
+        // Process each selected instance
+        let successCount = 0;
+        let errorCount = 0;
+        
+        // Use Promise.all to process all instances in parallel
+        Promise.all(instanceIds.map(instanceId => {
+            return fetch(`/api/instances/${instanceId}/prompt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ prompt: promptText, submit: submit })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            })
+            .catch(() => {
+                errorCount++;
+            });
+        }))
+        .then(() => {
+            // Show result toast
+            if (errorCount === 0) {
+                showToast(`Sent prompt to ${successCount} instance(s)`);
+            } else {
+                showToast(`Sent to ${successCount} instances, ${errorCount} failed`, true);
+            }
+            
+            // Clear the prompt text
+            document.getElementById('prompt-text').value = '';
+            
+            // Refresh the page after a short delay
+            setTimeout(() => {
+                refreshInstanceData();
+            }, 1000);
+        });
+    }
+    
+    // Stop selected instances
+    function stopSelectedInstances() {
+        if (selectedInstances.length === 0) return;
+        
+        // Confirm with user
+        if (!confirm(`Stop ${selectedInstances.length} instance(s)?`)) {
+            return;
+        }
+        
+        // Show loading toast
+        showToast(`Stopping ${selectedInstances.length} instance(s)...`);
+        
+        // Process each selected instance
+        let successCount = 0;
+        let errorCount = 0;
+        
+        // Use Promise.all to process all instances in parallel
+        Promise.all(selectedInstances.map(instanceId => {
+            return fetch(`/api/instances/${instanceId}/stop`, {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    successCount++;
+                } else {
+                    errorCount++;
+                }
+            })
+            .catch(() => {
+                errorCount++;
+            });
+        }))
+        .then(() => {
+            // Show result toast
+            if (errorCount === 0) {
+                showToast(`Stopped ${successCount} instance(s)`);
+            } else {
+                showToast(`Stopped ${successCount} instances, ${errorCount} failed`, true);
+            }
+            
+            // Refresh the page after a short delay
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        });
+    }
+</script>
+{% endblock %}
