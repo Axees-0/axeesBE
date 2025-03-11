@@ -4,9 +4,23 @@
 
 # Use double quotes to properly handle paths with spaces and special characters
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+PROJECT_ROOT="$( cd "$SCRIPT_DIR/../../../" >/dev/null 2>&1 && pwd )"
+
+# Create necessary directories
+RUN_DIR="$PROJECT_ROOT/run"
+LOGS_DIR="$PROJECT_ROOT/logs"
+DATA_DIR="$PROJECT_ROOT/data"
+
+# Ensure directories exist
+mkdir -p "$RUN_DIR"
+mkdir -p "$LOGS_DIR"
+mkdir -p "$DATA_DIR"
+
+# Set paths for service files
 SERVICE_SCRIPT="$SCRIPT_DIR/auto_monitor_service.py"
-PID_FILE="$SCRIPT_DIR/monitor_service.pid"
-LOG_FILE="$SCRIPT_DIR/monitor_service.log"
+PID_FILE="$RUN_DIR/monitor_service.pid"
+LOG_FILE="$LOGS_DIR/monitor_service.log"
+MONITORED_FILE="$DATA_DIR/monitored_sessions.json"
 
 # Function to check if service is running
 is_running() {
@@ -69,7 +83,6 @@ status_service() {
         echo "Log file: $LOG_FILE"
         
         # Show monitored sessions if available
-        MONITORED_FILE="$SCRIPT_DIR/monitored_sessions.json"
         if [ -f "$MONITORED_FILE" ]; then
             echo ""
             echo "Monitored sessions:"

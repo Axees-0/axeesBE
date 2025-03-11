@@ -12,24 +12,21 @@ import logging
 import threading
 import tempfile
 
-# Configure logging - use a more distinctive format for better visibility
-logging.basicConfig(
-    level=logging.INFO,
-    format='\033[1;36m%(asctime)s - %(name)s\033[0m - \033[1;33m%(levelname)s\033[0m - %(message)s',
-    datefmt='%H:%M:%S'
-)
-logger = logging.getLogger('test_dialog_log')
-
 # Add the parent directory to the path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from src.claude_task_manager import ClaudeTaskManager, ClaudeInstance
+from tests.helpers import get_test_logger
 
-# Create a temporary log file for this test
-temp_log_file = tempfile.NamedTemporaryFile(delete=False, suffix='.log', prefix='claude_test_')
-temp_log_path = temp_log_file.name
-temp_log_file.close()
+# Configure logging with a more distinctive format
+logger = get_test_logger('test_dialog_log', 'dialog_with_log_test.log')
 
-# Add a file handler to monitor this specific log
+# Create a temporary log file specifically for this test to watch in real-time
+# Place it in the logs directory
+logs_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs'))
+os.makedirs(logs_dir, exist_ok=True)
+temp_log_path = os.path.join(logs_dir, 'dialog_realtime_watch.log')
+
+# Create and configure the special file handler for real-time monitoring
 file_handler = logging.FileHandler(temp_log_path)
 file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 logger.addHandler(file_handler)

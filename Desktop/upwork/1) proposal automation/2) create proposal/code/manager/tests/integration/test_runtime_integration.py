@@ -31,17 +31,11 @@ from src.core import ClaudeTaskManager
 from src.core.models.instance import ClaudeInstance, RuntimeType, InstanceStatus
 from src.infrastructure.process.tmux import TmuxProcessManager
 
+# Import the test logger helper
+from tests.helpers import get_test_logger
+
 # Configure logging
-LOG_FILE = "runtime_integration_test.log"
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_FILE),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger('test_runtime_integration')
+logger = get_test_logger('test_runtime_integration', 'runtime_integration_test.log')
 
 
 class TestRuntimeIntegration(unittest.TestCase):
@@ -742,6 +736,8 @@ class TestRuntimeIntegration(unittest.TestCase):
 
 if __name__ == "__main__":
     logger.info(f"Starting runtime integration tests at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    logger.info(f"Using log file: {os.path.abspath(LOG_FILE)}")
+    log_dir = os.path.abspath(os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'logs'))
+    log_file = os.path.join(log_dir, 'runtime_integration_test.log')
+    logger.info(f"Using log file: {log_file}")
     
     unittest.main()

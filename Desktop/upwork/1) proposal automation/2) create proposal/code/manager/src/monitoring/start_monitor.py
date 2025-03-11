@@ -20,9 +20,22 @@ from datetime import datetime
 # Get the directory where this script is located
 script_dir = os.path.dirname(os.path.abspath(__file__))
 service_script = os.path.join(script_dir, "auto_monitor_service.py")
-pid_file = os.path.join(script_dir, "monitor_service.pid")
-log_file = os.path.join(script_dir, "monitor_service.log")
-monitored_file = os.path.join(script_dir, "monitored_sessions.json")
+
+# Set up proper directories for logs, etc.
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+run_dir = os.path.join(project_root, "run")
+logs_dir = os.path.join(project_root, "logs")
+data_dir = os.path.join(project_root, "data")
+
+# Ensure directories exist
+os.makedirs(run_dir, exist_ok=True)
+os.makedirs(logs_dir, exist_ok=True) 
+os.makedirs(data_dir, exist_ok=True)
+
+# Use appropriate paths for files
+pid_file = os.path.join(run_dir, "monitor_service.pid")
+log_file = os.path.join(logs_dir, "monitor_service.log") 
+monitored_file = os.path.join(data_dir, "monitored_sessions.json")
 
 def is_running():
     """Check if the service is running"""

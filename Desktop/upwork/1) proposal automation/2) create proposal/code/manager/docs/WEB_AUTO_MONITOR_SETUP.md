@@ -42,13 +42,14 @@ If you prefer to directly start the service:
 cd /Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager
 
 # Start the service in the background
-nohup python auto_monitor_service.py > monitor_service.log 2>&1 &
+mkdir -p logs run
+nohup python auto_monitor_service.py > logs/monitor_service.log 2>&1 &
 
 # Note the process ID for later
-echo $! > monitor_service.pid
+echo $! > run/monitor_service.pid
 
 # To stop it later
-kill $(cat monitor_service.pid)
+kill $(cat run/monitor_service.pid)
 ```
 
 ## Integration with Web Interface
@@ -84,9 +85,9 @@ touch ~/Library/LaunchAgents/com.claude.monitor.plist
     <key>KeepAlive</key>
     <true/>
     <key>StandardErrorPath</key>
-    <string>/Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/service_error.log</string>
+    <string>/Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/logs/service_error.log</string>
     <key>StandardOutPath</key>
-    <string>/Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/service_output.log</string>
+    <string>/Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/logs/service_output.log</string>
 </dict>
 </plist>
 ```
@@ -110,7 +111,7 @@ Alternatively, you can modify the web interface startup script to also start the
 5. Check the logs to confirm monitoring is working:
 
 ```bash
-tail -f /Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/claude_auto_monitor.log
+tail -f /Users/Mike/Desktop/upwork/1) proposal automation/2) create proposal/code/manager/logs/claude_auto_monitor.log
 ```
 
 ## Troubleshooting
@@ -124,8 +125,8 @@ If monitoring isn't working:
 
 2. Check the logs:
    ```bash
-   tail -f monitor_service.log
-   tail -f claude_auto_monitor.log
+   tail -f logs/monitor_service.log
+   tail -f logs/claude_auto_monitor.log
    ```
 
 3. Try restarting the service:
