@@ -3,47 +3,137 @@
 This file tests the refactored API for the Claude Task Manager,
 specifically focusing on the transition from use_tmux to runtime_type.
 """
-
+import unittest
 import os
 import sys
 import time
 import tempfile
 import argparse
-from src.claude_task_manager import ClaudeTaskManager
+from unittest.mock import MagicMock, patch
 
-# Import the new RuntimeType enum 
-try:
-    from src.core.models.instance import RuntimeType
-    HAS_RUNTIME_TYPE = True
-except ImportError:
-    # Define a simple enum-like class for compatibility
-    class RuntimeType:
-        TMUX = "tmux"
-        TERMINAL = "terminal"
-    HAS_RUNTIME_TYPE = False
+# Import helpers
+from tests.helpers import import_module
 
-def test_legacy_api():
-    """Test using the legacy API with use_tmux parameter."""
-    print("\n--- Testing Legacy API (use_tmux) ---")
+# Import components to test
+from src.core import ClaudeTaskManager, RuntimeType
+
+class TestAPIRefactoring(unittest.TestCase):
+    """Tests for the API refactoring (legacy and modern APIs)."""
     
-    # Create a task manager
-    manager = ClaudeTaskManager()
+    def setUp(self):
+        """Set up test fixtures."""
+        # Set up mocks
+        self.storage_mock = MagicMock()
+        self.tmux_manager_mock = MagicMock()
+        self.terminal_manager_mock = MagicMock()
+        
+        # Configure mocks to behave like a real implementation
+        self.tmux_manager_mock.start_process.return_value = "test_session_id"
+        
+        # Store mocked data
+        self.instances = {}
+        
+        # Make storage mock store instances
+        def save_instances_mock(instances):
+            self.instances = instances
+        
+        self.storage_mock.load_instances.return_value = self.instances
+        self.storage_mock.save_instances.side_effect = save_instances_mock
+        
+        # Configure task manager
+        self.manager = ClaudeTaskManager(
+            storage=self.storage_mock,
+            tmux_manager=self.tmux_manager_mock,
+            terminal_manager=self.terminal_manager_mock
+        )
+        
+        # Override instances property with our mock instances
+        type(self.manager).instances = MagicMock(return_value=self.instances)
+        
+        # Patch the start_instance method to return a known ID
+        self.original_start_instance = self.manager.start_instance
+        self.manager.start_instance = MagicMock(return_value="test-instance-id")
     
-    # Create a temporary project directory and prompt file
-    with tempfile.TemporaryDirectory() as project_dir:
+    def tearDown(self):
+        """Clean up after the test."""
+        # Restore original methods
+        self.manager.start_instance = self.original_start_instance
+    
+    def test_legacy_api(self):
+        """Test using the legacy API with use_tmux parameter."""
+        # Create a temporary prompt file
         with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as prompt_file:
             prompt_file.write("Test prompt using legacy API (use_tmux=True)")
             prompt_path = prompt_file.name
             
         try:
             # Start instance with legacy API
+            instance_id = self.manager.start_instance(
+                project_dir="/test/project",
+                prompt_path=prompt_path,
+                use_tmux=True,
+                open_terminal=False
+            )
+            
+            # Verify the manager's start_instance was called with correct parameters
+            self.manager.start_instance.assert_called_once()
+            call_args = self.manager.start_instance.call_args[1]
+            self.assertEqual(call_args["project_dir"], "/test/project")
+            self.assertEqual(call_args["prompt_path"], prompt_path)
+            self.assertEqual(call_args["use_tmux"], True)
+            self.assertEqual(call_args["open_terminal"], False)
+            
+        finally:
+            # Clean up
+            os.unlink(prompt_path)
+    
+    def test_modern_api(self):
+        """Test using the modern API with runtime_type parameter."""
+        # Create a temporary prompt file
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as prompt_file:
+            prompt_file.write("Test prompt using modern API (runtime_type=TMUX)")
+            prompt_path = prompt_file.name
+            
+        try:
+            # Start instance with modern API
+            instance_id = self.manager.start_instance(
+                project_dir="/test/project",
+                prompt_path=prompt_path,
+                runtime_type=RuntimeType.TMUX,
+                open_terminal=False
+            )
+            
+            # Verify the manager's start_instance was called with correct parameters
+            self.manager.start_instance.assert_called_once()
+            call_args = self.manager.start_instance.call_args[1]
+            self.assertEqual(call_args["project_dir"], "/test/project")
+            self.assertEqual(call_args["prompt_path"], prompt_path)
+            self.assertEqual(call_args["runtime_type"], RuntimeType.TMUX)
+            self.assertEqual(call_args["open_terminal"], False)
+            
+        finally:
+            # Clean up
+            os.unlink(prompt_path)
+
+def manual_test():
+    """Run manual API tests."""
+    manager = ClaudeTaskManager()
+    
+    # Create a temporary project directory and prompt file
+    with tempfile.TemporaryDirectory() as project_dir:
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as prompt_file:
+            prompt_file.write("Test prompt for API testing")
+            prompt_path = prompt_file.name
+            
+        try:
+            # Test legacy API
+            print("\n--- Testing Legacy API (use_tmux) ---")
             instance_id = manager.start_instance(
                 project_dir=project_dir,
                 prompt_path=prompt_path,
                 use_tmux=True,
                 open_terminal=False
             )
-            
             print(f"Created instance {instance_id} with legacy API")
             
             # Get instance details
@@ -61,46 +151,17 @@ def test_legacy_api():
                 # Stop the instance
                 manager.stop_instance(instance_id)
                 print(f"Stopped instance {instance_id}")
-                
-                return True
             else:
                 print(f"ERROR: Instance {instance_id} not found in list_instances()")
-                return False
-                
-        except Exception as e:
-            print(f"ERROR: {e}")
-            return False
-        finally:
-            # Clean up
-            os.unlink(prompt_path)
-
-def test_modern_api():
-    """Test using the modern API with runtime_type parameter."""
-    print("\n--- Testing Modern API (runtime_type) ---")
-    
-    # Skip if RuntimeType enum isn't available
-    if not HAS_RUNTIME_TYPE:
-        print("WARNING: RuntimeType enum not available, skipping modern API test")
-        return None
-    
-    # Create a task manager
-    manager = ClaudeTaskManager()
-    
-    # Create a temporary project directory and prompt file
-    with tempfile.TemporaryDirectory() as project_dir:
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as prompt_file:
-            prompt_file.write("Test prompt using modern API (runtime_type=TMUX)")
-            prompt_path = prompt_file.name
             
-        try:
-            # Start instance with modern API
+            # Test modern API
+            print("\n--- Testing Modern API (runtime_type) ---")
             instance_id = manager.start_instance(
                 project_dir=project_dir,
                 prompt_path=prompt_path,
                 runtime_type=RuntimeType.TMUX,
                 open_terminal=False
             )
-            
             print(f"Created instance {instance_id} with modern API")
             
             # Get instance details
@@ -118,45 +179,20 @@ def test_modern_api():
                 # Stop the instance
                 manager.stop_instance(instance_id)
                 print(f"Stopped instance {instance_id}")
-                
-                return True
             else:
                 print(f"ERROR: Instance {instance_id} not found in list_instances()")
-                return False
                 
         except Exception as e:
             print(f"ERROR: {e}")
-            return False
         finally:
             # Clean up
             os.unlink(prompt_path)
 
-def main():
-    """Run API tests."""
-    parser = argparse.ArgumentParser(description='Test Claude Task Manager API refactoring')
-    parser.add_argument('--legacy', action='store_true', help='Test legacy API only')
-    parser.add_argument('--modern', action='store_true', help='Test modern API only')
-    args = parser.parse_args()
-    
-    legacy_result = None
-    modern_result = None
-    
-    if args.legacy or not (args.legacy or args.modern):
-        legacy_result = test_legacy_api()
-        
-    if args.modern or not (args.legacy or args.modern):
-        modern_result = test_modern_api()
-    
-    print("\n--- Test Results ---")
-    if legacy_result is not None:
-        print(f"Legacy API test: {'PASSED' if legacy_result else 'FAILED'}")
-    if modern_result is not None:
-        print(f"Modern API test: {'PASSED' if modern_result else 'FAILED'}")
-        
-    # Calculate exit code
-    if (legacy_result is False) or (modern_result is False):
-        return 1
-    return 0
-
 if __name__ == "__main__":
-    sys.exit(main())
+    # If called directly, run the manual test
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "--manual":
+        manual_test()
+    else:
+        # Run the unit tests
+        unittest.main()

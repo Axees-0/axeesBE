@@ -2,7 +2,6 @@
 """
 Tests for path utility functions.
 """
-
 import os
 import sys
 import tempfile
@@ -10,9 +9,10 @@ import unittest
 import shutil
 from pathlib import Path
 
-# Add the parent directory to the path to allow imports
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Import helpers
+from tests.helpers import import_module
 
+# Import the functions to test
 from src.utils.path_utils import (
     normalize_path,
     resolve_path,
@@ -220,5 +220,53 @@ class TestPathUtils(unittest.TestCase):
         self.assertIsNone(project_id)
 
 
+def manual_test_path_utils():
+    """Manual tests for path utility functions."""
+    print("Testing path utility functions...")
+    
+    # Create some test paths
+    current_dir = os.getcwd()
+    parent_dir = os.path.dirname(current_dir)
+    
+    # Test normalize_path
+    print("\nTesting normalize_path:")
+    print(f"Current dir: {current_dir}")
+    print(f"With trailing slash: {normalize_path(current_dir + '/')}")
+    print(f"With redundant components: {normalize_path(os.path.join(current_dir, '.', '..', os.path.basename(current_dir)))}")
+    
+    # Test resolve_path
+    print("\nTesting resolve_path:")
+    print(f"Current dir: {resolve_path(current_dir)}")
+    print(f"Relative path '.': {resolve_path('.')}")
+    print(f"Relative path '..': {resolve_path('..')}")
+    
+    # Test compare_paths
+    print("\nTesting compare_paths:")
+    print(f"Current dir vs itself: {compare_paths(current_dir, current_dir)}")
+    print(f"Current dir vs with trailing slash: {compare_paths(current_dir, current_dir + '/')}")
+    print(f"Current dir vs parent dir: {compare_paths(current_dir, parent_dir)}")
+    
+    # Test find_instances_by_project_dir
+    print("\nTesting find_instances_by_project_dir:")
+    test_instances = [
+        {"id": "instance1", "project_dir": current_dir, "start_time": 100},
+        {"id": "instance2", "project_dir": parent_dir, "start_time": 200},
+        {"id": "instance3", "project_dir": current_dir, "start_time": 300}
+    ]
+    matching = find_instances_by_project_dir(test_instances, current_dir)
+    print(f"Found {len(matching)} instances for current dir: {[i['id'] for i in matching]}")
+    
+    # Test find_project_id_by_path
+    print("\nTesting find_project_id_by_path:")
+    project_id = find_project_id_by_path(test_instances, current_dir)
+    print(f"Project ID for current dir: {project_id}")
+
+
 if __name__ == "__main__":
-    unittest.main()
+    # If called directly, run the manual test
+    import sys
+    if len(sys.argv) > 1 and sys.argv[1] == "--manual":
+        manual_test_path_utils()
+    else:
+        # Run the unit tests
+        unittest.main()
