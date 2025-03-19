@@ -277,6 +277,14 @@ def create_app():
         )
         return jsonify(result)
     
+    # Add health check endpoint
+    @app.route('/health', methods=['GET'])
+    def health_check():
+        return jsonify({
+            'status': 'ok',
+            'service': 'mt4_mock_api'
+        })
+    
     return app
 
 

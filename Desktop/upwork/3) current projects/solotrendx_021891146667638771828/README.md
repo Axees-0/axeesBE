@@ -42,8 +42,13 @@ For detailed development steps, see the [Development Guide](docs/user-guides/DEV
 
 - ✅ Project structure set up
 - ✅ MT4 Mock API implemented
-- 🔄 Webhook API implementation in progress
-- 🔄 Telegram Bot implementation in progress
+- ✅ MT4 Real API with Windows integration implemented
+- ✅ Webhook API implemented
+- ✅ Telegram Bot implemented
+- ✅ End-to-end tests implemented for both mock and real environments
+- ✅ Integration tests implemented
+- ✅ System tested under load with stress tests
+- ✅ Windows deployment scripts for production environment
 
 See [PROGRESS.md](PROGRESS.md) for detailed status.
 
@@ -70,11 +75,19 @@ project-root/                         # Root directory of the project
 
 ### Prerequisites
 
+#### For Development (macOS/Linux)
 - Python 3.8+
 - Telegram Bot API token
-- MT4 Terminal (for final deployment only)
+- Git
 
-### Setup
+#### For Production (Windows)
+- Windows Server 2019 or newer
+- Python 3.8+
+- MetaTrader 4 Terminal (with Manager API)
+- Telegram Bot API token
+- Azure account (for cloud deployment)
+
+### Development Setup (macOS/Linux)
 
 ```bash
 # Clone the repository
@@ -89,11 +102,72 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 # Run tests
-python -m pytest tests/
+python -m pytest tests/unit  # Unit tests
+python -m pytest tests/integration  # Integration tests
+./scripts/run_e2e_tests.sh  # End-to-end tests
 
-# Start the MT4 Mock API
+# Start the full development environment (using mock MT4 API)
+./scripts/start_dev_environment.sh
+
+# Or start individual components
 ./scripts/start_mt4_mock_api.sh
+./scripts/start_webhook_api.sh
+./scripts/start_telegram_connector.sh
+
+# Generate test signals
+./scripts/generate_test_signal.py --url http://localhost:5001/webhook --direct
 ```
+
+### Production Setup (Windows)
+
+```powershell
+# Clone the repository
+git clone <repository_url>
+cd solotrendx
+
+# Run the Windows environment setup script (as Administrator)
+powershell -ExecutionPolicy Bypass -File .\scripts\setup_windows_environment.ps1
+
+# Edit the .env file to add your MT4 and Telegram credentials
+notepad .env
+
+# Start all services
+.\start_all_services.bat
+
+# Run end-to-end tests against the real MT4 environment
+.\run_e2e_tests.bat
+```
+
+### Component URLs
+
+- MT4 API: http://localhost:5003/api
+  - Status: http://localhost:5003/api/status
+  - Health: http://localhost:5003/health
+  - Orders: http://localhost:5003/api/orders
+  - Trade: http://localhost:5003/api/trade
+
+- Webhook API: http://localhost:5000
+  - Health: http://localhost:5000/health
+  - TradingView signals: http://localhost:5000/webhook/tradingview
+  - EA signals: http://localhost:5000/webhook/ea
+
+- Telegram Connector: http://localhost:5001
+  - Health: http://localhost:5001/health
+  - Webhook: http://localhost:5001/webhook
+  - Execute Trade: http://localhost:5001/api/execute_trade
+
+## Azure Deployment
+
+For deploying to Azure:
+
+1. Create a Windows VM in Azure
+2. Install MT4 and configure with your broker account
+3. Clone the repository and run the setup script
+4. Configure environment variables with your credentials
+5. Start all services
+6. Configure domain and SSL certificates for the webhook endpoints
+
+See the [Architecture Diagram](docs/architecture/architecture_diagram.md) for the recommended Azure setup.
 
 ## Documentation
 
