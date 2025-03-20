@@ -2,7 +2,7 @@ import logging
 import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
-from .mt4_connector import MT4Connector
+from src.backend.telegram_connector.mt4_connector import MT4Connector
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

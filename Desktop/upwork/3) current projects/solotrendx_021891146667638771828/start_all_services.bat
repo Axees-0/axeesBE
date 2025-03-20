@@ -48,7 +48,7 @@ timeout /t 3
 
 rem Start component 3: Telegram Connector
 echo Starting Telegram Connector...
-start cmd /k "title Telegram Connector && cd /d "%TELEGRAM_DIR%" && echo Current dir: %cd% && echo Activating venv: %VENV_DIR% && call "%VENV_DIR%\Scripts\activate.bat" && echo PYTHONPATH=%PROJECT_ROOT% && set "PYTHONPATH=%PROJECT_ROOT%" && set "FLASK_APP=src.backend.telegram_connector.app" && set "FLASK_DEBUG=True" && set "FLASK_PORT=5001" && set "MT4_API_URL=http://localhost:5002/api" && echo Running python app.py && python app.py"
+start cmd /k "title Telegram Connector && cd /d "%TELEGRAM_DIR%" && echo Current dir: %cd% && echo Activating venv: %VENV_DIR% && call "%VENV_DIR%\Scripts\activate.bat" && echo PYTHONPATH=%PROJECT_ROOT% && set "PYTHONPATH=%PROJECT_ROOT%" && set "FLASK_APP=src.backend.telegram_connector.app" && set "FLASK_DEBUG=True" && set "FLASK_PORT=5001" && set "MT4_API_URL=http://localhost:5002/api" && echo Running python run.py && python run.py"
 
 echo All components started!
 echo MT4 REST API running in first window

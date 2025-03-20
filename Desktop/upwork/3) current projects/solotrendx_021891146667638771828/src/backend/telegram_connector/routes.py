@@ -1,8 +1,8 @@
 from flask import Blueprint, request, jsonify, current_app
 import logging
 import asyncio
-from .signal_handler import process_webhook_signal
-from .mt4_connector import MT4Connector
+from src.backend.telegram_connector.signal_handler import process_webhook_signal
+from src.backend.telegram_connector.mt4_connector import MT4Connector
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

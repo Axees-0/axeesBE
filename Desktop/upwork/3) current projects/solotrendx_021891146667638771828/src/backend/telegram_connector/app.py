@@ -49,18 +49,18 @@ def create_app(test_config=None):
     os.makedirs(os.path.join('data', 'logs'), exist_ok=True)
     
     # Register routes
-    from . import routes
+    import src.backend.telegram_connector.routes as routes
     routes.register_routes(app)
     
     # Initialize MT4 connector
-    from .mt4_connector import MT4Connector
+    from src.backend.telegram_connector.mt4_connector import MT4Connector
     mt4_api_url = app.config.get('MT4_API_URL')
     use_mock = app.config.get('MOCK_MODE', True)
     app.mt4_connector = MT4Connector(mt4_api_url, use_mock=use_mock)
     logger.info(f"MT4Connector initialized with URL: {mt4_api_url}, mock mode: {use_mock}")
     
     # Initialize Telegram bot (asynchronously)
-    from . import bot
+    import src.backend.telegram_connector.bot as bot
     app.bot_instance = bot.setup_bot(app)
     
     logger.info(f"Telegram bot application created with mode: {'mock' if app.config.get('MOCK_MODE') else 'live'}")
