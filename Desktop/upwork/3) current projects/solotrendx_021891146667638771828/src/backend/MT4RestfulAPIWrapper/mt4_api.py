@@ -75,12 +75,145 @@ class MT4Manager:
         try:
             # Import ctypes for DLL interaction
             import ctypes
+            from ctypes import c_int, c_uint, c_ulong, c_double, c_char_p, c_void_p, POINTER, Structure, c_long, c_wchar_p, create_string_buffer, byref
             
             # Try to load the DLL
             if os.path.exists(self.dll_path):
                 logger.info(f"Loading MT4 Manager API DLL from {self.dll_path}")
                 self.dll = ctypes.cdll.LoadLibrary(self.dll_path)
                 logger.info("MT4 Manager API DLL loaded successfully")
+                
+                # Define necessary structures for MT4 Manager API
+                class TradeRecord(Structure):
+                    _fields_ = [
+                        ("order", c_int),
+                        ("login", c_int),
+                        ("symbol", c_char_p * 12),
+                        ("digits", c_int),
+                        ("cmd", c_int),
+                        ("volume", c_int),
+                        ("open_time", c_int),
+                        ("state", c_int),
+                        ("open_price", c_double),
+                        ("sl", c_double),
+                        ("tp", c_double),
+                        ("close_time", c_int),
+                        ("expiration", c_int),
+                        ("reason", c_int),
+                        ("close_price", c_double),
+                        ("commission", c_double),
+                        ("commission_agent", c_double),
+                        ("swaps", c_double),
+                        ("close_price_profit", c_double),
+                        ("profit", c_double),
+                        ("taxes", c_double),
+                        ("comment", c_char_p * 32),
+                        ("gw_volume", c_int),
+                        ("activation", c_int),
+                        ("gw_order", c_int),
+                        ("gw_open_price", c_double),
+                        ("gw_close_price", c_double),
+                        ("margin_rate", c_double),
+                        ("timestamp", c_int),
+                        ("api_data", c_int * 4),
+                        ("reserved", c_int * 2)
+                    ]
+                
+                class UserRecord(Structure):
+                    _fields_ = [
+                        ("login", c_int),
+                        ("password", c_char_p * 16),
+                        ("group", c_char_p * 16),
+                        ("name", c_char_p * 128),
+                        ("leverage", c_int),
+                        ("email", c_char_p * 48),
+                        ("phone", c_char_p * 32),
+                        ("address", c_char_p * 96),
+                        ("city", c_char_p * 32),
+                        ("state", c_char_p * 32),
+                        ("zipcode", c_char_p * 16),
+                        ("country", c_char_p * 32),
+                        ("comment", c_char_p * 64),
+                        ("id", c_char_p * 32),
+                        ("status", c_char_p * 16),
+                        ("regdate", c_int),
+                        ("lastdate", c_int),
+                        ("prevbalance", c_double),
+                        ("balance", c_double),
+                        ("prevequity", c_double),
+                        ("equity", c_double),
+                        ("margin", c_double),
+                        ("margin_level", c_double),
+                        ("margin_free", c_double),
+                        ("flags", c_int),
+                        ("enable", c_int),
+                        ("reserved", c_int * 3)
+                    ]
+                
+                class SymbolInfo(Structure):
+                    _fields_ = [
+                        ("name", c_char_p * 12),
+                        ("description", c_char_p * 64),
+                        ("source", c_char_p * 12),
+                        ("currency", c_char_p * 12),
+                        ("type", c_int),
+                        ("digits", c_int),
+                        ("trade", c_int),
+                        ("background_color", c_int),
+                        ("count", c_int),
+                        ("count_original", c_int),
+                        ("starting", c_int),
+                        ("reserved", c_int * 3),
+                        ("bid", c_double),
+                        ("ask", c_double),
+                        ("point", c_double),
+                        ("lot_min", c_double),
+                        ("lot_max", c_double),
+                        ("lot_step", c_double),
+                        ("commission", c_double),
+                        ("swap_long", c_double),
+                        ("swap_short", c_double),
+                        ("stops_level", c_int),
+                        ("margin_call", c_int),
+                        ("margin_mode", c_int),
+                        ("margin_initial", c_double),
+                        ("margin_hedge", c_double),
+                        ("margin_maintenance", c_double),
+                        ("tick_value", c_double),
+                        ("tick_size", c_double)
+                    ]
+                
+                # Define function types and return values
+                self.TradeRecord = TradeRecord
+                self.UserRecord = UserRecord
+                self.SymbolInfo = SymbolInfo
+                
+                # MT4 function signatures
+                # Manager connection/initialization functions
+                self.dll.MtManagerCreate.restype = c_void_p
+                self.dll.MtManagerConnect.argtypes = [c_void_p, c_char_p, c_int]
+                self.dll.MtManagerConnect.restype = c_int
+                self.dll.MtManagerLogin.argtypes = [c_void_p, c_int, c_char_p]
+                self.dll.MtManagerLogin.restype = c_int
+                self.dll.MtManagerDisconnect.argtypes = [c_void_p]
+                self.dll.MtManagerDisconnect.restype = c_int
+                
+                # Manager API functions for data access
+                self.dll.MtManagerGetUserInfo.argtypes = [c_void_p, c_int, POINTER(UserRecord)]
+                self.dll.MtManagerGetUserInfo.restype = c_int
+                self.dll.MtManagerGetSymbolInfo.argtypes = [c_void_p, c_char_p, POINTER(SymbolInfo)]
+                self.dll.MtManagerGetSymbolInfo.restype = c_int
+                self.dll.MtManagerGetTrades.argtypes = [c_void_p, c_int, POINTER(TradeRecord), c_int]
+                self.dll.MtManagerGetTrades.restype = c_int
+                self.dll.MtManagerTradeTransaction.argtypes = [c_void_p, POINTER(TradeRecord)]
+                self.dll.MtManagerTradeTransaction.restype = c_int
+                
+                # Create MT4 Manager instance
+                self.manager = self.dll.MtManagerCreate()
+                if not self.manager:
+                    raise RuntimeError("Failed to create MT4 Manager instance")
+                
+                logger.info("MT4 Manager DLL functions initialized successfully")
             else:
                 raise FileNotFoundError(f"MT4 Manager API DLL not found at {self.dll_path}")
         except Exception as e:
@@ -190,9 +323,29 @@ class MT4Manager:
             try:
                 # Implement real MT4 API connection here
                 logger.info(f"Connecting to MT4 server {server}:{port}")
-                # Call DLL function to connect
-                # Example: self.dll.ConnectToServer(server.encode(), port)
-                self.connected = True  # Should be set based on actual connection result
+                
+                # Convert parameters to correct types
+                server_bytes = server.encode('utf-8')
+                
+                # Call the MtManagerConnect function
+                result = self.dll.MtManagerConnect(self.manager, server_bytes, port)
+                
+                # Check result
+                if result > 0:
+                    logger.info(f"Successfully connected to MT4 server {server}:{port}")
+                    self.connected = True
+                else:
+                    error_codes = {
+                        0: "Failed to connect",
+                        -1: "Unknown error",
+                        -2: "Invalid parameters",
+                        -3: "Connection failed",
+                        -4: "Server returned error"
+                    }
+                    error_msg = error_codes.get(result, f"Unknown error code: {result}")
+                    logger.error(f"MT4 connection error: {error_msg}")
+                    self.connected = False
+                
                 return self.connected
             except Exception as e:
                 logger.error(f"Failed to connect to MT4 server: {e}")
@@ -243,7 +396,7 @@ class MT4Manager:
             logger.error("Cannot login: Not connected to MT4 server")
             return False
         
-        self.login = login
+        self.login_id = login
         self.password = password
         
         if self.mock_mode:
@@ -255,9 +408,29 @@ class MT4Manager:
             try:
                 # Implement real MT4 API login here
                 logger.info(f"Logging in to MT4 server with ID {login}")
+                
+                # Convert parameters to correct types
+                password_bytes = password.encode('utf-8')
+                
                 # Call DLL function to login
-                # Example: self.dll.Login(login, password.encode())
-                self.logged_in = True  # Should be set based on actual login result
+                result = self.dll.MtManagerLogin(self.manager, login, password_bytes)
+                
+                # Check result
+                if result > 0:
+                    logger.info(f"Successfully logged in to MT4 server with ID {login}")
+                    self.logged_in = True
+                else:
+                    error_codes = {
+                        0: "Failed to login",
+                        -1: "Login not found",
+                        -2: "Invalid password",
+                        -3: "Not connected to server",
+                        -4: "Server returned error"
+                    }
+                    error_msg = error_codes.get(result, f"Unknown error code: {result}")
+                    logger.error(f"MT4 login error: {error_msg}")
+                    self.logged_in = False
+                
                 return self.logged_in
             except Exception as e:
                 logger.error(f"Failed to login to MT4 server: {e}")
@@ -469,12 +642,57 @@ class MT4Manager:
             return ticket
         else:
             try:
+                # Import ctypes locally if needed
+                import ctypes
+                from ctypes import byref, create_string_buffer
+                
                 # Implement real MT4 API place order here
                 logger.info(f"Placing order: {symbol} {cmd.name} {volume} lots at {price}")
+                
+                # Create a trade record
+                trade_rec = self.TradeRecord()
+                
+                # Initialize with zeros
+                ctypes.memset(byref(trade_rec), 0, ctypes.sizeof(trade_rec))
+                
+                # Set order parameters
+                trade_rec.login = login
+                
+                # Convert string to bytes and copy to char array
+                symbol_bytes = symbol.encode('utf-8')
+                for i, b in enumerate(symbol_bytes[:11]):  # Copy up to 11 chars (12th is null terminator)
+                    trade_rec.symbol[i] = b
+                
+                trade_rec.cmd = int(cmd)
+                trade_rec.volume = int(volume * 100)  # Convert to MT4 volume format (0.01 lot = 1)
+                trade_rec.open_price = price
+                trade_rec.sl = sl
+                trade_rec.tp = tp
+                
+                # Set comment if provided
+                if comment:
+                    comment_bytes = comment.encode('utf-8')
+                    for i, b in enumerate(comment_bytes[:31]):  # Copy up to 31 chars (32nd is null terminator)
+                        trade_rec.comment[i] = b
+                
                 # Call DLL function to place order
-                # Example: ticket = self.dll.TradeOrderSend(login, symbol.encode(), cmd, volume, price, sl, tp, comment.encode())
-                # Return the ticket number
-                return 0  # Replace with actual result
+                result = self.dll.MtManagerTradeTransaction(self.manager, byref(trade_rec))
+                
+                if result > 0:
+                    logger.info(f"Order placed successfully with ticket {result}")
+                    return result
+                else:
+                    error_codes = {
+                        0: "Failed to place order",
+                        -1: "Invalid order parameters",
+                        -2: "Server rejected order",
+                        -3: "Not enough money",
+                        -4: "Invalid price",
+                        -5: "Invalid stops"
+                    }
+                    error_msg = error_codes.get(result, f"Unknown error code: {result}")
+                    logger.error(f"MT4 order error: {error_msg}")
+                    return 0
             except Exception as e:
                 logger.error(f"Failed to place order: {e}")
                 return 0
