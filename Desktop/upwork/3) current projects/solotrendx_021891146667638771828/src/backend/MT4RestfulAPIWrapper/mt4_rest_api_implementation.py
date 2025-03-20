@@ -21,16 +21,53 @@ import jwt
 from mt4_api import MT4Manager, TradeCommand
 
 # Initialize logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("mt4_rest_api.log"),
-        logging.StreamHandler()
-    ]
-)
+try:
+    # Get project root directory
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+    log_dir = os.path.join(project_root, "data", "logs")
+    
+    # Ensure log directory exists
+    os.makedirs(log_dir, exist_ok=True)
+    
+    log_file = os.path.join(log_dir, "mt4_rest_api.log")
+    print(f"Logging to: {log_file}")
+    
+    # Check if we can write to the log file
+    try:
+        open(log_file, 'a').close()
+    except PermissionError:
+        print(f"PERMISSION ERROR: Cannot write to log file at {log_file}")
+        print("Falling back to current directory for logging")
+        # Fall back to current directory
+        log_file = "mt4_rest_api_local.log"
+    
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.FileHandler(log_file),
+            logging.StreamHandler()
+        ]
+    )
+except Exception as e:
+    print(f"LOGGING SETUP ERROR: {e}")
+    print("Falling back to console-only logging")
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        handlers=[
+            logging.StreamHandler()
+        ]
+    )
 
 logger = logging.getLogger(__name__)
+
+# Debug environment variables
+print("Environment variables:")
+print(f"PORT: {os.environ.get('PORT', 'Not set')}")
+print(f"USE_MOCK_MODE: {os.environ.get('USE_MOCK_MODE', 'Not set')}")
+print(f"MT4_SERVER: {os.environ.get('MT4_SERVER', 'Not set')}")
+print(f"MT4_PORT: {os.environ.get('MT4_PORT', 'Not set')}")
 
 # Configuration
 class Config:
@@ -43,6 +80,12 @@ class Config:
     USE_MOCK_MODE = os.environ.get('USE_MOCK_MODE', 'False').lower() == 'true'
     API_ADMIN_USERNAME = os.environ.get('API_ADMIN_USERNAME', 'admin')
     API_ADMIN_PASSWORD = os.environ.get('API_ADMIN_PASSWORD', 'password')
+
+# Print actual configuration after environment variables are processed
+print("Actual configuration:")
+print(f"MT4_SERVER: {Config.MT4_SERVER}")
+print(f"MT4_PORT: {Config.MT4_PORT}")
+print(f"USE_MOCK_MODE: {Config.USE_MOCK_MODE}")
 
 # Flask application
 app = Flask(__name__)
