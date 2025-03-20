@@ -49,6 +49,7 @@ For detailed development steps, see the [Development Guide](docs/user-guides/DEV
 - ✅ Integration tests implemented
 - ✅ System tested under load with stress tests
 - ✅ Windows deployment scripts for production environment
+- ✅ Path handling stabilized for all Windows environments including UNC paths
 
 See [PROGRESS.md](PROGRESS.md) for detailed status.
 
@@ -61,6 +62,10 @@ project-root/                         # Root directory of the project
 ├── src/                              # All source code for the project
 │   ├── frontend/                     # Frontend (client-side) code
 │   └── backend/                      # Backend (server-side) code
+│       ├── MT4RestfulAPIWrapper/     # MT4 Manager API REST wrapper
+│       ├── webhook_api/              # Webhook API for receiving signals
+│       ├── telegram_connector/       # Telegram bot and connector
+│       └── mt4_mock_api/             # Mock implementation of MT4 API
 ├── tests/                            # Automated tests
 │   ├── unit/                         # Unit tests for individual components
 │   ├── integration/                  # Integration tests for module interactions
@@ -68,6 +73,9 @@ project-root/                         # Root directory of the project
 ├── docs/                             # Documentation and design specifications
 ├── config/                           # Configuration and environment files
 ├── data/                             # Data files and logs
+│   ├── input/                        # Input data files
+│   ├── output/                       # Output data files
+│   └── logs/                         # Log files for all components
 └── scripts/                          # Development and deployment scripts
 ```
 
@@ -140,21 +148,36 @@ notepad .env
 
 ### Component URLs
 
-- MT4 API: http://localhost:5003/api
-  - Status: http://localhost:5003/api/status
-  - Health: http://localhost:5003/health
-  - Orders: http://localhost:5003/api/orders
-  - Trade: http://localhost:5003/api/trade
+- MT4 REST API: http://localhost:5002/api
+  - Health: http://localhost:5002/api/health
+  - Server Status: http://localhost:5002/api/server/status
+  - Trades: http://localhost:5002/api/trades
 
-- Webhook API: http://localhost:5000
-  - Health: http://localhost:5000/health
-  - TradingView signals: http://localhost:5000/webhook/tradingview
-  - EA signals: http://localhost:5000/webhook/ea
+- Webhook API: http://localhost:5003
+  - Health: http://localhost:5003/health
+  - Webhook: http://localhost:5003/webhook
+  - TradingView signals: http://localhost:5003/webhook/tradingview
+  - EA signals: http://localhost:5003/webhook/ea
 
 - Telegram Connector: http://localhost:5001
   - Health: http://localhost:5001/health
   - Webhook: http://localhost:5001/webhook
-  - Execute Trade: http://localhost:5001/api/execute_trade
+  - Bot: Running as a background service
+
+## Debugging and Monitoring
+
+Several tools are available for debugging and monitoring the services:
+
+```bash
+# Debug and fix service issues
+python scripts/debug_services.py
+
+# Test signal flow between components
+python scripts/test_signal_flow.py
+
+# Continuously monitor and fix service issues
+python scripts/fix_service_issues.py --iterations 3
+```
 
 ## Azure Deployment
 
