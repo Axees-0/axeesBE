@@ -103,6 +103,19 @@ The production deployment process includes:
 
 ## Current Work
 
+### STABLE V2.2: Windows Path Stability (March 19, 2025)
+
+Fixed Windows path handling issues for all deployment scenarios:
+
+- **PATH STABLE**: All batch files now use absolute paths without navigation commands
+- Works with standard Windows paths, UNC paths, and Parallels Desktop paths
+- No more permission issues with logging to system directories
+- Services start properly in all environments with no user interaction
+- Properly handles logging with fallback mechanisms
+- Added diagnostic output for environmental configuration
+
+### Previous Milestones
+
 Completed implementation of all components with real MT4 integration for production:
 
 - Implemented real MT4 Manager API with RESTful interface for Windows
@@ -136,20 +149,23 @@ Completed implementation of all components with real MT4 integration for product
 
 ### Component URL Reference
 
-- MT4 API: http://localhost:5003/api
-  - Status: http://localhost:5003/api/status
-  - Health: http://localhost:5003/health
-  - Orders: http://localhost:5003/api/orders
-  - Trade: http://localhost:5003/api/trade
+- MT4 API: http://localhost:5002/api
+  - Status: http://localhost:5002/api/status
+  - Health: http://localhost:5002/api/health
+  - Server Status: http://localhost:5002/api/server/status
+  - Orders: http://localhost:5002/api/trades
+  - Trade: http://localhost:5002/api/trades
 
-- Webhook API: http://localhost:5000
-  - Health: http://localhost:5000/health
-  - TradingView signals: http://localhost:5000/webhook/tradingview
-  - EA signals: http://localhost:5000/webhook/ea
+- Webhook API: http://localhost:5003
+  - Health: http://localhost:5003/api/health
+  - Webhook: http://localhost:5003/webhook
+  - TradingView signals: http://localhost:5003/webhook/tradingview
+  - EA signals: http://localhost:5003/webhook/ea
 
 - Telegram Connector: http://localhost:5001
-  - Health: http://localhost:5001/health
+  - Health Server: http://localhost:5001/health
   - Webhook: http://localhost:5001/webhook
+  - Bot: Running as a background service
   - Execute Trade: http://localhost:5001/api/execute_trade
 
 ## References
