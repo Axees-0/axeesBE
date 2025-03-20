@@ -419,6 +419,7 @@ def setup_bot(app):
     application.add_handler(CallbackQueryHandler(handle_callback))
     
     # Start the bot
+    # Use a non-blocking method to start the bot
     asyncio.create_task(application.run_polling(allowed_updates=Update.ALL_TYPES))
     
     logger.info("Telegram bot started successfully")

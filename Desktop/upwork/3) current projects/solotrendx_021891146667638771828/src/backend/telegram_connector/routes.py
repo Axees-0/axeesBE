@@ -91,12 +91,14 @@ def register_routes(app):
     app.register_blueprint(api_bp)
     app.register_blueprint(webhook_bp)
     
-    # Add health check endpoint
-    @app.route('/health', methods=['GET'])
-    def health_check():
+    # Remove conflicting health check endpoint as it's now in app.py
+    # Add debug endpoint
+    @app.route('/debug', methods=['GET'])
+    def debug_info():
         return jsonify({
             'status': 'ok',
-            'service': 'telegram_connector'
+            'service': 'telegram_connector',
+            'routes': [rule.rule for rule in app.url_map.iter_rules()]
         })
     
     # Register error handlers

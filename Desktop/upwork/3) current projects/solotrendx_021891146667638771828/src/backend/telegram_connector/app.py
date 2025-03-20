@@ -45,12 +45,22 @@ def create_app(test_config=None):
     if test_config:
         app.config.update(test_config)
     
-    # Ensure data directories exist
-    os.makedirs(os.path.join('data', 'logs'), exist_ok=True)
+    # Ensure data directories exist at project root
+    os.makedirs(os.path.join(PROJECT_ROOT, 'data', 'logs'), exist_ok=True)
     
     # Register routes
     import src.backend.telegram_connector.routes as routes
     routes.register_routes(app)
+    
+    # Add a simple health check endpoint directly
+    @app.route('/health', methods=['GET'])
+    def health():
+        from flask import jsonify
+        logger.info("Health check endpoint called")
+        return jsonify({
+            'status': 'ok',
+            'service': 'telegram_connector'
+        })
     
     # Initialize MT4 connector
     from src.backend.telegram_connector.mt4_connector import MT4Connector

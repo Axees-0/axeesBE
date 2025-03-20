@@ -50,9 +50,11 @@ def generate_tradingview_signal(symbol=None, side=None, price=None):
     return {
         "signal_type": "tradingview",
         "symbol": symbol,
-        "direction": side,  # Use direction instead of side for consistency
+        "side": side,  # Use side as webhook API expects this field name
+        "direction": side, # Include direction for backward compatibility
         "price": price,
         "stop_loss": sl,   # Use full name for better compatibility
+        "sl": sl,        # Include sl for backward compatibility
         "tp1": tp1,
         "tp2": tp2,
         "tp3": tp3,
@@ -199,11 +201,23 @@ def main():
     if args.direct:
         webhook_url = args.url  # Use the provided URL directly
     else:
-        # If not direct and the URL doesn't have webhook/source pattern
-        if "webhook" not in args.url:
+        # Check if URL already includes the source part
+        if f"/{args.source}" in args.url:
+            webhook_url = args.url
+        # Check if URL ends with /webhook
+        elif args.url.endswith("/webhook"):
+            webhook_url = f"{args.url}/{args.source}"
+        # If URL doesn't have webhook at all
+        elif "webhook" not in args.url:
             webhook_url = f"{args.url}/webhook/{args.source}"
+        # Default case: just use the URL as is
         else:
             webhook_url = args.url
+            
+    # Debug output for URL construction
+    if args.verbose:
+        print(f"Original URL: {args.url}")
+        print(f"Final webhook URL: {webhook_url}")
     
     for i in range(args.count):
         if args.count > 1:
@@ -212,6 +226,9 @@ def main():
         # Generate signal based on source
         if args.source == "tradingview":
             signal = generate_tradingview_signal(args.symbol, args.side, args.price)
+            # Make sure the side field is set properly for webhook API
+            if 'side' not in signal and 'direction' in signal:
+                signal['side'] = signal['direction']
         else:  # EA signals
             if not args.type:
                 ea_types = ["open_buy", "open_sell", "close_buy", "close_sell", "modify", "trail"]
@@ -221,6 +238,10 @@ def main():
             
             signal = generate_ea_signal(signal_type, args.symbol, args.ticket)
         
+        # For debugging: print the webhook URL
+        if args.verbose:
+            print(f"Using webhook URL: {webhook_url}")
+            
         # Send the signal
         response = send_signal(webhook_url, signal, args.verbose)
         

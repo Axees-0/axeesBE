@@ -29,6 +29,10 @@ def main():
         # Import app only after setting up PATH
         from src.backend.telegram_connector.app import create_app
         
+        # Print path debug info
+        logger.info(f"Project root: {project_root}")
+        logger.info(f"Log directory: {log_dir}")
+        
         # Create the Flask app
         app = create_app()
         
@@ -41,8 +45,18 @@ def main():
         logger.info(f"Mock mode: {app.config.get('MOCK_MODE', True)}")
         logger.info(f"MT4 API URL: {app.config.get('MT4_API_URL')}")
         
-        # Run the app
-        app.run(host='0.0.0.0', port=port, debug=debug)
+        # Run the app - ensure it's using threaded mode
+        logger.info(f"Binding Flask app to 0.0.0.0:{port}")
+        
+        # Print the registered routes for debugging
+        logger.info("Registered routes:")
+        for rule in app.url_map.iter_rules():
+            logger.info(f"Route: {rule.rule} Methods: {rule.methods}")
+            
+        try:
+            app.run(host='0.0.0.0', port=port, debug=debug, use_reloader=False, threaded=True)
+        except Exception as e:
+            logger.error(f"Error starting Flask server: {e}", exc_info=True)
         
     except Exception as e:
         logger.error(f"Error starting Telegram Connector: {e}", exc_info=True)
