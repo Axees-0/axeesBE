@@ -21,8 +21,24 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_dotenv()
+# Load environment variables from multiple possible locations
+load_dotenv(os.path.join(PROJECT_ROOT, '.env'))
+load_dotenv(os.path.join(PROJECT_ROOT, '.env.telegram'))
+load_dotenv(os.path.join(PROJECT_ROOT, '.env.local'))
+
+# Ensure critical environment variables are printed for debugging
+logger.info(f"Loading from PROJECT_ROOT: {PROJECT_ROOT}")
+
+# Check if we have telegram token set
+if 'TELEGRAM_BOT_TOKEN' in os.environ:
+    token = os.environ['TELEGRAM_BOT_TOKEN']
+    token_parts = token.split(':')
+    if len(token_parts) == 2:
+        logger.info(f"Found TELEGRAM_BOT_TOKEN in environment with ID: {token_parts[0]}")
+    else:
+        logger.warning(f"TELEGRAM_BOT_TOKEN found but has invalid format (should be NUMBER:STRING)")
+else:
+    logger.warning("TELEGRAM_BOT_TOKEN not found in environment variables")
 
 def create_app(test_config=None):
     """Create and configure the Flask application"""
@@ -70,10 +86,42 @@ def create_app(test_config=None):
     logger.info(f"MT4Connector initialized with URL: {mt4_api_url}, mock mode: {use_mock}")
     
     # Initialize Telegram bot (asynchronously)
-    import src.backend.telegram_connector.bot as bot
-    app.bot_instance = bot.setup_bot(app)
-    
-    logger.info(f"Telegram bot application created with mode: {'mock' if app.config.get('MOCK_MODE') else 'live'}")
+    try:
+        import src.backend.telegram_connector.bot as bot
+        
+        # Check token format before even attempting to set up bot
+        token = app.config.get('TELEGRAM_BOT_TOKEN')
+        if not token:
+            logger.error("TELEGRAM_BOT_TOKEN environment variable is missing or empty")
+            logger.warning("Telegram bot will not be available - please set TELEGRAM_BOT_TOKEN in .env")
+            app.bot_instance = None
+        elif ':' not in token:
+            logger.error(f"Invalid Telegram bot token format. Expected format: '123456789:ABCDefGhiJklmNoPQRstUvwxyz'")
+            logger.warning("Telegram bot will not be available - please check token format")
+            app.bot_instance = None
+        else:
+            # Token has basic format, attempt to set up the bot
+            token_parts = token.split(':')
+            token_id_part = token_parts[0]
+            
+            # Log attempt with token ID for debugging
+            logger.info(f"Setting up Telegram bot with token ID: {token_id_part}")
+            
+            # Set up the bot through bot.py
+            app.bot_instance = bot.setup_bot(app)
+            
+            if app.bot_instance:
+                logger.info(f"Telegram bot successfully initialized with mode: {'mock' if app.config.get('MOCK_MODE') else 'live'}")
+                # Store the token info in app config for easy access
+                app.config['TELEGRAM_BOT_CONNECTED'] = True
+            else:
+                logger.error("Failed to initialize Telegram bot - check logs for details")
+                # Mark as not connected in config
+                app.config['TELEGRAM_BOT_CONNECTED'] = False
+    except Exception as e:
+        logger.error(f"Error during Telegram bot initialization: {str(e)}", exc_info=True)
+        app.bot_instance = None
+        logger.warning("Telegram bot will not be available due to initialization error")
     return app
 
 # This is used when running the file directly with 'python app.py'

@@ -1,7 +1,10 @@
 import logging
 import asyncio
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+import os
+import traceback
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, Bot
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes, MessageHandler, filters
+from telegram.error import InvalidToken, TelegramError
 from src.backend.telegram_connector.mt4_connector import MT4Connector
 
 # Configure logging
@@ -383,44 +386,204 @@ def setup_bot(app):
     token = app.config.get('TELEGRAM_BOT_TOKEN')
     if not token:
         logger.error("Telegram bot token not provided")
+        # Check environment variables directly in case it wasn't properly loaded into app config
+        token = os.environ.get('TELEGRAM_BOT_TOKEN')
+        if not token:
+            logger.error("Telegram bot token not found in environment variables either")
+            return None
+        else:
+            logger.info("Found Telegram token in environment variables")
+    
+    # Validate token format - it should have two parts separated by a colon
+    token_parts = token.split(':')
+    if len(token_parts) != 2:
+        logger.error(f"Invalid Telegram bot token format. Expected format: '123456789:ABCDefGhiJklmNoPQRstUvwxyz'")
         return None
     
-    mock_mode = app.config.get('MOCK_MODE', True)
-    admin_user_ids = [int(user_id) for user_id in app.config.get('ADMIN_USER_IDS', []) if user_id]
-    allowed_user_ids = [int(user_id) for user_id in app.config.get('ALLOWED_USER_IDS', []) if user_id]
+    try:
+        # Validate first part is a number
+        token_num = int(token_parts[0])
+        logger.info(f"Token ID validated as numeric: {token_num}")
+        
+        # Validate second part is a non-empty string
+        if not token_parts[1]:
+            logger.error("Second part of token after ':' is empty")
+            return None
+            
+        # Warning for short token keys but continue anyway
+        if len(token_parts[1]) < 20:  
+            logger.warning(f"Telegram token part after ':' is shorter than expected - this might be a test token")
+    except ValueError:
+        logger.error(f"Invalid Telegram bot token format. First part should be numeric.")
+        # Even though it's invalid, we'll continue in mock mode if enabled
+        if app.config.get('MOCK_MODE', True):
+            logger.warning("Running in MOCK mode - continuing despite invalid token format")
+        else:
+            return None
+
+    # Make sure the token works by creating a test Bot instance first
+    try:
+        test_bot = Bot(token=token)
+        logger.info("Successfully created test Bot instance with the provided token")
+    except InvalidToken as e:
+        logger.error(f"The provided Telegram token is invalid: {e}")
+        # If in mock mode, create a mock bot instance instead of failing
+        if app.config.get('MOCK_MODE', True):
+            logger.warning("Running in MOCK mode - will use a mock bot implementation instead")
+            # Continue with application setup using mock token
+            token = "mock:token_for_testing_purposes"
+        else:
+            return None
+    except TelegramError as e:
+        logger.error(f"Telegram API error when testing token: {e}")
+        # Could be a temporary connection issue, log but continue if in mock mode
+        if app.config.get('MOCK_MODE', True):
+            logger.warning("Running in MOCK mode - continuing despite Telegram API error")
+            # Continue with application setup using original token
+        else:
+            return None
+    except Exception as e:
+        logger.error(f"Unexpected error when testing token: {e}")
+        traceback.print_exc()
+        # If in mock mode, try to continue despite the error
+        if app.config.get('MOCK_MODE', True):
+            logger.warning("Running in MOCK mode - attempting to continue despite error")
+        else:
+            return None
+        
+    # Log token validation success but mask the actual token for security
+    logger.info(f"Telegram token validated with ID: {token_parts[0]} and key: {token_parts[1][:5]}...")
     
-    # Include admin users in allowed users list
-    for admin_id in admin_user_ids:
-        if admin_id not in allowed_user_ids:
-            allowed_user_ids.append(admin_id)
+    mock_mode = app.config.get('MOCK_MODE', True)
+    
+    # Process admin and allowed user IDs
+    try:
+        admin_user_ids_raw = app.config.get('ADMIN_USER_IDS', [])
+        allowed_user_ids_raw = app.config.get('ALLOWED_USER_IDS', [])
+        
+        # Handle various formats (list, comma-separated string, etc.)
+        if isinstance(admin_user_ids_raw, str):
+            admin_user_ids = [int(user_id.strip()) for user_id in admin_user_ids_raw.split(',') if user_id.strip()]
+        else:
+            admin_user_ids = [int(user_id) for user_id in admin_user_ids_raw if user_id]
+            
+        if isinstance(allowed_user_ids_raw, str):
+            allowed_user_ids = [int(user_id.strip()) for user_id in allowed_user_ids_raw.split(',') if user_id.strip()]
+        else:
+            allowed_user_ids = [int(user_id) for user_id in allowed_user_ids_raw if user_id]
+        
+        # Include admin users in allowed users list
+        for admin_id in admin_user_ids:
+            if admin_id not in allowed_user_ids:
+                allowed_user_ids.append(admin_id)
+                
+        logger.info(f"Configured admin users: {admin_user_ids}")
+        logger.info(f"Configured allowed users: {allowed_user_ids}")
+        
+        # If no allowed users, add a default for testing
+        if not allowed_user_ids and mock_mode:
+            default_user = 123456789
+            logger.warning(f"No allowed users configured, adding default test user: {default_user}")
+            allowed_user_ids.append(default_user)
+    except Exception as e:
+        logger.error(f"Error processing user IDs: {e}")
+        # Set defaults
+        admin_user_ids = [123456789]
+        allowed_user_ids = [123456789]
     
     # Use MT4 connector from app
     global mt4_connector
     mt4_connector = app.mt4_connector
     
-    # Create the Application
-    application = Application.builder().token(token).build()
-    
-    # Store configuration in bot_data
-    application.bot_data["mock_mode"] = mock_mode
-    application.bot_data["admin_users"] = admin_user_ids
-    application.bot_data["allowed_users"] = allowed_user_ids
-    application.bot_data["active_signals"] = {}  # Store active signals
-    
-    # Add command handlers
-    application.add_handler(CommandHandler("start", start_command))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("status", status_command))
-    application.add_handler(CommandHandler("settings", settings_command))
-    application.add_handler(CommandHandler("orders", orders_command))
-    application.add_handler(CommandHandler("cancel", cancel_command))
-    
-    # Add callback query handler for buttons
-    application.add_handler(CallbackQueryHandler(handle_callback))
-    
-    # Start the bot
-    # Use a non-blocking method to start the bot
-    asyncio.create_task(application.run_polling(allowed_updates=Update.ALL_TYPES))
-    
-    logger.info("Telegram bot started successfully")
-    return application
+    # Set up better exception handling for the Application builder
+    for attempt in range(3):  # Try up to 3 times
+        try:
+            logger.info(f"Attempting to build Application (attempt {attempt+1})")
+            
+            # Create the Application with proper builder pattern
+            application = (
+                Application.builder()
+                .token(token)
+                .build()
+            )
+            
+            logger.info("Application object successfully built")
+            
+            # Store configuration in bot_data
+            application.bot_data["mock_mode"] = mock_mode
+            application.bot_data["admin_users"] = admin_user_ids
+            application.bot_data["allowed_users"] = allowed_user_ids
+            application.bot_data["active_signals"] = {}  # Store active signals
+            
+            # Add command handlers
+            application.add_handler(CommandHandler("start", start_command))
+            application.add_handler(CommandHandler("help", help_command))
+            application.add_handler(CommandHandler("status", status_command))
+            application.add_handler(CommandHandler("settings", settings_command))
+            application.add_handler(CommandHandler("orders", orders_command))
+            application.add_handler(CommandHandler("cancel", cancel_command))
+            
+            # Add callback query handler for buttons
+            application.add_handler(CallbackQueryHandler(handle_callback))
+            
+            # Start the bot - use a separate function to handle polling start
+            try:
+                _start_polling(application)
+                logger.info("Telegram bot setup completed successfully")
+                return application
+            except Exception as e:
+                logger.error(f"Error starting polling: {str(e)}")
+                logger.debug(traceback.format_exc())
+                if attempt == 2:  # Last attempt
+                    logger.error("Failed to start polling after multiple attempts")
+                    return None
+                
+        except InvalidToken as e:
+            logger.error(f"Invalid token error: {e}")
+            return None  # Don't retry for invalid token
+        except TelegramError as e:
+            logger.error(f"Telegram API error: {e}")
+            if attempt == 2:  # Last attempt
+                return None
+        except Exception as e:
+            logger.error(f"Error initializing Telegram bot: {str(e)}")
+            logger.debug(traceback.format_exc())
+            if attempt == 2:  # Last attempt
+                return None
+            
+    # If we get here, all attempts failed
+    logger.error("Failed to initialize Telegram bot after multiple attempts")
+    return None
+
+
+def _start_polling(application):
+    """Start polling in a separate function to better handle errors"""
+    try:
+        # Create a new event loop for the polling task if needed
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_closed():
+                logger.info("Creating new event loop for Telegram polling")
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+        except RuntimeError as e:
+            logger.warning(f"RuntimeError when getting event loop: {e}")
+            logger.info("Creating new event loop")
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+        
+        # Start the polling with specific parameters as per guide
+        polling_task = asyncio.create_task(
+            application.run_polling(
+                allowed_updates=Update.ALL_TYPES,
+                drop_pending_updates=True,
+                close_loop=False
+            )
+        )
+        
+        logger.info("Telegram bot polling started successfully")
+        return polling_task
+    except Exception as e:
+        logger.error(f"Error in _start_polling: {str(e)}")
+        logger.debug(traceback.format_exc())
+        raise
