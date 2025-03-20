@@ -3,12 +3,12 @@ echo Checking SoloTrend X services...
 echo.
 
 echo ===== MT4 REST API =====
-curl -s http://localhost:5000/api/health
+curl -s http://localhost:5002/api/health
 echo.
 echo.
 
 echo ===== Webhook API =====
-curl -s http://localhost:5002/health
+curl -s http://localhost:5003/health
 echo.
 echo.
 
@@ -24,7 +24,7 @@ echo.
 
 echo Checking listening ports...
 echo.
-netstat -ano | findstr "5000 5001 5002" | findstr "LISTENING"
+netstat -ano | findstr "5001 5002 5003" | findstr "LISTENING"
 echo.
 
 echo Service check complete!
