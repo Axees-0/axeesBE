@@ -22,7 +22,9 @@ from webhook_api.app import create_app
 
 def setup_logging():
     """Configure logging for the webhook API server"""
-    log_dir = Path('data/logs')
+    # Get the project root directory (3 levels up from the current file)
+    project_root = Path(__file__).resolve().parent.parent.parent.parent
+    log_dir = project_root / 'data' / 'logs'
     log_dir.mkdir(exist_ok=True, parents=True)
     
     log_file = log_dir / 'webhook_api.log'

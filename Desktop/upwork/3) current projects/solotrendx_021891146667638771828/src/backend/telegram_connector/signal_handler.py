@@ -14,6 +14,9 @@ from pathlib import Path
 import requests
 from datetime import datetime
 import time
+import uuid
+import asyncio
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 class SignalHandler:
     """Handles trading signals and forwards them to the MT4 API"""
@@ -199,3 +202,143 @@ class SignalHandler:
         
         # Join with newlines
         return "\n".join(message_lines)
+
+
+# Function to handle webhook signals from external sources (like the webhook API)
+async def process_webhook_signal(bot, signal_data):
+    """
+    Process a webhook signal and send it to Telegram users
+
+    Args:
+        bot: The Telegram bot instance
+        signal_data (dict): The signal data from webhook
+
+    Returns:
+        bool: True if processed successfully, False otherwise
+    """
+    logger = logging.getLogger(__name__)
+    logger.info(f"Processing webhook signal: {signal_data}")
+    
+    try:
+        # Generate a unique ID for this signal
+        signal_id = str(uuid.uuid4())
+        
+        # Store signal in bot's active signals
+        if hasattr(bot, "bot_data"):
+            if "active_signals" not in bot.bot_data:
+                bot.bot_data["active_signals"] = {}
+            bot.bot_data["active_signals"][signal_id] = signal_data
+        
+        # Format the signal message
+        message = format_signal_message(signal_data)
+        
+        # Create inline keyboard for trade actions
+        keyboard = [
+            [
+                InlineKeyboardButton("✅ Accept", callback_data=f"trade_{signal_id}_accept"),
+                InlineKeyboardButton("❌ Reject", callback_data=f"trade_{signal_id}_reject")
+            ],
+            [InlineKeyboardButton("⚙️ Custom", callback_data=f"trade_{signal_id}_custom")]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        
+        # Send to all allowed users
+        if hasattr(bot, "bot_data") and "allowed_users" in bot.bot_data:
+            allowed_users = bot.bot_data["allowed_users"]
+            for user_id in allowed_users:
+                try:
+                    await bot.send_message(
+                        chat_id=user_id,
+                        text=message,
+                        reply_markup=reply_markup,
+                        parse_mode="Markdown"
+                    )
+                    logger.info(f"Signal sent to user {user_id}")
+                except Exception as e:
+                    logger.error(f"Error sending signal to user {user_id}: {e}")
+        else:
+            logger.warning("No allowed users found in bot_data")
+        
+        return True
+        
+    except Exception as e:
+        logger.error(f"Error processing webhook signal: {e}", exc_info=True)
+        return False
+
+
+def format_signal_message(signal_data):
+    """
+    Format a signal for display in Telegram - standalone function version
+    
+    Args:
+        signal_data (dict): The signal data
+        
+    Returns:
+        str: Formatted message for Telegram
+    """
+    # Basic signal info
+    symbol = signal_data.get("symbol", "Unknown")
+    
+    # Determine action type (different signals might use different field names)
+    action = None
+    for field in ["action", "side", "direction", "type", "cmd"]:
+        if field in signal_data and signal_data[field]:
+            action = signal_data[field].upper()
+            break
+    
+    if not action:
+        action = "UNKNOWN"
+    
+    # Get price
+    price = signal_data.get("price", "Market")
+    
+    # Format as a nice message
+    message_lines = [
+        f"🔔 *SIGNAL: {symbol} {action}*",
+        f"💰 Price: {price}",
+    ]
+    
+    # Add volume if present
+    if "volume" in signal_data:
+        message_lines.append(f"📊 Volume: {signal_data['volume']}")
+    
+    # Add stop loss and take profit if present (check multiple possible field names)
+    sl_value = None
+    for field in ["stop_loss", "sl", "stoploss"]:
+        if field in signal_data and signal_data[field]:
+            sl_value = signal_data[field]
+            break
+    
+    if sl_value:
+        message_lines.append(f"🛑 Stop Loss: {sl_value}")
+    
+    # Try different take profit field names
+    for i in range(1, 4):  # Check TP1, TP2, TP3
+        tp_field = f"tp{i}"
+        if tp_field in signal_data and signal_data[tp_field]:
+            message_lines.append(f"🎯 Take Profit {i}: {signal_data[tp_field]}")
+    
+    # Also check for generic "take_profit" or "tp" fields
+    if "take_profit" in signal_data and signal_data["take_profit"]:
+        message_lines.append(f"🎯 Take Profit: {signal_data['take_profit']}")
+    elif "tp" in signal_data and signal_data["tp"] and "tp1" not in signal_data:
+        message_lines.append(f"🎯 Take Profit: {signal_data['tp']}")
+    
+    # Add source if present
+    if "source" in signal_data:
+        message_lines.append(f"📡 Source: {signal_data['source']}")
+    
+    # Add timeframe if present
+    if "timeframe" in signal_data:
+        message_lines.append(f"⏱ Timeframe: {signal_data['timeframe']}")
+    
+    # Add strategy if present
+    if "strategy" in signal_data:
+        message_lines.append(f"📈 Strategy: {signal_data['strategy']}")
+    
+    # Add timestamp
+    timestamp = signal_data.get("timestamp", datetime.now().isoformat())
+    message_lines.append(f"🕒 Time: {timestamp}")
+    
+    # Join with newlines
+    return "\n".join(message_lines)
