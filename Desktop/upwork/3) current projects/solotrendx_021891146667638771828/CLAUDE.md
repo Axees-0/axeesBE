@@ -47,6 +47,17 @@ When working on this project, please:
 3. **Phase 3**: Integration testing with mock components
 4. **Phase 4**: Windows VM deployment and live MT4 integration
 
+## Windows Compatibility Guidelines
+
+1. **PATHS STABLE**: For all Windows batch files, use the following approach for path handling:
+   - Always use absolute paths with `%PROJECT_ROOT%` variable
+   - Avoid using `cd`, `pushd` or other directory navigation commands
+   - Run Python scripts with their full absolute paths
+   - This ensures compatibility with:
+     - Standard Windows paths
+     - UNC paths (\\server\share\path)
+     - Parallels Desktop paths (\\Mac\Home\...)
+
 ## Common Commands
 
 ```bash
