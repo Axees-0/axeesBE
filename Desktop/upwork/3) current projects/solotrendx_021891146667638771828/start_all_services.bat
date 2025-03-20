@@ -34,9 +34,7 @@ start cmd /k "title Webhook API && echo Running from %WEBHOOK_DIR% && call "%VEN
 rem Wait a moment before starting the next component
 timeout /t 3
 
-rem Start component 3: Telegram Health Server
-echo Starting Telegram Health Server...
-start cmd /k "title Telegram Health && echo Running from %TELEGRAM_DIR% && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && python "%TELEGRAM_DIR%\test_health.py""
+rem REMOVED Telegram Health Server (causes port conflict)
 
 rem Start component 4: Telegram Bot
 echo Starting Telegram Bot...
@@ -46,8 +44,7 @@ echo All components started!
 echo.
 echo MT4 REST API running on port 5002
 echo Webhook API running on port 5003
-echo Telegram Health Server running on port 5001
-echo Telegram Bot running in background
+echo Telegram Bot running on port 5001
 echo.
 echo Press any key to exit this window (services will continue running)
 pause

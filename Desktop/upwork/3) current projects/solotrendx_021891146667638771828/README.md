@@ -139,6 +139,9 @@ powershell -ExecutionPolicy Bypass -File .\scripts\setup_windows_environment.ps1
 # Edit the .env file to add your MT4 and Telegram credentials
 notepad .env
 
+# Set up the virtual environment with required dependencies
+.\setup_venv.bat
+
 # Start all services
 .\start_all_services.bat
 

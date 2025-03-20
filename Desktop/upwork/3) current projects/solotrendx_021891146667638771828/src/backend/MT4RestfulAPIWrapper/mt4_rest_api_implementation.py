@@ -516,5 +516,9 @@ if __name__ == '__main__':
     # Get port from environment or default to 5000
     port = int(os.environ.get('PORT', 5000))
     
+    # Disable Flask banner to avoid CLI interception
+    import flask.cli
+    flask.cli.show_server_banner = lambda *args: None
+    
     # In production, use a proper WSGI server like gunicorn
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)

@@ -62,8 +62,10 @@ def main():
         # Get port from environment or use default
         port = int(os.environ.get('WEBHOOK_API_PORT', 5003))
         
-        # Start the server
-        app.run(host='0.0.0.0', port=port, debug=False)
+        # Use the Flask app's direct run method to avoid CLI issues
+        import flask.cli
+        flask.cli.show_server_banner = lambda *args: None
+        app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
         
     except Exception as e:
         logger.error(f"Error starting Webhook API server: {e}")
