@@ -259,154 +259,266 @@ async def process_webhook_signal(bot, signal_data):
     logger.info(f"Processing webhook signal: {symbol} - {action}")
     
     try:
-        # Validate bot instance
-        if not bot:
-            logger.error("Bot instance is None")
-            return False
-            
-        # Validate bot token - check more carefully
-        has_token = hasattr(bot, 'token')
-        token_value = getattr(bot, 'token', '') if has_token else ''
+        # Try primary approach with bot instance first
+        primary_success = await _process_with_bot_instance(bot, signal_data, symbol, action)
         
-        if not has_token or not token_value:
-            logger.error("Bot token is missing or invalid")
-            # Log more details for debugging
-            logger.debug(f"Bot instance type: {type(bot).__name__}")
-            logger.debug(f"Bot has token attribute: {has_token}")
-            logger.debug(f"Bot token value exists: {bool(token_value)}")
-            return False
+        # If primary approach fails, try fallback with telegram_sender module
+        if not primary_success:
+            logger.info("Primary approach failed, using telegram_sender fallback")
+            return await _process_with_sender(signal_data, symbol, action)
         
-        # Check if we have a mock token (some implementations might use this)
-        is_mock_token = token_value.startswith("mock:") or token_value == "dummy_token_for_testing"
-        if is_mock_token:
-            logger.info("Using mock token - skipping API connectivity test")
-        else:
-            # Try a simple API call to test connectivity
-            try:
-                me = await bot.get_me()
-                logger.info(f"Bot connectivity test successful: @{me.username}")
-            except Exception as e:
-                logger.warning(f"Bot connectivity test failed: {e}")
-                # Continue anyway, as we don't want to block signals due to temporary connectivity issues
-            
-        # Print details about the bot status for debugging
-        logger.debug(f"Bot instance type: {type(bot).__name__}")
-        has_bot_data = hasattr(bot, "bot_data")
-        logger.debug(f"Bot has bot_data: {has_bot_data}")
-        
-        if has_bot_data:
-            logger.debug(f"Bot data keys: {list(bot.bot_data.keys())}")
-            
-        # Generate a unique ID for this signal
-        signal_id = str(uuid.uuid4())
-        
-        # Create a safe copy of signal data
-        safe_signal_data = {
-            'symbol': symbol,
-            'action': action,
-            'price': signal_data.get('price', 0),
-            'volume': signal_data.get('volume', 0.1),
-            'timestamp': signal_data.get('timestamp', datetime.now().isoformat()),
-            'source': signal_data.get('source', 'webhook')
-        }
-        
-        # Add stop loss and take profit if present (different field names)
-        for sl_field in ['sl', 'stop_loss', 'stoploss']:
-            if sl_field in signal_data and signal_data[sl_field]:
-                safe_signal_data['stop_loss'] = signal_data[sl_field]
-                break
-                
-        for tp_field in ['tp', 'tp1', 'take_profit']:
-            if tp_field in signal_data and signal_data[tp_field]:
-                safe_signal_data['take_profit'] = signal_data[tp_field]
-                break
-                
-        # Add strategy if present
-        if 'strategy' in signal_data:
-            safe_signal_data['strategy'] = signal_data['strategy']
-            
-        # Store signal in bot's active signals
-        if has_bot_data:
-            if "active_signals" not in bot.bot_data:
-                bot.bot_data["active_signals"] = {}
-            bot.bot_data["active_signals"][signal_id] = safe_signal_data
-            
-            # For testing purposes, ensure there are allowed users
-            if "allowed_users" not in bot.bot_data or not bot.bot_data["allowed_users"]:
-                logger.warning("No allowed users in bot_data, adding test user 123456789")
-                bot.bot_data["allowed_users"] = [123456789]
-        else:
-            logger.warning("Bot has no bot_data attribute, using workaround for signal processing")
-            # Create temporary storage for this request
-            temp_data = {
-                "active_signals": {signal_id: safe_signal_data},
-                "allowed_users": [123456789]  # Default test user
-            }
-            return True  # Can't proceed without bot_data, but don't fail
-        
-        # Format the signal message
-        message = format_signal_message(safe_signal_data)
-        logger.info(f"Formatted message: {message}")
-        
-        # Create inline keyboard for trade actions
-        keyboard = [
-            [
-                InlineKeyboardButton("✅ Accept", callback_data=f"trade_{signal_id}_accept"),
-                InlineKeyboardButton("❌ Reject", callback_data=f"trade_{signal_id}_reject")
-            ],
-            [InlineKeyboardButton("⚙️ Custom", callback_data=f"trade_{signal_id}_custom")]
-        ]
-        reply_markup = InlineKeyboardMarkup(keyboard)
-        
-        # Send to all allowed users if they exist
-        success_count = 0
-        if has_bot_data and "allowed_users" in bot.bot_data:
-            allowed_users = bot.bot_data["allowed_users"]
-            logger.info(f"Attempting to send signal to {len(allowed_users)} allowed users")
-            
-            for user_id in allowed_users:
-                try:
-                    # Special handling for test tokens
-                    if bot.token.startswith("test:") or bot.token == "dummy_token_for_testing":
-                        logger.info(f"MOCK MODE: Would send message to user {user_id}: {message}")
-                        success_count += 1
-                        continue
-                        
-                    # Attempt to send the message
-                    await bot.send_message(
-                        chat_id=user_id,
-                        text=message,
-                        reply_markup=reply_markup,
-                        parse_mode="Markdown"
-                    )
-                    logger.info(f"Signal sent to user {user_id}")
-                    success_count += 1
-                except Exception as e:
-                    error_details = traceback.format_exc()
-                    logger.error(f"Error sending signal to user {user_id}: {e}")
-                    logger.debug(f"Detailed error trace: {error_details}")
-        else:
-            logger.warning("No allowed users found in bot_data")
-            
-        # Consider successful if we sent to at least one user or in mock mode
-        if success_count > 0 or bot.token.startswith("test:") or bot.token == "dummy_token_for_testing":
-            logger.info(f"Signal processing completed successfully (sent to {success_count} users)")
-            return True
-        else:
-            logger.warning("Signal was not sent to any users")
-            return False
+        return primary_success
             
     except Exception as e:
         error_details = traceback.format_exc()
         logger.error(f"Error processing webhook signal: {e}")
         logger.debug(f"Detailed error traceback: {error_details}")
-        # Log additional context information to help with troubleshooting
+        
+        # Try fallback approach with telegram_sender module when exceptions occur
         try:
-            logger.debug(f"Bot information: {bot.__class__.__name__ if bot else 'None'}, Signal type: {type(signal_data).__name__}")
-            logger.debug(f"Signal data: {json.dumps(signal_data, indent=2, default=str)[:1000]}")
-        except:
-            pass
+            logger.info("Exception occurred, trying telegram_sender fallback")
+            return await _process_with_sender(signal_data, symbol, action)
+        except Exception as fallback_error:
+            logger.error(f"Fallback approach also failed: {fallback_error}")
+            return False
+
+
+async def _process_with_bot_instance(bot, signal_data, symbol, action):
+    """Process webhook signal using the main bot instance"""
+    logger = logging.getLogger(__name__)
+    
+    # Validate bot instance
+    if not bot:
+        logger.error("Bot instance is None")
         return False
+        
+    # Validate bot token - check more carefully
+    has_token = hasattr(bot, 'token')
+    token_value = getattr(bot, 'token', '') if has_token else ''
+    
+    if not has_token or not token_value:
+        logger.error("Bot token is missing or invalid")
+        # Log more details for debugging
+        logger.debug(f"Bot instance type: {type(bot).__name__}")
+        logger.debug(f"Bot has token attribute: {has_token}")
+        logger.debug(f"Bot token value exists: {bool(token_value)}")
+        return False
+    
+    # Check if we have a mock token (some implementations might use this)
+    is_mock_token = token_value.startswith("mock:") or token_value == "dummy_token_for_testing"
+    if is_mock_token:
+        logger.info("Using mock token - skipping API connectivity test")
+    else:
+        # Try a simple API call to test connectivity
+        try:
+            me = await bot.get_me()
+            logger.info(f"Bot connectivity test successful: @{me.username}")
+        except Exception as e:
+            logger.warning(f"Bot connectivity test failed: {e}")
+            # Continue anyway, as we don't want to block signals due to temporary connectivity issues
+        
+    # Print details about the bot status for debugging
+    logger.debug(f"Bot instance type: {type(bot).__name__}")
+    has_bot_data = hasattr(bot, "bot_data")
+    logger.debug(f"Bot has bot_data: {has_bot_data}")
+    
+    if has_bot_data:
+        logger.debug(f"Bot data keys: {list(bot.bot_data.keys())}")
+        
+    # Generate a unique ID for this signal
+    signal_id = str(uuid.uuid4())
+    
+    # Create a safe copy of signal data
+    safe_signal_data = {
+        'symbol': symbol,
+        'action': action,
+        'price': signal_data.get('price', 0),
+        'volume': signal_data.get('volume', 0.1),
+        'timestamp': signal_data.get('timestamp', datetime.now().isoformat()),
+        'source': signal_data.get('source', 'webhook')
+    }
+    
+    # Add stop loss and take profit if present (different field names)
+    for sl_field in ['sl', 'stop_loss', 'stoploss']:
+        if sl_field in signal_data and signal_data[sl_field]:
+            safe_signal_data['stop_loss'] = signal_data[sl_field]
+            break
+            
+    for tp_field in ['tp', 'tp1', 'take_profit']:
+        if tp_field in signal_data and signal_data[tp_field]:
+            safe_signal_data['take_profit'] = signal_data[tp_field]
+            break
+            
+    # Add strategy if present
+    if 'strategy' in signal_data:
+        safe_signal_data['strategy'] = signal_data['strategy']
+        
+    # Store signal in bot's active signals
+    if has_bot_data:
+        if "active_signals" not in bot.bot_data:
+            bot.bot_data["active_signals"] = {}
+        bot.bot_data["active_signals"][signal_id] = safe_signal_data
+        
+        # For testing purposes, ensure there are allowed users
+        if "allowed_users" not in bot.bot_data or not bot.bot_data["allowed_users"]:
+            logger.warning("No allowed users in bot_data, adding test user 123456789")
+            bot.bot_data["allowed_users"] = [123456789]
+    else:
+        logger.warning("Bot has no bot_data attribute, using workaround for signal processing")
+        # Create temporary storage for this request
+        temp_data = {
+            "active_signals": {signal_id: safe_signal_data},
+            "allowed_users": [123456789]  # Default test user
+        }
+        return True  # Can't proceed without bot_data, but don't fail
+    
+    # Format the signal message
+    message = format_signal_message(safe_signal_data)
+    logger.info(f"Formatted message: {message}")
+    
+    # Create inline keyboard for trade actions
+    keyboard = [
+        [
+            InlineKeyboardButton("✅ Accept", callback_data=f"trade_{signal_id}_accept"),
+            InlineKeyboardButton("❌ Reject", callback_data=f"trade_{signal_id}_reject")
+        ],
+        [InlineKeyboardButton("⚙️ Custom", callback_data=f"trade_{signal_id}_custom")]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    
+    # Send to all allowed users if they exist
+    success_count = 0
+    if has_bot_data and "allowed_users" in bot.bot_data:
+        allowed_users = bot.bot_data["allowed_users"]
+        logger.info(f"Attempting to send signal to {len(allowed_users)} allowed users")
+        
+        for user_id in allowed_users:
+            try:
+                # Special handling for test tokens
+                if bot.token.startswith("test:") or bot.token == "dummy_token_for_testing":
+                    logger.info(f"MOCK MODE: Would send message to user {user_id}: {message}")
+                    success_count += 1
+                    continue
+                    
+                # Attempt to send the message
+                await bot.send_message(
+                    chat_id=user_id,
+                    text=message,
+                    reply_markup=reply_markup,
+                    parse_mode="Markdown"
+                )
+                logger.info(f"Signal sent to user {user_id}")
+                success_count += 1
+            except Exception as e:
+                error_details = traceback.format_exc()
+                logger.error(f"Error sending signal to user {user_id}: {e}")
+                logger.debug(f"Detailed error trace: {error_details}")
+    else:
+        logger.warning("No allowed users found in bot_data")
+        
+    # Consider successful if we sent to at least one user or in mock mode
+    if success_count > 0 or bot.token.startswith("test:") or bot.token == "dummy_token_for_testing":
+        logger.info(f"Signal processing completed successfully (sent to {success_count} users)")
+        return True
+    else:
+        logger.warning("Signal was not sent to any users")
+        return False
+
+
+async def _process_with_sender(signal_data, symbol, action):
+    """Process webhook signal using the standalone telegram_sender module"""
+    logger = logging.getLogger(__name__)
+    
+    # Import here to avoid circular imports
+    try:
+        from src.backend.telegram_connector.telegram_sender import send_telegram_message, notify_admins
+    except ImportError:
+        logger.error("Could not import telegram_sender module")
+        return False
+    
+    # Extract values with fallbacks for different field names
+    price = signal_data.get('price', 0)
+    
+    # Get stop loss (trying different field names)
+    stop_loss = None
+    for sl_field in ['sl', 'stop_loss', 'stoploss']:
+        if sl_field in signal_data and signal_data[sl_field]:
+            stop_loss = signal_data[sl_field]
+            break
+            
+    # Get take profit (trying different field names)
+    take_profit = None
+    for tp_field in ['tp', 'tp1', 'take_profit']:
+        if tp_field in signal_data and signal_data[tp_field]:
+            take_profit = signal_data[tp_field]
+            break
+            
+    # Get volume
+    volume = signal_data.get('volume', 0.1)
+    
+    # Get strategy
+    strategy = signal_data.get('strategy', 'SoloTrend X')
+    
+    # Format message
+    message_lines = [
+        f"🔔 *SIGNAL: {symbol} {action.upper()}*",
+        f"💰 Price: {price}",
+    ]
+    
+    if volume:
+        message_lines.append(f"📊 Volume: {volume}")
+        
+    if stop_loss:
+        message_lines.append(f"🛑 Stop Loss: {stop_loss}")
+        
+    if take_profit:
+        message_lines.append(f"🎯 Take Profit: {take_profit}")
+    
+    if strategy:
+        message_lines.append(f"📈 Strategy: {strategy}")
+        
+    # Add source
+    source = signal_data.get('source', 'webhook')
+    message_lines.append(f"📡 Source: {source}")
+    
+    # Add timestamp
+    timestamp = signal_data.get('timestamp', datetime.now().isoformat())
+    message_lines.append(f"🕒 Time: {timestamp}")
+    
+    # Add fallback note so users know about missing interactivity
+    message_lines.append("\n*Note: This is a fallback notification. Interactive trade buttons unavailable.*")
+    
+    # Join message
+    message = "\n".join(message_lines)
+    
+    # Try to send to admins
+    try:
+        success = await notify_admins(message, "Markdown")
+        if success:
+            logger.info("Signal sent successfully using telegram_sender fallback")
+            return True
+        else:
+            logger.warning("Failed to send using notify_admins, trying direct send")
+            # Try direct send as fallback
+            admin_ids = os.environ.get("ADMIN_USER_IDS", "").split(",")
+            for admin_id in admin_ids:
+                if admin_id.strip():
+                    try:
+                        chat_id = int(admin_id.strip())
+                        success = await send_telegram_message(message, chat_id, "Markdown")
+                        if success:
+                            logger.info(f"Signal sent to admin {chat_id} using direct send")
+                            return True
+                    except ValueError:
+                        continue
+                    except Exception as e:
+                        logger.error(f"Error in direct send: {e}")
+    except Exception as e:
+        logger.error(f"Error in telegram_sender fallback: {e}")
+        
+    # If we get here, all attempts failed
+    logger.error("All sending methods failed")
+    return False
 
 
 def format_signal_message(signal_data):
