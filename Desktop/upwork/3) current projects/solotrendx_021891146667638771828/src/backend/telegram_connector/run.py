@@ -1,37 +1,86 @@
+#!/usr/bin/env python3
 """
 Run script for Telegram Connector
+
+This script launches the Telegram Connector service which provides:
+1. A webhook endpoint for receiving trading signals
+2. A Telegram bot for sending signals to users
+3. Integration with the MT4 API for trade execution
 """
 import os
 import sys
 import logging
 from pathlib import Path
-
-# Add project root to the system path to allow absolute imports
-current_file = Path(__file__).resolve()
-project_root = current_file.parents[3]  # Go up 3 levels to the project root
-sys.path.insert(0, str(project_root))
+from dotenv import load_dotenv
 
 # Configure logging
+# Actual log file path will be configured in main()
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
 )
 logger = logging.getLogger(__name__)
 
-# Make sure data/logs directory exists
-log_dir = project_root / 'data' / 'logs'
-log_dir.mkdir(parents=True, exist_ok=True)
-
-# Main logic
+# Main function
 def main():
     """Run the Telegram connector server"""
     try:
-        # Import app only after setting up PATH
-        from src.backend.telegram_connector.app import create_app
+        # Get the script directory and backend directory
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        backend_dir = os.path.abspath(os.path.join(script_dir, '..'))
         
-        # Print path debug info
+        # Get the actual project root (two levels up from the backend directory)
+        project_root = os.path.abspath(os.path.join(backend_dir, '..', '..'))
+        
+        # Add project root to path for module imports
+        sys.path.insert(0, project_root)
+        sys.path.insert(0, backend_dir)
+        
+        # Configure log directory
+        log_dir = os.path.join(project_root, 'data', 'logs')
+        os.makedirs(log_dir, exist_ok=True)
+        
+        # Configure file logger with the correct log path
+        log_file = os.path.join(log_dir, 'telegram_connector.log')
+        file_handler = logging.FileHandler(log_file)
+        file_handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        logger.addHandler(file_handler)
+        
+        # Load environment variables from project root .env file
+        env_path = os.path.join(project_root, '.env')
+        load_dotenv(dotenv_path=env_path)
+        logger.info(f"Loaded configuration from: {env_path}")
+        
+        # Check for required environment variables
+        required_vars = ['TELEGRAM_BOT_TOKEN', 'ALLOWED_USER_IDS', 'MT4_API_URL']
+        missing_vars = [var for var in required_vars if not os.environ.get(var)]
+        
+        if missing_vars:
+            print(f"\n{'='*80}")
+            print(f"ERROR: Missing required environment variables: {', '.join(missing_vars)}")
+            print(f"Please create a .env file with the following variables:")
+            for var in required_vars:
+                print(f"  - {var}")
+            print(f"{'='*80}\n")
+            sys.exit(1)
+            
+        # Import app from the current directory
+        sys.path.insert(0, script_dir)
+        from app import create_app
+        
+        print(f"\n{'='*80}")
+        print(f"STARTING TELEGRAM CONNECTOR")
+        print(f"{'='*80}\n")
+        
+        # Print path info
+        logger.info(f"Script directory: {script_dir}")
+        logger.info(f"Backend directory: {backend_dir}")
         logger.info(f"Project root: {project_root}")
         logger.info(f"Log directory: {log_dir}")
+        logger.info(f"Environment file: {env_path} (exists: {os.path.exists(env_path)})")
         
         # Create the Flask app
         app = create_app()
@@ -39,27 +88,41 @@ def main():
         # Get port from config
         port = app.config.get('FLASK_PORT', 5001)
         debug = app.config.get('FLASK_DEBUG', False)
+        mock_mode = app.config.get('MOCK_MODE', False)
         
-        # Print configuration for debugging
-        logger.info(f"Starting Telegram Connector server on port {port} (debug={debug})")
-        logger.info(f"Mock mode: {app.config.get('MOCK_MODE', True)}")
-        logger.info(f"MT4 API URL: {app.config.get('MT4_API_URL')}")
+        # Print configuration
+        logger.info(f"Starting Telegram Connector server:")
+        logger.info(f"  - Port: {port}")
+        logger.info(f"  - Debug: {debug}")
+        logger.info(f"  - Mock mode: {mock_mode}")
+        logger.info(f"  - MT4 API URL: {app.config.get('MT4_API_URL')}")
         
-        # Run the app - ensure it's using threaded mode
-        logger.info(f"Binding Flask app to 0.0.0.0:{port}")
+        # Print health check URL
+        health_url = f"http://localhost:{port}/health"
+        logger.info(f"Health check URL: {health_url}")
         
-        # Print the registered routes for debugging
+        # Print webhook URL
+        webhook_url = f"http://localhost:{port}/webhook"
+        logger.info(f"Signal webhook URL: {webhook_url}")
+        
+        # Print the registered routes
         logger.info("Registered routes:")
         for rule in app.url_map.iter_rules():
-            logger.info(f"Route: {rule.rule} Methods: {rule.methods}")
-            
-        try:
-            app.run(host='0.0.0.0', port=port, debug=debug, use_reloader=False, threaded=True)
-        except Exception as e:
-            logger.error(f"Error starting Flask server: {e}", exc_info=True)
+            logger.info(f"  - {rule.rule} [{', '.join(rule.methods)}]")
+        
+        # Run the app
+        print(f"\nTelegram connector is running! Press CTRL+C to stop.")
+        print(f"Health check: {health_url}")
+        print(f"Webhook URL: {webhook_url}\n")
+        
+        app.run(host='0.0.0.0', port=port, debug=debug, use_reloader=False, threaded=True)
         
     except Exception as e:
         logger.error(f"Error starting Telegram Connector: {e}", exc_info=True)
+        print(f"\n{'='*80}")
+        print(f"ERROR: {str(e)}")
+        print(f"Check the logs for details.")
+        print(f"{'='*80}\n")
         sys.exit(1)
 
 if __name__ == '__main__':
