@@ -1,0 +1,512 @@
+Traceback (most recent call last):
+File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/webhook_api/run_server.py", line 21, in <module>
+from webhook_api.app import create_app
+File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/webhook_api/app.py", line 13, in <module>
+from dotenv import load_dotenv
+ModuleNotFoundError: No module named 'dotenv'
+2025-03-20 13:23:26,766 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'}
+2025-03-20 13:23:26,768 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5001/webhook
+2025-03-20 13:23:26,768 - webhook_api.app - INFO - Request URL: http://localhost:5001/webhook
+2025-03-20 13:23:26,769 - webhook_api.app - INFO - Request data: {"symbol": "EURUSD", "side": "BUY", "price": 1.1234, "sl": 1.12, "tp1": 1.13, "strategy": "SoloTrend X Test"}
+Starting new HTTP connection (1): localhost:5001
+2025-03-20 13:23:30,856 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6E055ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:23:30,858 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6E055ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:25:20,590 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'}
+2025-03-20 13:25:20,591 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5001/webhook
+2025-03-20 13:25:20,592 - webhook_api.app - INFO - Request URL: http://localhost:5001/webhook
+2025-03-20 13:25:20,593 - webhook_api.app - INFO - Request data: {"symbol": "EURUSD", "side": "BUY", "price": 1.1234, "sl": 1.12, "tp1": 1.13, "strategy": "SoloTrend X Test"}
+Starting new HTTP connection (1): localhost:5001
+2025-03-20 13:25:24,630 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000266E117ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:25:24,631 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000266E117ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:28:10,048 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'}
+2025-03-20 13:28:10,049 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5001/webhook
+2025-03-20 13:28:10,050 - webhook_api.app - INFO - Request URL: http://localhost:5001/webhook
+2025-03-20 13:28:10,051 - webhook_api.app - INFO - Request data: {"symbol": "EURUSD", "side": "BUY", "price": 1.1234, "sl": 1.12, "tp1": 1.13, "strategy": "SoloTrend X Test"}
+Starting new HTTP connection (1): localhost:5001
+2025-03-20 13:28:14,110 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024A2A61ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:28:14,111 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024A2A61ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:28:50,068 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'}
+2025-03-20 13:28:50,070 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5001/webhook
+2025-03-20 13:28:50,072 - webhook_api.app - INFO - Request URL: http://localhost:5001/webhook
+2025-03-20 13:28:50,073 - webhook_api.app - INFO - Request data: {"symbol": "EURUSD", "side": "BUY", "price": 1.1234, "sl": 1.12, "tp1": 1.13, "strategy": "SoloTrend X Test"}
+Starting new HTTP connection (1): localhost:5001
+2025-03-20 13:28:54,126 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024A2A662350>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:28:54,127 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024A2A662350>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 14:00:52,549 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025- 0-ThT14:00:52', 'source': 'test_signal_bat'} - [app.py:263]
+2025-03-20 14:00:52,552 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5001/webhook - [app.py:292]
+2025-03-20 14:00:52,553 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5001/webhook - [app.py:295]
+2025-03-20 14:00:52,554 - webhook_api.app - DEBUG - Request URL: http://localhost:5001/webhook - [app.py:296]
+2025-03-20 14:00:52,555 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test",
+  "timestamp": "2025- 0-ThT14:00:52",
+  "source": "test_signal_bat"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5001
+http://localhost:5001 "POST /webhook HTTP/1.1" 500 101
+2025-03-20 14:00:54,601 - webhook_api.app - INFO - Response status code: 500 - [app.py:316]
+2025-03-20 14:00:54,603 - webhook_api.app - INFO - Response content: {
+  "message": "Telegram bot not initialized. Check server logs for details.",
+  "status": "error"
+}
+ - [app.py:317]
+2025-03-20 14:00:54,604 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "message": "Telegram bot not initialized. Check server logs for details.",
+  "status": "error"
+}
+ - [app.py:352]
+2025-03-20 14:05:44,599 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025- 0-ThT14:05:44', 'source': 'test_signal_bat'} - [app.py:263]
+2025-03-20 14:05:44,601 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5001/webhook - [app.py:292]
+2025-03-20 14:05:44,602 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5001/webhook - [app.py:295]
+2025-03-20 14:05:44,604 - webhook_api.app - DEBUG - Request URL: http://localhost:5001/webhook - [app.py:296]
+2025-03-20 14:05:44,604 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test",
+  "timestamp": "2025- 0-ThT14:05:44",
+  "source": "test_signal_bat"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5001
+http://localhost:5001 "POST /webhook HTTP/1.1" 500 101
+2025-03-20 14:05:46,632 - webhook_api.app - INFO - Response status code: 500 - [app.py:316]
+2025-03-20 14:05:46,634 - webhook_api.app - INFO - Response content: {
+  "message": "Telegram bot not initialized. Check server logs for details.",
+  "status": "error"
+}
+ - [app.py:317]
+2025-03-20 14:05:46,635 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "message": "Telegram bot not initialized. Check server logs for details.",
+  "status": "error"
+}
+ - [app.py:352]
+2025-03-20 17:06:58,721 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-20 17:06:58,724 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-20 17:06:58,726 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-20 17:06:58,727 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-20 17:06:58,728 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 500 149
+2025-03-20 17:07:00,767 - webhook_api.app - INFO - Response status code: 500 - [app.py:316]
+2025-03-20 17:07:00,768 - webhook_api.app - INFO - Response content: {
+  "message": "Telegram bot not initialized: Unknown issue with Telegram bot initialization. Check server logs for details.",
+  "status": "error"
+}
+ - [app.py:317]
+2025-03-20 17:07:00,770 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "message": "Telegram bot not initialized: Unknown issue with Telegram bot initialization. Check server logs for details.",
+  "status": "error"
+}
+ - [app.py:352]
+2025-03-20 17:15:04,247 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-20 17:15:04,248 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-20 17:15:04,250 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-20 17:15:04,252 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-20 17:15:04,253 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 121
+2025-03-20 17:15:06,310 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-20 17:15:06,312 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed in mock mode (bot not available)",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-20 17:15:06,313 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-20 17:30:38,006 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-20 17:30:38,010 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-20 17:30:38,012 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-20 17:30:38,013 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-20 17:30:38,014 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 138
+2025-03-20 17:30:47,811 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-20 17:30:47,812 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-20 17:30:47,814 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-20 17:36:10,570 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-20 17:36:10,572 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-20 17:36:10,574 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-20 17:36:10,576 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-20 17:36:10,577 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+2025-03-20 17:36:14,632 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508ABBEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:358]
+2025-03-20 17:36:14,634 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508ABBEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:362]
+2025-03-20 17:37:49,652 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-20 17:37:49,654 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-20 17:37:49,657 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-20 17:37:49,660 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-20 17:37:49,661 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+2025-03-20 17:37:53,719 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508AC02490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:358]
+2025-03-20 17:37:53,721 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508AC02490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:362]
+2025-03-21 10:28:57,425 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 10:28:57,428 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 10:28:57,430 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 10:28:57,432 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 10:28:57,433 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+2025-03-21 10:29:01,628 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6D5EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:358]
+2025-03-21 10:29:01,629 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6D5EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:362]
+2025-03-21 10:30:49,704 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 10:30:49,707 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 10:30:49,708 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 10:30:49,710 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 10:30:49,711 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+2025-03-21 10:30:53,810 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:358]
+2025-03-21 10:30:53,812 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:362]
+2025-03-21 10:31:08,842 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 10:31:08,844 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 10:31:08,846 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 10:31:08,848 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 10:31:08,849 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+2025-03-21 10:31:13,158 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:358]
+2025-03-21 10:31:13,162 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:362]
+2025-03-21 10:36:36,802 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 10:36:36,804 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 10:36:36,805 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 10:36:36,806 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 10:36:36,807 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+2025-03-21 10:36:40,908 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855C6EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:358]
+2025-03-21 10:36:40,909 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855C6EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:362]
+2025-03-21 10:37:17,399 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 10:37:17,402 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 10:37:17,403 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 10:37:17,405 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 10:37:17,406 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+2025-03-21 10:37:21,499 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:358]
+2025-03-21 10:37:21,501 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:362]
+2025-03-21 10:37:31,758 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 10:37:31,760 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 10:37:31,762 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 10:37:31,764 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 10:37:31,765 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+2025-03-21 10:37:35,880 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:358]
+2025-03-21 10:37:35,900 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:362]
+2025-03-21 10:49:13,592 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 10:49:13,597 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 10:49:13,598 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 10:49:13,600 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 10:49:13,600 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 138
+2025-03-21 10:49:23,503 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 10:49:23,504 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 10:49:23,505 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-21 11:13:12,765 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 11:13:12,767 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 11:13:12,769 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 11:13:12,770 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 11:13:12,772 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 114
+2025-03-21 11:13:25,765 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 11:13:25,767 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed using direct notification",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 11:13:25,768 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-21 11:20:46,933 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 11:20:46,936 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 11:20:46,938 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 11:20:46,940 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 11:20:46,941 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 138
+2025-03-21 11:20:49,104 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 11:20:49,106 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 11:20:49,108 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-21 11:21:26,116 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 11:21:26,118 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 11:21:26,120 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 11:21:26,122 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 11:21:26,123 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 138
+2025-03-21 11:21:28,197 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 11:21:28,199 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 11:21:28,201 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-21 11:24:06,924 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 11:24:06,927 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 11:24:06,929 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 11:24:06,931 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 11:24:06,932 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 138
+2025-03-21 11:24:09,031 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 11:24:09,034 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 11:24:09,036 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-21 11:24:42,677 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 11:24:42,680 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 11:24:42,685 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 11:24:42,686 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 11:24:42,687 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 138
+2025-03-21 11:24:54,927 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 11:24:54,929 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 11:24:54,931 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-21 11:26:00,395 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 11:26:00,397 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 11:26:00,399 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 11:26:00,401 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 11:26:00,402 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 138
+2025-03-21 11:26:10,914 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 11:26:10,916 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 11:26:10,917 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-21 11:26:46,565 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 11:26:46,568 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 11:26:46,569 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 11:26:46,571 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 11:26:46,572 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+2025-03-21 11:26:50,695 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002D0AC0CEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:358]
+2025-03-21 11:26:50,697 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002D0AC0CEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it')) - [app.py:362]
+2025-03-21 11:27:05,998 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 11:27:06,000 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 11:27:06,001 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 11:27:06,003 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 11:27:06,004 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 138
+2025-03-21 11:27:15,700 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 11:27:15,702 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 11:27:15,703 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-21 11:28:48,998 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 11:28:49,000 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 11:28:49,002 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 11:28:49,004 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 11:28:49,005 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 114
+2025-03-21 11:28:58,746 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 11:28:58,748 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed using direct notification",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 11:28:58,749 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]
+2025-03-21 15:40:20,179 - webhook_api.app - INFO - Received generic signal: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test'} - [app.py:263]
+2025-03-21 15:40:20,182 - webhook_api.app - INFO - Forwarding tradingview signal to Telegram: http://localhost:5005/webhook - [app.py:292]
+2025-03-21 15:40:20,184 - webhook_api.app - INFO - Forwarding signal: EURUSD BUY to http://localhost:5005/webhook - [app.py:295]
+2025-03-21 15:40:20,186 - webhook_api.app - DEBUG - Request URL: http://localhost:5005/webhook - [app.py:296]
+2025-03-21 15:40:20,187 - webhook_api.app - DEBUG - Full request data: {
+  "symbol": "EURUSD",
+  "side": "BUY",
+  "price": 1.1234,
+  "sl": 1.12,
+  "tp1": 1.13,
+  "strategy": "SoloTrend X Test"
+} - [app.py:297]
+Starting new HTTP connection (1): localhost:5005
+http://localhost:5005 "POST /webhook HTTP/1.1" 200 114
+2025-03-21 15:40:29,535 - webhook_api.app - INFO - Response status code: 200 - [app.py:316]
+2025-03-21 15:40:29,537 - webhook_api.app - INFO - Response content: {
+  "message": "Signal received and processed using direct notification",
+  "mock": true,
+  "status": "success"
+}
+ - [app.py:317]
+2025-03-21 15:40:29,539 - webhook_api.app - INFO - Signal forwarded successfully - [app.py:320]

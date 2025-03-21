@@ -1,0 +1,84 @@
+2025-03-20 12:16:47,639 - __main__ - INFO - Project root: /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828
+2025-03-20 12:16:47,640 - __main__ - INFO - Starting SoloTrend X services for debugging...
+2025-03-20 12:16:47,640 - __main__ - INFO - Starting MT4 REST API...
+2025-03-20 12:16:47,641 - __main__ - INFO - Command: /usr/local/opt/python@3.13/bin/python3.13 /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/MT4RestfulAPIWrapper/mt4_rest_api_implementation.py
+2025-03-20 12:16:47,641 - __main__ - INFO - Environment: {"PYTHONPATH": "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828", "USE_MOCK_MODE": "true", "PORT": "5002"}
+2025-03-20 12:16:49,648 - __main__ - INFO - Starting Webhook API...
+2025-03-20 12:16:49,649 - __main__ - INFO - Command: /usr/local/opt/python@3.13/bin/python3.13 /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/webhook_api/run_server.py
+2025-03-20 12:16:49,649 - __main__ - INFO - Environment: {"PYTHONPATH": "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828", "WEBHOOK_API_PORT": "5003", "TELEGRAM_WEBHOOK_URL": "http://localhost:5001/webhook", "MOCK_MODE": "True"}
+2025-03-20 12:16:51,656 - __main__ - INFO - Starting Telegram Health Server...
+2025-03-20 12:16:51,657 - __main__ - INFO - Command: /usr/local/opt/python@3.13/bin/python3.13 /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/health_server.py
+2025-03-20 12:16:51,657 - __main__ - INFO - Environment: {"PYTHONPATH": "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828", "HEALTH_PORT": "5001"}
+2025-03-20 12:16:53,662 - __main__ - INFO - Starting Telegram Bot...
+2025-03-20 12:16:53,663 - __main__ - INFO - Command: /usr/local/opt/python@3.13/bin/python3.13 /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/run.py
+2025-03-20 12:16:53,663 - __main__ - INFO - Environment: {"PYTHONPATH": "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828", "MT4_API_URL": "http://localhost:5002/api", "MOCK_MODE": "True", "FLASK_PORT": "5001"}
+2025-03-20 12:16:55,671 - __main__ - INFO - Waiting for services to start...
+2025-03-20 12:17:00,675 - __main__ - INFO - Checking health of MT4 REST API at http://localhost:5002/api/health...
+2025-03-20 12:17:00,801 - __main__ - ERROR - Health check for MT4 REST API failed with status code 404: <!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
+
+2025-03-20 12:17:00,801 - __main__ - INFO - Checking health of Webhook API at http://localhost:5003/health...
+2025-03-20 12:17:00,804 - __main__ - ERROR - Health check for Webhook API failed: HTTPConnectionPool(host='localhost', port=5003): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10de10910>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-03-20 12:17:00,804 - __main__ - INFO - Checking health of Telegram Health Server at http://localhost:5001/health...
+2025-03-20 12:17:00,820 - __main__ - ERROR - Health check for Telegram Health Server failed with status code 404: {"error":"Not Found","message":"The requested resource was not found"}
+
+2025-03-20 12:17:00,820 - __main__ - INFO - No health URL configured for Telegram Bot, skipping health check
+2025-03-20 12:17:00,820 - __main__ - WARNING - Some services are not healthy!
+2025-03-20 12:17:00,820 - __main__ - INFO - Monitoring services...
+2025-03-20 12:17:30,894 - __main__ - INFO - === Service Analysis Results ===
+2025-03-20 12:17:30,896 - __main__ - INFO - 
+=== MT4 REST API Analysis ===
+2025-03-20 12:17:30,896 - __main__ - INFO - Expected patterns found: 0/2
+2025-03-20 12:17:30,896 - __main__ - INFO -   ❌ Not found: Starting MT4 REST API
+2025-03-20 12:17:30,896 - __main__ - INFO -   ❌ Not found: Running on http://[0-9.:]+:5002
+2025-03-20 12:17:30,896 - __main__ - INFO - Error patterns found: 2
+2025-03-20 12:17:30,896 - __main__ - INFO -   ⚠️ Found: Error
+2025-03-20 12:17:30,897 - __main__ - INFO -   ⚠️ Found: Traceback
+2025-03-20 12:17:30,897 - __main__ - INFO - 
+=== Webhook API Analysis ===
+2025-03-20 12:17:30,897 - __main__ - INFO - Expected patterns found: 0/2
+2025-03-20 12:17:30,897 - __main__ - INFO -   ❌ Not found: Starting Webhook API Server
+2025-03-20 12:17:30,897 - __main__ - INFO -   ❌ Not found: Running on http://[0-9.:]+:5003
+2025-03-20 12:17:30,897 - __main__ - INFO - Error patterns found: 2
+2025-03-20 12:17:30,897 - __main__ - INFO -   ⚠️ Found: Error
+2025-03-20 12:17:30,897 - __main__ - INFO -   ⚠️ Found: Traceback
+2025-03-20 12:17:30,897 - __main__ - INFO - 
+=== Telegram Health Server Analysis ===
+2025-03-20 12:17:30,897 - __main__ - INFO - Expected patterns found: 1/2
+2025-03-20 12:17:30,898 - __main__ - INFO -   ✅ Found: Starting Telegram Connector health server
+2025-03-20 12:17:30,898 - __main__ - INFO -   ❌ Not found: Running on http://[0-9.:]+:5001
+2025-03-20 12:17:30,898 - __main__ - INFO -   ✅ No errors found
+2025-03-20 12:17:30,898 - __main__ - INFO - 
+=== Telegram Bot Analysis ===
+2025-03-20 12:17:30,898 - __main__ - INFO - Expected patterns found: 0/3
+2025-03-20 12:17:30,898 - __main__ - INFO -   ❌ Not found: Starting Telegram Connector server
+2025-03-20 12:17:30,898 - __main__ - INFO -   ❌ Not found: Telegram bot application created
+2025-03-20 12:17:30,898 - __main__ - INFO -   ❌ Not found: Registered routes
+2025-03-20 12:17:30,898 - __main__ - INFO - Error patterns found: 2
+2025-03-20 12:17:30,898 - __main__ - INFO -   ⚠️ Found: Error
+2025-03-20 12:17:30,898 - __main__ - INFO -   ⚠️ Found: Traceback
+2025-03-20 12:17:30,898 - __main__ - INFO - 
+=== Final Health Check ===
+2025-03-20 12:17:30,899 - __main__ - INFO - Checking health of MT4 REST API at http://localhost:5002/api/health...
+2025-03-20 12:17:30,917 - __main__ - ERROR - Health check for MT4 REST API failed with status code 404: <!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
+
+2025-03-20 12:17:30,917 - __main__ - INFO - Checking health of Webhook API at http://localhost:5003/health...
+2025-03-20 12:17:30,919 - __main__ - ERROR - Health check for Webhook API failed: HTTPConnectionPool(host='localhost', port=5003): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10ddc9a70>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-03-20 12:17:30,920 - __main__ - INFO - Checking health of Telegram Health Server at http://localhost:5001/health...
+2025-03-20 12:17:30,925 - __main__ - ERROR - Health check for Telegram Health Server failed with status code 404: {"error":"Not Found","message":"The requested resource was not found"}
+
+2025-03-20 12:17:30,925 - __main__ - INFO - No health URL configured for Telegram Bot, skipping health check
+2025-03-20 12:17:30,925 - __main__ - ERROR - ❌ Some services are not healthy!
+2025-03-20 12:17:30,925 - __main__ - ERROR - Error in main function: EOF when reading a line
+Traceback (most recent call last):
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/scripts/debug_services.py", line 450, in main
+    keep_running = input("\nKeep services running? (y/n): ").lower() == 'y'
+                   ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+EOFError: EOF when reading a line

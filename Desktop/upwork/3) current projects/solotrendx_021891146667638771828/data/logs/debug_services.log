@@ -1,0 +1,53 @@
+2025-03-20 11:22:39 - Service debugger started
+2025-03-20 11:22:39 - Starting debugging process
+2025-03-20 11:22:39 - Listing all files in logs directory:
+2025-03-20 11:22:39 -   telegram_connector.log - Size: 0 bytes, Modified: 2025-03-20 10:41:31
+2025-03-20 11:22:39 -   mt4_rest_api.log - Size: 0 bytes, Modified: 2025-03-20 10:41:28
+2025-03-20 11:22:39 -   debug_services.log - Size: 337 bytes, Modified: 2025-03-20 11:22:39
+2025-03-20 11:22:39 - Checking running processes:
+2025-03-20 11:22:39 - Python processes:
+2025-03-20 11:22:39 -   Mike             25908  50.2  0.2 34236640  29320 s024  S+   11:22AM   0:00.45 /usr/local/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/Resources/Python.app/Contents/MacOS/Python scripts/debug_services.py
+2025-03-20 11:22:39 -   Mike             17496   1.2  0.1 34367692  18760 s011  S+   11:04AM   1:52.61 /usr/local/Cellar/python@3.11/3.11.11/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python -m flask run --port=5001
+2025-03-20 11:22:39 -   Mike             96627   0.4  0.1 35830932  14516 s005  S+    2:58PM  10:27.13 /usr/local/Cellar/python@3.11/3.11.11/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python /Users/Mike/Desktop/ebay_app/app/services/03_tag/venv/bin/flask run
+2025-03-20 11:22:39 -   Mike             96628   0.0  0.0 34231744   2224 s005  S+    2:58PM   0:00.22 /usr/local/Cellar/python@3.11/3.11.11/Frameworks/Python.framework/Versions/3.11/Resources/Python.app/Contents/MacOS/Python /Users/Mike/Desktop/start_ngrok.py 5002 tag
+2025-03-20 11:22:39 - 
+==================================================
+2025-03-20 11:22:39 - Debugging MT4 REST API
+2025-03-20 11:22:39 - ==================================================
+2025-03-20 11:22:39 - Checking health for MT4 REST API at http://localhost:5002/api/health
+2025-03-20 11:22:39 - ❌ MT4 REST API returned status code 404: <!doctype html>
+<html lang=en>
+<title>404 Not Found</title>
+<h1>Not Found</h1>
+<p>The requested URL was not found on the server. If you entered the URL manually please check your spelling and try again.</p>
+
+2025-03-20 11:22:39 - Checking log files for MT4 REST API
+2025-03-20 11:22:39 - Log file: /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/data/logs/mt4_rest_api.log
+2025-03-20 11:22:39 -   Log file is empty or doesn't exist
+2025-03-20 11:22:39 - Error log file: /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/data/logs/mt4_rest_api_error.log
+2025-03-20 11:22:39 -   Error log file is empty or doesn't exist
+2025-03-20 11:22:39 - 
+==================================================
+2025-03-20 11:22:39 - Debugging Webhook API
+2025-03-20 11:22:39 - ==================================================
+2025-03-20 11:22:39 - Checking health for Webhook API at http://localhost:5003/health
+2025-03-20 11:22:39 - ❌ Webhook API is not responding: HTTPConnectionPool(host='localhost', port=5003): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x10fdc7d90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-03-20 11:22:39 - Checking log files for Webhook API
+2025-03-20 11:22:39 - Log file: /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/data/logs/webhook_api.log
+2025-03-20 11:22:39 -   Log file is empty or doesn't exist
+2025-03-20 11:22:39 - Error log file: /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/data/logs/webhook_api_error.log
+2025-03-20 11:22:39 -   Error log file is empty or doesn't exist
+2025-03-20 11:22:39 - 
+==================================================
+2025-03-20 11:22:39 - Debugging Telegram Connector
+2025-03-20 11:22:39 - ==================================================
+2025-03-20 11:22:39 - Checking health for Telegram Connector at http://localhost:5001/health
+2025-03-20 11:22:39 - ❌ Telegram Connector returned status code 404: {"error":"Not Found","message":"The requested resource was not found"}
+
+2025-03-20 11:22:39 - Checking log files for Telegram Connector
+2025-03-20 11:22:39 - Log file: /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/data/logs/telegram_connector.log
+2025-03-20 11:22:39 -   Log file is empty or doesn't exist
+2025-03-20 11:22:39 - Error log file: /Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/data/logs/telegram_connector_error.log
+2025-03-20 11:22:39 -   Error log file is empty or doesn't exist
+2025-03-20 11:22:39 - 
+Debugging completed

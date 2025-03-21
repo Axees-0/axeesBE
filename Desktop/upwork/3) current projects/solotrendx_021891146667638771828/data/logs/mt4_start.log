@@ -1,0 +1,19 @@
+Logging to: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\data\logs\mt4_rest_api.log
+Environment variables:
+PORT: 5002 
+USE_MOCK_MODE: true 
+MT4_SERVER: Not set
+MT4_PORT: Not set
+Actual configuration:
+MT4_SERVER: localhost
+MT4_PORT: 443
+USE_MOCK_MODE: False
+Starting MT4 REST API on port 5002
+ * Serving Flask app 'mt4_rest_api_implementation'
+ * Debug mode: off
+2025-03-21 10:24:23,905 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://10.211.55.3:5002
+2025-03-21 10:24:23,905 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-03-21 10:24:30,220 - werkzeug - INFO - 127.0.0.1 - - [21/Mar/2025 10:24:30] "[33mGET /api%20/health HTTP/1.1[0m" 404 -

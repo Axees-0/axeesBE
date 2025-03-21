@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/MT4RestfulAPIWrapper/mt4_rest_api_implementation.py", line 16, in <module>
+from flask_cors import CORS
+ModuleNotFoundError: No module named 'flask_cors'

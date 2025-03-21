@@ -1,0 +1,3 @@
+2025-03-20 12:51:01,066 - __main__ - INFO - Starting mock MT4 REST API server on port 7002
+127.0.0.1 - - [20/Mar/2025 12:51:12] "GET /api/health HTTP/1.1" 200 -
+/var/folders/g1/7y3w2j8s2qd7qmvkpd8byklw0000gp/T/tmp.1nZ8bSmZIp: line 10: 61530 Terminated: 15          python /Users/Mike/solotrendx_link/src/backend/MT4RestfulAPIWrapper/mock_server.py
