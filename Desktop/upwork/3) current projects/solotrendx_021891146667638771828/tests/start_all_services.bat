@@ -2,7 +2,9 @@
 echo Starting SoloTrend X System Components...
 
 rem Get the current directory and fix path issues
-set "PROJECT_ROOT=%~dp0"
+set "SCRIPT_DIR=%~dp0"
+set "PROJECT_ROOT=%SCRIPT_DIR%..\\"
+echo Script directory: %SCRIPT_DIR%
 echo Project root: %PROJECT_ROOT%
 
 rem Define the virtual environment path
