@@ -11,6 +11,27 @@ rem Define the virtual environment path
 set "VENV_DIR=%PROJECT_ROOT%environment\python\venv"
 echo Virtual environment: %VENV_DIR%
 
+rem Check if virtual environment exists
+if not exist "%VENV_DIR%" (
+    echo WARNING: Virtual environment not found at %VENV_DIR%
+    echo Checking alternative locations...
+    
+    if exist "%PROJECT_ROOT%venv" (
+        echo Found virtual environment at %PROJECT_ROOT%venv
+        set "VENV_DIR=%PROJECT_ROOT%venv"
+    ) else if exist "%SCRIPT_DIR%venv" (
+        echo Found virtual environment at %SCRIPT_DIR%venv
+        set "VENV_DIR=%SCRIPT_DIR%venv"
+    ) else (
+        echo ERROR: Could not find virtual environment
+        echo Please run setup_venv.bat first
+        pause
+        exit /b 1
+    )
+)
+
+echo Using virtual environment: %VENV_DIR%
+
 rem Create separate log directories if they don't exist
 if not exist "%PROJECT_ROOT%data\logs" (
     mkdir "%PROJECT_ROOT%data\logs"
@@ -21,6 +42,30 @@ set "MT4_API_DIR=%PROJECT_ROOT%src\backend\MT4RestfulAPIWrapper"
 set "WEBHOOK_DIR=%PROJECT_ROOT%src\backend\webhook_api"
 set "TELEGRAM_DIR=%PROJECT_ROOT%src\backend\telegram_connector"
 set "LOG_DIR=%PROJECT_ROOT%data\logs"
+
+rem Verify paths exist (for debugging)
+echo MT4 API Directory: %MT4_API_DIR%
+echo Webhook Directory: %WEBHOOK_DIR%
+echo Telegram Directory: %TELEGRAM_DIR%
+echo Log Directory: %LOG_DIR%
+
+rem Create directories if they don't exist
+if not exist "%MT4_API_DIR%" (
+    echo Creating MT4 API directory...
+    mkdir "%MT4_API_DIR%"
+)
+if not exist "%WEBHOOK_DIR%" (
+    echo Creating Webhook directory...
+    mkdir "%WEBHOOK_DIR%"
+)
+if not exist "%TELEGRAM_DIR%" (
+    echo Creating Telegram directory...
+    mkdir "%TELEGRAM_DIR%"
+)
+if not exist "%LOG_DIR%" (
+    echo Creating Log directory...
+    mkdir "%LOG_DIR%"
+)
 
 rem Start component 1: MT4 REST API with real MT4 connection
 echo Starting MT4 REST API with REAL MT4 connection...
@@ -40,8 +85,14 @@ rem REMOVED Telegram Health Server (causes port conflict)
 
 rem Read .env file to get FLASK_PORT value
 set "TELEGRAM_PORT=5005"
-for /f "tokens=1,* delims==" %%a in ('type "%PROJECT_ROOT%.env" ^| findstr "FLASK_PORT"') do (
-    if "%%a"=="FLASK_PORT" set "TELEGRAM_PORT=%%b"
+echo Reading .env file from: %PROJECT_ROOT%.env
+if exist "%PROJECT_ROOT%.env" (
+    echo .env file found
+    for /f "tokens=1,* delims==" %%a in ('type "%PROJECT_ROOT%.env" ^| findstr "FLASK_PORT"') do (
+        if "%%a"=="FLASK_PORT" set "TELEGRAM_PORT=%%b"
+    )
+) else (
+    echo WARNING: .env file not found, using default port: %TELEGRAM_PORT%
 )
 echo Using Telegram port: %TELEGRAM_PORT%
 
