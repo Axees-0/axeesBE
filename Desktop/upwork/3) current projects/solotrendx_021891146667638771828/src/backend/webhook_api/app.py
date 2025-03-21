@@ -9,6 +9,7 @@ This module defines the Flask application factory for the webhook API.
 import os
 import logging
 import json
+import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 from flask import Flask, request, jsonify, g
@@ -19,6 +20,32 @@ load_dotenv()
 
 # Configure logger
 logger = logging.getLogger(__name__)
+
+# Set up file handler for detailed logging
+log_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', '..', 'data', 'logs'))
+os.makedirs(log_dir, exist_ok=True)
+
+# Set up standard log file
+standard_file_handler = logging.FileHandler(os.path.join(log_dir, 'webhook_api.log'))
+standard_file_handler.setLevel(logging.INFO)
+standard_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+standard_file_handler.setFormatter(standard_formatter)
+
+# Set up detailed debug log file
+debug_file_handler = logging.FileHandler(os.path.join(log_dir, 'webhook_api_debug.log'))
+debug_file_handler.setLevel(logging.DEBUG)
+debug_formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s - [%(filename)s:%(lineno)d]')
+debug_file_handler.setFormatter(debug_formatter)
+
+# Configure root logger
+root_logger = logging.getLogger()
+root_logger.setLevel(logging.INFO)
+root_logger.addHandler(standard_file_handler)
+
+# Configure module logger
+logger.setLevel(logging.DEBUG)
+logger.addHandler(debug_file_handler)
+logger.addHandler(standard_file_handler)
 
 def create_app(test_config=None):
     """
@@ -40,7 +67,21 @@ def create_app(test_config=None):
         FLASK_PORT=int(os.environ.get('WEBHOOK_API_PORT', 5003)),
         FLASK_DEBUG=os.environ.get('FLASK_DEBUG', 'False') == 'True',
         MOCK_MODE=os.environ.get('MOCK_MODE', 'True') == 'True',
+        DEBUG_REQUESTS=os.environ.get('DEBUG_REQUESTS', 'True') == 'True',
     )
+    
+    # Configure debug logger for requests if enabled
+    if app.config.get('DEBUG_REQUESTS'):
+        requests_log = logging.getLogger('urllib3')
+        requests_log.setLevel(logging.DEBUG)
+        requests_log.propagate = True
+        
+        # Also set up file handler for requests debugging
+        log_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))), 'data', 'logs')
+        os.makedirs(log_dir, exist_ok=True)
+        file_handler = logging.FileHandler(os.path.join(log_dir, 'webhook_api_debug.log'))
+        file_handler.setLevel(logging.DEBUG)
+        requests_log.addHandler(file_handler)
     
     # Override with test config if provided
     if test_config:
@@ -90,14 +131,24 @@ def create_app(test_config=None):
                 telegram_url = app.config['TELEGRAM_WEBHOOK_URL']
                 logger.info(f"Forwarding signal to Telegram: {telegram_url}")
                 
+                # Add source field if not present
+                if 'source' not in data:
+                    data['source'] = 'tradingview'
+                
+                # Add detailed logging
+                logger.info(f"Request payload: {data}")
+                
                 response = requests.post(
                     telegram_url,
                     json=data,
                     headers={'Content-Type': 'application/json'},
-                    timeout=5
+                    timeout=10  # Increased timeout
                 )
                 
-                if response.status_code == 200:
+                logger.info(f"Telegram response status: {response.status_code}")
+                logger.info(f"Telegram response text: {response.text}")
+                
+                if response.status_code in (200, 201, 202):
                     logger.info("Signal forwarded successfully")
                     return jsonify({
                         'status': 'success',
@@ -186,9 +237,19 @@ def create_app(test_config=None):
                 'message': f'Internal server error: {str(e)}'
             }), 500
     
-    @app.route('/webhook', methods=['POST'])
+    @app.route('/webhook', methods=['POST', 'GET'])
     def generic_webhook():
         """Handle generic webhook signals with signal type detection"""
+        # For GET requests, just return a status message (useful for testing)
+        if request.method == 'GET':
+            logger.info("GET request received at webhook endpoint")
+            return jsonify({
+                'status': 'ok',
+                'message': 'Webhook endpoint is ready to receive signals',
+                'service': 'webhook_api'
+            })
+            
+        # For POST requests, process the signal
         try:
             if not request.is_json:
                 logger.error("Received non-JSON request")
@@ -230,25 +291,72 @@ def create_app(test_config=None):
                 telegram_url = app.config['TELEGRAM_WEBHOOK_URL']
                 logger.info(f"Forwarding {signal_type} signal to Telegram: {telegram_url}")
                 
-                response = requests.post(
-                    telegram_url,
-                    json=data,
-                    headers={'Content-Type': 'application/json'},
-                    timeout=5
-                )
+                # Debug request details - standard info in main log, detailed in debug log
+                logger.info(f"Forwarding signal: {data.get('symbol')} {data.get('side', data.get('action', 'Unknown'))} to {telegram_url}")
+                logger.debug(f"Request URL: {telegram_url}")
+                logger.debug(f"Full request data: {json.dumps(data, indent=2)}")
                 
-                if response.status_code == 200:
-                    logger.info("Signal forwarded successfully")
-                    return jsonify({
-                        'status': 'success',
-                        'message': 'Signal received and forwarded to Telegram'
-                    })
-                else:
-                    logger.error(f"Error forwarding to Telegram: {response.status_code} - {response.text}")
-                    return jsonify({
-                        'status': 'error',
-                        'message': f'Error forwarding to Telegram: {response.status_code}'
-                    }), 500
+                # Ensure timestamp is added to data if not present
+                if 'timestamp' not in data:
+                    data['timestamp'] = datetime.datetime.now().isoformat()
+                
+                # Add source if not already present
+                if 'source' not in data:
+                    data['source'] = 'webhook_api'
+                
+                # Try with increased timeout and verbose error handling
+                try:
+                    response = requests.post(
+                        telegram_url,
+                        json=data,
+                        headers={'Content-Type': 'application/json'},
+                        timeout=15  # Increased timeout
+                    )
+                    
+                    logger.info(f"Response status code: {response.status_code}")
+                    logger.info(f"Response content: {response.text}")
+                    
+                    if response.status_code in (200, 201, 202):
+                        logger.info("Signal forwarded successfully")
+                        return jsonify({
+                            'status': 'success',
+                            'message': 'Signal received and forwarded to Telegram'
+                        })
+                    else:
+                        # If 404, try alternative direct endpoint
+                        if response.status_code == 404:
+                            logger.warning("Original endpoint not found, trying direct root endpoint")
+                            # Try direct endpoint as fallback
+                            alt_url = telegram_url.split('/webhook')[0] + '/webhook'
+                            logger.info(f"Trying alternative URL: {alt_url}")
+                            
+                            alt_response = requests.post(
+                                alt_url,
+                                json=data,
+                                headers={'Content-Type': 'application/json'},
+                                timeout=15
+                            )
+                            
+                            logger.info(f"Alternative response status: {alt_response.status_code}")
+                            logger.info(f"Alternative response content: {alt_response.text}")
+                            
+                            if alt_response.status_code in (200, 201, 202):
+                                logger.info("Signal forwarded successfully using alternative endpoint")
+                                return jsonify({
+                                    'status': 'success',
+                                    'message': 'Signal received and forwarded to Telegram using alternative endpoint'
+                                })
+                        
+                        # Still failing, return error
+                        error_msg = f"Error forwarding to Telegram: {response.status_code} - {response.text}"
+                        logger.error(error_msg)
+                        return jsonify({
+                            'status': 'error',
+                            'message': error_msg
+                        }), 500
+                except Exception as inner_e:
+                    logger.error(f"Inner request error: {str(inner_e)}")
+                    raise inner_e
                     
             except requests.RequestException as e:
                 logger.error(f"Request error forwarding to Telegram: {e}")

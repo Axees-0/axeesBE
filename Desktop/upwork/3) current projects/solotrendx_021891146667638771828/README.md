@@ -180,7 +180,51 @@ python scripts/test_signal_flow.py
 
 # Continuously monitor and fix service issues
 python scripts/fix_service_issues.py --iterations 3
+
+# Test Telegram Bot token validity
+python scripts/test_telegram_token.py
 ```
+
+## Telegram Bot Configuration
+
+The Telegram Bot requires proper configuration to function correctly:
+
+### Setting Up a Bot Token
+
+1. Create a new bot with BotFather on Telegram:
+   - Open Telegram and search for @BotFather
+   - Send `/newbot` command and follow the instructions
+   - Copy the API token (format: `NUMBER:STRING`)
+
+2. Configure the token in your environment:
+   - Add to `.env` file: `TELEGRAM_BOT_TOKEN=your_token_here`
+   - Or set as environment variable: `export TELEGRAM_BOT_TOKEN=your_token_here`
+
+3. Verify token format:
+   - Must follow the pattern `NUMBER:STRING` (e.g., `123456789:ABCDefGhiJklmNoPQRstUvwxyz`)
+   - First part must be numeric
+   - Second part is the secret key
+
+4. Test the token:
+   ```bash
+   python scripts/test_telegram_token.py
+   ```
+
+### Configuring User Access
+
+Configure which users can interact with the bot in your environment:
+
+- `ADMIN_USER_IDS`: Comma-separated list of Telegram user IDs for administrators
+- `ALLOWED_USER_IDS`: Comma-separated list of Telegram user IDs for regular users
+
+Example in `.env`:
+```
+TELEGRAM_BOT_TOKEN=123456789:ABCDefGhiJklmNoPQRstUvwxyz
+ADMIN_USER_IDS=123456789
+ALLOWED_USER_IDS=123456789,987654321
+```
+
+You can find your Telegram user ID by sending a message to @userinfobot on Telegram.
 
 ## Azure Deployment
 
