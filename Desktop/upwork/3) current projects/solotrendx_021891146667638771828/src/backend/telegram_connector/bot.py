@@ -422,6 +422,8 @@ def setup_bot(app):
             return None
 
     # Make sure the token works by creating a test Bot instance first
+    # Remove any unwanted whitespace from the token
+    token = token.strip()
     try:
         test_bot = Bot(token=token)
         logger.info("Successfully created test Bot instance with the provided token")
@@ -503,7 +505,7 @@ def setup_bot(app):
             # Create the Application with proper builder pattern
             application = (
                 Application.builder()
-                .token(token)
+                .token(token.strip())  # Ensure any whitespace is stripped
                 .build()
             )
             
@@ -572,12 +574,27 @@ def _start_polling(application):
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
         
-        # Start the polling with specific parameters as per guide
+        # Add error handlers for conflicts
+        application.add_error_handler(lambda update, context: logger.error(f"Update {update} caused error: {context.error}"))
+        
+        # Use a random token when generating the bot instance ID to prevent conflicts
+        import random
+        import string
+        random_id = ''.join(random.choices(string.ascii_letters + string.digits, k=10))
+        
+        # Start the polling with specific parameters to handle conflicts
         polling_task = asyncio.create_task(
             application.run_polling(
                 allowed_updates=Update.ALL_TYPES,
                 drop_pending_updates=True,
-                close_loop=False
+                close_loop=False,
+                read_timeout=7,  # Reduced from default 30s
+                write_timeout=5,  # Reduced from default 30s
+                connect_timeout=5,  # Reduced from default 30s
+                pool_timeout=5,  # Reduced from default
+                bootstrap_retries=-1,  # Retry forever on bootstrap
+                connection_pool_size=1,  # Limit connections to prevent conflicts
+                bot_instance_id=f"solotrendx_{random_id}"  # Generate unique ID for this instance
             )
         )
         

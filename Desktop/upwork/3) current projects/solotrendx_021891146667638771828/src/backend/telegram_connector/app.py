@@ -90,7 +90,7 @@ def create_app(test_config=None):
         import src.backend.telegram_connector.bot as bot
         
         # Check token format before even attempting to set up bot
-        token = app.config.get('TELEGRAM_BOT_TOKEN')
+        token = app.config.get('TELEGRAM_BOT_TOKEN', '').strip()  # Strip whitespace
         if not token:
             logger.error("TELEGRAM_BOT_TOKEN environment variable is missing or empty")
             logger.warning("Telegram bot will not be available - please set TELEGRAM_BOT_TOKEN in .env")
@@ -101,11 +101,38 @@ def create_app(test_config=None):
             app.bot_instance = None
         else:
             # Token has basic format, attempt to set up the bot
+            # Update the config with the stripped token
+            app.config['TELEGRAM_BOT_TOKEN'] = token
             token_parts = token.split(':')
             token_id_part = token_parts[0]
             
             # Log attempt with token ID for debugging
             logger.info(f"Setting up Telegram bot with token ID: {token_id_part}")
+            
+            # Try to delete any existing webhook first to avoid conflicts
+            try:
+                import asyncio
+                from telegram import Bot
+                
+                # Create temporary bot instance to clean up webhooks
+                temp_bot = Bot(token=token)
+                
+                # Run in a new event loop to ensure it completes
+                async def delete_existing_webhook():
+                    try:
+                        logger.info("Attempting to delete any existing webhook")
+                        await temp_bot.delete_webhook(drop_pending_updates=True)
+                        logger.info("Successfully deleted any existing webhook")
+                    except Exception as e:
+                        logger.warning(f"Couldn't delete webhook (this is often normal): {str(e)}")
+                
+                # Run the async function
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                loop.run_until_complete(delete_existing_webhook())
+                loop.close()
+            except Exception as e:
+                logger.warning(f"Error during webhook cleanup: {str(e)}. Continuing anyway.")
             
             # Set up the bot through bot.py
             app.bot_instance = bot.setup_bot(app)
@@ -122,6 +149,31 @@ def create_app(test_config=None):
         logger.error(f"Error during Telegram bot initialization: {str(e)}", exc_info=True)
         app.bot_instance = None
         logger.warning("Telegram bot will not be available due to initialization error")
+    # Register shutdown functions to ensure clean bot termination
+    @app.teardown_appcontext
+    def shutdown_telegram_bot(exception=None):
+        if hasattr(app, 'bot_instance') and app.bot_instance:
+            logger.info("Shutting down Telegram bot...")
+            try:
+                # Signal to the bot that we're shutting down
+                # This will help prevent conflicts in future startups
+                import atexit
+                
+                async def stop_bot():
+                    try:
+                        logger.info("Attempting to gracefully stop the Telegram bot")
+                        if hasattr(app.bot_instance, 'stop'):
+                            await app.bot_instance.stop()
+                        logger.info("Telegram bot stopped successfully")
+                    except Exception as e:
+                        logger.warning(f"Error stopping Telegram bot: {str(e)}")
+                
+                # Register the cleanup function
+                atexit.register(lambda: asyncio.run(stop_bot()))
+                
+            except Exception as e:
+                logger.warning(f"Error setting up bot shutdown: {str(e)}")
+
     return app
 
 # This is used when running the file directly with 'python app.py'
@@ -134,4 +186,6 @@ if __name__ == '__main__':
     debug = app.config.get('FLASK_DEBUG', False)
     
     logger.info(f"Starting Telegram Connector server on port {port} (debug={debug})")
-    app.run(host='0.0.0.0', port=port, debug=debug)
+    
+    # Run with extra shutdown timeout to ensure bot has time to disconnect cleanly
+    app.run(host='0.0.0.0', port=port, debug=debug, use_reloader=False)
