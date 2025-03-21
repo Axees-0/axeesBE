@@ -22,7 +22,7 @@ call "%VENV_DIR%\Scripts\activate.bat"
 
 rem Use the same ports as defined in start_all_services.bat
 set WEBHOOK_API_PORT=5003
-set TELEGRAM_PORT=5001
+set TELEGRAM_PORT=5005
 set MT4_API_PORT=5002
 
 rem First verify all services are running

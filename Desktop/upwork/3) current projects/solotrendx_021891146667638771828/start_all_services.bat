@@ -22,14 +22,14 @@ set "LOG_DIR=%PROJECT_ROOT%data\logs"
 
 rem Start component 1: MT4 REST API
 echo Starting MT4 REST API...
-start cmd /k "title MT4 REST API && echo Running from %MT4_API_DIR% && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set USE_MOCK_MODE=true && set PORT=5002 && python "%MT4_API_DIR%\direct_run.py""
+start cmd /k "title MT4 REST API && echo Running from %MT4_API_DIR% && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set USE_MOCK_MODE=false && set PORT=5002 && python "%MT4_API_DIR%\direct_run.py""
 
 rem Wait a moment before starting the next component
 timeout /t 3
 
 rem Start component 2: Webhook API
 echo Starting Webhook API...
-start cmd /k "title Webhook API && echo Running from %WEBHOOK_DIR% && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set FLASK_APP=src.backend.webhook_api.app && python "%WEBHOOK_DIR%\run_server.py""
+start cmd /k "title Webhook API && echo Running from %WEBHOOK_DIR% && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set FLASK_APP=src.backend.webhook_api.app && set MOCK_MODE=False && python "%WEBHOOK_DIR%\run_server.py""
 
 rem Wait a moment before starting the next component
 timeout /t 3
@@ -45,7 +45,7 @@ echo Using Telegram port: %TELEGRAM_PORT%
 
 rem Start component 4: Telegram Bot
 echo Starting Telegram Bot...
-start cmd /k "title Telegram Bot && echo Running from %TELEGRAM_DIR% && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set MT4_API_URL=http://localhost:5002/api && set FLASK_PORT=%TELEGRAM_PORT% && set TELEGRAM_BOT_TOKEN=7890390388:AAHAeOn_tzn1rihuEfpCCNZLzXReIF3fBD4 && set ADMIN_USER_IDS=123456789 && set ALLOWED_USER_IDS=123456789 && set MOCK_MODE=True && python "%TELEGRAM_DIR%\run.py""
+start cmd /k "title Telegram Bot && echo Running from %TELEGRAM_DIR% && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set MT4_API_URL=http://localhost:5002/api && set FLASK_PORT=%TELEGRAM_PORT% && set TELEGRAM_BOT_TOKEN=7890390388:AAHAeOn_tzn1rihuEfpCCNZLzXReIF3fBD4 && set ADMIN_USER_IDS=123456789 && set ALLOWED_USER_IDS=123456789 && set MOCK_MODE=False && python "%TELEGRAM_DIR%\run.py""
 
 echo All components started!
 echo.
