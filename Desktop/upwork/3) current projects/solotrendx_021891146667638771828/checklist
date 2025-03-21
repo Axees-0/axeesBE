@@ -1,22 +1,22 @@
 # MT4 Terminal Integration Checklist
 
 ## 📋 Step 1: Install MT4 Terminal on Windows
-- [ ] Ensure access to a Windows machine (dedicated, VM, or Parallels Desktop)
-- [ ] Copy and install `src/backend/CloudTrader.4.terminal.setup.exe`
-- [ ] Enter credentials during installation:
+- [x] Ensure access to a Windows machine (dedicated, VM, or Parallels Desktop)
+- [x] Copy and install `src/backend/CloudTrader.4.terminal.setup.exe`
+- [x] Enter credentials during installation:
   - Server: CLOUD TRADER MT
   - Login: 80000300
   - Password: D7m!NMg&tteB
-- [ ] Verify successful login to MT4 terminal
-- [ ] Ensure terminal remains running at all times
+- [x] Verify successful login to MT4 terminal
+- [x] Ensure terminal remains running at all times
 
 ## 📋 Step 2: Prepare MT4 Manager API Files
-- [ ] Locate `mtmanapi.dll` and `mtmanapi64.dll` in MT4 installation directory
-- [ ] Copy both files to `src/backend/MT4RestfulAPIWrapper/`
-- [ ] Verify the files have proper permissions (read/execute)
+- [x] Locate `mtmanapi.dll` and `mtmanapi64.dll` in MT4 installation directory
+- [x] Copy both files to `src/backend/MT4RestfulAPIWrapper/`
+- [x] Verify the files have proper permissions (read/execute)
 
 ## 📋 Step 3: Configure Environment Variables
-- [ ] Create/edit `.env` file in project root with the following:
+- [x] Create/edit `.env` file in project root with the following:
 ```
 # MT4 API Configuration
 MT4_SERVER=localhost
@@ -30,22 +30,22 @@ PORT=5002
 WEBHOOK_API_PORT=5003
 
 # Telegram connector configuration
-TELEGRAM_BOT_TOKEN=your_telegram_bot_token
-TELEGRAM_BOT_LINK=https://t.me/your_bot_username
-TELEGRAM_CHAT_ID=your_chat_id
-ADMIN_USER_IDS=your_admin_user_id
-ALLOWED_USER_IDS=your_user_id
+TELEGRAM_BOT_TOKEN=7890390388:AAHAeOn_tzn1rihuEfpCCNZLzXReIF3fBD4
+TELEGRAM_BOT_LINK=https://t.me/solotrendx_pocketoption_bot
+TELEGRAM_CHAT_ID=6737051045
+ADMIN_USER_IDS=123456789
+ALLOWED_USER_IDS=123456789
 FLASK_PORT=5005
 ```
-- [ ] Replace Telegram configuration with actual values
-- [ ] Verify the .env file is saved in the correct location
+- [x] Replace Telegram configuration with actual values
+- [x] Verify the .env file is saved in the correct location
 
 ## 📋 Step 4: Modify start_all_services.bat Script
-- [ ] Edit `tests/start_all_services.bat` to use real MT4 API:
-  - [ ] Set `USE_MOCK_MODE=false`
-  - [ ] Add MT4 credentials (server, port, login, password)
-  - [ ] Update Telegram configuration values
-- [ ] Save the modified script
+- [x] Edit `tests/start_all_services.bat` to use real MT4 API:
+  - [x] Set `USE_MOCK_MODE=false`
+  - [x] Add MT4 credentials (server, port, login, password)
+  - [x] Update Telegram configuration values
+- [x] Save the modified script
 
 ## 📋 Step 5: Verify MT4 Terminal Status
 - [ ] Confirm MT4 terminal is running on Windows

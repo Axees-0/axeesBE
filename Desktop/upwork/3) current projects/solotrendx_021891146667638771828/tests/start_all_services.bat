@@ -99,28 +99,56 @@ if %ERROR_COUNT% GTR 0 (
 
 rem ============== CONFIGURATION SETUP ==============
 
-rem Read port settings from .env file
+rem Set default configuration values
 set "MT4_API_PORT=5002"
 set "WEBHOOK_API_PORT=5003"
 set "TELEGRAM_PORT=5005"
 set "USE_MOCK_MODE=false"
 set "MOCK_MODE=False"
+set "MT4_SERVER=localhost"
+set "MT4_PORT=443"
+set "MT4_LOGIN=80000300"
+set "MT4_PASSWORD=D7m!NMg&tteB"
+set "TELEGRAM_BOT_TOKEN=7890390388:AAHAeOn_tzn1rihuEfpCCNZLzXReIF3fBD4"
+set "TELEGRAM_CHAT_ID=6737051045"
+set "ADMIN_USER_IDS=123456789"
+set "ALLOWED_USER_IDS=123456789"
 
 rem Try to read from .env file if it exists
 if exist "%PROJECT_ROOT%.env" (
-    echo Reading port settings from .env file... >> "%LOG_FILE%"
+    echo Reading settings from .env file... >> "%LOG_FILE%"
     
     rem Parse the .env file for port settings
     for /f "tokens=1,* delims==" %%a in ('type "%PROJECT_ROOT%.env" ^| findstr "PORT"') do (
         if "%%a"=="WEBHOOK_API_PORT" set "WEBHOOK_API_PORT=%%b"
         if "%%a"=="FLASK_PORT" set "TELEGRAM_PORT=%%b"
         if "%%a"=="PORT" set "MT4_API_PORT=%%b"
+        if "%%a"=="MT4_PORT" set "MT4_PORT=%%b"
     )
     
     rem Parse the .env file for mock mode settings
     for /f "tokens=1,* delims==" %%a in ('type "%PROJECT_ROOT%.env" ^| findstr "MOCK"') do (
         if "%%a"=="USE_MOCK_MODE" set "USE_MOCK_MODE=%%b"
         if "%%a"=="MOCK_MODE" set "MOCK_MODE=%%b"
+    )
+    
+    rem Parse the .env file for MT4 settings
+    for /f "tokens=1,* delims==" %%a in ('type "%PROJECT_ROOT%.env" ^| findstr "MT4_"') do (
+        if "%%a"=="MT4_SERVER" set "MT4_SERVER=%%b"
+        if "%%a"=="MT4_LOGIN" set "MT4_LOGIN=%%b"
+        if "%%a"=="MT4_PASSWORD" set "MT4_PASSWORD=%%b"
+    )
+    
+    rem Parse the .env file for Telegram settings
+    for /f "tokens=1,* delims==" %%a in ('type "%PROJECT_ROOT%.env" ^| findstr "TELEGRAM_"') do (
+        if "%%a"=="TELEGRAM_BOT_TOKEN" set "TELEGRAM_BOT_TOKEN=%%b"
+        if "%%a"=="TELEGRAM_CHAT_ID" set "TELEGRAM_CHAT_ID=%%b"
+    )
+    
+    rem Parse the .env file for user settings
+    for /f "tokens=1,* delims==" %%a in ('type "%PROJECT_ROOT%.env" ^| findstr "USER_"') do (
+        if "%%a"=="ADMIN_USER_IDS" set "ADMIN_USER_IDS=%%b"
+        if "%%a"=="ALLOWED_USER_IDS" set "ALLOWED_USER_IDS=%%b"
     )
 )
 
@@ -144,7 +172,7 @@ set "TELEGRAM_LOG=%LOG_DIR%\telegram_start.log"
 rem Start component 1: MT4 REST API with real MT4 connection
 echo Starting MT4 REST API on port %MT4_API_PORT%... >> "%LOG_FILE%"
 echo Starting MT4 REST API with REAL MT4 connection...
-start cmd /k "title MT4 REST API && echo MT4 API starting from %MT4_API_DIR% > "%MT4_LOG%" && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set PORT=%MT4_API_PORT% && set USE_MOCK_MODE=%USE_MOCK_MODE% && set MT4_SERVER=localhost && set MT4_PORT=443 && set MT4_LOGIN=80000300 && set MT4_PASSWORD=D7m!NMg&tteB && cd /d "%MT4_API_DIR%" && python direct_run.py 2>> "%MT4_LOG%""
+start cmd /k "title MT4 REST API && echo MT4 API starting from %MT4_API_DIR% > "%MT4_LOG%" && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set PORT=%MT4_API_PORT% && set USE_MOCK_MODE=%USE_MOCK_MODE% && set MT4_SERVER=%MT4_SERVER% && set MT4_PORT=%MT4_PORT% && set MT4_LOGIN=%MT4_LOGIN% && set MT4_PASSWORD=%MT4_PASSWORD% && cd /d "%MT4_API_DIR%" && python direct_run.py 2>> "%MT4_LOG%""
 echo MT4 API started >> "%LOG_FILE%"
 
 rem Wait a moment before starting the next component
@@ -162,7 +190,7 @@ timeout /t 3 > nul
 rem Start component 3: Telegram Bot
 echo Starting Telegram Bot on port %TELEGRAM_PORT%... >> "%LOG_FILE%"
 echo Starting Telegram Bot...
-start cmd /k "title Telegram Bot && echo Telegram Bot starting from %TELEGRAM_DIR% > "%TELEGRAM_LOG%" && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set MT4_API_URL=http://localhost:%MT4_API_PORT%/api && set FLASK_PORT=%TELEGRAM_PORT% && set MOCK_MODE=%MOCK_MODE% && cd /d "%TELEGRAM_DIR%" && python run.py 2>> "%TELEGRAM_LOG%""
+start cmd /k "title Telegram Bot && echo Telegram Bot starting from %TELEGRAM_DIR% > "%TELEGRAM_LOG%" && call "%VENV_DIR%\Scripts\activate.bat" && set PYTHONPATH=%PROJECT_ROOT% && set MT4_API_URL=http://localhost:%MT4_API_PORT%/api && set FLASK_PORT=%TELEGRAM_PORT% && set MOCK_MODE=%MOCK_MODE% && set TELEGRAM_BOT_TOKEN=%TELEGRAM_BOT_TOKEN% && set TELEGRAM_CHAT_ID=%TELEGRAM_CHAT_ID% && set ADMIN_USER_IDS=%ADMIN_USER_IDS% && set ALLOWED_USER_IDS=%ALLOWED_USER_IDS% && cd /d "%TELEGRAM_DIR%" && python run.py 2>> "%TELEGRAM_LOG%""
 echo Telegram Bot started >> "%LOG_FILE%"
 
 echo All components started! >> "%LOG_FILE%"
