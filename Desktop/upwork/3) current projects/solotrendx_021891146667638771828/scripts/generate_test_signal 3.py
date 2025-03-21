@@ -181,7 +181,7 @@ def send_signal(webhook_url, signal_data, verbose=False):
 def main():
     """Main function for generating and sending test signals"""
     parser = argparse.ArgumentParser(description="Generate and send test trading signals")
-    parser.add_argument("--url", default="http://localhost:5003/webhook", 
+    parser.add_argument("--url", default="http://localhost:5001/webhook", 
                         help="Full URL of the webhook endpoint")
     parser.add_argument("--source", choices=["tradingview", "ea"], default="tradingview", 
                         help="Signal source")

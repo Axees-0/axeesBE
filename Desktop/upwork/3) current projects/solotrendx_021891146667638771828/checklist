@@ -48,38 +48,36 @@ FLASK_PORT=5005
 - [x] Save the modified script
 
 ## 📋 Step 5: Verify MT4 Terminal Status
-- [ ] Confirm MT4 terminal is running on Windows
-- [ ] Verify active login to the broker account
-- [ ] Check terminal connection status (green connection indicator)
-- [ ] Ensure Expert Advisors are enabled (smiling face icon)
+- [x] Confirm MT4 terminal is running on Windows
+- [x] Verify active login to the broker account
+- [x] Check terminal connection status (green connection indicator)
+- [x] Ensure Expert Advisors are enabled (smiling face icon)
+- [x] Test connection using check_mt4_connection.bat
 
 ## 📋 Step 6: Start Services
-- [ ] Run the modified start_all_services.bat script
-- [ ] Monitor console output for errors
-- [ ] Check each component starts successfully:
-  - [ ] MT4 REST API
-  - [ ] Webhook API
-  - [ ] Telegram Bot
+- [x] Run the modified start_all_services.bat script
+- [x] Monitor console output for errors
+- [x] Check each component starts successfully:
+  - [x] MT4 REST API
+  - [x] Webhook API
+  - [x] Telegram Bot
 
 ## 📋 Step 7: Verify Connections
-- [ ] Run check_services.bat to verify all components
-- [ ] Review logs for errors:
-  - [ ] data\logs\mt4_rest_api.log
-  - [ ] data\logs\webhook_api.log
-  - [ ] data\logs\telegram_connector.log
-- [ ] Test API endpoints manually:
-  - [ ] MT4 API health: http://localhost:5002/api/health
-  - [ ] Webhook API: http://localhost:5003/health
-  - [ ] Telegram connector: http://localhost:5005/health
+- [x] Run check_services.bat to verify all components
+- [x] Review logs for errors:
+  - [x] data\logs\mt4_rest_api.log
+  - [x] data\logs\webhook_api.log
+  - [x] data\logs\telegram_connector.log
+- [x] Test API endpoints manually:
+  - [x] MT4 API health: http://localhost:5002/api/health
+  - [x] Webhook API: http://localhost:5003/health
+  - [x] Telegram connector: http://localhost:5005/health
 
 ## 📋 Step 8: Test with Sample Signal
-- [ ] Generate test trade signal:
-  ```
-  python scripts\generate_test_signal.py --url http://localhost:5003/webhook --direct
-  ```
-- [ ] Check Telegram bot for notification
-- [ ] Try executing the trade via Telegram button
-- [ ] Verify the order appears in MT4 terminal
+- [x] Generate test trade signal using test_signal.bat
+- [x] Check Telegram bot for notification
+- [x] Execute the trade via Telegram button
+- [x] Verify the order appears in MT4 terminal
 
 ## ⚠️ Troubleshooting
 - MT4 Connection Issues:

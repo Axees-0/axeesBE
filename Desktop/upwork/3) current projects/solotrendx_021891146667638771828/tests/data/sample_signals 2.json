@@ -1,0 +1,62 @@
+{
+  "tradingview_signals": [
+    {
+      "symbol": "EURUSD",
+      "side": "BUY",
+      "price": 1.2345,
+      "sl": 1.2300,
+      "tp1": 1.2400,
+      "tp2": 1.2450,
+      "tp3": 1.2500,
+      "currentTimeframe": "H1",
+      "strategy": "SOLOTREND X",
+      "risk": "1%",
+      "expiration": "2h"
+    },
+    {
+      "symbol": "USDJPY",
+      "side": "SELL",
+      "price": 145.67,
+      "sl": 146.00,
+      "tp1": 145.00,
+      "tp2": 144.50,
+      "tp3": 144.00,
+      "currentTimeframe": "H4",
+      "strategy": "SOLOTREND X",
+      "risk": "2%",
+      "expiration": "8h"
+    }
+  ],
+  "ea_signals": [
+    {
+      "symbol": "GBPUSD",
+      "side": "SELL",
+      "price": 1.3500,
+      "sl": 1.3550,
+      "tp": 1.3450,
+      "type": "signal",
+      "strategy": "DYNAMIC TRAILING STOP",
+      "timeframe": "M15"
+    },
+    {
+      "symbol": "AUDUSD",
+      "side": "BUY",
+      "price": 0.7650,
+      "sl": 0.7600,
+      "tp": 0.7700,
+      "type": "signal",
+      "strategy": "DYNAMIC TRAILING STOP",
+      "timeframe": "M30"
+    }
+  ],
+  "telegram_responses": [
+    {
+      "command": "start",
+      "response": "Welcome to SoloTrend X Trading Bot!"
+    },
+    {
+      "command": "help",
+      "response": "Available commands..."
+    }
+  ]
+}
