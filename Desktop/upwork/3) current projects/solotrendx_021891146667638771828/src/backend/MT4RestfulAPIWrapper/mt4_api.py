@@ -51,9 +51,10 @@ class MT4Manager:
         self.logged_in = False
         self.server = ""
         self.port = 0
-        self.login = 0
+        self.login_number = 0  # Renamed from login to avoid conflict with login method
         self.password = ""
-        self.dll_path = dll_path or "mtmanapi.dll"
+        self.dll_path = dll_path or self._find_dll_path()
+        
         
         # Mocked data for development
         self._mock_users = []
@@ -66,6 +67,68 @@ class MT4Manager:
         else:
             logger.info("MT4 Manager running in REAL mode")
             self._initialize_dll()
+            
+    def _find_dll_path(self):
+        """Find the MT4 Manager API DLL in various locations, prioritizing 64-bit DLL for 64-bit Python"""
+        import os
+        import struct
+        import platform
+        
+        # Determine if we're running 64-bit Python
+        is_64bit_python = struct.calcsize("P") == 8
+        
+        # Define root project path for absolute referencing
+        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+        
+        # Define DLL file names based on Python architecture
+        if is_64bit_python:
+            logger.info("Detected 64-bit Python, prioritizing 64-bit DLL (mtmanapi64.dll)")
+            primary_dll = "mtmanapi64.dll"
+            fallback_dll = "mtmanapi.dll"
+        else:
+            logger.info("Detected 32-bit Python, using 32-bit DLL (mtmanapi.dll)")
+            primary_dll = "mtmanapi.dll"
+            fallback_dll = None  # No fallback for 32-bit
+        
+        # Define search paths in order of priority
+        search_paths = [
+            # Current working directory
+            os.getcwd(),
+            
+            # Script directory
+            os.path.dirname(os.path.abspath(__file__)),
+            
+            # MT4ManagerAPI directory
+            os.path.join(project_root, "src", "backend", "MT4ManagerAPI"),
+            
+            # Project root
+            project_root,
+            
+            # Parallels-specific paths (if running in Parallels)
+            "\\\\Mac\\Home\\Desktop\\upwork\\3) current projects\\solotrendx_021891146667638771828",
+            "\\\\Mac\\Home\\Desktop\\upwork\\3) current projects\\solotrendx_021891146667638771828\\src\\backend\\MT4RestfulAPIWrapper",
+            "\\\\Mac\\Home\\Desktop\\upwork\\3) current projects\\solotrendx_021891146667638771828\\src\\backend\\MT4ManagerAPI"
+        ]
+        
+        # First try to find primary DLL
+        for base_path in search_paths:
+            dll_path = os.path.join(base_path, primary_dll) if base_path else primary_dll
+            if os.path.exists(dll_path):
+                logger.info(f"Found {primary_dll} at {dll_path}")
+                return dll_path
+        
+        # If primary DLL not found and we have a fallback, try fallback
+        if fallback_dll:
+            logger.warning(f"{primary_dll} not found, trying fallback DLL ({fallback_dll})")
+            for base_path in search_paths:
+                dll_path = os.path.join(base_path, fallback_dll) if base_path else fallback_dll
+                if os.path.exists(dll_path):
+                    logger.info(f"Found {fallback_dll} at {dll_path}")
+                    return dll_path
+        
+        # If still nothing found, return default
+        logger.warning("MT4 Manager API DLL not found in any of the standard locations")
+        return primary_dll  # Default fallback to current directory
     
     def _initialize_dll(self):
         """Initialize the MT4 Manager API DLL"""
@@ -396,7 +459,9 @@ class MT4Manager:
             logger.error("Cannot login: Not connected to MT4 server")
             return False
         
-        self.login_id = login
+        # Store the login ID and password as properties
+        # Renamed from login_id to login_number to avoid conflict with the login method
+        self.login_number = login
         self.password = password
         
         if self.mock_mode:
