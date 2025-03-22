@@ -3,6 +3,8 @@ flask==3.1.0
 python-telegram-bot>=20.0
 python-dotenv>=1.0.0
 requests>=2.30.0
+PyJWT>=2.6.0
+flask-cors>=3.0.10
 
 # Testing requirements
 pytest>=7.0.0
