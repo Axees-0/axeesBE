@@ -155,14 +155,18 @@ def get_mt4_connection():
     # Create new connection if needed
     if conn_id not in mt4_connections:
         logger.info(f"Creating new MT4 connection to {Config.MT4_SERVER}:{Config.MT4_PORT}")
+        # Convert port to integer to prevent 'int' object is not callable error
+        port = int(Config.MT4_PORT) if not isinstance(Config.MT4_PORT, int) else Config.MT4_PORT
+        login_id = int(Config.MT4_LOGIN) if not isinstance(Config.MT4_LOGIN, int) else Config.MT4_LOGIN
+        
         mt4 = MT4Manager(use_mock_mode=Config.USE_MOCK_MODE)
         
         # Connect and login
-        if not mt4.connect(Config.MT4_SERVER, Config.MT4_PORT):
-            raise Exception(f"Failed to connect to MT4 server {Config.MT4_SERVER}:{Config.MT4_PORT}")
+        if not mt4.connect(Config.MT4_SERVER, port):
+            raise Exception(f"Failed to connect to MT4 server {Config.MT4_SERVER}:{port}")
         
-        if not mt4.login(Config.MT4_LOGIN, Config.MT4_PASSWORD):
-            raise Exception(f"Failed to login to MT4 server with login {Config.MT4_LOGIN}")
+        if not mt4.login(login_id, Config.MT4_PASSWORD):
+            raise Exception(f"Failed to login to MT4 server with login {login_id}")
         
         mt4_connections[conn_id] = mt4
     
