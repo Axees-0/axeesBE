@@ -210,28 +210,20 @@ def test_mt4_connect():
         port = int(os.environ.get('MT4_PORT', '443'))
         login = os.environ.get('MT4_LOGIN', '')
         password = os.environ.get('MT4_PASSWORD', '')
-        domain = os.environ.get('MT4_DOMAIN', '')
         
         # Mask password in logs
         password_mask = '*' * len(password) if password else ''
-        logger.info(f"Server info: {server}:{port} Login: {login} Password: {password_mask} Domain: {domain}")
+        logger.info(f"Server info: {server}:{port} Login: {login} Password: {password_mask}")
         
         if server and login and password:
             logger.info(f"Connecting to server: {server}:{port}")
             
-            # Prepare connection string with domain if provided
-            connection_string = server
-            if domain:
-                # Format: server:port\\domain
-                connection_string = f"{server}\\{domain}"
-                logger.info(f"Using domain in connection string: {connection_string}")
-            
             # Connect to server
             try:
-                logger.info(f"Connecting with: Server={connection_string}, Port={port}, Login={login}")
+                logger.info(f"Connecting with: Server={server}, Port={port}, Login={login}")
                 result = mt4_dll.MtManagerConnect(
                     handle,
-                    connection_string.encode('utf-8'),
+                    server.encode('utf-8'),
                     port,
                     login.encode('utf-8'),
                     password.encode('utf-8')
