@@ -1,15 +1,25 @@
 # Web Scraping Utilities
 
-A collection of Python utilities for scraping web content and Google Sheets data.
+A collection of Python utilities for scraping web content, Google Sheets data, and downloading files from Google Drive and YouTube.
 
 ## Features
 
-- Extract all links from a webpage
+- Extract all links from a webpage, including embedded Google Drive links
 - Extract YouTube video IDs from links
 - Generate YouTube playlist URLs from extracted video IDs
 - Scrape data from published Google Sheets
 - Export scraped data to CSV, avoiding duplicates
 - Download YouTube videos and transcripts
+- Download files from Google Drive
+
+## Directory Structure
+
+- `/` - Main executable scripts
+- `/utils` - Core utility modules 
+- `/scripts` - Helper scripts for specific tasks
+- `/cache` - Cached HTML and debug files
+- `/youtube_downloads` - Downloaded YouTube videos and transcripts
+- `/drive_downloads` - Downloaded Google Drive files
 
 ## Google Sheet Table Structure
 
@@ -66,12 +76,20 @@ The table in the Google Sheet has the following structure:
 ## Requirements
 
 ```
-requests
-beautifulsoup4
-selenium
-webdriver-manager
-pytube
-youtube-transcript-api
+requests>=2.28.2
+beautifulsoup4>=4.11.2
+selenium>=4.8.0
+webdriver-manager>=3.8.5
+pathlib>=1.0.1
+yt-dlp>=2025.4.30
+python-dotenv>=1.0.0
+pytest>=7.3.1
+```
+
+You can install all requirements using:
+
+```bash
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -114,22 +132,52 @@ from master_scraper import process_links_from_csv
 # 2. Process each link from the CSV
 # 3. Add extracted links and YouTube playlists to the CSV
 process_links_from_csv()
+
+# Command-line usage with options
+# python master_scraper.py --force-download  # Force new download of Google Sheet
+# python master_scraper.py --max-rows 10     # Process only 10 rows
+# python master_scraper.py --reset           # Reprocess all rows, even if already processed
+```
+
+### Complete Workflow Automation
+
+The `run_complete_workflow.py` script automates the entire process:
+1. Download and scrape a new Google Sheet
+2. Extract and process links
+3. Download all new Google Drive files
+4. Download all new YouTube videos
+
+```bash
+# Activate virtual environment
+source venv/bin/activate
+
+# Run complete workflow
+python run_complete_workflow.py
+
+# Run with specific options
+python run_complete_workflow.py --max-rows 10   # Process only 10 rows 
+python run_complete_workflow.py --reset         # Reprocess all rows
+
+# Skip specific steps if needed
+python run_complete_workflow.py --skip-sheet    # Skip Google Sheet scraping
+python run_complete_workflow.py --skip-drive    # Skip Google Drive downloads
+python run_complete_workflow.py --skip-youtube  # Skip YouTube downloads
 ```
 
 ### Download YouTube Videos and Transcripts
 
-```python
-from download_youtube import process_youtube_url
-
-# Download a video and its transcript
-process_youtube_url("https://www.youtube.com/watch?v=VIDEO_ID")
-
-# Download only the transcript
-process_youtube_url("https://www.youtube.com/watch?v=VIDEO_ID", transcript_only=True)
-
-# Process a playlist
-process_youtube_url("https://www.youtube.com/playlist?list=PLAYLIST_ID")
-
+```bash
 # Command-line usage
-# python download_youtube.py https://www.youtube.com/watch?v=VIDEO_ID --transcript-only --output-format json
+python download_youtube.py https://www.youtube.com/watch?v=VIDEO_ID
+python download_youtube.py https://www.youtube.com/watch?v=VIDEO_ID --transcript-only
+python download_youtube.py https://www.youtube.com/watch?v=VIDEO_ID --resolution 1080
+```
+
+### Download Google Drive Files
+
+```bash
+# Command-line usage
+python download_drive.py "https://drive.google.com/file/d/FILE_ID/view"
+python download_drive.py "https://drive.google.com/file/d/FILE_ID/view" --filename custom_name.ext
+python download_drive.py "https://drive.google.com/file/d/FILE_ID/view" --metadata
 ```
