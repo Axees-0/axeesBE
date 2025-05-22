@@ -25,47 +25,25 @@ ENFORCE_RATE_LIMIT = True  # Whether to enforce rate limiting
 
 # Prompt Templates
 RESUME_JOB_MATCHING_PROMPT = """
-Below is a resume followed by a job description. Please update the resume to better match the job's focus, while remaining truthful to the underlying experience. Output the result as a JSON object matching EXACTLY the core_template.json format shown.
-
-RESUME:
-{resume_content}
+Below is a job description and an existing resume template in JSON format. Please refine ONLY the job titles and descriptions in the template to better match the job requirements, while keeping everything else exactly the same.
 
 JOB DESCRIPTION:
 {job_description}
 
-CORE_TEMPLATE FORMAT:
-{{
-  "application_info": {{
-    "company": "Target Company Name",
-    "role": "Position Title",
-    "id": "JobID123"
-  }},
-  "Company1": {{
-    "company": "Company Name",
-    "location": "Location",
-    "title": "Job Title",
-    "dates": "Start Date - End Date",
-    "description": "Job description paragraph focusing on relevant experience."
-  }},
-  "Company2": {{
-    "company": "Company Name",
-    "location": "Location",
-    "title": "Job Title",
-    "dates": "Start Date - End Date",
-    "description": "Job description paragraph focusing on relevant experience."
-  }},
-  ... and so on for each company
-}}
+CURRENT RESUME TEMPLATE:
+{resume_content}
 
-IMPORTANT:
-1. Use the EXACT format of core_template.json with CompanyN keys
-2. Maintain the original company names, locations, and date ranges
-3. Only modify job titles and descriptions to better match the job requirements
-4. Keep the exact same number of company entries
-5. Ensure descriptions are concise, focused on relevant experience, and truthful
-6. Fill in the application_info section with the target job details
+INSTRUCTIONS:
+1. Keep the exact same JSON structure
+2. DO NOT modify company names, locations, or date ranges
+3. DO NOT add or remove any company entries
+4. ONLY update the "title" and "description" fields to better match the job requirements
+5. Update the "application_info" section with the target job details
+6. Ensure descriptions maintain their approximate length and remain truthful to the underlying experience
+7. Focus on highlighting relevant skills and experiences that match the job description
+8. Keep the same general structure of bullet points if they exist in the original descriptions
 
-Output a JSON object matching this exact structure. Do not include any explanations or notes outside the JSON.
+Output the complete JSON template with the updated fields. Do not include any explanations or notes outside the JSON.
 """
 
 JOB_ANALYSIS_PROMPT = """

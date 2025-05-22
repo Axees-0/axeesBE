@@ -125,7 +125,7 @@ def main():
     parser.add_argument('--resume', required=True, help='Path to the resume file')
     parser.add_argument('--jobs-csv', required=True, help='Path to the jobs CSV file')
     parser.add_argument('--job-id', help='Optional job ID to use')
-    parser.add_argument('--template', help='Path to the resume template JSON file')
+    parser.add_argument('--template', help='Path to the resume template JSON file', default='/Users/Mike/Desktop/job_search/resume_customizer/src/core_template.json')
     parser.add_argument('--output', help='Path to save the updated template JSON file')
     parser.add_argument('--cover-letter', help='Path to save the generated cover letter')
     
@@ -145,7 +145,9 @@ def main():
         
         # Match the resume to the job description
         logger.info("Matching resume to job description")
-        match_result = skills_matcher.match_resume_to_job(resume_content, job_description, job_title, company)
+        template_path = args.template if args.template else None
+        job_id = args.job_id if args.job_id else "JobID123"
+        match_result = skills_matcher.match_resume_to_job(resume_content, job_description, job_title, company, job_id, template_path=template_path)
         
         # Display the match result 
         print("\n==== MATCH RESULT ====")
@@ -171,6 +173,11 @@ def main():
         if args.output:
             logger.info(f"Saving updated template to {args.output}")
             save_updated_template(match_result, args.output)
+            
+            # Also save the raw GPT output to a debug file
+            debug_output_path = os.path.join(os.path.dirname(args.output), "gpt_output_debug.json")
+            logger.info(f"Saving raw GPT output to {debug_output_path}")
+            save_updated_template(match_result, debug_output_path)
         
         # If a cover letter path is provided, generate a cover letter
         if args.cover_letter:
