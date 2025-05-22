@@ -32,7 +32,10 @@ class SkillsMatcher:
     def match_resume_to_job(
         self, 
         resume_content: str, 
-        job_description: str
+        job_description: str,
+        job_title: Optional[str] = None,
+        company: Optional[str] = None,
+        job_id: Optional[str] = "JobID123"
     ) -> Dict[str, Any]:
         """
         Match a resume to a job description.
@@ -40,79 +43,47 @@ class SkillsMatcher:
         Args:
             resume_content: The resume content in text format.
             job_description: The job description text.
+            job_title: Optional job title to use in application_info.
+            company: Optional company name to use in application_info.
+            job_id: Optional job ID to use in application_info.
             
         Returns:
-            A dictionary containing match results and suggested updates.
+            A dictionary containing match results in core_template.json format.
         """
         logger.info("Matching resume to job description")
         
+        # Add job information to the prompt if available
+        job_info = ""
+        if job_title:
+            job_info += f"\nJOB TITLE: {job_title}"
+        if company:
+            job_info += f"\nCOMPANY: {company}"
+        if job_id:
+            job_info += f"\nJOB ID: {job_id}"
+        
         prompt = RESUME_JOB_MATCHING_PROMPT.format(
             resume_content=resume_content,
-            job_description=job_description
+            job_description=job_description + job_info
         )
         
         try:
             result = self.client.generate_json(
                 prompt=prompt,
-                system_message="You are a skilled resume writer that helps tailor resumes to specific job descriptions."
+                system_message="You are a skilled resume writer that helps tailor resumes to specific job descriptions. Always output in valid JSON format exactly matching the core_template.json structure."
             )
+            
+            # Ensure the application_info is correctly set
+            if "application_info" not in result and (job_title or company):
+                result["application_info"] = {}
+                if company:
+                    result["application_info"]["company"] = company
+                if job_title:
+                    result["application_info"]["role"] = job_title
+                if job_id:
+                    result["application_info"]["id"] = job_id
             
             logger.info("Resume matching complete")
             return result
         except Exception as e:
             logger.error(f"Error matching resume to job: {str(e)}")
             raise
-    
-    def get_updated_jobs(
-        self, 
-        resume_content: str, 
-        job_description: str
-    ) -> List[Dict[str, str]]:
-        """
-        Get updated job entries for a resume based on a job description.
-        
-        Args:
-            resume_content: The resume content in text format.
-            job_description: The job description text.
-            
-        Returns:
-            A list of updated job entries.
-        """
-        match_result = self.match_resume_to_job(resume_content, job_description)
-        return match_result.get("updated_jobs", [])
-    
-    def get_skills_to_emphasize(
-        self, 
-        resume_content: str, 
-        job_description: str
-    ) -> List[str]:
-        """
-        Get skills to emphasize based on a job description.
-        
-        Args:
-            resume_content: The resume content in text format.
-            job_description: The job description text.
-            
-        Returns:
-            A list of skills to emphasize.
-        """
-        match_result = self.match_resume_to_job(resume_content, job_description)
-        return match_result.get("skills_to_emphasize", [])
-    
-    def get_match_summary(
-        self, 
-        resume_content: str, 
-        job_description: str
-    ) -> str:
-        """
-        Get a summary of the match between a resume and job description.
-        
-        Args:
-            resume_content: The resume content in text format.
-            job_description: The job description text.
-            
-        Returns:
-            A summary of the match.
-        """
-        match_result = self.match_resume_to_job(resume_content, job_description)
-        return match_result.get("summary", "")

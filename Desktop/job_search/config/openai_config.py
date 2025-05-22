@@ -25,7 +25,7 @@ ENFORCE_RATE_LIMIT = True  # Whether to enforce rate limiting
 
 # Prompt Templates
 RESUME_JOB_MATCHING_PROMPT = """
-Below is a resume followed by a job description. Please update the resume so that the titles and descriptions better match the job's focus, while remaining truthful to the underlying experience. Output the result as a JSON object in the format shown.
+Below is a resume followed by a job description. Please update the resume to better match the job's focus, while remaining truthful to the underlying experience. Output the result as a JSON object matching EXACTLY the core_template.json format shown.
 
 RESUME:
 {resume_content}
@@ -33,21 +33,39 @@ RESUME:
 JOB DESCRIPTION:
 {job_description}
 
-OUTPUT FORMAT:
+CORE_TEMPLATE FORMAT:
 {{
-  "updated_jobs": [
-    {{
-      "company": "Original Company Name",
-      "location": "Original Location",
-      "title": "Updated Job Title",
-      "dates": "Original Date Range",
-      "description": "Updated job description with better matching keywords and focus areas."
-    }},
-    ...
-  ],
-  "skills_to_emphasize": ["Skill 1", "Skill 2", "Skill 3"],
-  "summary": "Brief analysis of the changes made and why they better match the job description."
+  "application_info": {{
+    "company": "Target Company Name",
+    "role": "Position Title",
+    "id": "JobID123"
+  }},
+  "Company1": {{
+    "company": "Company Name",
+    "location": "Location",
+    "title": "Job Title",
+    "dates": "Start Date - End Date",
+    "description": "Job description paragraph focusing on relevant experience."
+  }},
+  "Company2": {{
+    "company": "Company Name",
+    "location": "Location",
+    "title": "Job Title",
+    "dates": "Start Date - End Date",
+    "description": "Job description paragraph focusing on relevant experience."
+  }},
+  ... and so on for each company
 }}
+
+IMPORTANT:
+1. Use the EXACT format of core_template.json with CompanyN keys
+2. Maintain the original company names, locations, and date ranges
+3. Only modify job titles and descriptions to better match the job requirements
+4. Keep the exact same number of company entries
+5. Ensure descriptions are concise, focused on relevant experience, and truthful
+6. Fill in the application_info section with the target job details
+
+Output a JSON object matching this exact structure. Do not include any explanations or notes outside the JSON.
 """
 
 JOB_ANALYSIS_PROMPT = """

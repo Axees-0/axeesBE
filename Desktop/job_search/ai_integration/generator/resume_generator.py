@@ -44,11 +44,11 @@ class ResumeGenerator:
             job_description: The job description text.
             
         Returns:
-            A dictionary containing the optimized resume content.
+            A dictionary containing the optimized resume content in core_template.json format.
         """
         logger.info("Generating optimized resume")
         
-        # Use the skills matcher to get updated job entries
+        # Use the skills matcher to get updated job entries in core_template.json format
         match_result = self.skills_matcher.match_resume_to_job(
             resume_content=resume_content,
             job_description=job_description
@@ -80,33 +80,13 @@ class ResumeGenerator:
         if resume_text is None:
             resume_text = self._generate_resume_text(template_data)
         
-        # Generate optimized resume content
-        optimized_resume = self.generate_optimized_resume(
+        # Generate optimized resume content - this will now be in core_template.json format
+        updated_template = self.generate_optimized_resume(
             resume_content=resume_text,
             job_description=job_description
         )
         
-        # Update the template data with the optimized content
-        updated_template = template_data.copy()
-        
-        # Update job entries
-        for updated_job in optimized_resume.get("updated_jobs", []):
-            company_name = updated_job.get("company")
-            if company_name in updated_template:
-                # Update existing job entry
-                job_entry = updated_template[company_name]
-                if "title" in updated_job:
-                    job_entry["title"] = updated_job["title"]
-                if "description" in updated_job:
-                    job_entry["description"] = updated_job["description"]
-        
-        # Add skills to emphasize and summary as metadata
-        if "application_info" not in updated_template:
-            updated_template["application_info"] = {}
-        
-        updated_template["application_info"]["skills_to_emphasize"] = optimized_resume.get("skills_to_emphasize", [])
-        updated_template["application_info"]["match_summary"] = optimized_resume.get("summary", "")
-        
+        # The result should already be in the correct format for core_template.json
         return updated_template
     
     def _generate_resume_text(self, template_data: Dict[str, Any]) -> str:
@@ -121,51 +101,22 @@ class ResumeGenerator:
         """
         resume_text = []
         
-        # Add header if available
-        if "header" in template_data:
-            header = template_data["header"]
-            resume_text.append(f"{header.get('name', '')}")
-            resume_text.append(f"{header.get('email', '')} | {header.get('phone', '')}")
-            resume_text.append(f"{header.get('location', '')}")
-            resume_text.append("")
-        
-        # Add summary if available
-        if "summary" in template_data:
-            resume_text.append("SUMMARY")
-            resume_text.append(template_data["summary"])
-            resume_text.append("")
-        
-        # Add experience
-        resume_text.append("EXPERIENCE")
-        
-        # Process each job entry
-        for company, details in template_data.items():
+        # Add company entries
+        for key, details in template_data.items():
             # Skip non-job entries
-            if company in ["application_info", "header", "summary", "education", "skills"]:
+            if key == "application_info":
                 continue
-            
-            company_name = details.get("company", company)
-            location = details.get("location", "")
-            title = details.get("title", "")
-            dates = details.get("dates", "")
-            description = details.get("description", "")
-            
-            resume_text.append(f"{company_name}, {location} — {title}")
-            resume_text.append(f"{dates}")
-            resume_text.append(f"{description}")
-            resume_text.append("")
-        
-        # Add education if available
-        if "education" in template_data:
-            resume_text.append("EDUCATION")
-            for edu in template_data["education"]:
-                resume_text.append(f"{edu.get('institution', '')}, {edu.get('location', '')}")
-                resume_text.append(f"{edu.get('degree', '')}, {edu.get('dates', '')}")
+                
+            if isinstance(details, dict) and "company" in details:
+                company_name = details.get("company", "")
+                location = details.get("location", "")
+                title = details.get("title", "")
+                dates = details.get("dates", "")
+                description = details.get("description", "")
+                
+                resume_text.append(f"{company_name}, {location} — {title}")
+                resume_text.append(f"{dates}")
+                resume_text.append(f"{description}")
                 resume_text.append("")
-        
-        # Add skills if available
-        if "skills" in template_data:
-            resume_text.append("SKILLS")
-            resume_text.append(", ".join(template_data["skills"]))
         
         return "\n".join(resume_text)

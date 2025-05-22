@@ -73,6 +73,11 @@ def load_job_description_from_csv(csv_path: str, job_id: Optional[str] = None) -
         
         # Get the job description
         job_description = job_df.iloc[0]['Description']
+        job_title = job_df.iloc[0]['role']
+        company = job_df.iloc[0]['company']
+        
+        # Return job info
+        return job_description, job_title, company
     else:
         # Use the first job with a non-empty description
         job_df = df[df['Description'].notna() & (df['Description'] != '')]
@@ -81,8 +86,11 @@ def load_job_description_from_csv(csv_path: str, job_id: Optional[str] = None) -
             raise ValueError("No jobs with descriptions found in CSV")
         
         job_description = job_df.iloc[0]['Description']
-    
-    return job_description
+        job_title = job_df.iloc[0]['role']
+        company = job_df.iloc[0]['company']
+        
+        # Return job info
+        return job_description, job_title, company
 
 def load_resume_template(template_path: str) -> Dict[str, Any]:
     """
@@ -105,6 +113,9 @@ def save_updated_template(template_data: Dict[str, Any], output_path: str) -> No
         template_data: The template data to save.
         output_path: Path to save the template to.
     """
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
     with open(output_path, 'w') as f:
         json.dump(template_data, f, indent=2)
 
@@ -127,50 +138,39 @@ def main():
         
         # Load the job description
         logger.info(f"Loading job description from {args.jobs_csv}")
-        job_description = load_job_description_from_csv(args.jobs_csv, args.job_id)
+        job_description, job_title, company = load_job_description_from_csv(args.jobs_csv, args.job_id)
         
         # Create a skills matcher
         skills_matcher = SkillsMatcher()
         
         # Match the resume to the job description
         logger.info("Matching resume to job description")
-        match_result = skills_matcher.match_resume_to_job(resume_content, job_description)
+        match_result = skills_matcher.match_resume_to_job(resume_content, job_description, job_title, company)
         
-        # Print the match result
+        # Display the match result 
         print("\n==== MATCH RESULT ====")
-        print(f"Summary: {match_result.get('summary', '')}")
-        print("\nSkills to emphasize:")
-        for skill in match_result.get('skills_to_emphasize', []):
-            print(f"- {skill}")
+        print(f"Application Info:")
+        app_info = match_result.get('application_info', {})
+        print(f"- Company: {app_info.get('company', '')}")
+        print(f"- Role: {app_info.get('role', '')}")
+        print(f"- ID: {app_info.get('id', '')}")
         
-        print("\nUpdated jobs:")
-        for job in match_result.get('updated_jobs', []):
-            print(f"\nCompany: {job.get('company', '')}")
-            print(f"Location: {job.get('location', '')}")
-            print(f"Title: {job.get('title', '')}")
-            print(f"Dates: {job.get('dates', '')}")
-            print(f"Description: {job.get('description', '')}")
+        print("\nUpdated Jobs:")
+        for key, job in match_result.items():
+            if key == "application_info":
+                continue
+                
+            if isinstance(job, dict) and "company" in job:
+                print(f"\nCompany: {job.get('company', '')}")
+                print(f"Location: {job.get('location', '')}")
+                print(f"Title: {job.get('title', '')}")
+                print(f"Dates: {job.get('dates', '')}")
+                print(f"Description: {job.get('description', '')}")
         
-        # If a template path is provided, update the template
-        if args.template:
-            logger.info(f"Loading resume template from {args.template}")
-            template_data = load_resume_template(args.template)
-            
-            # Create a resume generator
-            resume_generator = ResumeGenerator()
-            
-            # Update the template
-            logger.info("Updating resume template")
-            updated_template = resume_generator.update_resume_template(
-                template_data=template_data,
-                job_description=job_description,
-                resume_text=resume_content
-            )
-            
-            # Save the updated template if an output path is provided
-            if args.output:
-                logger.info(f"Saving updated template to {args.output}")
-                save_updated_template(updated_template, args.output)
+        # If a template path is provided, save the output
+        if args.output:
+            logger.info(f"Saving updated template to {args.output}")
+            save_updated_template(match_result, args.output)
         
         # If a cover letter path is provided, generate a cover letter
         if args.cover_letter:
