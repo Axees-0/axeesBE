@@ -1,0 +1,84 @@
+{
+  "application_info": {
+    "company": "Default",
+    "role": "Default",
+    "id": "Default",
+    "skills_to_emphasize": [
+      "React & TypeScript",
+      "Design Systems",
+      "UI/UX Design",
+      "Cross-functional Collaboration",
+      "Performance Optimization"
+    ],
+    "match_summary": "The resume has been updated to emphasize Michael's experience in UX design and front-end engineering, aligning with the job description's focus on building polished user interfaces and design systems. Job titles and descriptions now highlight collaboration with cross-functional teams, design system contributions, and performance optimization, which are key aspects of the UX Design Engineer role at Chainlink Labs. Skills such as React & TypeScript, design systems, and UI/UX design are emphasized to match the job requirements more closely."
+  },
+  "header": {
+    "name": "Michael Abdo",
+    "email": "michael.abdo@example.com",
+    "phone": "(555) 123-4567",
+    "location": "Portland, OR"
+  },
+  "summary": "Experienced software engineer with 7+ years of experience in full-stack development, specializing in frontend technologies and UI/UX design. Passionate about creating intuitive, accessible user interfaces and optimizing web performance.",
+  "TechCorp": {
+    "company": "TechCorp",
+    "location": "Portland, OR",
+    "title": "Lead UX Design Engineer",
+    "dates": "January 2022 - Present",
+    "description": "Led a team of 5 engineers to redesign the company's main dashboard interface, resulting in a 25% increase in user engagement. Developed responsive web applications using React and TypeScript, improving load times by 40%. Implemented comprehensive unit and integration testing, achieving 90% code coverage. Collaborated with cross-functional teams to conceptualize and implement new features, contributing to a robust design system.",
+    "use": true
+  },
+  "DataSystems Inc.": {
+    "company": "DataSystems Inc.",
+    "location": "Remote",
+    "title": "Frontend Design Engineer",
+    "dates": "February 2019 - December 2021",
+    "description": "Created modular, reusable UI components with Vue.js and SCSS, ensuring consistency across products. Collaborated with UX designers to implement responsive designs across desktop and mobile platforms. Reduced bundle size by 35% through code splitting and lazy loading techniques. Mentored junior developers on best practices for frontend architecture and contributed to shared components and documentation.",
+    "use": true
+  },
+  "WebFusion": {
+    "company": "WebFusion",
+    "location": "Cedar Rapids, IA",
+    "title": "Full Stack Developer with Design Focus",
+    "dates": "March 2017 - January 2019",
+    "description": "Built RESTful APIs using Node.js and Express, integrating with MongoDB and PostgreSQL databases. Implemented frontend interfaces using Angular, focusing on performance, accessibility, and cross-browser compatibility. Participated in agile development processes, including daily standups and sprint planning, and contributed to design system development.",
+    "use": true
+  },
+  "CodeWorks": {
+    "company": "CodeWorks",
+    "location": "Seattle, WA",
+    "title": "Junior Developer",
+    "dates": "June 2015 - February 2017",
+    "description": "Maintained and updated legacy PHP applications. Assisted with migration to modern JavaScript frameworks. Developed internal tools to improve team productivity and collaborated with designers to enhance UI/UX.",
+    "use": true
+  },
+  "education": [
+    {
+      "institution": "University of Washington",
+      "location": "Seattle",
+      "degree": "BS Computer Science",
+      "dates": "September 2011 - May 2015"
+    }
+  ],
+  "skills": [
+    "JavaScript",
+    "TypeScript",
+    "HTML",
+    "CSS",
+    "Python",
+    "SQL",
+    "React",
+    "Vue.js",
+    "Angular",
+    "Node.js",
+    "Express",
+    "Git",
+    "Webpack",
+    "Jest",
+    "Cypress",
+    "Docker",
+    "Figma",
+    "Adobe XD",
+    "Responsive Design",
+    "Accessibility"
+  ]
+}

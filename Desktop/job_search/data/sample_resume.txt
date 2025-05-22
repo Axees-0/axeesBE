@@ -1,0 +1,36 @@
+MICHAEL ABDO
+michael.abdo@example.com | (555) 123-4567
+Portland, OR
+
+SUMMARY
+Experienced software engineer with 7+ years of experience in full-stack development, specializing in frontend technologies and UI/UX design. Passionate about creating intuitive, accessible user interfaces and optimizing web performance.
+
+EXPERIENCE
+
+TechCorp, Portland, OR — Senior Software Engineer
+January 2022 - Present
+Developed responsive web applications using React and TypeScript, improving load times by 40%. Led a team of 5 engineers to redesign the company's main dashboard interface, resulting in a 25% increase in user engagement. Implemented comprehensive unit and integration testing, achieving 90% code coverage.
+
+DataSystems Inc., Remote — Frontend Developer
+February 2019 - December 2021
+Created modular, reusable UI components with Vue.js and SCSS. Collaborated with UX designers to implement responsive designs across desktop and mobile platforms. Reduced bundle size by 35% through code splitting and lazy loading techniques. Mentored junior developers on best practices for frontend architecture.
+
+WebFusion, Cedar Rapids, IA — Full Stack Developer
+March 2017 - January 2019
+Built RESTful APIs using Node.js and Express, integrating with MongoDB and PostgreSQL databases. Implemented frontend interfaces using Angular. Participated in agile development processes, including daily standups and sprint planning.
+
+CodeWorks, Seattle, WA — Junior Developer
+June 2015 - February 2017
+Maintained and updated legacy PHP applications. Assisted with migration to modern JavaScript frameworks. Developed internal tools to improve team productivity.
+
+EDUCATION
+
+University of Washington, Seattle — BS Computer Science
+September 2011 - May 2015
+GPA: 3.8/4.0
+
+SKILLS
+Languages: JavaScript, TypeScript, HTML, CSS, Python, SQL
+Frameworks: React, Vue.js, Angular, Node.js, Express
+Tools: Git, Webpack, Jest, Cypress, Docker
+Design: Figma, Adobe XD, Responsive Design, Accessibility
