@@ -1,0 +1,32 @@
+{
+  "name": "test_frontend",
+  "version": "1.0.0",
+  "description": "An MCP (Model Context Protocol) server that provides Puppeteer-based browser automation tools for frontend testing.",
+  "main": "dist/index.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc && node dist/index.js",
+    "test": "node test-mcp-integration.js"
+  },
+  "keywords": ["mcp", "puppeteer", "frontend-testing", "browser-automation"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0",
+    "puppeteer": "^21.0.0",
+    "js-yaml": "^4.1.0",
+    "joi": "^17.9.0",
+    "sharp": "^0.32.0",
+    "diff": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "@types/js-yaml": "^4.0.5",
+    "@types/diff": "^5.0.3"
+  }
+}

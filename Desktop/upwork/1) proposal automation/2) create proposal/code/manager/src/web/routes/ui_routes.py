@@ -16,10 +16,7 @@ def dashboard():
     # Get the task manager
     task_manager = current_app.config['TASK_MANAGER']
     
-    # Force synchronization with system processes
-    task_manager.sync_with_system()
-    
-    # Get instance list
+    # Get instance list first without synchronization for faster initial load
     instance_list = task_manager.list_instances()
     
     # Get current time

@@ -52,20 +52,30 @@ class ClaudeInstance:
     generation_time: str = "0s"
     content: Optional[str] = None
     metadata: Dict[str, Any] = field(default_factory=dict)
+    open_terminal: bool = False
+    tmux_content: Optional[str] = None  # Content captured from tmux session
 
     @classmethod
     def create(cls, project_dir: str, prompt_path: str, 
-               runtime_type: RuntimeType = RuntimeType.TMUX) -> 'ClaudeInstance':
+               runtime_type: RuntimeType = RuntimeType.TMUX,
+               open_terminal: bool = False) -> 'ClaudeInstance':
         """Factory method to create a new instance with defaults."""
+        # Import path utilities at the method level to avoid circular imports
+        from src.utils.path_utils import normalize_path
+        
+        # Normalize project directory to ensure consistency
+        normalized_project_dir = normalize_path(project_dir)
+        
         instance_id = str(uuid.uuid4())
         return cls(
             id=instance_id,
-            project_dir=project_dir,
+            project_dir=normalized_project_dir,
             prompt_path=prompt_path,
             start_time=time.time(),
             status=InstanceStatus.INITIALIZING,
             runtime_type=runtime_type,
-            use_tmux=runtime_type == RuntimeType.TMUX
+            use_tmux=runtime_type == RuntimeType.TMUX,
+            open_terminal=open_terminal
         )
 
     def to_dict(self) -> Dict[str, Any]:
@@ -87,7 +97,9 @@ class ClaudeInstance:
             "active_since": self.active_since,
             "ready_since": self.ready_since,
             "generation_time": self.generation_time,
-            "metadata": self.metadata
+            "metadata": self.metadata,
+            "open_terminal": self.open_terminal,
+            "tmux_content": self.tmux_content
         }
 
     @classmethod

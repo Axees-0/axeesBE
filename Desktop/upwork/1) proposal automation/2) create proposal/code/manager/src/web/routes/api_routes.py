@@ -17,6 +17,14 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 def get_instances():
     """Get all instances."""
     task_manager = current_app.config['TASK_MANAGER']
+    
+    # Get query parameter for sync (default to False)
+    sync = request.args.get('sync', 'false').lower() == 'true'
+    
+    # Only synchronize with system if explicitly requested
+    if sync:
+        task_manager.sync_with_system()
+        
     instances = task_manager.list_instances()
     return jsonify(instances)
 
@@ -332,3 +340,16 @@ def find_directory():
             
     # If not found, return the original name
     return jsonify({"path": dir_name})
+
+
+@api_bp.route('/project_dir/<project_id>', methods=['GET'])
+def get_project_dir(project_id):
+    """Get a project directory by ID."""
+    task_manager = current_app.config['TASK_MANAGER']
+    
+    project_dir = task_manager.find_project_dir_by_id(project_id)
+    
+    if project_dir:
+        return jsonify({"project_dir": project_dir})
+    else:
+        return jsonify({"error": "Project directory not found"}), 404

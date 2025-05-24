@@ -1,0 +1,25 @@
+2025-03-21 10:24:22,531 - src.backend.telegram_connector.app - INFO - Loading from PROJECT_ROOT: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828
+2025-03-21 10:24:22,532 - src.backend.telegram_connector.app - INFO - Found TELEGRAM_BOT_TOKEN in environment with ID: 7890390388
+2025-03-21 10:24:22,533 - __main__ - INFO - Project root: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828
+2025-03-21 10:24:22,534 - __main__ - INFO - Log directory: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\data\logs
+2025-03-21 10:24:28,134 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook']
+2025-03-21 10:24:28,169 - src.backend.telegram_connector.mt4_connector - INFO - MT4Connector initialized with API URL: http://localhost:5002/api 
+2025-03-21 10:24:28,169 - src.backend.telegram_connector.mt4_connector - INFO - MT4Connector using mock mode: False
+2025-03-21 10:24:28,169 - src.backend.telegram_connector.mt4_connector - INFO - Checking MT4 connection: http://localhost:5002/api /health
+2025-03-21 10:24:30,223 - src.backend.telegram_connector.mt4_connector - WARNING - MT4 connection failed: API returned status code: 404
+2025-03-21 10:24:30,223 - src.backend.telegram_connector.app - INFO - MT4Connector initialized with URL: http://localhost:5002/api , mock mode: False
+2025-03-21 10:24:30,563 - src.backend.telegram_connector.app - INFO - Setting up Telegram bot with token ID: 7890390388
+2025-03-21 10:24:36,232 - src.backend.telegram_connector.app - INFO - Attempting to delete any existing webhook
+2025-03-21 10:24:37,515 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7890390388:AAHAeOn_tzn1rihuEfpCCNZLzXReIF3fBD4/deleteWebhook "HTTP/1.1 200 OK"
+2025-03-21 10:24:37,517 - src.backend.telegram_connector.app - INFO - Successfully deleted any existing webhook
+2025-03-21 10:24:37,520 - src.backend.telegram_connector.bot - INFO - Token ID validated as numeric: 7890390388
+2025-03-21 10:24:40,873 - src.backend.telegram_connector.bot - INFO - Successfully created test Bot instance with the provided token
+2025-03-21 10:24:40,873 - src.backend.telegram_connector.bot - INFO - Telegram token validated with ID: 7890390388 and key: AAHAe...
+2025-03-21 10:24:40,879 - src.backend.telegram_connector.bot - INFO - Configured admin users: [123456789]
+2025-03-21 10:24:40,880 - src.backend.telegram_connector.bot - INFO - Configured allowed users: [123456789]
+2025-03-21 10:24:40,881 - src.backend.telegram_connector.bot - INFO - Attempting to build Application (attempt 1)
+2025-03-21 10:24:44,417 - src.backend.telegram_connector.bot - INFO - Application object successfully built
+2025-03-21 10:24:44,418 - src.backend.telegram_connector.bot - INFO - Creating new event loop for Telegram polling
+2025-03-21 10:24:45,953 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7890390388:AAHAeOn_tzn1rihuEfpCCNZLzXReIF3fBD4/getMe "HTTP/1.1 200 OK"
+2025-03-21 10:24:46,152 - httpx - INFO - HTTP Request: POST https://api.telegram.org/bot7890390388:AAHAeOn_tzn1rihuEfpCCNZLzXReIF3fBD4/deleteWebhook "HTTP/1.1 200 OK"
+2025-03-21 10:24:46,154 - telegram.ext.Application - INFO - Application started

@@ -1,0 +1,3 @@
+2025-03-20 12:16:52,029 - __main__ - INFO - Starting Telegram Connector health server on port 5001
+* Ignoring a call to 'app.run()' that would block the current 'flask' CLI command.
+Only call 'app.run()' in an 'if __name__ == "__main__"' guard.

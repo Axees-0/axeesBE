@@ -1,0 +1,37 @@
+name: Simple Navigation Test
+description: Test basic navigation and element interaction
+version: 1.0.0
+
+config:
+  headless: true
+  timeout: 15000
+
+steps:
+  - type: navigate
+    description: Go to example page
+    url: "https://example.com"
+    screenshot: true
+    
+  - type: wait
+    value: 2000
+    description: Wait for page to load
+    
+  - type: assertText
+    description: Check page title
+    selector: "h1"
+    expected: "Example Domain"
+    
+  - type: evaluate
+    description: Get page info
+    script: |
+      {
+        title: document.title,
+        url: window.location.href,
+        headingCount: document.querySelectorAll('h1, h2, h3').length
+      }
+    
+  - type: screenshot
+    description: Final screenshot
+    screenshot:
+      name: "example-com-final"
+      fullPage: true

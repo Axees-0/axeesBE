@@ -1,0 +1,103 @@
+# MT4 Terminal Integration Checklist
+
+## 📋 Step 1: Install MT4 Terminal on Windows
+- [x] Ensure access to a Windows machine (dedicated, VM, or Parallels Desktop)
+- [x] Copy and install `src/backend/CloudTrader.4.terminal.setup.exe`
+- [x] Enter credentials during installation:
+  - Server: CLOUD TRADER MT
+  - Login: 80000300
+  - Password: D7m!NMg&tteB
+- [x] Verify successful login to MT4 terminal
+- [x] Ensure terminal remains running at all times
+
+## 📋 Step 2: Prepare MT4 Manager API Files
+- [x] Locate `mtmanapi.dll` and `mtmanapi64.dll` in MT4 installation directory
+- [x] Copy both files to `src/backend/MT4RestfulAPIWrapper/`
+- [x] Verify the files have proper permissions (read/execute)
+
+## 📋 Step 3: Configure Environment Variables
+- [x] Create/edit `.env` file in project root with the following:
+```
+# MT4 API Configuration
+MT4_SERVER=localhost
+MT4_PORT=443
+MT4_LOGIN=80000300
+MT4_PASSWORD=D7m!NMg&tteB
+USE_MOCK_MODE=false
+PORT=5002
+
+# Webhook API Configuration
+WEBHOOK_API_PORT=5003
+
+# Telegram connector configuration
+TELEGRAM_BOT_TOKEN=7890390388:AAHAeOn_tzn1rihuEfpCCNZLzXReIF3fBD4
+TELEGRAM_BOT_LINK=https://t.me/solotrendx_pocketoption_bot
+TELEGRAM_CHAT_ID=6737051045
+ADMIN_USER_IDS=123456789
+ALLOWED_USER_IDS=123456789
+FLASK_PORT=5005
+```
+- [x] Replace Telegram configuration with actual values
+- [x] Verify the .env file is saved in the correct location
+
+## 📋 Step 4: Modify start_all_services.bat Script
+- [x] Edit `tests/start_all_services.bat` to use real MT4 API:
+  - [x] Set `USE_MOCK_MODE=false`
+  - [x] Add MT4 credentials (server, port, login, password)
+  - [x] Update Telegram configuration values
+- [x] Save the modified script
+
+## 📋 Step 5: Verify MT4 Terminal Status
+- [x] Confirm MT4 terminal is running on Windows
+- [x] Verify active login to the broker account
+- [x] Check terminal connection status (green connection indicator)
+- [x] Ensure Expert Advisors are enabled (smiling face icon)
+- [x] Test connection using check_mt4_connection.bat
+
+## 📋 Step 6: Start Services
+- [x] Run the modified start_all_services.bat script
+- [x] Monitor console output for errors
+- [x] Check each component starts successfully:
+  - [x] MT4 REST API
+  - [x] Webhook API
+  - [x] Telegram Bot
+
+## 📋 Step 7: Verify Connections
+- [x] Run check_services.bat to verify all components
+- [x] Review logs for errors:
+  - [x] data\logs\mt4_rest_api.log
+  - [x] data\logs\webhook_api.log
+  - [x] data\logs\telegram_connector.log
+- [x] Test API endpoints manually:
+  - [x] MT4 API health: http://localhost:5002/api/health
+  - [x] Webhook API: http://localhost:5003/health
+  - [x] Telegram connector: http://localhost:5005/health
+
+## 📋 Step 8: Test with Sample Signal
+- [x] Generate test trade signal using test_signal.bat
+- [x] Check Telegram bot for notification
+- [x] Execute the trade via Telegram button
+- [x] Verify the order appears in MT4 terminal
+
+## ⚠️ Troubleshooting
+- MT4 Connection Issues:
+  - [ ] Verify MT4 is running and logged in
+  - [ ] Check login credentials in .env file
+  - [ ] Confirm MT4 server allows API connections
+  - [ ] Restart MT4 terminal if necessary
+
+- DLL Loading Issues:
+  - [ ] Verify DLL files are in correct location
+  - [ ] Run command prompt as Administrator
+  - [ ] Check Windows Event Viewer for errors
+
+- Telegram Bot Issues:
+  - [ ] Verify bot token is correct
+  - [ ] Ensure conversation with bot is started
+  - [ ] Check chat ID configuration
+
+- Path Issues:
+  - [ ] Check for spaces or special characters in paths
+  - [ ] Verify all paths are correct for Windows environment
+
+IMPORTANT: This checklist must be followed step by step, checking off each item before proceeding to the next. Claude should reference this checklist for every MT4 terminal integration task.

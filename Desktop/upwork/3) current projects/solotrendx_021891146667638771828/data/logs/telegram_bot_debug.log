@@ -1,0 +1,1123 @@
+2025-03-20 12:16:53,977 - __main__ - ERROR - Error starting Telegram Connector: No module named 'dotenv'
+Traceback (most recent call last):
+File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/run.py", line 30, in main
+from src.backend.telegram_connector.app import create_app
+File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/app.py", line 5, in <module>
+from dotenv import load_dotenv
+ModuleNotFoundError: No module named 'dotenv'
+2025-03-20 13:34:34,112 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:206]
+2025-03-20 14:00:39,903 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:310]
+2025-03-20 14:00:54,594 - src.backend.telegram_connector.routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025- 0-ThT14:00:52', 'source': 'test_signal_bat'} - [routes.py:106]
+2025-03-20 14:00:54,596 - src.backend.telegram_connector.routes - ERROR - Bot not initialized or properly configured - [routes.py:169]
+2025-03-20 14:00:54,959 - src.backend.telegram_connector.routes - INFO - GET request received at webhook endpoint - [routes.py:90]
+2025-03-20 14:05:19,678 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:310]
+2025-03-20 14:05:46,628 - src.backend.telegram_connector.routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025- 0-ThT14:05:44', 'source': 'test_signal_bat'} - [routes.py:106]
+2025-03-20 14:05:46,629 - src.backend.telegram_connector.routes - ERROR - Bot not initialized or properly configured - [routes.py:169]
+2025-03-20 14:05:46,974 - src.backend.telegram_connector.routes - INFO - GET request received at webhook endpoint - [routes.py:90]
+2025-03-20 14:26:03,327 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:336]
+2025-03-20 16:58:07,869 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:336]
+2025-03-20 17:03:37,809 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:336]
+2025-03-20 17:06:31,861 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:336]
+2025-03-20 17:06:58,376 - src.backend.telegram_connector.routes - INFO - GET request received at webhook endpoint - [routes.py:90]
+2025-03-20 17:07:00,762 - src.backend.telegram_connector.routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-20T17:06:58.729510', 'source': 'webhook_api'} - [routes.py:106]
+2025-03-20 17:07:00,763 - src.backend.telegram_connector.routes - ERROR - Bot not initialized or properly configured - [routes.py:169]
+2025-03-20 17:07:00,764 - src.backend.telegram_connector.routes - ERROR - Bot initialization failed and not in mock mode. Issue: Unknown issue with Telegram bot initialization - [routes.py:200]
+2025-03-20 17:14:41,928 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:303]
+2025-03-20 17:15:03,948 - src.backend.telegram_connector.routes - INFO - GET request received at webhook endpoint - [routes.py:90]
+2025-03-20 17:15:06,301 - src.backend.telegram_connector.routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-20T17:15:04.255037', 'source': 'webhook_api'} - [routes.py:106]
+2025-03-20 17:15:06,304 - src.backend.telegram_connector.routes - ERROR - Bot not initialized or properly configured - [routes.py:169]
+2025-03-20 17:15:06,305 - src.backend.telegram_connector.routes - WARNING - Using forced mock mode, returning success despite bot initialization failure: Unknown issue with Telegram bot initialization - [routes.py:189]
+2025-03-20 17:15:06,306 - src.backend.telegram_connector.routes - INFO - MOCK MODE: Simulating successful processing of signal for EURUSD - [routes.py:190]
+2025-03-20 17:30:22,810 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-20 17:30:40,076 - src.backend.telegram_connector.routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-20T17:30:38.015046', 'source': 'webhook_api'} - [routes.py:106]
+2025-03-20 17:30:40,080 - src.backend.telegram_connector.routes - ERROR - Bot not initialized or properly configured - [routes.py:167]
+2025-03-20 17:30:40,081 - src.backend.telegram_connector.routes - INFO - Using fallback signal processing method - [routes.py:174]
+2025-03-20 17:30:42,629 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-20 17:30:42,654 - src.backend.telegram_connector.signal_handler - WARNING - Failed to send using notify_admins, trying direct send - [signal_handler.py:501]
+2025-03-20 17:30:45,097 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-20 17:30:45,107 - src.backend.telegram_connector.signal_handler - ERROR - All sending methods failed - [signal_handler.py:520]
+2025-03-20 17:30:45,109 - src.backend.telegram_connector.telegram_sender - INFO - Using admin user as default chat ID: 123456789 - [telegram_sender.py:78]
+2025-03-20 17:30:47,795 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Chat not found - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Chat not found
+2025-03-20 17:30:47,805 - src.backend.telegram_connector.routes - WARNING - Using forced mock mode, returning success despite all processing failures - [routes.py:285]
+2025-03-20 17:30:47,806 - src.backend.telegram_connector.routes - INFO - MOCK MODE: Simulating successful processing of signal for EURUSD - [routes.py:286]
+2025-03-20 17:35:45,779 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 10:23:04,267 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 10:24:28,134 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 10:27:37,915 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 10:36:22,669 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 10:39:18,343 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 10:47:54,282 - src.backend.telegram_connector.routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 10:49:13,250 - src.backend.telegram_connector.routes - INFO - GET request received at webhook endpoint - [routes.py:90]
+2025-03-21 10:49:15,675 - src.backend.telegram_connector.routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T10:49:13.601725', 'source': 'webhook_api'} - [routes.py:106]
+2025-03-21 10:49:15,676 - src.backend.telegram_connector.routes - ERROR - Bot not initialized or properly configured - [routes.py:167]
+2025-03-21 10:49:15,677 - src.backend.telegram_connector.routes - INFO - Using fallback signal processing method - [routes.py:174]
+2025-03-21 10:49:18,237 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-21 10:49:18,265 - src.backend.telegram_connector.signal_handler - WARNING - Failed to send using notify_admins, trying direct send - [signal_handler.py:501]
+2025-03-21 10:49:20,757 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-21 10:49:20,771 - src.backend.telegram_connector.signal_handler - ERROR - All sending methods failed - [signal_handler.py:520]
+2025-03-21 10:49:20,773 - src.backend.telegram_connector.telegram_sender - INFO - Using admin user as default chat ID: 123456789 - [telegram_sender.py:78]
+2025-03-21 10:49:23,487 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Chat not found - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Chat not found
+2025-03-21 10:49:23,496 - src.backend.telegram_connector.routes - WARNING - Using forced mock mode, returning success despite all processing failures - [routes.py:285]
+2025-03-21 10:49:23,497 - src.backend.telegram_connector.routes - INFO - MOCK MODE: Simulating successful processing of signal for EURUSD - [routes.py:286]
+2025-03-21 11:02:31,284 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:412]
+2025-03-21 11:09:09,238 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:412]
+2025-03-21 11:10:38,663 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:412]
+2025-03-21 11:10:42,429 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.0765, 'sl': 1.073, 'tp1': 1.08, 'tp2': 1.085, 'tp3': 1.09, 'timeframe': 'H1', 'strategy': 'SoloTrend X Test', 'risk': '1%', 'timestamp': '2025-03-21T11:10:42.425081', 'source': 'test_script'} - [routes.py:115]
+2025-03-21 11:10:42,429 - routes - ERROR - Bot token is invalid or missing - [routes.py:123]
+2025-03-21 11:10:42,429 - routes - INFO - Using fallback signal processing method - [routes.py:183]
+2025-03-21 11:10:42,441 - telegram_sender - INFO - Telegram sender initialized with 1 admin users - [telegram_sender.py:50]
+2025-03-21 11:10:42,441 - telegram_sender - INFO - Admin user IDs: ['123456789'] - [telegram_sender.py:52]
+2025-03-21 11:10:42,442 - telegram_sender - INFO - Using Telegram bot token with ID: 7890390388 - [telegram_sender.py:62]
+2025-03-21 11:10:42,442 - routes - INFO - Using local telegram_sender module - [routes.py:191]
+2025-03-21 11:10:42,442 - routes - INFO - Using local _process_with_sender function - [routes.py:202]
+2025-03-21 11:10:42,442 - telegram_sender - INFO - Attempting to send notification to admin: 123456789 - [telegram_sender.py:211]
+2025-03-21 11:10:42,982 - telegram_sender - WARNING - Markdown parsing error, retrying without parse mode: Can't parse entities: can't find end of the entity starting at byte offset 156 - [telegram_sender.py:133]
+2025-03-21 11:10:43,376 - telegram_sender - ERROR - Failed to send Telegram message: Chat not found - [telegram_sender.py:146]
+Traceback (most recent call last):
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/telegram_sender.py", line 122, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 313, in decorator
+    result = await func(*args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 723, in send_message
+    return await self._send_message(  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<13 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 467, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 395, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 426, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 167, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 330, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 156
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/telegram_sender.py", line 134, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 313, in decorator
+    result = await func(*args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 723, in send_message
+    return await self._send_message(  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<13 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 467, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 395, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 426, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 167, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 330, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Chat not found
+2025-03-21 11:10:43,388 - telegram_sender - INFO - Retrying sending to admin 123456789 without parse mode - [telegram_sender.py:219]
+2025-03-21 11:10:44,147 - telegram_sender - ERROR - Failed to send Telegram message: Chat not found - [telegram_sender.py:146]
+Traceback (most recent call last):
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/telegram_sender.py", line 144, in send_telegram_message
+    raise parse_error
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/telegram_sender.py", line 122, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 313, in decorator
+    result = await func(*args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 723, in send_message
+    return await self._send_message(  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<13 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 467, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 395, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 426, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 167, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 330, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Chat not found
+2025-03-21 11:10:44,151 - telegram_sender - WARNING - Failed to send notification to any admin - [telegram_sender.py:234]
+2025-03-21 11:10:44,151 - signal_handler - WARNING - Failed to send using notify_admins, trying direct send - [signal_handler.py:507]
+2025-03-21 11:10:44,736 - telegram_sender - WARNING - Markdown parsing error, retrying without parse mode: Can't parse entities: can't find end of the entity starting at byte offset 156 - [telegram_sender.py:133]
+2025-03-21 11:10:45,134 - telegram_sender - ERROR - Failed to send Telegram message: Chat not found - [telegram_sender.py:146]
+Traceback (most recent call last):
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/telegram_sender.py", line 122, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 313, in decorator
+    result = await func(*args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 723, in send_message
+    return await self._send_message(  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<13 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 467, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 395, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 426, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 167, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 330, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 156
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_021891146667638771828/src/backend/telegram_connector/telegram_sender.py", line 134, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 313, in decorator
+    result = await func(*args, **kwargs)  # skipcq: PYL-E1102
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 723, in send_message
+    return await self._send_message(  # type: ignore[return-value]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<13 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 467, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 395, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/_bot.py", line 426, in _do_post
+    return await request.post(
+           ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 167, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "/Users/Mike/Desktop/upwork/3) current projects/solotrendx_old/old/telegram/new_venv/lib/python3.13/site-packages/telegram/request/_baserequest.py", line 330, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Chat not found
+2025-03-21 11:10:45,140 - signal_handler - ERROR - All sending methods failed - [signal_handler.py:526]
+2025-03-21 11:10:45,821 - telegram_sender - INFO - Message sent to 6737051045: 🔔 *SIGNAL: EURUSD BUY*
+💰 Price: 1.0765
+📊 Volume: 0... - [telegram_sender.py:128]
+2025-03-21 11:10:45,823 - routes - INFO - Signal processed successfully using send_trade_notification - [routes.py:291]
+2025-03-21 11:11:50,956 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:412]
+2025-03-21 11:13:12,442 - routes - INFO - GET request received at webhook endpoint - [routes.py:99]
+2025-03-21 11:13:14,827 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T11:13:12.773237', 'source': 'webhook_api'} - [routes.py:115]
+2025-03-21 11:13:14,828 - routes - ERROR - Bot token is invalid or missing - [routes.py:123]
+2025-03-21 11:13:14,829 - routes - INFO - Using fallback signal processing method - [routes.py:183]
+2025-03-21 11:13:14,850 - telegram_sender - INFO - Telegram sender initialized with 1 admin users - [telegram_sender.py:50]
+2025-03-21 11:13:14,851 - telegram_sender - INFO - Admin user IDs: ['123456789'] - [telegram_sender.py:52]
+2025-03-21 11:13:14,852 - telegram_sender - INFO - Using Telegram bot token with ID: 7890390388 - [telegram_sender.py:62]
+2025-03-21 11:13:14,852 - routes - INFO - Using local telegram_sender module - [routes.py:191]
+2025-03-21 11:13:14,853 - routes - INFO - Using local _process_with_sender function - [routes.py:202]
+2025-03-21 11:13:14,855 - telegram_sender - INFO - Attempting to send notification to admin: 123456789 - [telegram_sender.py:211]
+2025-03-21 11:13:17,227 - telegram_sender - WARNING - Markdown parsing error, retrying without parse mode: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:133]
+2025-03-21 11:13:17,651 - telegram_sender - ERROR - Failed to send Telegram message: Chat not found - [telegram_sender.py:146]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 122, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 134, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Chat not found
+2025-03-21 11:13:17,682 - telegram_sender - INFO - Retrying sending to admin 123456789 without parse mode - [telegram_sender.py:219]
+2025-03-21 11:13:20,164 - telegram_sender - ERROR - Failed to send Telegram message: Chat not found - [telegram_sender.py:146]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 144, in send_telegram_message
+    raise parse_error
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 122, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Chat not found
+2025-03-21 11:13:20,172 - telegram_sender - WARNING - Failed to send notification to any admin - [telegram_sender.py:234]
+2025-03-21 11:13:20,172 - signal_handler - WARNING - Failed to send using notify_admins, trying direct send - [signal_handler.py:507]
+2025-03-21 11:13:22,410 - telegram_sender - WARNING - Markdown parsing error, retrying without parse mode: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:133]
+2025-03-21 11:13:22,821 - telegram_sender - ERROR - Failed to send Telegram message: Chat not found - [telegram_sender.py:146]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 122, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 134, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Chat not found
+2025-03-21 11:13:22,837 - signal_handler - ERROR - All sending methods failed - [signal_handler.py:526]
+2025-03-21 11:13:25,762 - routes - INFO - Signal processed successfully using send_trade_notification - [routes.py:291]
+2025-03-21 11:20:29,165 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:412]
+2025-03-21 11:20:46,632 - routes - INFO - GET request received at webhook endpoint - [routes.py:99]
+2025-03-21 11:20:49,008 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T11:20:46.942237', 'source': 'webhook_api'} - [routes.py:115]
+2025-03-21 11:20:49,009 - routes - ERROR - Bot token is invalid or missing - [routes.py:123]
+2025-03-21 11:20:49,010 - routes - INFO - Using fallback signal processing method - [routes.py:183]
+2025-03-21 11:20:49,079 - routes - ERROR - All fallback approaches failed: cannot import name 'send_trade_notification' from 'src.backend.telegram_connector.telegram_sender' (\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py) - [routes.py:304]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\routes.py", line 190, in _process_with_fallback
+    from telegram_sender import send_trade_notification, notify_admins
+ImportError: cannot import name 'send_trade_notification' from 'telegram_sender' (\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\routes.py", line 194, in _process_with_fallback
+    from src.backend.telegram_connector.telegram_sender import send_trade_notification, notify_admins
+ImportError: cannot import name 'send_trade_notification' from 'src.backend.telegram_connector.telegram_sender' (\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py)
+2025-03-21 11:20:49,100 - routes - WARNING - Using forced mock mode, returning success despite all processing failures - [routes.py:308]
+2025-03-21 11:20:49,100 - routes - INFO - MOCK MODE: Simulating successful processing of signal for EURUSD - [routes.py:309]
+2025-03-21 11:21:25,807 - routes - INFO - GET request received at webhook endpoint - [routes.py:99]
+2025-03-21 11:21:28,165 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T11:21:26.124411', 'source': 'webhook_api'} - [routes.py:115]
+2025-03-21 11:21:28,166 - routes - ERROR - Bot token is invalid or missing - [routes.py:123]
+2025-03-21 11:21:28,167 - routes - INFO - Using fallback signal processing method - [routes.py:183]
+2025-03-21 11:21:28,168 - routes - ERROR - All fallback approaches failed: cannot import name 'send_trade_notification' from 'src.backend.telegram_connector.telegram_sender' (\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py) - [routes.py:304]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\routes.py", line 190, in _process_with_fallback
+    from telegram_sender import send_trade_notification, notify_admins
+ImportError: cannot import name 'send_trade_notification' from 'telegram_sender' (\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\routes.py", line 194, in _process_with_fallback
+    from src.backend.telegram_connector.telegram_sender import send_trade_notification, notify_admins
+ImportError: cannot import name 'send_trade_notification' from 'src.backend.telegram_connector.telegram_sender' (\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py)
+2025-03-21 11:21:28,193 - routes - WARNING - Using forced mock mode, returning success despite all processing failures - [routes.py:308]
+2025-03-21 11:21:28,193 - routes - INFO - MOCK MODE: Simulating successful processing of signal for EURUSD - [routes.py:309]
+2025-03-21 11:24:06,615 - routes - INFO - GET request received at webhook endpoint - [routes.py:99]
+2025-03-21 11:24:08,997 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T11:24:06.933989', 'source': 'webhook_api'} - [routes.py:115]
+2025-03-21 11:24:08,998 - routes - ERROR - Bot token is invalid or missing - [routes.py:123]
+2025-03-21 11:24:08,999 - routes - INFO - Using fallback signal processing method - [routes.py:183]
+2025-03-21 11:24:08,999 - routes - ERROR - All fallback approaches failed: cannot import name 'send_trade_notification' from 'src.backend.telegram_connector.telegram_sender' (\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py) - [routes.py:304]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\routes.py", line 190, in _process_with_fallback
+    from telegram_sender import send_trade_notification, notify_admins
+ImportError: cannot import name 'send_trade_notification' from 'telegram_sender' (\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\routes.py", line 194, in _process_with_fallback
+    from src.backend.telegram_connector.telegram_sender import send_trade_notification, notify_admins
+ImportError: cannot import name 'send_trade_notification' from 'src.backend.telegram_connector.telegram_sender' (\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py)
+2025-03-21 11:24:09,025 - routes - WARNING - Using forced mock mode, returning success despite all processing failures - [routes.py:308]
+2025-03-21 11:24:09,026 - routes - INFO - MOCK MODE: Simulating successful processing of signal for EURUSD - [routes.py:309]
+2025-03-21 11:24:35,437 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:428]
+2025-03-21 11:24:46,782 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T11:24:42.688669', 'source': 'webhook_api'} - [routes.py:115]
+2025-03-21 11:24:46,783 - routes - ERROR - Bot token is invalid or missing - [routes.py:123]
+2025-03-21 11:24:46,784 - routes - INFO - Using fallback signal processing method - [routes.py:183]
+2025-03-21 11:24:46,811 - routes - INFO - Using local telegram_sender module - [routes.py:191]
+2025-03-21 11:24:46,812 - routes - INFO - Using local _process_with_sender function - [routes.py:202]
+2025-03-21 11:24:52,169 - signal_handler - WARNING - Failed to send using notify_admins, trying direct send - [signal_handler.py:539]
+2025-03-21 11:24:54,920 - signal_handler - ERROR - All sending methods failed - [signal_handler.py:558]
+2025-03-21 11:24:54,921 - routes - ERROR - Error in send_trade_notification_sync: name 'send_trade_notification_sync' is not defined - [routes.py:292]
+2025-03-21 11:24:54,922 - routes - WARNING - Using forced mock mode, returning success despite all processing failures - [routes.py:324]
+2025-03-21 11:24:54,923 - routes - INFO - MOCK MODE: Simulating successful processing of signal for EURUSD - [routes.py:325]
+2025-03-21 11:26:00,098 - routes - INFO - GET request received at webhook endpoint - [routes.py:99]
+2025-03-21 11:26:02,449 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T11:26:00.403004', 'source': 'webhook_api'} - [routes.py:115]
+2025-03-21 11:26:02,450 - routes - ERROR - Bot token is invalid or missing - [routes.py:123]
+2025-03-21 11:26:02,451 - routes - INFO - Using fallback signal processing method - [routes.py:183]
+2025-03-21 11:26:02,451 - routes - INFO - Using local telegram_sender module - [routes.py:191]
+2025-03-21 11:26:02,452 - routes - INFO - Using local _process_with_sender function - [routes.py:202]
+2025-03-21 11:26:07,967 - signal_handler - WARNING - Failed to send using notify_admins, trying direct send - [signal_handler.py:539]
+2025-03-21 11:26:10,907 - signal_handler - ERROR - All sending methods failed - [signal_handler.py:558]
+2025-03-21 11:26:10,908 - routes - ERROR - Error in send_trade_notification_sync: name 'send_trade_notification_sync' is not defined - [routes.py:292]
+2025-03-21 11:26:10,909 - routes - WARNING - Using forced mock mode, returning success despite all processing failures - [routes.py:324]
+2025-03-21 11:26:10,910 - routes - INFO - MOCK MODE: Simulating successful processing of signal for EURUSD - [routes.py:325]
+2025-03-21 11:26:38,115 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 11:27:05,673 - routes - INFO - GET request received at webhook endpoint - [routes.py:90]
+2025-03-21 11:27:08,061 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T11:27:06.005511', 'source': 'webhook_api'} - [routes.py:106]
+2025-03-21 11:27:08,062 - routes - ERROR - Bot not initialized or properly configured - [routes.py:167]
+2025-03-21 11:27:08,063 - routes - INFO - Using fallback signal processing method - [routes.py:174]
+2025-03-21 11:27:10,496 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-21 11:27:10,519 - src.backend.telegram_connector.signal_handler - WARNING - Failed to send using notify_admins, trying direct send - [signal_handler.py:501]
+2025-03-21 11:27:13,019 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-21 11:27:13,027 - src.backend.telegram_connector.signal_handler - ERROR - All sending methods failed - [signal_handler.py:520]
+2025-03-21 11:27:13,029 - src.backend.telegram_connector.telegram_sender - INFO - Using admin user as default chat ID: 123456789 - [telegram_sender.py:78]
+2025-03-21 11:27:15,685 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Chat not found - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Chat not found
+2025-03-21 11:27:15,695 - routes - WARNING - Using forced mock mode, returning success despite all processing failures - [routes.py:285]
+2025-03-21 11:27:15,696 - routes - INFO - MOCK MODE: Simulating successful processing of signal for EURUSD - [routes.py:286]
+2025-03-21 11:28:28,990 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 11:28:48,675 - routes - INFO - GET request received at webhook endpoint - [routes.py:90]
+2025-03-21 11:28:51,068 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T11:28:49.005932', 'source': 'webhook_api'} - [routes.py:106]
+2025-03-21 11:28:51,070 - routes - ERROR - Bot not initialized or properly configured - [routes.py:167]
+2025-03-21 11:28:51,070 - routes - INFO - Using fallback signal processing method - [routes.py:174]
+2025-03-21 11:28:53,580 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-21 11:28:53,607 - src.backend.telegram_connector.signal_handler - WARNING - Failed to send using notify_admins, trying direct send - [signal_handler.py:501]
+2025-03-21 11:28:56,104 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-21 11:28:56,112 - src.backend.telegram_connector.signal_handler - ERROR - All sending methods failed - [signal_handler.py:520]
+2025-03-21 11:28:58,742 - routes - INFO - Signal processed successfully using send_trade_notification - [routes.py:268]
+2025-03-21 15:28:31,674 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 15:39:55,632 - routes - INFO - Registered routes: ['/static/<path:filename>', '/api/status', '/api/execute_trade', '/webhook', '/webhook'] - [routes.py:389]
+2025-03-21 15:40:19,877 - routes - INFO - GET request received at webhook endpoint - [routes.py:90]
+2025-03-21 15:40:22,277 - routes - INFO - Received signal from Webhook API: {'symbol': 'EURUSD', 'side': 'BUY', 'price': 1.1234, 'sl': 1.12, 'tp1': 1.13, 'strategy': 'SoloTrend X Test', 'timestamp': '2025-03-21T15:40:20.188118', 'source': 'webhook_api'} - [routes.py:106]
+2025-03-21 15:40:22,278 - routes - ERROR - Bot not initialized or properly configured - [routes.py:167]
+2025-03-21 15:40:22,278 - routes - INFO - Using fallback signal processing method - [routes.py:174]
+2025-03-21 15:40:24,650 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-21 15:40:24,675 - src.backend.telegram_connector.signal_handler - WARNING - Failed to send using notify_admins, trying direct send - [signal_handler.py:501]
+2025-03-21 15:40:27,018 - src.backend.telegram_connector.telegram_sender - ERROR - Failed to send Telegram message: Can't parse entities: can't find end of the entity starting at byte offset 158 - [telegram_sender.py:111]
+Traceback (most recent call last):
+  File "\\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector\telegram_sender.py", line 102, in send_telegram_message
+    await bot.send_message(
+    ...<4 lines>...
+    )
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 1091, in send_message
+    return await self._send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<19 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 803, in _send_message
+    result = await self._post(
+             ^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 691, in _post
+    return await self._do_post(
+           ^^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\_bot.py", line 720, in _do_post
+    result = await request.post(
+             ^^^^^^^^^^^^^^^^^^^
+    ...<6 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 197, in post
+    result = await self._request_wrapper(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv\Lib\site-packages\telegram\request\_baserequest.py", line 353, in _request_wrapper
+    raise BadRequest(message)
+telegram.error.BadRequest: Can't parse entities: can't find end of the entity starting at byte offset 158
+2025-03-21 15:40:27,026 - src.backend.telegram_connector.signal_handler - ERROR - All sending methods failed - [signal_handler.py:520]
+2025-03-21 15:40:29,531 - routes - INFO - Signal processed successfully using send_trade_notification - [routes.py:268]

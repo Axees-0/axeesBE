@@ -1,9 +1,0 @@
-Hello Claude! This is a test prompt created by the test_instance.py script.
-
-Your task is to analyze this project and provide a summary of what you find.
-
-1. What files are in the current directory?
-2. What does this project seem to do?
-3. How would you improve the code structure?
-
-Please provide a detailed analysis of the codebase.

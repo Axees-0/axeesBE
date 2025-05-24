@@ -1,0 +1,20 @@
+Service startup initiated at Fri 03/21/2025 10:22:37.41 
+Virtual environment: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv 
+Path configuration: 
+- MT4 API Directory: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\MT4RestfulAPIWrapper 
+- Webhook Directory: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\webhook_api 
+- Telegram Directory: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\src\backend\telegram_connector 
+- Log Directory: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\data\logs 
+Reading port settings from .env file... 
+Using port configuration: 
+- MT4 API Port: 5002 
+- Webhook API Port: 5003 
+- Telegram Port: 5005 
+Starting MT4 REST API on port 5002... 
+MT4 API started 
+Starting Webhook API on port 5003... 
+Webhook API started 
+Starting Telegram Bot on port 5005... 
+Telegram Bot started 
+All components started! 
+Service startup completed at Fri 03/21/2025 10:22:46.80 

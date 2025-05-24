@@ -1,0 +1,55 @@
+{
+  "tradingview": {
+    "valid": {
+      "symbol": "EURUSD",
+      "side": "BUY",
+      "price": 1.0876,
+      "sl": 1.0826,
+      "tp1": 1.0926,
+      "tp2": 1.0976,
+      "tp3": 1.1026,
+      "currentTimeframe": "H1",
+      "strategy": "SOLOTREND X",
+      "risk": "1%",
+      "expiration": "2h"
+    },
+    "invalid": {
+      "symbol": "EURUSD",
+      "price": 1.0876
+    }
+  },
+  "ea": {
+    "open_buy": {
+      "symbol": "EURUSD",
+      "action": "OPEN_BUY",
+      "price": 1.0876,
+      "sl": 1.0826,
+      "tp": 1.0926,
+      "volume": 0.1
+    },
+    "close_buy": {
+      "symbol": "EURUSD",
+      "action": "CLOSE_BUY",
+      "ticket": 12345,
+      "price": 1.0876,
+      "profit": 10.5
+    },
+    "modify": {
+      "symbol": "EURUSD",
+      "action": "MODIFY",
+      "ticket": 12345,
+      "new_sl": 1.0850,
+      "new_tp": 1.0950
+    },
+    "trail": {
+      "symbol": "EURUSD",
+      "action": "TRAIL",
+      "ticket": 12345,
+      "new_sl": 1.0850
+    },
+    "invalid": {
+      "symbol": "EURUSD",
+      "action": "INVALID"
+    }
+  }
+}

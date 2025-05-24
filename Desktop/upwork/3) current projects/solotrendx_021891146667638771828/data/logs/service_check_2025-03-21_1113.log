@@ -1,0 +1,139 @@
+Service check started at Fri 03/21/2025 11:13:08.07 
+Virtual environment: \\Mac\Home\Desktop\upwork\3) current projects\solotrendx_021891146667638771828\environment\python\venv 
+Virtual environment activated 
+Using port configuration: 
+- MT4 API Port: 5002 
+- Webhook API Port: 5003 
+- Telegram Port: 5005 
+Checking if services are running... 
+Checking logs for errors... 
+Checking MT4 REST API logs for errors: 
+Checking Webhook API logs for errors: 
+2025-03-20 12:58:40,597 - webhook_api.app - ERROR - Error forwarding to Telegram: 404 - {
+  "status": "error"
+2025-03-20 13:01:08,482 - webhook_api.app - ERROR - Error forwarding to Telegram: 404 - {
+  "status": "error"
+2025-03-20 13:09:36,114 - webhook_api.app - ERROR - Error forwarding to Telegram: 404 - {
+  "status": "error"
+2025-03-20 13:23:30,856 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6E055ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:23:30,858 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000002C6E055ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:25:24,630 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000266E117ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:25:24,631 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x00000266E117ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:28:14,110 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024A2A61ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:28:14,111 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024A2A61ECF0>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:28:54,126 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024A2A662350>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 13:28:54,127 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5001): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000024A2A662350>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+  "status": "error"
+  "status": "error"
+  "status": "error"
+2025-03-20 14:00:54,604 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "status": "error"
+2025-03-20 14:00:54,604 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "status": "error"
+2025-03-20 14:00:54,604 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "status": "error"
+  "status": "error"
+  "status": "error"
+  "status": "error"
+2025-03-20 14:05:46,635 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "status": "error"
+2025-03-20 14:05:46,635 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "status": "error"
+2025-03-20 14:05:46,635 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "status": "error"
+  "status": "error"
+  "status": "error"
+  "status": "error"
+2025-03-20 17:07:00,770 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "status": "error"
+2025-03-20 17:07:00,770 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "status": "error"
+2025-03-20 17:07:00,770 - webhook_api.app - ERROR - Error forwarding to Telegram: 500 - {
+  "status": "error"
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+2025-03-20 17:36:14,632 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508ABBEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:36:14,632 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508ABBEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:36:14,632 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508ABBEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:36:14,634 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508ABBEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:36:14,634 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508ABBEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:36:14,634 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508ABBEE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:37:53,719 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508AC02490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:37:53,719 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508AC02490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:37:53,719 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508AC02490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:37:53,721 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508AC02490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:37:53,721 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508AC02490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-20 17:37:53,721 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x000001508AC02490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:29:01,628 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6D5EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:29:01,628 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6D5EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:29:01,628 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6D5EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:29:01,629 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6D5EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:29:01,629 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6D5EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:29:01,629 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6D5EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:30:53,810 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:30:53,810 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:30:53,810 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:30:53,812 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:30:53,812 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:30:53,812 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:31:13,158 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:31:13,158 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:31:13,158 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:31:13,162 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:31:13,162 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:31:13,162 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000020CB6DA3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:36:40,908 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855C6EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:36:40,908 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855C6EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:36:40,908 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855C6EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:36:40,909 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855C6EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:36:40,909 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855C6EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:36:40,909 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855C6EE40>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:21,499 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:21,499 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:21,499 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:21,501 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:21,501 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:21,501 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB2490>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:35,880 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:35,880 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:35,880 - webhook_api.app - ERROR - Inner request error: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:35,900 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:35,900 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+2025-03-21 10:37:35,900 - webhook_api.app - ERROR - Request error forwarding to Telegram: HTTPConnectionPool(host='localhost', port=5005): Max retries exceeded with url: /webhook (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x0000019855CB3250>: Failed to establish a new connection: [WinError 10061] No connection could be made because the target machine actively refused it'))
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+  "message": "Signal received and processed in mock mode (all handlers failed but continuing)",
+Checking Telegram Connector logs for errors: 
+2025-03-20 12:51:12,082 - src.backend.telegram_connector.bot - ERROR - Telegram bot token not provided
+1. Checking MT4 REST API (port 5002)... 
+MT4 REST API is running. 
+{"data":{"healthy":true,"service":"MT4 REST API","time":"2025-03-21T18:13:09.449700"},"status":"success"}
+2. Checking Webhook API (port 5003)... 
+Webhook API is running. 
+{"service":"webhook_api","status":"ok"}
+3. Checking Telegram Connector (port 5005)... 
+Telegram Connector is running. 
+{
+  "components": {
+    "mt4_api": "error",
+    "telegram": "ok"
+  },
+  "config_validation": {
+    "result": "passed"
+  },
+  "mock_mode": false,
+  "service": "telegram_connector",
+  "status": "error"
+}
+Checking webhook endpoint... 
+{
+  "message": "Webhook endpoint is ready to receive signals",
+  "service": "telegram_connector",
+  "status": "ok"
+}
+4. Testing connections between components... 
+Testing Webhook API to Telegram Connector connection... 
+Connection test response: 
+{"message":"Signal received and forwarded to Telegram","status":"success"}
+5. Checking for new errors in logs after test... 

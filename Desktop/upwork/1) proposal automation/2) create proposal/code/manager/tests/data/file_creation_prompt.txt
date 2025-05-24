@@ -1,0 +1,11 @@
+Hello Claude! This is a test prompt for the card layout interface.
+
+This prompt is used for testing the card view in the dashboard UI.
+
+Please generate some sample content that would be displayed in a card:
+- Project: Card Layout Testing
+- Status: Active
+- Description: Testing the card-based display of Claude instances in the dashboard
+- Date: March 10, 2025
+
+The UI should render this with proper formatting in a card view that can be expanded to show more details.
