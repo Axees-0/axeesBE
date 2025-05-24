@@ -1,0 +1,129 @@
+{
+  "name": "Login Form Test",
+  "description": "Test the login form with valid and invalid credentials",
+  "version": "1.0.0",
+  "config": {
+    "headless": false,
+    "timeout": 30000,
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "variables": {
+    "validUsername": "testuser",
+    "validPassword": "testpass",
+    "invalidUsername": "wronguser",
+    "invalidPassword": "wrongpass"
+  },
+  "steps": [
+    {
+      "type": "navigate",
+      "description": "Navigate to login page",
+      "url": "file:///Users/Mike/Desktop/upwork/MCPs/test_frontend/examples/test-example.html",
+      "waitUntil": "networkidle2",
+      "screenshot": true
+    },
+    {
+      "type": "wait",
+      "value": 1000,
+      "description": "Wait for page to settle"
+    },
+    {
+      "type": "type",
+      "description": "Enter invalid username",
+      "selector": "#username",
+      "value": "${invalidUsername}"
+    },
+    {
+      "type": "type",
+      "description": "Enter invalid password",
+      "selector": "#password",
+      "value": "${invalidPassword}"
+    },
+    {
+      "type": "click",
+      "description": "Click submit button",
+      "selector": "#submit-btn",
+      "screenshot": true
+    },
+    {
+      "type": "waitForSelector",
+      "description": "Wait for error message",
+      "selector": "#error-msg[style*=\"display: block\"]",
+      "timeout": 5000
+    },
+    {
+      "type": "assertText",
+      "description": "Verify error message",
+      "selector": "#error-msg",
+      "expected": "Invalid credentials. Please try again."
+    },
+    {
+      "type": "screenshot",
+      "description": "Capture error state",
+      "screenshot": {
+        "name": "login-error",
+        "fullPage": true
+      }
+    },
+    {
+      "type": "evaluate",
+      "description": "Clear form fields",
+      "script": "document.getElementById('username').value = ''; document.getElementById('password').value = ''"
+    },
+    {
+      "type": "type",
+      "description": "Enter valid username",
+      "selector": "#username",
+      "value": "${validUsername}"
+    },
+    {
+      "type": "type",
+      "description": "Enter valid password",
+      "selector": "#password",
+      "value": "${validPassword}"
+    },
+    {
+      "type": "click",
+      "description": "Click submit button again",
+      "selector": "#submit-btn"
+    },
+    {
+      "type": "waitForSelector",
+      "description": "Wait for success message",
+      "selector": "#success-msg[style*=\"display: block\"]",
+      "timeout": 5000
+    },
+    {
+      "type": "assertText",
+      "description": "Verify success message",
+      "selector": "#success-msg",
+      "expected": "Login successful! Welcome to the dashboard."
+    },
+    {
+      "type": "screenshot",
+      "description": "Capture success state",
+      "screenshot": {
+        "name": "login-success",
+        "fullPage": true
+      }
+    }
+  ],
+  "assertions": [
+    {
+      "selector": "#success-msg",
+      "property": "style.display",
+      "operator": "equals",
+      "expected": "block",
+      "message": "Success message should be visible"
+    }
+  ],
+  "cleanup": [
+    {
+      "type": "evaluate",
+      "description": "Reset form state",
+      "script": "location.reload()"
+    }
+  ]
+}
