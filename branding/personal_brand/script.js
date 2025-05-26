@@ -186,12 +186,8 @@ document.addEventListener('DOMContentLoaded', () => {
         "You could've learned a new skill by now... but here we are",
         "I bet you read terms and conditions too",
         "Are you my mom? She's the only one who reads this far",
-        "Oh good, you're back. I was starting to miss the attention",
-        "This is the longest anyone's stared at me without buying me dinner",
-        "I'm starting to think you have a thing for minimalist websites",
-        "You're either very bored or very into me. Both are concerning",
-        "I appreciate the dedication, but I'm just not that deep",
-        "Fine. You win. Click one more time and let's talk for real."
+        "Plot twist: I'm just as confused about why you're still here",
+        "[This message has been removed due to excessive visitor dedication]",
     ];
     
     let messageIndex = 0;
@@ -234,11 +230,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Final click - open email
                     const subject = encodeURIComponent("Okay, you got me");
                     const body = encodeURIComponent(
-                        "Hi Michael,\n\n" +
-                        "I clicked through all your sarcastic messages. " +
-                        "I'm either deeply intrigued by your work or desperately avoiding mine.\n\n" +
+                        "Michael,\n\n" +
+                        "I'm either deeply intrigued by your work or desperately trying to avoid mine.\n\n" +
                         "Either way, I thought I'd reach out because...\n\n" +
-                        "[Your incredibly patient website visitor]"
+                        "Sinerely,"
+                        "[Your incredibly persistent website visitor]"
                     );
                     window.location.href = `mailto:michael@michaelabdo.com?subject=${subject}&body=${body}`;
                     
