@@ -381,6 +381,12 @@ h2::after {
         display: block !important;
     }
     
+    .sarcasm-link a {
+        white-space: nowrap;
+        word-wrap: normal;
+        overflow-wrap: normal;
+    }
+    
     .image-container {
         width: 220px;
         margin: 0 auto;
@@ -452,6 +458,12 @@ h2::after {
     
     .email-suffix {
         display: block !important;
+    }
+    
+    .sarcasm-link a {
+        white-space: nowrap;
+        word-wrap: normal;
+        overflow-wrap: normal;
     }
     
     h2 {
