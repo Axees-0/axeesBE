@@ -153,14 +153,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sarcasm content
     const sarcasmContent = {
         aboutHTML: `
-            <p style="margin-bottom: 1.5rem;">Oh, just your typical guy obsessively curious about the world and our place in it. I build systems that think, trade, and occasionally question their own existence—not unlike me during mandatory social outings.</p>
-            <p>📊 Quantitative Finance - Because poker got boring.</p>
-            <p>🧬 Behavioral Genetics - Mapping personality from genes.</p>
-            <p>🤖 Computational Intelligence - Teaching machines to solve problems humans caused in the first place</p>
+            <p style="margin-bottom: 1.5rem;">Oh, just your typical guy with an insatiable appetite for life's deeper mysteries. I create systems that think, trade, and from time to time question their own existence—not unlike me during 'mandatory' social outings.</p>
+            <p>📊 Quantitative Finance - Because the stakes in poker stopped feeling high enough.</p>
+            <p>🧬 Behavioral Genetics – Predicting your choices before you make them.</p>
+            <p>🤖 Computational Intelligence – Teaching machines to solve problems humans caused in the first place</p>
         `,
         venturesHTML: `
-            <li><a href="https://vespera.us" target="_blank">Vespera</a> - Trading so reliable, it almost feels unfair... almost.</li>
-            <li><a href="https://xenodex.us" target="_blank">Xenodex Sciences</a> - Where behavioral genetics meets AI and quietly redefines what it means to be human (don't look here).</li>
+            <li><a href="https://vespera.us" target="_blank">Vespera</a> – Algorithms that whisper sweet alpha into your portfolio's ear.</li>
+            <li><a href="https://xenodex.us" target="_blank">Xenodex Sciences</a> – Quietly reverse-engineering evolution. Pay no attention behind the curtain.</li>
         `
     };
     
