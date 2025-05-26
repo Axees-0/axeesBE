@@ -149,7 +149,7 @@ nav a:hover::after {
 }
 
 .section-content a {
-    color: #888;
+    color: rgb(138, 180, 248);
     text-decoration: none;
     transition: color 0.3s ease;
 }
