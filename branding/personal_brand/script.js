@@ -239,10 +239,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     window.location.href = `mailto:michael@michaelabdo.com?subject=${subject}&body=${body}`;
                     
-                    // Reset for next visitor
-                    messageIndex = 0;
-                    sarcasmActivated = false;
-                    sarcasmToggle.textContent = sarcasmMessages[0];
+                    // Reset for next visitor AFTER email is triggered
+                    setTimeout(() => {
+                        messageIndex = 0;
+                        sarcasmActivated = false;
+                        sarcasmToggle.textContent = sarcasmMessages[0];
+                    }, 1000);
                 } else {
                     // Advance to next message, stay in sarcasm mode
                     messageIndex++;
