@@ -153,29 +153,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sarcasm content
     const sarcasmContent = {
         aboutHTML: `
-            <p>Oh, just your typical guy obsessively curious about the world and our place in it. I build systems that think, trade, and occasionally question their own existence—not unlike me during mandatory social outings.</p>
-            <p>🤖 Computational Intelligence - Teaching machines to solve problems humans caused in the first place</p>
-            <p>🧬 Behavioral Genetics - Mapping personality from genes.</p>
             <p>📊 Quantitative Finance - Because poker got boring.</p>
+            <p>🧬 Behavioral Genetics - Mapping personality from genes.</p>
+            <p>🤖 Computational Intelligence - Teaching machines to solve problems humans caused in the first place</p>
+            <p style="margin-top: 1.5rem;">Oh, just your typical guy obsessively curious about the world and our place in it. I build systems that think, trade, and occasionally question their own existence—not unlike me during mandatory social outings.</p>
         `,
         venturesHTML: `
-            <li>
-                <a href="https://vespera.us" target="_blank">Vespera</a>
-                <p>Trading so reliable, it almost feels unfair... almost.</p>
-            </li>
-            <li>
-                <a href="https://xenodex.us" target="_blank">Xenodex Sciences</a>
-                <p>Where behavioral genetics meets AI and quietly redefines what it means to be human (don't look here).</p>
-            </li>
-        `,
-        contactHeading: 'contact (if you must)'
+            <li><a href="https://vespera.us" target="_blank">Vespera</a> - Trading so reliable, it almost feels unfair... almost.</li>
+            <li><a href="https://xenodex.us" target="_blank">Xenodex Sciences</a> - Where behavioral genetics meets AI and quietly redefines what it means to be human (don't look here).</li>
+        `
     };
+    
+    // Get email suffix element
+    const emailSuffix = document.querySelector('.email-suffix');
     
     // Store original content
     const originalContent = {
         aboutHTML: aboutDescription.innerHTML,
         venturesHTML: venturesContent.innerHTML,
-        contactHeading: contactHeading.textContent,
         profileSrc: profileImg.src
     };
     
@@ -191,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 profileImg.src = 'profile_photos/portrait_4.png';
                 aboutDescription.innerHTML = sarcasmContent.aboutHTML;
                 venturesContent.innerHTML = sarcasmContent.venturesHTML;
-                contactHeading.textContent = sarcasmContent.contactHeading;
+                emailSuffix.style.display = 'inline';
                 sarcasmToggle.textContent = 'Back to boring mode';
                 
                 // Reinitialize text reveal for new content
@@ -203,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 profileImg.src = originalContent.profileSrc;
                 aboutDescription.innerHTML = originalContent.aboutHTML;
                 venturesContent.innerHTML = originalContent.venturesHTML;
-                contactHeading.textContent = originalContent.contactHeading;
+                emailSuffix.style.display = 'none';
                 sarcasmToggle.textContent = 'Still Here? Try a dose of sarcasm';
                 
                 // Reinitialize text reveal for original content

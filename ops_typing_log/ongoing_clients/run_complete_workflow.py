@@ -5,9 +5,17 @@ import argparse
 import subprocess
 import csv
 from pathlib import Path
+from utils.logger import pipeline_run, get_pipeline_logger
+from utils.logging_config import get_logger
+from utils.parallel_processor import parallel_download_youtube_videos
 
-def run_process(command, description=None):
+def run_process(command, description=None, component='main', logger=None):
     """Run a process with the given command and print its output in real-time"""
+    # If logger is provided, use it; otherwise fall back to print
+    if logger:
+        return logger.log_subprocess(command, description, component)
+    
+    # Original implementation for when logger is not available
     if description:
         print(f"\n{'=' * 80}\n{description}\n{'=' * 80}")
     
@@ -45,8 +53,9 @@ def get_unprocessed_links(csv_file, link_type="google_drive"):
     Returns:
         List of links that haven't been processed yet
     """
+    logger = get_logger(__name__)
     if not os.path.exists(csv_file):
-        print(f"CSV file not found: {csv_file}")
+        logger.warning(f"CSV file not found: {csv_file}")
         return []
     
     links = []
@@ -117,20 +126,34 @@ def main():
     parser.add_argument("--skip-youtube", action="store_true", help="Skip YouTube downloads")
     parser.add_argument("--max-youtube", type=int, default=None, help="Maximum number of YouTube videos to download")
     parser.add_argument("--max-drive", type=int, default=None, help="Maximum number of Google Drive files to download")
+    parser.add_argument("--no-logging", action="store_true", help="Disable logging to files")
     
     args = parser.parse_args()
     
+    # Use logging unless disabled
+    if args.no_logging:
+        return main_workflow(args)
+    else:
+        with pipeline_run() as pipeline_logger:
+            return main_workflow(args, pipeline_logger)
+
+def main_workflow(args, logger=None):
+    """Main workflow logic"""
+    
     # Step 1: Scrape Google Sheet and extract links
     if not args.skip_sheet:
-        command = [sys.executable, "master_scraper.py", "--force-download"]
+        command = [sys.executable, "utils/master_scraper.py", "--force-download"]
         if args.max_rows is not None:
             command.extend(["--max-rows", str(args.max_rows)])
         if args.reset:
             command.append("--reset")
         
-        exit_code = run_process(command, "Step 1: Scraping Google Sheet and extracting links")
+        exit_code = run_process(command, "Step 1: Scraping Google Sheet and extracting links", 'scraper', logger)
         if exit_code != 0:
-            print(f"Error in Step 1: Google Sheet scraping failed with exit code {exit_code}")
+            if logger:
+                logger.log_error(f"Error in Step 1: Google Sheet scraping failed with exit code {exit_code}")
+            else:
+                print(f"Error in Step 1: Google Sheet scraping failed with exit code {exit_code}")
             return exit_code
     
     # Step 2: Download Google Drive files for unprocessed links
@@ -140,20 +163,35 @@ def main():
             # Apply max-drive limit if specified
             if args.max_drive is not None and args.max_drive > 0:
                 drive_links = drive_links[:args.max_drive]
-                print(f"\n{'=' * 80}\nStep 2: Downloading {len(drive_links)} Google Drive files (limited by --max-drive)\n{'=' * 80}")
+                if logger:
+                    logger.get_logger('main').info(f"Step 2: Downloading {len(drive_links)} Google Drive files (limited by --max-drive)")
+                else:
+                    print(f"\n{'=' * 80}\nStep 2: Downloading {len(drive_links)} Google Drive files (limited by --max-drive)\n{'=' * 80}")
             else:
-                print(f"\n{'=' * 80}\nStep 2: Downloading {len(drive_links)} Google Drive files\n{'=' * 80}")
+                if logger:
+                    logger.get_logger('main').info(f"Step 2: Downloading {len(drive_links)} Google Drive files")
+                else:
+                    print(f"\n{'=' * 80}\nStep 2: Downloading {len(drive_links)} Google Drive files\n{'=' * 80}")
             
             # Create the drive_downloads directory if it doesn't exist
             os.makedirs("drive_downloads", exist_ok=True)
             
             for i, link in enumerate(drive_links):
                 if link and "drive.google.com" in link:
-                    print(f"\nDownloading Google Drive file {i+1}/{len(drive_links)}: {link}")
-                    command = [sys.executable, "download_drive.py", link, "--metadata"]
-                    exit_code = run_process(command)
+                    if logger:
+                        logger.get_logger('drive').info(f"Downloading Google Drive file {i+1}/{len(drive_links)}: {link}")
+                    else:
+                        print(f"\nDownloading Google Drive file {i+1}/{len(drive_links)}: {link}")
+                    command = [sys.executable, "utils/download_drive.py", link, "--metadata"]
+                    exit_code = run_process(command, None, 'drive', logger)
                     if exit_code != 0:
-                        print(f"Warning: Failed to download Google Drive file: {link}")
+                        if logger:
+                            logger.log_error(f"Failed to download Google Drive file: {link}")
+                        else:
+                            print(f"Warning: Failed to download Google Drive file: {link}")
+                    else:
+                        if logger:
+                            logger.update_stats(drive_downloads=logger.run_stats['drive_downloads'] + 1)
     
     # Step 3: Download YouTube videos for unprocessed links
     if not args.skip_youtube:
@@ -163,18 +201,43 @@ def main():
             cleaned_youtube_links = []
             import re
             for link in youtube_links:
-                if link and "youtube.com" in link:
-                    if "watch_videos?video_ids=" in link:
-                        # Extract the video IDs, removing any newlines or other unwanted characters
+                if not link:
+                    continue
+                    
+                # Skip non-YouTube URLs (CSS files, JavaScript, etc.)
+                if any(link.endswith(ext) for ext in ['.css', '.js', '.png', '.jpg', '.gif']):
+                    continue
+                
+                # Skip URLs that don't contain youtube.com
+                if "youtube.com" not in link:
+                    continue
+                    
+                # Handle playlist URLs
+                if "watch_videos?video_ids=" in link:
+                    # Extract the video IDs, removing any newlines or other unwanted characters
+                    try:
                         video_ids_part = link.split("watch_videos?video_ids=")[1]
                         # Extract only valid video ID characters
                         video_ids = re.findall(r'[a-zA-Z0-9_-]{11}', video_ids_part)
                         if video_ids:
+                            # Remove duplicates while preserving order
+                            seen = set()
+                            unique_ids = []
+                            for vid in video_ids:
+                                if vid not in seen:
+                                    seen.add(vid)
+                                    unique_ids.append(vid)
                             # Reconstruct the URL properly
-                            cleaned_link = f"https://www.youtube.com/watch_videos?video_ids={','.join(video_ids)}"
+                            cleaned_link = f"https://www.youtube.com/watch_videos?video_ids={','.join(unique_ids)}"
                             cleaned_youtube_links.append(cleaned_link)
-                    else:
-                        cleaned_youtube_links.append(link)
+                    except Exception as e:
+                        if logger:
+                            logger.log_error(f"Failed to parse YouTube playlist URL: {link} - {str(e)}")
+                        else:
+                            print(f"Warning: Failed to parse YouTube playlist URL: {link} - {str(e)}")
+                # Handle regular YouTube URLs
+                elif "/watch?v=" in link or "youtu.be/" in link:
+                    cleaned_youtube_links.append(link)
             
             # Replace the original links with the cleaned ones
             youtube_links = cleaned_youtube_links
@@ -182,22 +245,75 @@ def main():
             # Apply max-youtube limit if specified
             if args.max_youtube is not None and args.max_youtube > 0:
                 youtube_links = youtube_links[:args.max_youtube]
-                print(f"\n{'=' * 80}\nStep 3: Downloading YouTube videos from {len(youtube_links)} playlists (limited by --max-youtube)\n{'=' * 80}")
+                if logger:
+                    logger.get_logger('main').info(f"Step 3: Downloading YouTube videos from {len(youtube_links)} playlists (limited by --max-youtube)")
+                else:
+                    print(f"\n{'=' * 80}\nStep 3: Downloading YouTube videos from {len(youtube_links)} playlists (limited by --max-youtube)\n{'=' * 80}")
             else:
-                print(f"\n{'=' * 80}\nStep 3: Downloading YouTube videos from {len(youtube_links)} playlists\n{'=' * 80}")
+                if logger:
+                    logger.get_logger('main').info(f"Step 3: Downloading YouTube videos from {len(youtube_links)} playlists")
+                else:
+                    print(f"\n{'=' * 80}\nStep 3: Downloading YouTube videos from {len(youtube_links)} playlists\n{'=' * 80}")
             
             # Create the youtube_downloads directory if it doesn't exist
             os.makedirs("youtube_downloads", exist_ok=True)
             
-            for i, link in enumerate(youtube_links):
-                if link:
-                    print(f"\nDownloading YouTube playlist {i+1}/{len(youtube_links)}: {link}")
-                    command = [sys.executable, "download_youtube.py", link]
-                    exit_code = run_process(command)
-                    if exit_code != 0:
-                        print(f"Warning: Failed to download YouTube video: {link}")
+            # Use parallel processing for YouTube downloads
+            if logger:
+                logger.get_logger('youtube').info(f"Starting parallel download of {len(youtube_links)} YouTube videos/playlists")
+            else:
+                print(f"\nStarting parallel download of {len(youtube_links)} YouTube videos/playlists")
+            
+            # Filter out empty links
+            valid_links = [link for link in youtube_links if link]
+            
+            if valid_links:
+                # Download videos in parallel with max 4 concurrent downloads
+                results = parallel_download_youtube_videos(
+                    valid_links,
+                    max_workers=4,  # Limit concurrent downloads
+                    transcript_only=False,
+                    resolution="720",
+                    logger=logger.get_logger('youtube') if logger else None
+                )
+                
+                # Count successes and failures
+                successful = 0
+                failed = 0
+                
+                for url, result in results:
+                    if isinstance(result, Exception):
+                        failed += 1
+                        if logger:
+                            logger.log_error(f"Failed to download YouTube video: {url} - {result}")
+                        else:
+                            print(f"Warning: Failed to download YouTube video: {url} - {result}")
+                    else:
+                        video_file, transcript_file = result
+                        if video_file or transcript_file:
+                            successful += 1
+                            if logger:
+                                logger.update_stats(youtube_downloads=logger.run_stats['youtube_downloads'] + 1)
+                        else:
+                            failed += 1
+                
+                if logger:
+                    logger.get_logger('youtube').info(f"YouTube downloads complete: {successful} successful, {failed} failed")
+                else:
+                    print(f"\nYouTube downloads complete: {successful} successful, {failed} failed")
     
-    print(f"\n{'=' * 80}\nAll steps completed successfully!\n{'=' * 80}")
+    # Update total rows processed if logger is available
+    if logger and not args.skip_sheet:
+        csv_rows = 0
+        if os.path.exists("output.csv"):
+            with open("output.csv", 'r', newline='', encoding='utf-8') as f:
+                csv_rows = sum(1 for _ in csv.DictReader(f))
+        logger.update_stats(rows_processed=csv_rows)
+    
+    if logger:
+        logger.get_logger('main').success("All steps completed successfully!")
+    else:
+        print(f"\n{'=' * 80}\nAll steps completed successfully!\n{'=' * 80}")
     return 0
 
 if __name__ == "__main__":
