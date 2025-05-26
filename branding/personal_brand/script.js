@@ -239,11 +239,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     window.location.href = `mailto:michael@michaelabdo.com?subject=${subject}&body=${body}`;
                     
-                    // Reset for next visitor AFTER email is triggered
+                    // Reset entire page to normal mode AFTER email is triggered
                     setTimeout(() => {
+                        // Revert to normal mode
+                        document.body.classList.remove('sarcasm-mode');
+                        profileImg.src = originalContent.profileSrc;
+                        aboutDescription.innerHTML = originalContent.aboutHTML;
+                        venturesContent.innerHTML = originalContent.venturesHTML;
+                        emailSuffix.style.display = 'none';
+                        
+                        // Reset for next visitor
                         messageIndex = 0;
                         sarcasmActivated = false;
                         sarcasmToggle.textContent = sarcasmMessages[0];
+                        
+                        // Reinitialize text reveal for original content
+                        createTextReveal(document.getElementById('about'));
+                        createTextReveal(document.getElementById('ventures'));
                     }, 1000);
                 } else {
                     // Advance to next message, stay in sarcasm mode
