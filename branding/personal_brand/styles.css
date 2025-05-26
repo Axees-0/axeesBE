@@ -149,7 +149,7 @@ nav a:hover::after {
 }
 
 .section-content a {
-    color: #4a9eff;
+    color: #888;
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -377,7 +377,7 @@ h2::after {
         text-align: center;
     }
     
-    .email-suffix {
+    body.sarcasm-mode .email-suffix {
         display: block !important;
         font-style: italic;
         color: #888;
@@ -467,7 +467,7 @@ h2::after {
         text-align: center;
     }
     
-    .email-suffix {
+    body.sarcasm-mode .email-suffix {
         display: block !important;
         font-style: italic;
         color: #888;
@@ -592,12 +592,14 @@ body.sarcasm-mode #about-description p {
     font-style: italic;
     color: #888;
     font-size: 0.9rem;
+    display: none;
 }
 
 body.sarcasm-mode .email-suffix {
     font-style: italic;
     color: #888;
     font-size: 0.9rem;
+    display: inline;
 }
 
 /* Sarcasm mode scrollbar */
