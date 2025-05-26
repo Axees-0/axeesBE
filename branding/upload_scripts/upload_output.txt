@@ -1,0 +1,9 @@
+[0;34m=== Simple Uploader for vespera ===[0m
+[1;33mFinding all files to upload...[0m
+[0;32mFound 53 files to upload[0m
+[0;32m[1/53] Uploading: request-consultation.html[0m
+[0;32m[2/53] Uploading: index.html[0m
+[0;34m[3/53] Creating directory: public_html/vespera.us/css[0m
+[0;32m[4/53] Uploading: css/reset.css[0m
+[0;32mUpload complete![0m
+[0;34mWebsite updated successfully at Thu May 22 12:57:53 PDT 2025[0m

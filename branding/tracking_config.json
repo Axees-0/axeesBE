@@ -1,0 +1,44 @@
+{
+  "tracking_services": {
+    "google_analytics": {
+      "enabled": false,
+      "tracking_id": "G-XXXXXXXXXX",
+      "script_template": "<!-- Google Analytics -->\n<script async src=\"https://www.googletagmanager.com/gtag/js?id={tracking_id}\"></script>\n<script>\n  window.dataLayer = window.dataLayer || [];\n  function gtag(){{dataLayer.push(arguments);}}\n  gtag('js', new Date());\n  gtag('config', '{tracking_id}');\n</script>\n<!-- End Google Analytics -->"
+    },
+    "google_tag_manager": {
+      "enabled": false,
+      "container_id": "GTM-XXXXXXX",
+      "head_script": "<!-- Google Tag Manager -->\n<script>(function(w,d,s,l,i){{w[l]=w[l]||[];w[l].push({{'gtm.start':\nnew Date().getTime(),event:'gtm.js'}});var f=d.getElementsByTagName(s)[0],\nj=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=\n'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);\n}})(window,document,'script','dataLayer','{container_id}');</script>\n<!-- End Google Tag Manager -->",
+      "body_script": "<!-- Google Tag Manager (noscript) -->\n<noscript><iframe src=\"https://www.googletagmanager.com/ns.html?id={container_id}\"\nheight=\"0\" width=\"0\" style=\"display:none;visibility:hidden\"></iframe></noscript>\n<!-- End Google Tag Manager (noscript) -->"
+    }
+  },
+  "websites": {
+    "personal_brand": {
+      "name": "Personal Brand Portfolio",
+      "files": ["personal_brand/index.html"],
+      "custom_tracking": {}
+    },
+    "vespera": {
+      "name": "Vespera Trading Platform",
+      "files": [
+        "vespera/index.html",
+        "vespera/request-consultation.html",
+        "vespera/api-docs.html"
+      ],
+      "custom_tracking": {}
+    },
+    "xenodex": {
+      "name": "Xenodex Sciences",
+      "files": [
+        "xenodex/index.html",
+        "xenodex/pages/plan.html",
+        "xenodex/pages/science.html"
+      ],
+      "custom_tracking": {}
+    }
+  },
+  "backup": {
+    "enabled": true,
+    "folder": "tracking_backups"
+  }
+}

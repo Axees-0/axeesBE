@@ -234,9 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
                       "a) Genuinely fascinated by your work\n" +
                       "b) The world's most thorough procrastinator\n" +
                       "c) Actually looking for that Netflix alternative you mentioned\n\n" +
-                      "Truth is,\n\n" +
+                      "Truth is,\n\n\n\n\n" +
 
-                      "- The person your mom warned you about"
+                      "Sincerely,\n"+
+                      "The person your mom warned you about"
                   );
 
                     window.location.href = `mailto:michael@michaelabdo.com?subject=${subject}&body=${body}`;
