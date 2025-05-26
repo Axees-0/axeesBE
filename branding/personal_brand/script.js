@@ -176,18 +176,15 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Sarcastic messages for returning to normal mode
     const sarcasmMessages = [
-        "Still Here? Try a dose of sarcasm",
-        "Still curious? That makes one of us",
-        "Seriously? You're still here? I admire your dedication to procrastination",
-        "You realize Netflix exists, right? Much more plot development there",
-        "You could've learned a new skill by now... but here we are",
-        "I'm flattered but also starting to get slightly concerned",
-        "This is just getting awkward. Should we exchange numbers?",
-        "At this point we're basically best friends",
-        "I bet you read terms and conditions too",
-        "Are you my mom? She's the only one who reads this far",
-        "Plot twist: I'm just as confused about why you're still here",
-        "[This message has been removed due to excessive visitor dedication]",
+        "Still Here? Try a dose of sarcasm", //Default Message
+        "Still curious? That makes one of us", //Second Message (says the same thing but slightly different)
+        "Seriously? You're still here? I admire your dedication to procrastination", //Suprise
+        "You realize Netflix exists, right? Much more plot development there", //Deflect
+        "I'm flattered but also starting to get slightly concerned", //Acknowledgment
+        "I bet you read terms and conditions too", //Friendly Insult
+        "This is just getting awkward. Should we exchange numbers?", //Flirty
+        "At this point we're basically best friends", //Acceptance
+        "[This message has been removed due to excessive visitor dedication]", //Meta
     ];
     
     let messageIndex = 0;
@@ -228,14 +225,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Check if we've reached the final message
                 if (messageIndex === sarcasmMessages.length - 1) {
                     // Final click - open email
-                    const subject = encodeURIComponent("Okay, you got me");
-                    const body = encodeURIComponent(
-                        "Michael,\n\n" +
-                        "I'm either deeply intrigued by your work or desperately trying to avoid mine.\n\n" +
-                        "Either way, I thought I'd reach out because...\n\n" +
-                        "Sinerely,"
-                        "[Your incredibly persistent website visitor]"
-                    );
+                  const subject = encodeURIComponent("I even clicked the broken message...");
+                  const body = encodeURIComponent(
+                      "Michael,\n\n" +
+                      "I just endured your website's increasingly pointed observations about my life choices, " +
+                      "and somehow ended up here.\n\n" +
+                      "Clearly, I'm either:\n" +
+                      "a) Genuinely fascinated by your work\n" +
+                      "b) The world's most thorough procrastinator\n" +
+                      "c) Actually looking for that Netflix alternative you mentioned\n\n" +
+                      "Truth is,\n\n" +
+
+                      "- The person your mom warned you about"
+                  );
+
                     window.location.href = `mailto:michael@michaelabdo.com?subject=${subject}&body=${body}`;
                     
                     // Reset for next visitor
