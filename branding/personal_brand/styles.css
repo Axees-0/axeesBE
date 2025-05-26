@@ -154,6 +154,11 @@ nav a:hover::after {
     transition: color 0.3s ease;
 }
 
+.section-content a {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
 .section-content a:hover {
     color: #fff;
 }
@@ -167,6 +172,14 @@ nav a:hover::after {
 
 .about-text {
     flex: 1;
+    width: 100%;
+}
+
+.about-text p {
+    width: 100%;
+    text-align: left;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 /* Image styles */
