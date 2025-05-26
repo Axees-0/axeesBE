@@ -130,9 +130,9 @@ nav a:hover::after {
 }
 
 .section-content {
-    max-width: 1200px;
+    max-width: 1000px;
     margin: 0 auto;
-    width: 90%;
+    width: 100%;
 }
 
 .section-content p {
@@ -140,6 +140,8 @@ nav a:hover::after {
     color: #999;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    text-align: left;
+    width: 100%;
 }
 
 .section-content p:last-child {
@@ -265,6 +267,8 @@ h2::after {
     position: relative;
     word-wrap: break-word;
     overflow-wrap: break-word;
+    text-align: left;
+    width: 100%;
 }
 
 .ventures-list li:hover {
@@ -358,8 +362,8 @@ h2::after {
     }
     
     .section-content {
-        width: 95%;
-        max-width: none;
+        max-width: 95%;
+        width: 100%;
     }
     
     h2::after {
@@ -396,8 +400,8 @@ h2::after {
     }
     
     .section-content {
-        width: 98%;
-        max-width: none;
+        max-width: 98%;
+        width: 100%;
     }
     
     h2 {
