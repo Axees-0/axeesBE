@@ -382,9 +382,10 @@ h2::after {
     }
     
     .sarcasm-link a {
-        white-space: nowrap;
-        word-wrap: normal;
-        overflow-wrap: normal;
+        text-wrap: balance;
+        text-align: center;
+        display: inline-block;
+        line-height: 1.3;
     }
     
     .image-container {
@@ -461,9 +462,10 @@ h2::after {
     }
     
     .sarcasm-link a {
-        white-space: nowrap;
-        word-wrap: normal;
-        overflow-wrap: normal;
+        text-wrap: balance;
+        text-align: center;
+        display: inline-block;
+        line-height: 1.3;
     }
     
     h2 {
