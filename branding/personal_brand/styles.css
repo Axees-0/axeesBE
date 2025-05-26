@@ -505,16 +505,48 @@ h2::after {
 .sarcasm-link {
     margin: 0;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .sarcasm-link a {
     color: #666;
     text-decoration: none;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, opacity 1.2s ease, min-height 0.3s ease;
+    opacity: 1;
+    display: inline-block;
+    position: relative;
 }
 
 .sarcasm-link a:hover {
     color: #999;
+}
+
+.sarcasm-link a.fading-out {
+    opacity: 0;
+}
+
+.sarcasm-link a.fading-in {
+    opacity: 1;
+}
+
+/* Elegant text appearance */
+.sarcasm-link a span {
+    opacity: 0;
+    display: inline-block;
+    animation: gracefulAppear 0.4s ease-out forwards;
+}
+
+@keyframes gracefulAppear {
+    0% { 
+        opacity: 0;
+        transform: translateY(3px);
+    }
+    100% { 
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Sarcasm Mode Styles */

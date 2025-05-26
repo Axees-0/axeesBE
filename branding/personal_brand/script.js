@@ -176,14 +176,14 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // Sarcastic messages for returning to normal mode
     const sarcasmMessages = [
-        "Still Here? Try a dose of sarcasm", //Default Message
-        "Still curious? That makes one of us", //Second Message (says the same thing but slightly different)
-        "Seriously? You're still here? I admire your dedication to procrastination", //Suprise
-        "You realize Netflix exists, right? Much more plot development there", //Deflect
-        "I'm flattered but also starting to get slightly concerned", //Acknowledgment
-        "I bet you read terms and conditions too", //Friendly Insult
+        "Still Here? Try a dose of sarcasm.", //Default Message
+        "Still curious? That makes one of us.", //Second Message (says the same thing but slightly different)
+        "Seriously? You're still here? I admire your dedication to procrastination.", //Suprise
+        "You realize Netflix exists, right? Much more plot development there.", //Deflect
+        "I'm flattered but also starting to get slightly concerned.", //Acknowledgment
+        "I bet you read terms and conditions too.", //Friendly Insult
         "This is just getting awkward. Should we exchange numbers?", //Flirty
-        "At this point we're basically best friends", //Acceptance
+        "At this point we're basically best friends.", //Acceptance
         "[This message has been removed due to excessive visitor dedication]", //Meta
     ];
     
@@ -220,48 +220,88 @@ document.addEventListener('DOMContentLoaded', () => {
                 createTextReveal(document.getElementById('about'));
                 createTextReveal(document.getElementById('ventures'));
             } else {
-                // Phase 2: Stay in sarcasm mode, just cycle through messages
-                if (messageIndex === sarcasmMessages.length - 1) {
-                    // Final click - open email
-                    const subject = encodeURIComponent("I even clicked the broken message...");
-                    const body = encodeURIComponent(
-                        "Michael,\n\n" +
-                        "I just endured your website's increasingly pointed observations about my life choices, " +
-                        "and somehow ended up here.\n\n" +
-                        "Clearly, I'm either:\n" +
-                        "a) Genuinely fascinated by your work\n" +
-                        "b) The world's most thorough procrastinator\n" +
-                        "c) Actually looking for that Netflix alternative you mentioned\n\n" +
-                        "Truth is,\n\n\n\n\n" +
-                        "Sincerely,\n"+
-                        "The person your mom warned you about"
-                    );
+                // Phase 2: Stay in sarcasm mode, just cycle through messages with magical fade effect
+                // Start fade out (like Marauder's Map)
+                sarcasmToggle.classList.add('fading-out');
+                
+                // Wait for complete fade out, then change text and fade back in
+                setTimeout(() => {
+                    if (messageIndex === sarcasmMessages.length - 1) {
+                        // Final click - open email
+                        const subject = encodeURIComponent("I even clicked the broken message...");
+                        const body = encodeURIComponent(
+                            "Michael,\n\n" +
+                            "I just endured your website's increasingly pointed observations about my life choices, " +
+                            "and somehow ended up here.\n\n" +
+                            "Clearly, I'm either:\n" +
+                            "a) Genuinely fascinated by your work\n" +
+                            "b) The world's most thorough procrastinator\n" +
+                            "c) Actually looking for that Netflix alternative you mentioned\n\n" +
+                            "Truth is,\n\n\n\n\n" +
+                            "Sincerely,\n"+
+                            "The person your mom warned you about"
+                        );
 
-                    window.location.href = `mailto:michael@michaelabdo.com?subject=${subject}&body=${body}`;
-                    
-                    // Reset entire page to normal mode AFTER email is triggered
-                    setTimeout(() => {
-                        // Revert to normal mode
-                        document.body.classList.remove('sarcasm-mode');
-                        profileImg.src = originalContent.profileSrc;
-                        aboutDescription.innerHTML = originalContent.aboutHTML;
-                        venturesContent.innerHTML = originalContent.venturesHTML;
-                        emailSuffix.style.display = 'none';
+                        window.location.href = `mailto:michael@michaelabdo.com?subject=${subject}&body=${body}`;
                         
-                        // Reset for next visitor
-                        messageIndex = 0;
-                        sarcasmActivated = false;
-                        sarcasmToggle.textContent = sarcasmMessages[0];
+                        // Reset entire page to normal mode AFTER email is triggered
+                        setTimeout(() => {
+                            // Revert to normal mode
+                            document.body.classList.remove('sarcasm-mode');
+                            profileImg.src = originalContent.profileSrc;
+                            aboutDescription.innerHTML = originalContent.aboutHTML;
+                            venturesContent.innerHTML = originalContent.venturesHTML;
+                            emailSuffix.style.display = 'none';
+                            
+                            // Reset for next visitor
+                            messageIndex = 0;
+                            sarcasmActivated = false;
+                            sarcasmToggle.textContent = sarcasmMessages[0];
+                            sarcasmToggle.classList.remove('fading-out');
+                            
+                            // Reinitialize text reveal for original content
+                            createTextReveal(document.getElementById('about'));
+                            createTextReveal(document.getElementById('ventures'));
+                        }, 1000);
+                    } else {
+                        // Advance to next message, stay in sarcasm mode
+                        messageIndex++;
+                        const nextMessage = sarcasmMessages[messageIndex];
                         
-                        // Reinitialize text reveal for original content
-                        createTextReveal(document.getElementById('about'));
-                        createTextReveal(document.getElementById('ventures'));
-                    }, 1000);
-                } else {
-                    // Advance to next message, stay in sarcasm mode
-                    messageIndex++;
-                    sarcasmToggle.textContent = sarcasmMessages[messageIndex];
-                }
+                        // Capture current height to prevent layout shift
+                        const currentHeight = sarcasmToggle.offsetHeight;
+                        sarcasmToggle.style.minHeight = currentHeight + 'px';
+                        
+                        // Clear text and remove fade out
+                        sarcasmToggle.textContent = '';
+                        sarcasmToggle.classList.remove('fading-out');
+                        
+                        // Start elegant text stream after a brief pause
+                        setTimeout(() => {
+                            // Split message into words for graceful appearance
+                            const words = nextMessage.split(' ');
+                            sarcasmToggle.innerHTML = '';
+                            
+                            words.forEach((word, index) => {
+                                const span = document.createElement('span');
+                                span.textContent = word;
+                                span.style.animationDelay = `${index * 50}ms`;
+                                sarcasmToggle.appendChild(span);
+                                
+                                // Add space after each word except the last
+                                if (index < words.length - 1) {
+                                    const space = document.createTextNode(' ');
+                                    sarcasmToggle.appendChild(space);
+                                }
+                            });
+                            
+                            // Remove min-height after animation completes
+                            setTimeout(() => {
+                                sarcasmToggle.style.minHeight = '';
+                            }, 600 + (words.length * 50));
+                        }, 200); // Reduced pause before text appears
+                    }
+                }, 800); // Wait for complete fade out (1.2s)
             }
         });
     }
