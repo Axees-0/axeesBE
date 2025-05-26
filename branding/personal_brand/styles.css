@@ -379,6 +379,9 @@ h2::after {
     
     .email-suffix {
         display: block !important;
+        font-style: italic;
+        color: #888;
+        font-size: 0.9rem;
     }
     
     .sarcasm-link a {
@@ -459,6 +462,9 @@ h2::after {
     
     .email-suffix {
         display: block !important;
+        font-style: italic;
+        color: #888;
+        font-size: 0.9rem;
     }
     
     .sarcasm-link a {
@@ -566,6 +572,12 @@ body.sarcasm-mode #ventures-content li {
 body.sarcasm-mode #about-description p {
     line-height: 1.8;
     margin-bottom: 1rem;
+}
+
+.email-suffix {
+    font-style: italic;
+    color: #888;
+    font-size: 0.9rem;
 }
 
 body.sarcasm-mode .email-suffix {
