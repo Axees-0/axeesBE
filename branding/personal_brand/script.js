@@ -174,6 +174,27 @@ document.addEventListener('DOMContentLoaded', () => {
         profileSrc: profileImg.src
     };
     
+    // Sarcastic messages for returning to normal mode
+    const sarcasmMessages = [
+        "Still Here? Try a dose of sarcasm",
+        "Go do something with your life instead of reading a random guy's website",
+        "Seriously? You're still here? I admire your dedication to procrastination",
+        "Don't you have better things to do? No? Me neither, apparently",
+        "You know there's a whole internet out there, right?",
+        "I'm flattered you're still reading, but also concerned",
+        "This is getting awkward. Should we exchange numbers?",
+        "At this point we're basically best friends",
+        "You could've learned a new skill by now, but here we are",
+        "I bet you read terms and conditions too",
+        "Still curious? That makes one of us",
+        "Are you my mom? She's the only one who reads this far",
+        "Plot twist: There is no plot",
+        "You're more persistent than my JavaScript errors",
+        "This level of commitment deserves a LinkedIn endorsement"
+    ];
+    
+    let messageIndex = 0;
+    
     // Toggle sarcasm mode
     if (sarcasmToggle) {
         sarcasmToggle.addEventListener('click', (e) => {
@@ -189,6 +210,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 emailSuffix.style.display = 'inline';
                 sarcasmToggle.textContent = 'Back to boring mode';
                 
+                // Smooth scroll to top
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+                
                 // Reinitialize text reveal for new content
                 createTextReveal(document.getElementById('about'));
                 createTextReveal(document.getElementById('ventures'));
@@ -199,7 +226,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 aboutDescription.innerHTML = originalContent.aboutHTML;
                 venturesContent.innerHTML = originalContent.venturesHTML;
                 emailSuffix.style.display = 'none';
-                sarcasmToggle.textContent = 'Still Here? Try a dose of sarcasm';
+                
+                // Cycle through sarcasm messages
+                messageIndex = (messageIndex + 1) % sarcasmMessages.length;
+                sarcasmToggle.textContent = sarcasmMessages[messageIndex];
                 
                 // Reinitialize text reveal for original content
                 createTextReveal(document.getElementById('about'));
