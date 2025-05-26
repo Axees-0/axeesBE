@@ -194,6 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
     
     let messageIndex = 0;
+    let firstSarcasmClick = true;
     
     // Toggle sarcasm mode
     if (sarcasmToggle) {
@@ -210,11 +211,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 emailSuffix.style.display = 'inline';
                 sarcasmToggle.textContent = 'Back to boring mode';
                 
-                // Smooth scroll to top
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                });
+                // Only scroll to about section on first click
+                if (firstSarcasmClick) {
+                    const aboutSection = document.getElementById('about');
+                    if (aboutSection) {
+                        aboutSection.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                    firstSarcasmClick = false;
+                }
+                // Otherwise stay at the bottom where the button is
                 
                 // Reinitialize text reveal for new content
                 createTextReveal(document.getElementById('about'));
