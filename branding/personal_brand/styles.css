@@ -377,6 +377,10 @@ h2::after {
         text-align: center;
     }
     
+    .email-suffix {
+        display: block !important;
+    }
+    
     .image-container {
         width: 220px;
         margin: 0 auto;
@@ -444,6 +448,10 @@ h2::after {
     
     .ventures-list li {
         text-align: center;
+    }
+    
+    .email-suffix {
+        display: block !important;
     }
     
     h2 {
