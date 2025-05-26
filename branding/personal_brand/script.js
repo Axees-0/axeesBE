@@ -177,20 +177,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sarcastic messages for returning to normal mode
     const sarcasmMessages = [
         "Still Here? Try a dose of sarcasm",
-        "Go do something with your life instead of reading a random guy's website",
+        "Still curious? That makes one of us",
         "Seriously? You're still here? I admire your dedication to procrastination",
-        "Don't you have better things to do? No? Me neither, apparently",
-        "You know there's a whole internet out there, right?",
-        "I'm flattered you're still reading, but also concerned",
+        "You realize Netflix exists, right? Much more plot development there",
+        "I'm flattered you're still reading, but also starting to get slightly concerned",
         "This is getting awkward. Should we exchange numbers?",
         "At this point we're basically best friends",
-        "You could've learned a new skill by now, but here we are",
+        "You could've learned a new skill by now... but here we are",
         "I bet you read terms and conditions too",
-        "Still curious? That makes one of us",
         "Are you my mom? She's the only one who reads this far",
-        "Plot twist: There is no plot",
-        "You're more persistent than my JavaScript errors",
-        "This level of commitment deserves a LinkedIn endorsement"
+        "Oh good, you're back. I was starting to miss the attention",
+        "This is the longest anyone's stared at me without buying me dinner",
+        "I'm starting to think you have a thing for minimalist websites",
+        "You're either very bored or very into me. Both are concerning",
+        "I appreciate the dedication, but I'm just not that deep",
+        "Fine. You win. Click one more time and let's talk for real."
     ];
     
     let messageIndex = 0;
@@ -228,20 +229,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 createTextReveal(document.getElementById('about'));
                 createTextReveal(document.getElementById('ventures'));
             } else {
-                // Disable sarcasm mode
-                document.body.classList.remove('sarcasm-mode');
-                profileImg.src = originalContent.profileSrc;
-                aboutDescription.innerHTML = originalContent.aboutHTML;
-                venturesContent.innerHTML = originalContent.venturesHTML;
-                emailSuffix.style.display = 'none';
-                
-                // Cycle through sarcasm messages
-                messageIndex = (messageIndex + 1) % sarcasmMessages.length;
-                sarcasmToggle.textContent = sarcasmMessages[messageIndex];
-                
-                // Reinitialize text reveal for original content
-                createTextReveal(document.getElementById('about'));
-                createTextReveal(document.getElementById('ventures'));
+                // Check if we've reached the final message
+                if (messageIndex === sarcasmMessages.length - 1) {
+                    // Final click - open email
+                    const subject = encodeURIComponent("Okay, you got me");
+                    const body = encodeURIComponent(
+                        "Hi Michael,\n\n" +
+                        "I clicked through all your sarcastic messages. " +
+                        "I'm either deeply intrigued by your work or desperately avoiding mine.\n\n" +
+                        "Either way, I thought I'd reach out because...\n\n" +
+                        "[Your incredibly patient website visitor]"
+                    );
+                    window.location.href = `mailto:michael@michaelabdo.com?subject=${subject}&body=${body}`;
+                    
+                    // Reset for next visitor
+                    messageIndex = 0;
+                    sarcasmToggle.textContent = sarcasmMessages[0];
+                } else {
+                    // Disable sarcasm mode
+                    document.body.classList.remove('sarcasm-mode');
+                    profileImg.src = originalContent.profileSrc;
+                    aboutDescription.innerHTML = originalContent.aboutHTML;
+                    venturesContent.innerHTML = originalContent.venturesHTML;
+                    emailSuffix.style.display = 'none';
+                    
+                    // Cycle through sarcasm messages
+                    messageIndex = (messageIndex + 1) % sarcasmMessages.length;
+                    sarcasmToggle.textContent = sarcasmMessages[messageIndex];
+                    
+                    // Reinitialize text reveal for original content
+                    createTextReveal(document.getElementById('about'));
+                    createTextReveal(document.getElementById('ventures'));
+                }
             }
         });
     }
