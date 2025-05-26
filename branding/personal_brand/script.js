@@ -188,78 +188,65 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
     
     let messageIndex = 0;
-    let firstSarcasmClick = true;
+    let sarcasmActivated = false;
     
-    // Toggle sarcasm mode
+    // Two-phase sarcasm mode
     if (sarcasmToggle) {
         sarcasmToggle.addEventListener('click', (e) => {
             e.preventDefault();
-            sarcasmMode = !sarcasmMode;
             
-            if (sarcasmMode) {
-                // Enable sarcasm mode
+            if (!sarcasmActivated) {
+                // Phase 1: First click - activate sarcasm mode and scroll to about
+                sarcasmActivated = true;
                 document.body.classList.add('sarcasm-mode');
                 profileImg.src = 'profile_photos/portrait_4.png';
                 aboutDescription.innerHTML = sarcasmContent.aboutHTML;
                 venturesContent.innerHTML = sarcasmContent.venturesHTML;
                 emailSuffix.style.display = 'inline';
-                sarcasmToggle.textContent = 'Back to boring mode';
                 
-                // Only scroll to about section on first click
-                if (firstSarcasmClick) {
-                    const aboutSection = document.getElementById('about');
-                    if (aboutSection) {
-                        aboutSection.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                    firstSarcasmClick = false;
+                // Show first message and scroll to about section
+                messageIndex = 1; // Move to second message for next click
+                sarcasmToggle.textContent = sarcasmMessages[messageIndex];
+                
+                const aboutSection = document.getElementById('about');
+                if (aboutSection) {
+                    aboutSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
                 }
-                // Otherwise stay at the bottom where the button is
                 
                 // Reinitialize text reveal for new content
                 createTextReveal(document.getElementById('about'));
                 createTextReveal(document.getElementById('ventures'));
             } else {
-                // Check if we've reached the final message
+                // Phase 2: Stay in sarcasm mode, just cycle through messages
                 if (messageIndex === sarcasmMessages.length - 1) {
                     // Final click - open email
-                  const subject = encodeURIComponent("I even clicked the broken message...");
-                  const body = encodeURIComponent(
-                      "Michael,\n\n" +
-                      "I just endured your website's increasingly pointed observations about my life choices, " +
-                      "and somehow ended up here.\n\n" +
-                      "Clearly, I'm either:\n" +
-                      "a) Genuinely fascinated by your work\n" +
-                      "b) The world's most thorough procrastinator\n" +
-                      "c) Actually looking for that Netflix alternative you mentioned\n\n" +
-                      "Truth is,\n\n\n\n\n" +
-
-                      "Sincerely,\n"+
-                      "The person your mom warned you about"
-                  );
+                    const subject = encodeURIComponent("I even clicked the broken message...");
+                    const body = encodeURIComponent(
+                        "Michael,\n\n" +
+                        "I just endured your website's increasingly pointed observations about my life choices, " +
+                        "and somehow ended up here.\n\n" +
+                        "Clearly, I'm either:\n" +
+                        "a) Genuinely fascinated by your work\n" +
+                        "b) The world's most thorough procrastinator\n" +
+                        "c) Actually looking for that Netflix alternative you mentioned\n\n" +
+                        "Truth is,\n\n\n\n\n" +
+                        "Sincerely,\n"+
+                        "The person your mom warned you about"
+                    );
 
                     window.location.href = `mailto:michael@michaelabdo.com?subject=${subject}&body=${body}`;
                     
                     // Reset for next visitor
                     messageIndex = 0;
+                    sarcasmActivated = false;
                     sarcasmToggle.textContent = sarcasmMessages[0];
                 } else {
-                    // Disable sarcasm mode
-                    document.body.classList.remove('sarcasm-mode');
-                    profileImg.src = originalContent.profileSrc;
-                    aboutDescription.innerHTML = originalContent.aboutHTML;
-                    venturesContent.innerHTML = originalContent.venturesHTML;
-                    emailSuffix.style.display = 'none';
-                    
-                    // Cycle through sarcasm messages
-                    messageIndex = (messageIndex + 1) % sarcasmMessages.length;
+                    // Advance to next message, stay in sarcasm mode
+                    messageIndex++;
                     sarcasmToggle.textContent = sarcasmMessages[messageIndex];
-                    
-                    // Reinitialize text reveal for original content
-                    createTextReveal(document.getElementById('about'));
-                    createTextReveal(document.getElementById('ventures'));
                 }
             }
         });
