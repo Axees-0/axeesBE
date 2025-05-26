@@ -153,10 +153,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sarcasm content
     const sarcasmContent = {
         aboutHTML: `
+            <p style="margin-bottom: 1.5rem;">Oh, just your typical guy obsessively curious about the world and our place in it. I build systems that think, trade, and occasionally question their own existence—not unlike me during mandatory social outings.</p>
             <p>📊 Quantitative Finance - Because poker got boring.</p>
             <p>🧬 Behavioral Genetics - Mapping personality from genes.</p>
             <p>🤖 Computational Intelligence - Teaching machines to solve problems humans caused in the first place</p>
-            <p style="margin-top: 1.5rem;">Oh, just your typical guy obsessively curious about the world and our place in it. I build systems that think, trade, and occasionally question their own existence—not unlike me during mandatory social outings.</p>
         `,
         venturesHTML: `
             <li><a href="https://vespera.us" target="_blank">Vespera</a> - Trading so reliable, it almost feels unfair... almost.</li>
