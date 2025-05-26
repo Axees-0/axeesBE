@@ -137,6 +137,9 @@ nav a:hover::after {
 .section-content p {
     margin: 0 0 1rem 0;
     color: #999;
+    text-wrap: balance;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
 .section-content p:last-child {
@@ -260,6 +263,9 @@ h2::after {
     cursor: default;
     padding-left: 0;
     position: relative;
+    text-wrap: balance;
+    word-wrap: break-word;
+    hyphens: auto;
 }
 
 .ventures-list li:hover {

@@ -156,11 +156,11 @@ document.addEventListener('DOMContentLoaded', () => {
             <p style="margin-bottom: 1.5rem;">Oh, just your typical guy with an insatiable appetite for life's deeper mysteries. I create systems that think, trade, and from time to time question their own existence—not unlike me during 'mandatory' social outings.</p>
             <p>📊 Quantitative Finance - Because the stakes in poker stopped feeling high enough.</p>
             <p>🧬 Behavioral Genetics – Predicting your choices before you make them.</p>
-            <p>🤖 Computational Intelligence – Teaching machines to solve problems humans caused in the first place</p>
+            <p>🤖 Computational&nbsp;Intelligence – Teaching machines to solve problems humans caused in the first&nbsp;place</p>
         `,
         venturesHTML: `
-            <li><a href="https://vespera.us" target="_blank">Vespera</a> – Algorithms that whisper sweet alpha into your portfolio's ear.</li>
-            <li><a href="https://xenodex.us" target="_blank">Xenodex Sciences</a> – Quietly reverse-engineering evolution. Pay no attention behind the curtain.</li>
+            <li><a href="https://vespera.us" target="_blank">Vespera</a> – Algorithms that whisper sweet alpha into your portfolio's&nbsp;ear.</li>
+            <li><a href="https://xenodex.us" target="_blank">Xenodex&nbsp;Sciences</a> – Quietly reverse-engineering evolution. Pay no attention behind the&nbsp;curtain.</li>
         `
     };
     
