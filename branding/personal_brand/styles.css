@@ -130,7 +130,7 @@ nav a:hover::after {
 }
 
 .section-content {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
 }
 
@@ -352,6 +352,10 @@ h2::after {
         padding: 3rem 1.5rem;
     }
     
+    .section-content {
+        max-width: 95%;
+    }
+    
     h2::after {
         left: 50%;
         transform: translateX(-50%);
@@ -383,6 +387,10 @@ h2::after {
     
     .section {
         padding: 2rem 1rem;
+    }
+    
+    .section-content {
+        max-width: 98%;
     }
     
     h2 {
