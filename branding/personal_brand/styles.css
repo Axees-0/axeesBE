@@ -149,7 +149,7 @@ nav a:hover::after {
 }
 
 .section-content a {
-    color: #999;
+    color: #4a9eff;
     text-decoration: none;
     transition: color 0.3s ease;
 }
@@ -389,6 +389,13 @@ h2::after {
         text-align: center;
         display: inline-block;
         line-height: 1.3;
+        color: #666 !important;
+        text-decoration: none !important;
+    }
+    
+    body.sarcasm-mode .sarcasm-link a {
+        color: #888 !important;
+        font-style: italic;
     }
     
     .image-container {
@@ -472,6 +479,13 @@ h2::after {
         text-align: center;
         display: inline-block;
         line-height: 1.3;
+        color: #666 !important;
+        text-decoration: none !important;
+    }
+    
+    body.sarcasm-mode .sarcasm-link a {
+        color: #888 !important;
+        font-style: italic;
     }
     
     h2 {
