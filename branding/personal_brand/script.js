@@ -182,6 +182,134 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // Scroll to dismiss functionality
+    if (venturesPanel) {
+        let isAtBottom = false;
+        let startScrollTop = 0;
+        let isDismissing = false;
+        let hasReachedBottom = false;
+        const scrollHint = document.querySelector('.scroll-dismiss-hint');
+        
+        // Check if panel is scrolled to bottom
+        const checkIfAtBottom = () => {
+            const scrollHeight = venturesPanel.scrollHeight;
+            const clientHeight = venturesPanel.clientHeight;
+            const scrollTop = venturesPanel.scrollTop;
+            const maxScroll = scrollHeight - clientHeight;
+            
+            // Consider "at bottom" if within 5px of the bottom
+            return scrollTop >= maxScroll - 5;
+        };
+        
+        // Handle scroll events
+        venturesPanel.addEventListener('scroll', () => {
+            const currentScrollTop = venturesPanel.scrollTop;
+            const scrollDelta = currentScrollTop - startScrollTop;
+            
+            // Update bottom status
+            const wasAtBottom = isAtBottom;
+            isAtBottom = checkIfAtBottom();
+            
+            // If we just reached the bottom, record the scroll position
+            if (isAtBottom && !wasAtBottom) {
+                startScrollTop = currentScrollTop;
+                hasReachedBottom = true;
+                // Hide the hint after reaching bottom
+                if (scrollHint) {
+                    scrollHint.style.opacity = '0';
+                    scrollHint.style.transform = 'translateY(20px)';
+                }
+            }
+            
+            // If at bottom and scrolling down (overscroll attempt)
+            if (isAtBottom && scrollDelta > 0 && !isDismissing) {
+                // Calculate overscroll amount (how much past the bottom we've "scrolled")
+                const overscrollAmount = scrollDelta;
+                
+                // Start moving the panel out based on overscroll
+                const translateAmount = Math.min(overscrollAmount * 3, venturesPanel.offsetWidth);
+                venturesPanel.style.transform = `translateX(${translateAmount}px)`;
+                venturesPanel.style.transition = 'none';
+                
+                // If scrolled enough (more than 100px past bottom), trigger dismiss
+                if (overscrollAmount > 100) {
+                    isDismissing = true;
+                    venturesPanel.style.transition = 'transform 0.3s ease-out';
+                    venturesPanel.style.transform = `translateX(${venturesPanel.offsetWidth}px)`;
+                    
+                    setTimeout(() => {
+                        closePanel();
+                        venturesPanel.style.transform = '';
+                        isDismissing = false;
+                        isAtBottom = false;
+                    }, 300);
+                }
+            } else if (!isAtBottom && !isDismissing) {
+                // Reset transform when not at bottom
+                venturesPanel.style.transform = '';
+                venturesPanel.style.transition = 'transform 0.2s ease-out';
+            }
+        });
+        
+        // Handle wheel events for smoother overscroll detection
+        venturesPanel.addEventListener('wheel', (e) => {
+            if (isAtBottom && e.deltaY > 0 && !isDismissing) {
+                // Prevent default scrolling when at bottom and scrolling down
+                e.preventDefault();
+                
+                // Simulate overscroll by manually adjusting scroll position
+                const currentScroll = venturesPanel.scrollTop;
+                const maxScroll = venturesPanel.scrollHeight - venturesPanel.clientHeight;
+                
+                // Add a small amount to scroll to trigger our overscroll logic
+                venturesPanel.scrollTop = maxScroll + (e.deltaY * 0.5);
+            }
+        }, { passive: false });
+        
+        // Reset on mouse/touch release
+        const handleRelease = () => {
+            if (!isDismissing && venturesPanel.style.transform && venturesPanel.style.transform !== 'none' && venturesPanel.style.transform !== '') {
+                const currentTransform = venturesPanel.style.transform;
+                const translateX = parseInt(currentTransform.match(/translateX\((\d+)px\)/)?.[1] || '0');
+                
+                // If not pushed far enough, spring back
+                if (translateX < venturesPanel.offsetWidth * 0.3) {
+                    venturesPanel.style.transition = 'transform 0.3s ease-out';
+                    venturesPanel.style.transform = '';
+                    
+                    // Reset scroll position to actual bottom
+                    setTimeout(() => {
+                        const maxScroll = venturesPanel.scrollHeight - venturesPanel.clientHeight;
+                        venturesPanel.scrollTop = maxScroll;
+                        startScrollTop = maxScroll;
+                    }, 50);
+                }
+            }
+        };
+        
+        venturesPanel.addEventListener('mouseup', handleRelease);
+        venturesPanel.addEventListener('mouseleave', handleRelease);
+        venturesPanel.addEventListener('touchend', handleRelease);
+        
+        // Reset state when panel opens
+        const originalOpen = previousVenturesToggle.addEventListener;
+        previousVenturesToggle.addEventListener('click', (e) => {
+            // Reset all dismiss-related state when opening
+            setTimeout(() => {
+                isAtBottom = false;
+                startScrollTop = 0;
+                isDismissing = false;
+                hasReachedBottom = false;
+                venturesPanel.style.transform = '';
+                // Show hint again
+                if (scrollHint) {
+                    scrollHint.style.opacity = '';
+                    scrollHint.style.transform = '';
+                }
+            }, 100);
+        });
+    }
+    
     // Sarcasm Mode
     const sarcasmToggle = document.getElementById('sarcasm-toggle');
     const profileImg = document.getElementById('profile-image');
