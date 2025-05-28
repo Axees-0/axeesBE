@@ -142,6 +142,46 @@ document.addEventListener('DOMContentLoaded', () => {
     // Start animations
     setTimeout(animateIn, 200);
     
+    // Previous Ventures Panel functionality
+    const previousVenturesToggle = document.getElementById('previous-ventures-toggle');
+    const venturesPanel = document.getElementById('ventures-panel');
+    const panelOverlay = document.getElementById('panel-overlay');
+    const panelClose = document.getElementById('panel-close');
+    
+    // Open panel
+    if (previousVenturesToggle) {
+        previousVenturesToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            venturesPanel.classList.add('active');
+            panelOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden'; // Prevent body scroll when panel is open
+        });
+    }
+    
+    // Close panel function
+    const closePanel = () => {
+        venturesPanel.classList.remove('active');
+        panelOverlay.classList.remove('active');
+        document.body.style.overflow = ''; // Restore body scroll
+    };
+    
+    // Close button
+    if (panelClose) {
+        panelClose.addEventListener('click', closePanel);
+    }
+    
+    // Close on overlay click
+    if (panelOverlay) {
+        panelOverlay.addEventListener('click', closePanel);
+    }
+    
+    // Close on escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && venturesPanel.classList.contains('active')) {
+            closePanel();
+        }
+    });
+    
     // Sarcasm Mode
     const sarcasmToggle = document.getElementById('sarcasm-toggle');
     const profileImg = document.getElementById('profile-image');

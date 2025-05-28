@@ -289,6 +289,16 @@ h2::after {
     transform: translateX(10px);
 }
 
+/* Style for Previously... link */
+#previous-ventures-toggle {
+    color: rgba(138, 180, 248, 0.6);
+    transition: color 0.3s ease;
+}
+
+#previous-ventures-toggle:hover {
+    color: rgba(138, 180, 248, 0.9);
+}
+
 /* Text reveal animations */
 .section p, .section li {
     opacity: 0;
@@ -645,4 +655,196 @@ body.sarcasm-mode::-webkit-scrollbar-thumb {
 
 body.sarcasm-mode::-webkit-scrollbar-thumb:hover {
     background: #666;
+}
+
+/* Slide-in Panel Styles */
+.panel-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    z-index: 999;
+}
+
+.panel-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.ventures-panel {
+    position: fixed;
+    top: 0;
+    right: -80%;
+    width: 80%;
+    height: 100%;
+    background: #0a0a0a;
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5);
+    transition: right 0.3s ease;
+    z-index: 1000;
+    overflow-y: auto;
+    border-left: 1px solid #222;
+}
+
+.ventures-panel.active {
+    right: 0;
+}
+
+.panel-header {
+    position: sticky;
+    top: 0;
+    background: #0a0a0a;
+    border-bottom: 1px solid #222;
+    padding: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 10;
+}
+
+.panel-header h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: #e0e0e0;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.panel-close {
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 2rem;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.panel-close:hover {
+    color: #fff;
+}
+
+.panel-content {
+    padding: 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.venture-item {
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid #222;
+}
+
+.venture-item:last-child {
+    border-bottom: none;
+}
+
+.venture-item h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 400;
+    color: #d0d0d0;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.5px;
+}
+
+.venture-date {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 0.2rem;
+}
+
+.venture-location {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.venture-item p:last-child {
+    color: #999;
+    line-height: 1.7;
+    font-size: 1rem;
+}
+
+/* Scrollbar for panel */
+.ventures-panel::-webkit-scrollbar {
+    width: 8px;
+}
+
+.ventures-panel::-webkit-scrollbar-track {
+    background: #0a0a0a;
+}
+
+.ventures-panel::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+.ventures-panel::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Mobile Responsive Panel */
+@media (max-width: 768px) {
+    .ventures-panel {
+        width: 90%;
+        right: -90%;
+    }
+    
+    .panel-header {
+        padding: 1.5rem;
+    }
+    
+    .panel-content {
+        padding: 1.5rem;
+    }
+    
+    .venture-item {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+    }
+    
+    .venture-item h4 {
+        font-size: 1.1rem;
+    }
+    
+    .venture-item p:last-child {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .ventures-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .panel-header h3 {
+        font-size: 1.5rem;
+    }
+    
+    .venture-item h4 {
+        font-size: 1rem;
+    }
+    
+    .venture-date,
+    .venture-location {
+        font-size: 0.85rem;
+    }
+    
+    .venture-item p:last-child {
+        font-size: 0.9rem;
+    }
 }

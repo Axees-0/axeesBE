@@ -5,8 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Michael Abdo</title>
     <link rel="stylesheet" href="styles.css">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-RM638Y0JWK"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-RM638Y0JWK');
+</script>
+<!-- End Google Analytics -->
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-NX75LFC');</script>
+<!-- End Google Tag Manager -->
 </head>
 <body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-NX75LFC"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
     <div class="container">
         <div class="content">
             <h1>Michael Abdo</h1>
@@ -44,6 +65,7 @@
             <ul class="ventures-list" id="ventures-content">
                 <li><a href="https://vespera.us" target="_blank">Vespera</a></li>
                 <li><a href="https://xenodex.us" target="_blank">Xenodex Sciences</a></li>
+                <li><a href="#" id="previous-ventures-toggle">Previously...</a></li>
             </ul>
         </div>
     </section>
@@ -61,6 +83,65 @@
     <div class="sarcasm-link-container">
         <p class="sarcasm-link"><a href="#" id="sarcasm-toggle">Still Here? Try a dose of sarcasm</a></p>
     </div>
+
+    <!-- Slide-in Panel for Previous Ventures -->
+    <div id="ventures-panel" class="ventures-panel">
+        <div class="panel-header">
+            <h3>Previous Ventures</h3>
+            <button id="panel-close" class="panel-close">&times;</button>
+        </div>
+        <div class="panel-content">
+            <div class="venture-item">
+                <h4>Co-Founder & Lead Developer | Xenodex Sciences</h4>
+                <p class="venture-date">Spring 2022 - Present</p>
+                <p class="venture-location">Portland, OR</p>
+                <p>Co-founded self-funded startup automating behavioral phenotype classification for genetic correlation analysis. Developed cost-effective framework demonstrating financial viability of automated behavioral classification at 22.5x cost reduction versus manual analysis. Training binary classification transformer on behavioral video data, implementing data augmentation techniques and transfer learning approaches to maximize signal extraction from limited samples. Building scalable inference pipeline replacing $45/hour manual analysis with automated classification at sub-$2 cost.</p>
+            </div>
+            
+            <div class="venture-item">
+                <h4>Algorithmic Trading Systems Developer | Vesper</h4>
+                <p class="venture-date">Spring 2021 - Present</p>
+                <p class="venture-location">Portland, OR | Remote</p>
+                <p>Apply programming and statistical analysis to real-world financial markets. Built small-scale systematic trading strategies optimized for alpha preservation rather than capital scale. Achieved 65.7% win rate with automated Python execution pipeline, demonstrating statistical edge identification and risk management. Maintain controlled scale with sub-second execution to preserve trading advantages while generating consistent returns.</p>
+            </div>
+            
+            <div class="venture-item">
+                <h4>Warehouse Data Analyst | Amazon PDX5</h4>
+                <p class="venture-date">Summer 2020 - Spring 2022</p>
+                <p class="venture-location">Portland, OR | Hybrid (COVID)</p>
+                <p>Became go-to analyst for complete PDX5 warehouse reconstruction project (300K+ sq ft, 1,000+ employees). Led data analysis and coordinated critical overnight implementation windows through facility remapping - one of multiple optimization initiatives delivered under tight operational constraints. Built Python/SQL systems tracking throughput metrics and identifying bottlenecks during auto-sorter implementation. Created real-time dashboards for operations leadership enabling data-driven decision making during major infrastructure overhaul.</p>
+            </div>
+            
+            <div class="venture-item">
+                <h4>Operations & Technology Lead | Panera Bread</h4>
+                <p class="venture-date">Spring 2018 - Summer 2020</p>
+                <p class="venture-location">Madison, WI</p>
+                <p>Took on primary technical leadership for Panera's proprietary in-house delivery platform serving Midwest regional rollout. Built frontend/backend integrations for custom dispatch system connecting restaurant operations to driver mobile apps. Debugged technical issues in production environment, implemented fixes, and trained staff on new delivery technology. Ensured seamless data synchronization between order management and driver assignment systems, achieving core performance metrics for system reliability and order accuracy.</p>
+            </div>
+            
+            <div class="venture-item">
+                <h4>Franchise Owner | College Pro Painters</h4>
+                <p class="venture-date">Spring 2017 - Spring 2018</p>
+                <p class="venture-location">Iowa City, IA</p>
+                <p>Generated $133K+ revenue managing complete painting franchise operations across Cedar Rapids, IA territory. Built resilient 8-person team through challenging market conditions, fostering strong interpersonal relationships that enabled 98% customer satisfaction across 45+ projects. Developed comprehensive business acumen through direct P&L responsibility, learning to navigate setbacks and adapt strategies while maintaining team morale and quality standards.</p>
+            </div>
+            
+            <div class="venture-item">
+                <h4>Mobile App Developer | Bio::Neos (Biotech Software Startup)</h4>
+                <p class="venture-date">Summer 2015 - Spring 2017</p>
+                <p class="venture-location">Iowa City, IA</p>
+                <p>Developed mobile applications for biotechnology company. Built iOS/Android interfaces for data collection and visualization systems. Early immersion in intersection of technology and biological sciences, establishing foundation for later ventures.</p>
+            </div>
+            
+            <div class="venture-item">
+                <h4>University of Iowa - Computer Science & Marketing</h4>
+                <p class="venture-date">Fall 2016 - Summer 2018</p>
+                <p class="venture-location">Iowa City, IA</p>
+                <p>Completed core coursework before making decision to pursue real-world innovation opportunities as market evolution outpaced traditional curriculum. Gained practical development experience through concurrent business ventures.</p>
+            </div>
+        </div>
+    </div>
+    <div id="panel-overlay" class="panel-overlay"></div>
 
     <script src="script.js?v=20250526"></script>
 </body>
