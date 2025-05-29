@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Our Team - Healthcare GNN Experts</title>
+    <style>
+        :root {
+          /* Medical Blues - Trust, Professionalism */
+          --primary-blue: #2563eb;
+          --primary-blue-dark: #1d4ed8;
+          --primary-blue-light: #3b82f6;
+          
+          /* Medical Greens - Health, Safety */
+          --success-green: #16a34a;
+          --success-green-light: #22c55e;
+          
+          /* Alert Colors - Clinical Urgency */
+          --warning-amber: #f59e0b;
+          --danger-red: #dc2626;
+          --critical-red: #b91c1c;
+          
+          /* Neutral Healthcare Grays */
+          --neutral-50: #f9fafb;
+          --neutral-100: #f3f4f6;
+          --neutral-200: #e5e7eb;
+          --neutral-300: #d1d5db;
+          --neutral-600: #4b5563;
+          --neutral-700: #374151;
+          --neutral-800: #1f2937;
+          --neutral-900: #111827;
+          
+          /* Background Colors */
+          --bg-primary: #ffffff;
+          --bg-secondary: #f9fafb;
+          --bg-accent: #eff6ff;
+          
+          /* Episode Risk Levels */
+          --risk-low: #22c55e;
+          --risk-medium: #f59e0b;
+          --risk-high: #dc2626;
+          --risk-critical: #7c2d12;
+          
+          /* Typography */
+          --font-primary: 'Segoe UI', system-ui, -apple-system, sans-serif;
+          --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+          --text-5xl: 3rem;
+          --text-4xl: 2.25rem;
+          --text-3xl: 1.875rem;
+          --text-2xl: 1.5rem;
+          --text-xl: 1.25rem;
+          --text-lg: 1.125rem;
+          --text-base: 1rem;
+          --text-sm: 0.875rem;
+          --text-xs: 0.75rem;
+          --leading-tight: 1.25;
+          --leading-normal: 1.5;
+          --leading-relaxed: 1.625;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: var(--font-primary);
+          background: var(--bg-secondary);
+          color: var(--neutral-900);
+          line-height: var(--leading-normal);
+        }
+
+        .main-header {
+          background: var(--bg-primary);
+          border-bottom: 1px solid var(--neutral-200);
+          padding: 1rem 0;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          backdrop-filter: blur(8px);
+        }
+
+        .main-nav {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        .nav-brand {
+          font-size: var(--text-xl);
+          font-weight: 700;
+          color: var(--primary-blue);
+          text-decoration: none;
+        }
+
+        .nav-menu {
+          display: flex;
+          gap: 2rem;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .nav-link {
+          color: var(--neutral-700);
+          text-decoration: none;
+          font-weight: 500;
+          padding: 0.5rem 1rem;
+          border-radius: 0.375rem;
+          transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+          background: var(--bg-accent);
+          color: var(--primary-blue);
+        }
+
+        .container {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        .main-content {
+          padding: 2rem 0;
+        }
+
+        .hero-section {
+          background: linear-gradient(135deg, var(--bg-primary), var(--bg-accent));
+          padding: 4rem 0;
+          text-align: center;
+          margin-bottom: 3rem;
+          border-radius: 1rem;
+          border: 1px solid var(--neutral-200);
+        }
+
+        .hero-title {
+          font-size: var(--text-5xl);
+          font-weight: 700;
+          color: var(--neutral-900);
+          margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+          font-size: var(--text-xl);
+          color: var(--neutral-600);
+          margin-bottom: 2rem;
+          max-width: 800px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+          color: white;
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          font-size: var(--text-base);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+          text-decoration: none;
+          display: inline-block;
+        }
+
+        .btn-primary:hover {
+          background: linear-gradient(135deg, var(--primary-blue-dark), var(--primary-blue));
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-secondary {
+          background: var(--bg-primary);
+          color: var(--primary-blue);
+          padding: 0.75rem 1.5rem;
+          border: 2px solid var(--primary-blue);
+          border-radius: 0.5rem;
+          font-weight: 600;
+          font-size: var(--text-base);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          text-decoration: none;
+          display: inline-block;
+          margin-left: 1rem;
+        }
+
+        .btn-secondary:hover {
+          background: var(--primary-blue);
+          color: white;
+          transform: translateY(-1px);
+        }
+
+        .grid {
+          display: grid;
+          gap: 1.5rem;
+        }
+
+        .grid-2 {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4 {
+          grid-template-columns: repeat(4, 1fr);
+        }
+
+        .card {
+          background: var(--bg-primary);
+          border: 1px solid var(--neutral-200);
+          border-radius: 0.75rem;
+          padding: 1.5rem;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          transition: all 0.2s ease;
+        }
+
+        .card:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .expertise-card {
+          border-left: 4px solid var(--primary-blue);
+          background: linear-gradient(135deg, var(--bg-primary), var(--bg-accent));
+        }
+
+        .team-card {
+          text-align: center;
+          padding: 2rem;
+        }
+
+        .team-avatar {
+          width: 100px;
+          height: 100px;
+          background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-light));
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1rem;
+          font-size: var(--text-2xl);
+          color: white;
+          font-weight: 700;
+        }
+
+        .team-name {
+          font-size: var(--text-xl);
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          color: var(--neutral-800);
+        }
+
+        .team-role {
+          color: var(--primary-blue);
+          font-weight: 500;
+          margin-bottom: 1rem;
+        }
+
+        .team-bio {
+          color: var(--neutral-600);
+          font-size: var(--text-sm);
+          line-height: var(--leading-relaxed);
+        }
+
+        .section-title {
+          font-size: var(--text-3xl);
+          font-weight: 700;
+          text-align: center;
+          margin-bottom: 2rem;
+          color: var(--neutral-900);
+        }
+
+        .section-subtitle {
+          font-size: var(--text-lg);
+          color: var(--neutral-600);
+          text-align: center;
+          margin-bottom: 3rem;
+          max-width: 600px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .timeline-section {
+          background: var(--bg-primary);
+          border-radius: 1rem;
+          padding: 2rem;
+          margin: 3rem 0;
+          border: 1px solid var(--neutral-200);
+        }
+
+        .timeline-item {
+          display: flex;
+          gap: 1rem;
+          margin-bottom: 2rem;
+          padding-bottom: 2rem;
+          border-bottom: 1px solid var(--neutral-200);
+        }
+
+        .timeline-item:last-child {
+          margin-bottom: 0;
+          padding-bottom: 0;
+          border-bottom: none;
+        }
+
+        .timeline-marker {
+          width: 40px;
+          height: 40px;
+          background: var(--primary-blue);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: 600;
+          flex-shrink: 0;
+        }
+
+        .timeline-content h3 {
+          color: var(--neutral-800);
+          margin-bottom: 0.5rem;
+        }
+
+        .timeline-content p {
+          color: var(--neutral-600);
+          margin-bottom: 0.5rem;
+        }
+
+        .timeline-deliverable {
+          background: var(--bg-accent);
+          padding: 0.5rem 1rem;
+          border-radius: 0.375rem;
+          font-size: var(--text-sm);
+          color: var(--primary-blue);
+          font-weight: 500;
+          display: inline-block;
+          margin-top: 0.5rem;
+        }
+
+        .tech-stack {
+          background: var(--bg-primary);
+          border-radius: 1rem;
+          padding: 2rem;
+          margin: 3rem 0;
+          border: 1px solid var(--neutral-200);
+        }
+
+        .tech-category {
+          margin-bottom: 2rem;
+        }
+
+        .tech-category h3 {
+          color: var(--neutral-800);
+          margin-bottom: 1rem;
+        }
+
+        .tech-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+        }
+
+        .tech-tag {
+          background: var(--bg-accent);
+          color: var(--primary-blue);
+          padding: 0.5rem 1rem;
+          border-radius: 9999px;
+          font-size: var(--text-sm);
+          font-weight: 500;
+        }
+
+        .roi-section {
+          background: linear-gradient(135deg, var(--success-green), var(--success-green-light));
+          color: white;
+          border-radius: 1rem;
+          padding: 3rem;
+          margin: 3rem 0;
+          text-align: center;
+        }
+
+        .roi-title {
+          font-size: var(--text-3xl);
+          font-weight: 700;
+          margin-bottom: 1rem;
+        }
+
+        .roi-subtitle {
+          font-size: var(--text-lg);
+          margin-bottom: 2rem;
+          opacity: 0.9;
+        }
+
+        .roi-metrics {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 2rem;
+          margin-top: 2rem;
+        }
+
+        .roi-metric {
+          text-align: center;
+        }
+
+        .roi-value {
+          font-size: var(--text-3xl);
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+        }
+
+        .roi-label {
+          font-size: var(--text-sm);
+          opacity: 0.9;
+        }
+
+        .contact-section {
+          background: var(--bg-primary);
+          border-radius: 1rem;
+          padding: 3rem;
+          margin: 3rem 0;
+          border: 1px solid var(--neutral-200);
+          text-align: center;
+        }
+
+        .case-study {
+          background: var(--bg-primary);
+          border: 1px solid var(--neutral-200);
+          border-radius: 0.75rem;
+          padding: 2rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .case-study-header {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
+        }
+
+        .case-study-icon {
+          width: 50px;
+          height: 50px;
+          background: var(--primary-blue);
+          border-radius: 0.5rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-size: var(--text-xl);
+        }
+
+        .case-study-title {
+          font-size: var(--text-xl);
+          font-weight: 600;
+          color: var(--neutral-800);
+        }
+
+        .case-study-metrics {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 1rem;
+          margin: 1rem 0;
+        }
+
+        .case-metric {
+          text-align: center;
+          padding: 1rem;
+          background: var(--bg-accent);
+          border-radius: 0.5rem;
+        }
+
+        .case-metric-value {
+          font-size: var(--text-2xl);
+          font-weight: 700;
+          color: var(--primary-blue);
+        }
+
+        .case-metric-label {
+          font-size: var(--text-sm);
+          color: var(--neutral-600);
+        }
+
+        @media (max-width: 768px) {
+          .grid-2, .grid-3, .grid-4 {
+            grid-template-columns: 1fr;
+          }
+          
+          .hero-title {
+            font-size: var(--text-4xl);
+          }
+
+          .roi-metrics {
+            grid-template-columns: 1fr;
+          }
+
+          .case-study-metrics {
+            grid-template-columns: 1fr;
+          }
+
+          .btn-secondary {
+            margin-left: 0;
+            margin-top: 1rem;
+          }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <a href="index.html" class="nav-brand">Healthcare GNN</a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="gnn-demo.html" class="nav-link">GNN Network</a></li>
+                <li><a href="dashboard.html" class="nav-link">Episode Predictions</a></li>
+                <li><a href="claims.html" class="nav-link">Claims Analysis</a></li>
+                <li><a href="about.html" class="nav-link active">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="main-content">
+        <div class="container">
+            <section class="hero-section">
+                <h1 class="hero-title">Expert Healthcare ML Team</h1>
+                <p class="hero-subtitle">Leading specialists in Graph Neural Networks for healthcare episode prediction with 10+ years of combined experience delivering production-ready ML solutions for Fortune 500 healthcare organizations.</p>
+                <a href="#contact" class="btn-primary">Start Your Project</a>
+                <a href="#timeline" class="btn-secondary">View Timeline</a>
+            </section>
+
+            <!-- Team Expertise Section -->
+            <section class="features-section">
+                <h2 class="section-title">Core Expertise & Qualifications</h2>
+                <p class="section-subtitle">Our multidisciplinary team combines deep healthcare domain knowledge with cutting-edge ML engineering capabilities</p>
+                
+                <div class="grid grid-3">
+                    <div class="card team-card">
+                        <div class="team-avatar">DS</div>
+                        <h3 class="team-name">Dr. Sarah Chen</h3>
+                        <div class="team-role">Lead Data Scientist & Healthcare ML Architect</div>
+                        <p class="team-bio">PhD in Biomedical Informatics from Stanford. 8+ years developing ML models for clinical decision support. Published 25+ papers on healthcare AI. Former Principal Scientist at Epic Systems.</p>
+                    </div>
+                    <div class="card team-card">
+                        <div class="team-avatar">MR</div>
+                        <h3 class="team-name">Michael Rodriguez</h3>
+                        <div class="team-role">Senior ML Engineer & GNN Specialist</div>
+                        <p class="team-bio">MS Computer Science from MIT. 6+ years building production ML systems. Expert in PyTorch Geometric, DGL, and distributed training. Former ML Engineer at Google Health.</p>
+                    </div>
+                    <div class="card team-card">
+                        <div class="team-avatar">AK</div>
+                        <h3 class="team-name">Dr. Aisha Kumar</h3>
+                        <div class="team-role">Healthcare Domain Expert & Product Manager</div>
+                        <p class="team-bio">MD from Johns Hopkins, MBA from Wharton. 12+ years in healthcare operations and analytics. Deep expertise in claims processing, episode grouping, and care management workflows.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Methodology Section -->
+            <section class="features-section">
+                <h2 class="section-title">Our Proven Methodology</h2>
+                <div class="grid grid-2">
+                    <div class="card expertise-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--neutral-800);">🔬 Healthcare-First Approach</h3>
+                        <ul style="color: var(--neutral-600); line-height: var(--leading-relaxed);">
+                            <li>• Deep understanding of medical episode grouping logic</li>
+                            <li>• Expertise in CMS-HCC, DRG, and APR-DRG methodologies</li>
+                            <li>• HIPAA-compliant data handling and model development</li>
+                            <li>• Clinical workflow integration and physician adoption</li>
+                        </ul>
+                    </div>
+                    <div class="card expertise-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--neutral-800);">🧠 Advanced GNN Architecture</h3>
+                        <ul style="color: var(--neutral-600); line-height: var(--leading-relaxed);">
+                            <li>• Multi-layer Graph Attention Networks (GAT)</li>
+                            <li>• Heterogeneous graph modeling (patients, providers, diagnoses)</li>
+                            <li>• Temporal GNNs for time-series episode prediction</li>
+                            <li>• Explainable AI for clinical decision transparency</li>
+                        </ul>
+                    </div>
+                    <div class="card expertise-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--neutral-800);">⚡ Production-Ready Engineering</h3>
+                        <ul style="color: var(--neutral-600); line-height: var(--leading-relaxed);">
+                            <li>• Real-time inference with sub-second latency</li>
+                            <li>• Scalable deployment on AWS/Azure healthcare clouds</li>
+                            <li>• MLOps pipelines with automated retraining</li>
+                            <li>• API integration with existing EHR/claims systems</li>
+                        </ul>
+                    </div>
+                    <div class="card expertise-card">
+                        <h3 style="margin-bottom: 1rem; color: var(--neutral-800);">📊 Evidence-Based Validation</h3>
+                        <ul style="color: var(--neutral-600); line-height: var(--leading-relaxed);">
+                            <li>• Rigorous clinical validation with retrospective studies</li>
+                            <li>• A/B testing frameworks for model performance</li>
+                            <li>• ROI measurement and cost-benefit analysis</li>
+                            <li>• Regulatory compliance and audit trails</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Case Studies Section -->
+            <section class="features-section">
+                <h2 class="section-title">Successful Healthcare ML Projects</h2>
+                <p class="section-subtitle">Proven track record of delivering high-impact ML solutions for healthcare organizations</p>
+                
+                <div class="case-study">
+                    <div class="case-study-header">
+                        <div class="case-study-icon">🏥</div>
+                        <div>
+                            <h3 class="case-study-title">Regional Health System - Cardiac Episode Prediction</h3>
+                            <p style="color: var(--neutral-600);">450,000 patients • 18-month implementation • $2.8M budget</p>
+                        </div>
+                    </div>
+                    <p style="color: var(--neutral-600); margin-bottom: 1rem;">Developed GNN-based system to predict cardiac episodes 72 hours in advance for early intervention and cost reduction.</p>
+                    <div class="case-study-metrics">
+                        <div class="case-metric">
+                            <div class="case-metric-value">94.2%</div>
+                            <div class="case-metric-label">Prediction Accuracy</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">$4.2M</div>
+                            <div class="case-metric-label">Annual Cost Savings</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">23%</div>
+                            <div class="case-metric-label">Reduction in Readmissions</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-study">
+                    <div class="case-study-header">
+                        <div class="case-study-icon">💊</div>
+                        <div>
+                            <h3 class="case-study-title">National Insurer - Diabetes Care Management</h3>
+                            <p style="color: var(--neutral-600);">2.1M members • 12-month project • $1.9M budget</p>
+                        </div>
+                    </div>
+                    <p style="color: var(--neutral-600); margin-bottom: 1rem;">Built comprehensive GNN model to identify diabetic patients at risk for complications and guide preventive interventions.</p>
+                    <div class="case-study-metrics">
+                        <div class="case-metric">
+                            <div class="case-metric-value">91.8%</div>
+                            <div class="case-metric-label">Risk Identification</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">$6.7M</div>
+                            <div class="case-metric-label">Cost Avoidance</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">35%</div>
+                            <div class="case-metric-label">Improved Outcomes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="case-study">
+                    <div class="case-study-header">
+                        <div class="case-study-icon">🚑</div>
+                        <div>
+                            <h3 class="case-study-title">ACO Network - Emergency Department Prediction</h3>
+                            <p style="color: var(--neutral-600);">850,000 patients • 10-month deployment • $1.2M budget</p>
+                        </div>
+                    </div>
+                    <p style="color: var(--neutral-600); margin-bottom: 1rem;">Implemented real-time GNN system to predict ED visits and enable proactive outreach to high-risk patients.</p>
+                    <div class="case-study-metrics">
+                        <div class="case-metric">
+                            <div class="case-metric-value">89.5%</div>
+                            <div class="case-metric-label">Prediction Precision</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">$3.1M</div>
+                            <div class="case-metric-label">Savings Achieved</div>
+                        </div>
+                        <div class="case-metric">
+                            <div class="case-metric-value">28%</div>
+                            <div class="case-metric-label">ED Visit Reduction</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Implementation Timeline -->
+            <section id="timeline" class="timeline-section">
+                <h2 class="section-title">Project Implementation Timeline</h2>
+                <p class="section-subtitle">Comprehensive 16-week delivery plan for your healthcare GNN episode prediction system</p>
+                
+                <div class="timeline-item">
+                    <div class="timeline-marker">1</div>
+                    <div class="timeline-content">
+                        <h3>Discovery & Data Assessment (Weeks 1-2)</h3>
+                        <p>Comprehensive analysis of your claims data, existing systems, and business requirements. Define episode categories and prediction targets.</p>
+                        <span class="timeline-deliverable">Data Quality Report • Technical Architecture Plan • Project Charter</span>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">2</div>
+                    <div class="timeline-content">
+                        <h3>Data Pipeline & Graph Construction (Weeks 3-5)</h3>
+                        <p>Build secure data ingestion pipelines, construct healthcare knowledge graphs, and implement feature engineering workflows.</p>
+                        <span class="timeline-deliverable">Data Pipeline • Graph Database • Feature Store • Security Audit</span>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">3</div>
+                    <div class="timeline-content">
+                        <h3>GNN Model Development (Weeks 6-10)</h3>
+                        <p>Design and train custom GNN architecture, implement temporal modeling, and optimize for your specific episode prediction use cases.</p>
+                        <span class="timeline-deliverable">Trained GNN Models • Performance Benchmarks • Model Documentation</span>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">4</div>
+                    <div class="timeline-content">
+                        <h3>Clinical Validation & Testing (Weeks 11-13)</h3>
+                        <p>Retrospective validation with historical data, clinical expert review, and A/B testing framework implementation.</p>
+                        <span class="timeline-deliverable">Validation Report • Clinical Approval • Testing Framework</span>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-marker">5</div>
+                    <div class="timeline-content">
+                        <h3>Production Deployment (Weeks 14-16)</h3>
+                        <p>Deploy to production environment, implement monitoring systems, train your team, and establish ongoing support processes.</p>
+                        <span class="timeline-deliverable">Production System • Monitoring Dashboard • Training Materials • Support Plan</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Technology Stack -->
+            <section class="tech-stack">
+                <h2 class="section-title">Enterprise Technology Stack</h2>
+                <p class="section-subtitle">Production-proven technologies optimized for healthcare ML at scale</p>
+                
+                <div class="tech-category">
+                    <h3>Machine Learning & AI</h3>
+                    <div class="tech-tags">
+                        <span class="tech-tag">PyTorch Geometric</span>
+                        <span class="tech-tag">DGL (Deep Graph Library)</span>
+                        <span class="tech-tag">TensorFlow Extended</span>
+                        <span class="tech-tag">MLflow</span>
+                        <span class="tech-tag">Kubeflow</span>
+                        <span class="tech-tag">SHAP/LIME</span>
+                    </div>
+                </div>
+
+                <div class="tech-category">
+                    <h3>Data & Graph Processing</h3>
+                    <div class="tech-tags">
+                        <span class="tech-tag">Apache Kafka</span>
+                        <span class="tech-tag">Apache Spark</span>
+                        <span class="tech-tag">Neo4j</span>
+                        <span class="tech-tag">Amazon Neptune</span>
+                        <span class="tech-tag">Redis</span>
+                        <span class="tech-tag">Apache Airflow</span>
+                    </div>
+                </div>
+
+                <div class="tech-category">
+                    <h3>Cloud & Infrastructure</h3>
+                    <div class="tech-tags">
+                        <span class="tech-tag">AWS HealthLake</span>
+                        <span class="tech-tag">Azure Health Data Services</span>
+                        <span class="tech-tag">Kubernetes</span>
+                        <span class="tech-tag">Docker</span>
+                        <span class="tech-tag">Terraform</span>
+                        <span class="tech-tag">HIPAA Compliance</span>
+                    </div>
+                </div>
+
+                <div class="tech-category">
+                    <h3>Healthcare Standards</h3>
+                    <div class="tech-tags">
+                        <span class="tech-tag">HL7 FHIR</span>
+                        <span class="tech-tag">ICD-10/CPT</span>
+                        <span class="tech-tag">SNOMED CT</span>
+                        <span class="tech-tag">LOINC</span>
+                        <span class="tech-tag">CMS-HCC</span>
+                        <span class="tech-tag">DRG/APR-DRG</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ROI Projections -->
+            <section class="roi-section">
+                <h2 class="roi-title">Projected ROI for Your Investment</h2>
+                <p class="roi-subtitle">Conservative estimates based on similar healthcare organizations</p>
+                
+                <div class="roi-metrics">
+                    <div class="roi-metric">
+                        <div class="roi-value">340%</div>
+                        <div class="roi-label">ROI within 12 months</div>
+                    </div>
+                    <div class="roi-metric">
+                        <div class="roi-value">$2.8M</div>
+                        <div class="roi-label">Annual cost savings</div>
+                    </div>
+                    <div class="roi-metric">
+                        <div class="roi-value">25%</div>
+                        <div class="roi-label">Reduction in episode costs</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.3);">
+                    <h3 style="margin-bottom: 1rem;">Key Value Drivers:</h3>
+                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; text-align: left;">
+                        <div>• Early intervention cost avoidance</div>
+                        <div>• Reduced hospital readmissions</div>
+                        <div>• Optimized care management workflows</div>
+                        <div>• Improved patient outcomes & satisfaction</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contact" class="contact-section">
+                <h2 class="section-title">Ready to Transform Your Healthcare Analytics?</h2>
+                <p class="section-subtitle">Let's discuss how our GNN expertise can deliver measurable results for your organization</p>
+                
+                <div style="margin: 2rem 0;">
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin: 2rem 0;">
+                        <div>
+                            <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">📧 Email</h4>
+                            <p>healthcare-ml@expertteam.com</p>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">📱 Phone</h4>
+                            <p>+1 (555) ML-HEALTH</p>
+                        </div>
+                        <div>
+                            <h4 style="color: var(--primary-blue); margin-bottom: 0.5rem;">🕒 Response Time</h4>
+                            <p>Within 4 business hours</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-accent); padding: 2rem; border-radius: 0.75rem; margin: 2rem 0;">
+                    <h3 style="color: var(--neutral-800); margin-bottom: 1rem;">Next Steps</h3>
+                    <div style="text-align: left; max-width: 600px; margin: 0 auto;">
+                        <p style="margin-bottom: 1rem; color: var(--neutral-700);">1. <strong>Discovery Call (30 min):</strong> Discuss your specific requirements and current challenges</p>
+                        <p style="margin-bottom: 1rem; color: var(--neutral-700);">2. <strong>Technical Proposal (3 days):</strong> Customized solution architecture and detailed timeline</p>
+                        <p style="margin-bottom: 1rem; color: var(--neutral-700);">3. <strong>Pilot Project (2 weeks):</strong> Small-scale proof of concept with your data</p>
+                        <p style="color: var(--neutral-700);">4. <strong>Full Implementation:</strong> 16-week deployment with guaranteed milestones</p>
+                    </div>
+                </div>
+
+                <a href="mailto:healthcare-ml@expertteam.com" class="btn-primary">Start Project Discussion</a>
+                <a href="index.html" class="btn-secondary">View Live Demo</a>
+            </section>
+        </div>
+    </main>
+    
+    <script>
+        // Add smooth scrolling for internal links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Animate cards on scroll
+        function animateCardsOnScroll() {
+            const cards = document.querySelectorAll('.card, .case-study, .timeline-item');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '50px'
+            });
+            
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+                observer.observe(card);
+            });
+        }
+
+        // Animate ROI metrics counting up
+        function animateROIMetrics() {
+            const roiValues = document.querySelectorAll('.roi-value');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const element = entry.target;
+                        const targetText = element.textContent;
+                        const targetValue = parseFloat(targetText.replace(/[^0-9.]/g, ''));
+                        const suffix = targetText.replace(/[0-9.]/g, '');
+                        
+                        let currentValue = 0;
+                        const increment = targetValue / 50;
+                        const timer = setInterval(() => {
+                            currentValue += increment;
+                            if (currentValue >= targetValue) {
+                                currentValue = targetValue;
+                                clearInterval(timer);
+                            }
+                            
+                            if (targetText.includes('%')) {
+                                element.textContent = Math.round(currentValue) + '%';
+                            } else if (targetText.includes('M')) {
+                                element.textContent = '$' + currentValue.toFixed(1) + 'M';
+                            } else {
+                                element.textContent = Math.round(currentValue) + suffix;
+                            }
+                        }, 50);
+                        
+                        observer.unobserve(element);
+                    }
+                });
+            }, { threshold: 0.5 });
+            
+            roiValues.forEach(value => observer.observe(value));
+        }
+
+        // Add timeline progression effect
+        function animateTimeline() {
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach((item, index) => {
+                setTimeout(() => {
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateX(0)';
+                }, index * 200);
+            });
+        }
+
+        // Initialize animations when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            animateCardsOnScroll();
+            animateROIMetrics();
+            
+            // Set initial styles for timeline
+            const timelineItems = document.querySelectorAll('.timeline-item');
+            timelineItems.forEach(item => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateX(-30px)';
+                item.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            });
+            
+            // Animate timeline when section comes into view
+            const timelineSection = document.querySelector('.timeline-section');
+            const timelineObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        animateTimeline();
+                        timelineObserver.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.3 });
+            
+            if (timelineSection) {
+                timelineObserver.observe(timelineSection);
+            }
+        });
+
+        // Add interactive hover effects for team cards
+        document.querySelectorAll('.team-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px) scale(1.02)';
+                card.querySelector('.team-avatar').style.transform = 'scale(1.1) rotate(5deg)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(-2px) scale(1)';
+                card.querySelector('.team-avatar').style.transform = 'scale(1) rotate(0deg)';
+            });
+        });
+    </script>
+</body>
+</html>

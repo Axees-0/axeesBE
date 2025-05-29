@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GNN Visualization - HealthGNN</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --secondary-light: #34d399;
+            --background-color: #ffffff;
+            --background-gray: #f8fafc;
+            --background-dark: #1e293b;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --text-white: #ffffff;
+            --border-color: #e2e8f0;
+            --border-dark: #cbd5e1;
+            --accent-blue: #0ea5e9;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-orange: #f59e0b;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--background-color);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            height: 80px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: var(--spacing-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-white);
+            padding: var(--spacing-2xl) 0;
+            text-align: center;
+        }
+
+        .page-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .page-header p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .demo-section {
+            padding: var(--spacing-3xl) 0;
+        }
+
+        .controls-panel {
+            background: var(--background-gray);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--spacing-xl);
+            display: flex;
+            gap: var(--spacing-lg);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+
+        .control-label {
+            font-weight: 500;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: var(--text-white);
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--text-white);
+        }
+
+        .visualization-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-3xl);
+        }
+
+        .gnn-visualization {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            height: 600px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-panel {
+            background: var(--background-gray);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            height: 600px;
+            overflow-y: auto;
+        }
+
+        .info-panel h3 {
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+
+        .node-info {
+            background: var(--background-color);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .node-info h4 {
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-primary);
+        }
+
+        .node-info p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .legend {
+            background: var(--background-color);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+
+        .stat-card {
+            background: var(--background-color);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .technical-details {
+            background: var(--background-gray);
+            padding: var(--spacing-2xl) 0;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-xl);
+        }
+
+        .detail-card {
+            background: var(--background-color);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        .detail-card h3 {
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+
+        .detail-card ul {
+            list-style: none;
+        }
+
+        .detail-card li {
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .detail-card li:last-child {
+            border-bottom: none;
+        }
+
+        .alert {
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background-color: #eff6ff;
+            border-color: var(--accent-blue);
+            color: #1e40af;
+        }
+
+        #gnn-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node {
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .node:hover {
+            stroke-width: 3px;
+        }
+
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+            stroke-width: 2px;
+        }
+
+        .node-patient {
+            fill: var(--primary-color);
+        }
+
+        .node-provider {
+            fill: var(--secondary-color);
+        }
+
+        .node-procedure {
+            fill: var(--accent-orange);
+        }
+
+        .node-diagnosis {
+            fill: var(--accent-red);
+        }
+
+        .node-selected {
+            stroke: #000;
+            stroke-width: 3px;
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTgiIGZpbGw9IiMyNTYzZWIiLz4KPGV0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+R048L3RleHQ+Cjwvc3ZnPgo=" alt="HealthGNN Logo">
+                    <span>HealthGNN</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="gnn-demo.html" class="nav-link active">GNN Visualization</a></li>
+                    <li><a href="dashboard.html" class="nav-link">Episode Dashboard</a></li>
+                    <li><a href="claims.html" class="nav-link">Claims Analysis</a></li>
+                    <li><a href="about.html" class="nav-link">About</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="page-header">
+                <div class="container">
+                    <h1>Graph Neural Network Visualization</h1>
+                    <p>Interactive exploration of patient-provider-procedure relationships and neural network architecture for episode prediction</p>
+                </div>
+            </section>
+
+            <section class="demo-section">
+                <div class="container">
+                    <div class="alert alert-info">
+                        <strong>Interactive Demo:</strong> Click on nodes to explore relationships. Use controls below to filter the network and observe prediction patterns.
+                    </div>
+
+                    <div class="controls-panel">
+                        <div class="control-group">
+                            <label class="control-label">Node Type Filter</label>
+                            <select id="nodeFilter" onchange="filterNodes()">
+                                <option value="all">All Nodes</option>
+                                <option value="patient">Patients Only</option>
+                                <option value="provider">Providers Only</option>
+                                <option value="procedure">Procedures Only</option>
+                                <option value="diagnosis">Diagnoses Only</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Episode Risk</label>
+                            <select id="riskFilter" onchange="filterByRisk()">
+                                <option value="all">All Risk Levels</option>
+                                <option value="high">High Risk</option>
+                                <option value="medium">Medium Risk</option>
+                                <option value="low">Low Risk</option>
+                            </select>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Simulation</label>
+                            <button class="btn-primary" onclick="runPrediction()">
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M8 5v14l11-7z"/>
+                                </svg>
+                                Run Prediction
+                            </button>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label">Layout</label>
+                            <button class="btn-secondary" onclick="resetLayout()">Reset Layout</button>
+                        </div>
+                    </div>
+
+                    <div class="visualization-container">
+                        <div class="gnn-visualization">
+                            <svg id="gnn-svg"></svg>
+                            <div id="tooltip" class="tooltip" style="display: none;"></div>
+                        </div>
+
+                        <div class="info-panel">
+                            <h3>Network Information</h3>
+                            
+                            <div class="legend">
+                                <h4>Node Types</h4>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: var(--primary-color);"></div>
+                                    <span>Patients</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: var(--secondary-color);"></div>
+                                    <span>Healthcare Providers</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: var(--accent-orange);"></div>
+                                    <span>Medical Procedures</span>
+                                </div>
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: var(--accent-red);"></div>
+                                    <span>Diagnoses</span>
+                                </div>
+                            </div>
+
+                            <div id="selectedNodeInfo" class="node-info" style="display: none;">
+                                <h4 id="nodeTitle">Select a node</h4>
+                                <p id="nodeDescription">Click on any node to view detailed information about its role in the healthcare network and episode prediction model.</p>
+                            </div>
+
+                            <div class="node-info">
+                                <h4>GNN Architecture</h4>
+                                <p>Our Graph Neural Network uses Graph Convolutional Networks (GCN) with attention mechanisms to model complex relationships in healthcare data. Each node aggregates information from its neighbors to learn rich representations for episode prediction.</p>
+                            </div>
+
+                            <div class="node-info">
+                                <h4>Prediction Process</h4>
+                                <p>The model analyzes temporal patterns in claims data, identifying subtle indicators that precede episode onset. Multi-hop message passing captures both direct and indirect relationships between patients and care patterns.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="nodeCount">156</div>
+                            <div class="stat-label">Active Nodes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="edgeCount">342</div>
+                            <div class="stat-label">Relationships</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="predictionAccuracy">94.2%</div>
+                            <div class="stat-label">Prediction Accuracy</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="technical-details">
+                <div class="container">
+                    <h2 style="text-align: center; margin-bottom: var(--spacing-2xl); color: var(--text-primary);">Technical Implementation</h2>
+                    
+                    <div class="detail-grid">
+                        <div class="detail-card">
+                            <h3>Graph Neural Network Architecture</h3>
+                            <ul>
+                                <li>Graph Convolutional Network (GCN) layers for feature aggregation</li>
+                                <li>Graph Attention Network (GAT) for weighted neighbor importance</li>
+                                <li>Multi-head attention mechanisms for complex relationship modeling</li>
+                                <li>Residual connections for deep network training stability</li>
+                                <li>Graph normalization for consistent node feature scaling</li>
+                                <li>Temporal embedding layers for time-series claims data</li>
+                            </ul>
+                        </div>
+
+                        <div class="detail-card">
+                            <h3>Healthcare Data Integration</h3>
+                            <ul>
+                                <li>Medical claims data preprocessing and feature engineering</li>
+                                <li>ICD-10 diagnosis code embedding and similarity mapping</li>
+                                <li>CPT procedure code hierarchical representation</li>
+                                <li>Provider network topology and specialty clustering</li>
+                                <li>Patient demographic and comorbidity features</li>
+                                <li>Temporal sequence modeling for episode patterns</li>
+                            </ul>
+                        </div>
+
+                        <div class="detail-card">
+                            <h3>Prediction Methodology</h3>
+                            <ul>
+                                <li>Multi-task learning for episode type prediction</li>
+                                <li>Contrastive learning for rare episode detection</li>
+                                <li>Uncertainty quantification for prediction confidence</li>
+                                <li>Explainable AI for clinical decision support</li>
+                                <li>Real-time inference for streaming claims data</li>
+                                <li>Adaptive thresholds for optimal intervention timing</li>
+                            </ul>
+                        </div>
+
+                        <div class="detail-card">
+                            <h3>Production Deployment</h3>
+                            <ul>
+                                <li>Scalable graph processing with distributed computing</li>
+                                <li>Real-time model inference with sub-second latency</li>
+                                <li>Automated model retraining with new claims data</li>
+                                <li>HIPAA-compliant data handling and privacy protection</li>
+                                <li>API integration for existing healthcare systems</li>
+                                <li>Monitoring and alerting for model performance</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Navigation active state management
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // GNN Visualization Data
+        const nodes = [
+            // Patients (high risk)
+            {id: 'P001', type: 'patient', name: 'Patient 001', risk: 'high', x: 200, y: 150},
+            {id: 'P002', type: 'patient', name: 'Patient 002', risk: 'medium', x: 150, y: 200},
+            {id: 'P003', type: 'patient', name: 'Patient 003', risk: 'low', x: 250, y: 100},
+            {id: 'P004', type: 'patient', name: 'Patient 004', risk: 'high', x: 100, y: 300},
+            {id: 'P005', type: 'patient', name: 'Patient 005', risk: 'medium', x: 300, y: 250},
+            
+            // Providers
+            {id: 'PR001', type: 'provider', name: 'Cardiology Clinic', risk: 'medium', x: 400, y: 200},
+            {id: 'PR002', type: 'provider', name: 'General Hospital', risk: 'high', x: 350, y: 150},
+            {id: 'PR003', type: 'provider', name: 'Endocrinology Practice', risk: 'medium', x: 450, y: 250},
+            {id: 'PR004', type: 'provider', name: 'Emergency Department', risk: 'high', x: 400, y: 100},
+            
+            // Procedures
+            {id: 'PC001', type: 'procedure', name: 'Cardiac Catheterization', risk: 'high', x: 550, y: 180},
+            {id: 'PC002', type: 'procedure', name: 'CT Scan', risk: 'medium', x: 500, y: 120},
+            {id: 'PC003', type: 'procedure', name: 'Blood Work', risk: 'low', x: 600, y: 200},
+            {id: 'PC004', type: 'procedure', name: 'MRI', risk: 'medium', x: 520, y: 260},
+            
+            // Diagnoses
+            {id: 'D001', type: 'diagnosis', name: 'Diabetes Type 2', risk: 'high', x: 50, y: 150},
+            {id: 'D002', type: 'diagnosis', name: 'Hypertension', risk: 'medium', x: 80, y: 200},
+            {id: 'D003', type: 'diagnosis', name: 'Coronary Artery Disease', risk: 'high', x: 30, y: 250},
+            {id: 'D004', type: 'diagnosis', name: 'Chronic Kidney Disease', risk: 'high', x: 70, y: 100}
+        ];
+
+        const links = [
+            // Patient-Provider relationships
+            {source: 'P001', target: 'PR001', strength: 0.8},
+            {source: 'P001', target: 'PR002', strength: 0.6},
+            {source: 'P002', target: 'PR002', strength: 0.7},
+            {source: 'P003', target: 'PR003', strength: 0.5},
+            {source: 'P004', target: 'PR004', strength: 0.9},
+            {source: 'P005', target: 'PR001', strength: 0.4},
+            
+            // Provider-Procedure relationships
+            {source: 'PR001', target: 'PC001', strength: 0.9},
+            {source: 'PR002', target: 'PC002', strength: 0.7},
+            {source: 'PR002', target: 'PC003', strength: 0.6},
+            {source: 'PR003', target: 'PC004', strength: 0.8},
+            {source: 'PR004', target: 'PC002', strength: 0.8},
+            
+            // Patient-Diagnosis relationships
+            {source: 'P001', target: 'D001', strength: 0.9},
+            {source: 'P001', target: 'D003', strength: 0.7},
+            {source: 'P002', target: 'D002', strength: 0.8},
+            {source: 'P004', target: 'D003', strength: 0.9},
+            {source: 'P004', target: 'D004', strength: 0.6},
+            {source: 'P005', target: 'D001', strength: 0.5}
+        ];
+
+        // Initialize D3 visualization
+        let svg, simulation, nodeElements, linkElements;
+        let selectedNode = null;
+
+        function initializeVisualization() {
+            const container = document.querySelector('.gnn-visualization');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            svg = d3.select('#gnn-svg')
+                .attr('width', width)
+                .attr('height', height);
+
+            simulation = d3.forceSimulation(nodes)
+                .force('link', d3.forceLink(links).id(d => d.id).distance(100))
+                .force('charge', d3.forceManyBody().strength(-300))
+                .force('center', d3.forceCenter(width / 2, height / 2))
+                .force('collision', d3.forceCollide().radius(30));
+
+            // Create links
+            linkElements = svg.append('g')
+                .selectAll('line')
+                .data(links)
+                .enter()
+                .append('line')
+                .attr('class', 'link')
+                .style('stroke-width', d => d.strength * 4);
+
+            // Create nodes
+            nodeElements = svg.append('g')
+                .selectAll('circle')
+                .data(nodes)
+                .enter()
+                .append('circle')
+                .attr('class', d => `node node-${d.type}`)
+                .attr('r', 15)
+                .on('click', handleNodeClick)
+                .on('mouseover', handleNodeMouseover)
+                .on('mouseout', handleNodeMouseout)
+                .call(d3.drag()
+                    .on('start', dragStarted)
+                    .on('drag', dragged)
+                    .on('end', dragEnded));
+
+            // Add node labels
+            svg.append('g')
+                .selectAll('text')
+                .data(nodes)
+                .enter()
+                .append('text')
+                .text(d => d.id)
+                .style('font-size', '10px')
+                .style('text-anchor', 'middle')
+                .style('fill', '#333')
+                .style('pointer-events', 'none');
+
+            simulation.on('tick', () => {
+                linkElements
+                    .attr('x1', d => d.source.x)
+                    .attr('y1', d => d.source.y)
+                    .attr('x2', d => d.target.x)
+                    .attr('y2', d => d.target.y);
+
+                nodeElements
+                    .attr('cx', d => d.x)
+                    .attr('cy', d => d.y);
+
+                svg.selectAll('text')
+                    .attr('x', d => d.x)
+                    .attr('y', d => d.y + 4);
+            });
+        }
+
+        function handleNodeClick(event, d) {
+            // Remove previous selection
+            nodeElements.classed('node-selected', false);
+            
+            // Select current node
+            d3.select(event.target).classed('node-selected', true);
+            selectedNode = d;
+            
+            // Update info panel
+            updateNodeInfo(d);
+            
+            // Highlight connected nodes
+            highlightConnectedNodes(d);
+        }
+
+        function handleNodeMouseover(event, d) {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.style.display = 'block';
+            tooltip.style.left = (event.pageX + 10) + 'px';
+            tooltip.style.top = (event.pageY - 10) + 'px';
+            tooltip.innerHTML = `
+                <strong>${d.name}</strong><br>
+                Type: ${d.type}<br>
+                Risk Level: ${d.risk}
+            `;
+        }
+
+        function handleNodeMouseout() {
+            document.getElementById('tooltip').style.display = 'none';
+        }
+
+        function updateNodeInfo(node) {
+            const infoPanel = document.getElementById('selectedNodeInfo');
+            const title = document.getElementById('nodeTitle');
+            const description = document.getElementById('nodeDescription');
+            
+            infoPanel.style.display = 'block';
+            title.textContent = node.name;
+            
+            let desc = '';
+            switch(node.type) {
+                case 'patient':
+                    desc = `Patient with ${node.risk} risk level for episode onset. Connected to ${getConnectedCount(node)} healthcare entities. Recent claims patterns suggest potential for intervention.`;
+                    break;
+                case 'provider':
+                    desc = `Healthcare provider specializing in patient care. Risk assessment based on patient episode rates and care patterns. Quality metrics indicate ${node.risk} episode prediction accuracy.`;
+                    break;
+                case 'procedure':
+                    desc = `Medical procedure with ${node.risk} risk correlation to episode development. Frequency and timing patterns are key indicators in our prediction model.`;
+                    break;
+                case 'diagnosis':
+                    desc = `Medical diagnosis with ${node.risk} episode risk weighting. Comorbidity patterns and temporal relationships help predict future care episodes.`;
+                    break;
+            }
+            description.textContent = desc;
+        }
+
+        function getConnectedCount(node) {
+            return links.filter(link => 
+                link.source.id === node.id || link.target.id === node.id
+            ).length;
+        }
+
+        function highlightConnectedNodes(node) {
+            const connectedNodeIds = new Set();
+            
+            links.forEach(link => {
+                if (link.source.id === node.id) {
+                    connectedNodeIds.add(link.target.id);
+                } else if (link.target.id === node.id) {
+                    connectedNodeIds.add(link.source.id);
+                }
+            });
+            
+            nodeElements.style('opacity', d => 
+                d.id === node.id || connectedNodeIds.has(d.id) ? 1 : 0.3
+            );
+            
+            linkElements.style('opacity', d => 
+                d.source.id === node.id || d.target.id === node.id ? 1 : 0.1
+            );
+        }
+
+        function filterNodes() {
+            const filter = document.getElementById('nodeFilter').value;
+            
+            nodeElements.style('display', d => 
+                filter === 'all' || d.type === filter ? 'block' : 'none'
+            );
+            
+            linkElements.style('display', d => {
+                if (filter === 'all') return 'block';
+                return (d.source.type === filter || d.target.type === filter) ? 'block' : 'none';
+            });
+            
+            updateStats();
+        }
+
+        function filterByRisk() {
+            const riskFilter = document.getElementById('riskFilter').value;
+            
+            nodeElements.style('opacity', d => 
+                riskFilter === 'all' || d.risk === riskFilter ? 1 : 0.3
+            );
+        }
+
+        function runPrediction() {
+            // Simulate prediction algorithm
+            const predictionButton = document.querySelector('button[onclick="runPrediction()"]');
+            predictionButton.innerHTML = '<span>Running...</span>';
+            predictionButton.disabled = true;
+            
+            // Animate high-risk nodes
+            nodeElements
+                .filter(d => d.risk === 'high')
+                .transition()
+                .duration(1000)
+                .attr('r', 20)
+                .style('stroke', '#ff4444')
+                .style('stroke-width', 3)
+                .transition()
+                .duration(1000)
+                .attr('r', 15)
+                .style('stroke', null)
+                .style('stroke-width', null);
+            
+            setTimeout(() => {
+                predictionButton.innerHTML = `
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    Run Prediction
+                `;
+                predictionButton.disabled = false;
+                
+                // Update prediction accuracy
+                const accuracy = document.getElementById('predictionAccuracy');
+                accuracy.textContent = (94.2 + Math.random() * 2).toFixed(1) + '%';
+            }, 2000);
+        }
+
+        function resetLayout() {
+            simulation.alpha(1).restart();
+            nodeElements.style('opacity', 1);
+            linkElements.style('opacity', 1);
+            nodeElements.classed('node-selected', false);
+            
+            document.getElementById('selectedNodeInfo').style.display = 'none';
+        }
+
+        function updateStats() {
+            const visibleNodes = nodes.filter(n => {
+                const filter = document.getElementById('nodeFilter').value;
+                return filter === 'all' || n.type === filter;
+            });
+            
+            document.getElementById('nodeCount').textContent = visibleNodes.length;
+            document.getElementById('edgeCount').textContent = links.length;
+        }
+
+        // Drag functions
+        function dragStarted(event, d) {
+            if (!event.active) simulation.alphaTarget(0.3).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragEnded(event, d) {
+            if (!event.active) simulation.alphaTarget(0);
+            d.fx = null;
+            d.fy = null;
+        }
+
+        // Initialize visualization when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initializeVisualization, 100);
+            updateStats();
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', function() {
+            const container = document.querySelector('.gnn-visualization');
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            
+            svg.attr('width', width).attr('height', height);
+            simulation.force('center', d3.forceCenter(width / 2, height / 2));
+            simulation.alpha(1).restart();
+        });
+    </script>
+</body>
+</html>

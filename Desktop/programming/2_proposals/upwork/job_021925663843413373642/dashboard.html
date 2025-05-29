@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Episode Prediction Dashboard - HealthGNN</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --secondary-light: #34d399;
+            --background-color: #ffffff;
+            --background-gray: #f8fafc;
+            --background-dark: #1e293b;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-light: #94a3b8;
+            --text-white: #ffffff;
+            --border-color: #e2e8f0;
+            --border-dark: #cbd5e1;
+            --accent-blue: #0ea5e9;
+            --accent-green: #22c55e;
+            --accent-red: #ef4444;
+            --accent-orange: #f59e0b;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+            --radius-sm: 0.25rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background-gray);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .page-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--background-color);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            height: 80px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--text-primary);
+        }
+
+        .logo img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: var(--spacing-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            transition: color 0.2s ease;
+            position: relative;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-color);
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+        }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-white);
+            padding: var(--spacing-xl) 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .header-title p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+
+        .time-selector {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-white);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            font-size: 0.875rem;
+        }
+
+        .refresh-btn {
+            background: var(--secondary-color);
+            color: var(--text-white);
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover {
+            background: var(--secondary-dark);
+        }
+
+        .dashboard-content {
+            padding: var(--spacing-xl) 0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .metric-card {
+            background: var(--background-color);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border-left: 4px solid var(--primary-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card.high-risk {
+            border-left-color: var(--accent-red);
+        }
+
+        .metric-card.medium-risk {
+            border-left-color: var(--accent-orange);
+        }
+
+        .metric-card.low-risk {
+            border-left-color: var(--accent-green);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .metric-title {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .metric-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0.7;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .metric-change {
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+
+        .metric-change.positive {
+            color: var(--accent-green);
+        }
+
+        .metric-change.negative {
+            color: var(--accent-red);
+        }
+
+        .alert-badge {
+            position: absolute;
+            top: var(--spacing-sm);
+            right: var(--spacing-sm);
+            background: var(--accent-red);
+            color: var(--text-white);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .main-dashboard {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .chart-container {
+            background: var(--background-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-lg);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .chart-btn {
+            background: var(--background-gray);
+            border: 1px solid var(--border-color);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .chart-btn.active {
+            background: var(--primary-color);
+            color: var(--text-white);
+            border-color: var(--primary-color);
+        }
+
+        .alerts-panel {
+            background: var(--background-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-lg);
+        }
+
+        .alert-item {
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-md);
+            position: relative;
+        }
+
+        .alert-item.critical {
+            border-left: 4px solid var(--accent-red);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        .alert-item.warning {
+            border-left: 4px solid var(--accent-orange);
+            background: rgba(245, 158, 11, 0.05);
+        }
+
+        .alert-item.info {
+            border-left: 4px solid var(--accent-blue);
+            background: rgba(14, 165, 233, 0.05);
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .alert-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .alert-time {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .alert-message {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .alert-btn {
+            background: var(--primary-color);
+            color: var(--text-white);
+            border: none;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .alert-btn.secondary {
+            background: var(--background-gray);
+            color: var(--text-secondary);
+        }
+
+        .alert-btn:hover {
+            opacity: 0.9;
+        }
+
+        .secondary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-lg);
+        }
+
+        .patient-timeline {
+            background: var(--background-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-lg);
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+
+        .timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-top: var(--spacing-xs);
+            flex-shrink: 0;
+        }
+
+        .timeline-dot.predicted {
+            background: var(--accent-orange);
+        }
+
+        .timeline-dot.confirmed {
+            background: var(--accent-red);
+        }
+
+        .timeline-dot.resolved {
+            background: var(--accent-green);
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .timeline-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .timeline-meta {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .cost-impact {
+            background: var(--background-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: var(--spacing-lg);
+        }
+
+        .cost-summary {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .cost-metric {
+            text-align: center;
+        }
+
+        .cost-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .cost-value.savings {
+            color: var(--accent-green);
+        }
+
+        .cost-value.projected {
+            color: var(--accent-orange);
+        }
+
+        .cost-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .intervention-panel {
+            background: linear-gradient(135deg, var(--secondary-color), var(--secondary-dark));
+            color: var(--text-white);
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            margin-top: var(--spacing-lg);
+        }
+
+        .intervention-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .intervention-list {
+            list-style: none;
+        }
+
+        .intervention-item {
+            padding: var(--spacing-sm) 0;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .intervention-item::before {
+            content: '→';
+            font-weight: bold;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--text-white);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .risk-score {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-xs) var(--spacing-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .risk-score.high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-red);
+        }
+
+        .risk-score.medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--accent-orange);
+        }
+
+        .risk-score.low {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent-green);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="logo">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMTgiIGZpbGw9IiMyNTYzZWIiLz4KPGV0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0iY2VudHJhbCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0id2hpdGUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCI+R048L3RleHQ+Cjwvc3ZnPgo=" alt="HealthGNN Logo">
+                    <span>HealthGNN</span>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="gnn-demo.html" class="nav-link">GNN Visualization</a></li>
+                    <li><a href="dashboard.html" class="nav-link active">Episode Dashboard</a></li>
+                    <li><a href="claims.html" class="nav-link">Claims Analysis</a></li>
+                    <li><a href="about.html" class="nav-link">About</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="dashboard-header">
+                <div class="container">
+                    <div class="header-content">
+                        <div class="header-title">
+                            <h1>Episode Prediction Dashboard</h1>
+                            <p>Real-time monitoring and predictive analytics for healthcare episodes</p>
+                        </div>
+                        <div class="header-controls">
+                            <select class="time-selector" id="timeRange">
+                                <option value="24h">Last 24 Hours</option>
+                                <option value="7d">Last 7 Days</option>
+                                <option value="30d" selected>Last 30 Days</option>
+                                <option value="90d">Last 90 Days</option>
+                            </select>
+                            <button class="refresh-btn" id="refreshBtn">
+                                <span class="loading-spinner hidden" id="loadingSpinner"></span>
+                                <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24" id="refreshIcon">
+                                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                                </svg>
+                                Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="dashboard-content">
+                <div class="container">
+                    <!-- Key Metrics -->
+                    <div class="dashboard-grid">
+                        <div class="metric-card high-risk">
+                            <div class="alert-badge">ALERT</div>
+                            <div class="metric-header">
+                                <span class="metric-title">High-Risk Predictions</span>
+                                <svg class="metric-icon" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2L2 7v10c0 5.55 3.84 9.74 9 11 5.16-1.26 9-5.45 9-11V7l-10-5z"/>
+                                    <path d="M12 8v4M12 16h.01"/>
+                                </svg>
+                            </div>
+                            <div class="metric-value" id="highRiskCount">247</div>
+                            <div class="metric-change positive">
+                                <span>↑ 12%</span>
+                                <span>vs last week</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card medium-risk">
+                            <div class="metric-header">
+                                <span class="metric-title">Episode Accuracy</span>
+                                <svg class="metric-icon" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M9 12l2 2 4-4"/>
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                            </div>
+                            <div class="metric-value" id="accuracyRate">94.2%</div>
+                            <div class="metric-change positive">
+                                <span>↑ 2.1%</span>
+                                <span>this month</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card low-risk">
+                            <div class="metric-header">
+                                <span class="metric-title">Cost Savings</span>
+                                <svg class="metric-icon" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                                </svg>
+                            </div>
+                            <div class="metric-value" id="costSavings">$2.8M</div>
+                            <div class="metric-change positive">
+                                <span>↑ 15%</span>
+                                <span>this quarter</span>
+                            </div>
+                        </div>
+
+                        <div class="metric-card">
+                            <div class="metric-header">
+                                <span class="metric-title">Active Monitoring</span>
+                                <svg class="metric-icon" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 6v6l4 2"/>
+                                    <circle cx="12" cy="12" r="10"/>
+                                </svg>
+                            </div>
+                            <div class="metric-value" id="activePatients">15,847</div>
+                            <div class="metric-change negative">
+                                <span>↓ 3%</span>
+                                <span>normal variation</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Dashboard -->
+                    <div class="main-dashboard">
+                        <div class="chart-container">
+                            <div class="chart-header">
+                                <h3 class="chart-title">Episode Prediction Timeline</h3>
+                                <div class="chart-controls">
+                                    <button class="chart-btn active" data-period="week">Week</button>
+                                    <button class="chart-btn" data-period="month">Month</button>
+                                    <button class="chart-btn" data-period="quarter">Quarter</button>
+                                </div>
+                            </div>
+                            <canvas id="timelineChart" width="800" height="400"></canvas>
+                        </div>
+
+                        <div class="alerts-panel">
+                            <h3 class="chart-title">Real-Time Alerts</h3>
+                            <div id="alertsList">
+                                <div class="alert-item critical">
+                                    <div class="alert-header">
+                                        <span class="alert-title">Critical Episode Risk Detected</span>
+                                        <span class="alert-time">2 min ago</span>
+                                    </div>
+                                    <div class="alert-message">
+                                        Patient ID: #HC-47821 shows 89% probability of cardiac episode within 72 hours
+                                    </div>
+                                    <div class="alert-actions">
+                                        <button class="alert-btn">Intervene</button>
+                                        <button class="alert-btn secondary">Review</button>
+                                    </div>
+                                </div>
+
+                                <div class="alert-item warning">
+                                    <div class="alert-header">
+                                        <span class="alert-title">Medium Risk Cohort Identified</span>
+                                        <span class="alert-time">8 min ago</span>
+                                    </div>
+                                    <div class="alert-message">
+                                        23 patients in diabetes management program showing elevated episode risk
+                                    </div>
+                                    <div class="alert-actions">
+                                        <button class="alert-btn">Review Cohort</button>
+                                        <button class="alert-btn secondary">Schedule</button>
+                                    </div>
+                                </div>
+
+                                <div class="alert-item info">
+                                    <div class="alert-header">
+                                        <span class="alert-title">Model Performance Update</span>
+                                        <span class="alert-time">15 min ago</span>
+                                    </div>
+                                    <div class="alert-message">
+                                        Weekly model retraining completed. Accuracy improved to 94.2%
+                                    </div>
+                                    <div class="alert-actions">
+                                        <button class="alert-btn">View Report</button>
+                                    </div>
+                                </div>
+
+                                <div class="alert-item info">
+                                    <div class="alert-header">
+                                        <span class="alert-title">Intervention Success</span>
+                                        <span class="alert-time">32 min ago</span>
+                                    </div>
+                                    <div class="alert-message">
+                                        Early intervention prevented estimated $45,000 in care costs for Patient #HC-47156
+                                    </div>
+                                    <div class="alert-actions">
+                                        <button class="alert-btn secondary">Details</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Secondary Dashboard -->
+                    <div class="secondary-grid">
+                        <div class="patient-timeline">
+                            <h3 class="chart-title">Recent Episode Timeline</h3>
+                            <div id="timelineEvents">
+                                <div class="timeline-item">
+                                    <div class="timeline-dot predicted"></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">High-Risk Prediction: Cardiac Episode</div>
+                                        <div class="timeline-desc">Patient #HC-47821 - 89% confidence</div>
+                                        <div class="timeline-meta">Predicted for next 72 hours • <span class="risk-score high">HIGH RISK</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-dot confirmed"></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">Episode Confirmed: Diabetes Complication</div>
+                                        <div class="timeline-desc">Patient #HC-45923 - Early intervention initiated</div>
+                                        <div class="timeline-meta">4 hours ago • <span class="risk-score medium">MEDIUM RISK</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-dot resolved"></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">Episode Resolved: Respiratory Care</div>
+                                        <div class="timeline-desc">Patient #HC-43201 - Successful early treatment</div>
+                                        <div class="timeline-meta">8 hours ago • <span class="risk-score low">RESOLVED</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-dot predicted"></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">Risk Elevation: Hypertension</div>
+                                        <div class="timeline-desc">Patient #HC-47156 - Monitoring increased</div>
+                                        <div class="timeline-meta">12 hours ago • <span class="risk-score medium">MEDIUM RISK</span></div>
+                                    </div>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-dot resolved"></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-title">Prevention Success: Cardiac Care</div>
+                                        <div class="timeline-desc">Patient #HC-42018 - Episode avoided through intervention</div>
+                                        <div class="timeline-meta">1 day ago • <span class="risk-score low">PREVENTED</span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="cost-impact">
+                            <h3 class="chart-title">Cost Impact Analysis</h3>
+                            <div class="cost-summary">
+                                <div class="cost-metric">
+                                    <div class="cost-value savings">$2,847,293</div>
+                                    <div class="cost-label">Total Savings (YTD)</div>
+                                </div>
+                                <div class="cost-metric">
+                                    <div class="cost-value projected">$1,245,000</div>
+                                    <div class="cost-label">Projected Prevention</div>
+                                </div>
+                            </div>
+                            <canvas id="costChart" width="400" height="200"></canvas>
+                            
+                            <div class="intervention-panel">
+                                <h4 class="intervention-title">Recommended Interventions</h4>
+                                <ul class="intervention-list">
+                                    <li class="intervention-item">Immediate cardiology consultation for Patient #HC-47821</li>
+                                    <li class="intervention-item">Enhanced monitoring for diabetes cohort (23 patients)</li>
+                                    <li class="intervention-item">Preventive care outreach for hypertension risk group</li>
+                                    <li class="intervention-item">Medication adherence review for respiratory patients</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Scoring Panel -->
+                    <div class="chart-container" style="margin-top: var(--spacing-xl);">
+                        <div class="chart-header">
+                            <h3 class="chart-title">Risk Score Distribution</h3>
+                            <div class="chart-controls">
+                                <button class="chart-btn active" data-risk="all">All Patients</button>
+                                <button class="chart-btn" data-risk="high">High Risk</button>
+                                <button class="chart-btn" data-risk="medium">Medium Risk</button>
+                                <button class="chart-btn" data-risk="low">Low Risk</button>
+                            </div>
+                        </div>
+                        <canvas id="riskChart" width="1200" height="300"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Sample data for demonstrations
+        const sampleData = {
+            timeline: {
+                week: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    predicted: [23, 31, 28, 35, 42, 38, 29],
+                    confirmed: [18, 25, 22, 28, 35, 30, 24],
+                    prevented: [5, 6, 6, 7, 7, 8, 5]
+                },
+                month: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+                    predicted: [189, 203, 198, 215],
+                    confirmed: [152, 167, 161, 178],
+                    prevented: [37, 36, 37, 37]
+                },
+                quarter: {
+                    labels: ['Month 1', 'Month 2', 'Month 3'],
+                    predicted: [805, 834, 798],
+                    confirmed: [658, 689, 661],
+                    prevented: [147, 145, 137]
+                }
+            },
+            costSavings: [
+                { month: 'Jan', amount: 245000 },
+                { month: 'Feb', amount: 289000 },
+                { month: 'Mar', amount: 312000 },
+                { month: 'Apr', amount: 298000 },
+                { month: 'May', amount: 334000 },
+                { month: 'Jun', amount: 356000 }
+            ],
+            riskDistribution: [12, 34, 67, 123, 189, 245, 198, 156, 98, 67, 34, 18]
+        };
+
+        let timelineChart, costChart, riskChart;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            startRealTimeUpdates();
+            setupEventListeners();
+        });
+
+        function initializeCharts() {
+            // Timeline Chart
+            const timelineCtx = document.getElementById('timelineChart').getContext('2d');
+            timelineChart = new Chart(timelineCtx, {
+                type: 'line',
+                data: {
+                    labels: sampleData.timeline.week.labels,
+                    datasets: [
+                        {
+                            label: 'Predicted Episodes',
+                            data: sampleData.timeline.week.predicted,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Confirmed Episodes',
+                            data: sampleData.timeline.week.confirmed,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Prevented Episodes',
+                            data: sampleData.timeline.week.prevented,
+                            borderColor: '#22c55e',
+                            backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Cost Chart
+            const costCtx = document.getElementById('costChart').getContext('2d');
+            costChart = new Chart(costCtx, {
+                type: 'bar',
+                data: {
+                    labels: sampleData.costSavings.map(item => item.month),
+                    datasets: [{
+                        label: 'Monthly Savings',
+                        data: sampleData.costSavings.map(item => item.amount),
+                        backgroundColor: '#10b981',
+                        borderColor: '#059669',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000).toFixed(0) + 'K';
+                                }
+                            },
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: '#e2e8f0'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Risk Distribution Chart
+            const riskCtx = document.getElementById('riskChart').getContext('2d');
+            riskChart = new Chart(riskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'Critical Risk (90-100%)',
+                        'High Risk (80-89%)',
+                        'Medium Risk (60-79%)',
+                        'Low Risk (40-59%)',
+                        'Minimal Risk (0-39%)'
+                    ],
+                    datasets: [{
+                        data: [247, 892, 3456, 7892, 3360],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f59e0b',
+                            '#eab308',
+                            '#22c55e',
+                            '#10b981'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        }
+                    }
+                }
+            });
+        }
+
+        function setupEventListeners() {
+            // Chart period controls
+            document.querySelectorAll('.chart-btn[data-period]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-btn[data-period]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    updateTimelineChart(this.dataset.period);
+                });
+            });
+
+            // Risk filter controls
+            document.querySelectorAll('.chart-btn[data-risk]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-btn[data-risk]').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    // Risk chart filtering would be implemented here
+                });
+            });
+
+            // Refresh button
+            document.getElementById('refreshBtn').addEventListener('click', function() {
+                simulateDataRefresh();
+            });
+
+            // Time range selector
+            document.getElementById('timeRange').addEventListener('change', function() {
+                // Time range filtering would be implemented here
+                simulateDataRefresh();
+            });
+
+            // Alert action buttons
+            document.querySelectorAll('.alert-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Simulate action
+                    this.style.opacity = '0.5';
+                    this.textContent = 'Processing...';
+                    
+                    setTimeout(() => {
+                        this.style.opacity = '1';
+                        this.textContent = 'Completed';
+                        this.style.backgroundColor = '#22c55e';
+                    }, 1500);
+                });
+            });
+        }
+
+        function updateTimelineChart(period) {
+            const data = sampleData.timeline[period];
+            timelineChart.data.labels = data.labels;
+            timelineChart.data.datasets[0].data = data.predicted;
+            timelineChart.data.datasets[1].data = data.confirmed;
+            timelineChart.data.datasets[2].data = data.prevented;
+            timelineChart.update();
+        }
+
+        function simulateDataRefresh() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            const spinner = document.getElementById('loadingSpinner');
+            const icon = document.getElementById('refreshIcon');
+            
+            // Show loading state
+            spinner.classList.remove('hidden');
+            icon.classList.add('hidden');
+            refreshBtn.disabled = true;
+            
+            // Simulate data update
+            setTimeout(() => {
+                // Update metrics with slight variations
+                updateMetricValue('highRiskCount', Math.floor(Math.random() * 50) + 225);
+                updateMetricValue('accuracyRate', (Math.random() * 2 + 93).toFixed(1) + '%');
+                updateMetricValue('costSavings', '$' + (Math.random() * 0.5 + 2.5).toFixed(1) + 'M');
+                updateMetricValue('activePatients', Math.floor(Math.random() * 1000) + 15000);
+                
+                // Add new alert
+                addNewAlert();
+                
+                // Hide loading state
+                spinner.classList.add('hidden');
+                icon.classList.remove('hidden');
+                refreshBtn.disabled = false;
+            }, 2000);
+        }
+
+        function updateMetricValue(elementId, newValue) {
+            const element = document.getElementById(elementId);
+            element.style.transform = 'scale(1.1)';
+            element.style.color = '#10b981';
+            
+            setTimeout(() => {
+                element.textContent = newValue;
+                element.style.transform = 'scale(1)';
+                element.style.color = '';
+            }, 300);
+        }
+
+        function addNewAlert() {
+            const alertsList = document.getElementById('alertsList');
+            const alerts = [
+                {
+                    type: 'warning',
+                    title: 'New Risk Pattern Detected',
+                    message: 'Cluster of 8 patients showing similar pre-episode indicators in oncology unit',
+                    time: 'Just now'
+                },
+                {
+                    type: 'info',
+                    title: 'Intervention Success',
+                    message: 'Early care coordination prevented episode for Patient #HC-48923',
+                    time: 'Just now'
+                }
+            ];
+            
+            const randomAlert = alerts[Math.floor(Math.random() * alerts.length)];
+            const alertHTML = `
+                <div class="alert-item ${randomAlert.type} fade-in">
+                    <div class="alert-header">
+                        <span class="alert-title">${randomAlert.title}</span>
+                        <span class="alert-time">${randomAlert.time}</span>
+                    </div>
+                    <div class="alert-message">${randomAlert.message}</div>
+                    <div class="alert-actions">
+                        <button class="alert-btn">Review</button>
+                        <button class="alert-btn secondary">Archive</button>
+                    </div>
+                </div>
+            `;
+            
+            alertsList.insertAdjacentHTML('afterbegin', alertHTML);
+            
+            // Remove oldest alert if more than 5
+            const alerts_items = alertsList.querySelectorAll('.alert-item');
+            if (alerts_items.length > 5) {
+                alerts_items[alerts_items.length - 1].remove();
+            }
+        }
+
+        function startRealTimeUpdates() {
+            // Simulate real-time updates every 30 seconds
+            setInterval(() => {
+                if (Math.random() < 0.3) { // 30% chance of new alert
+                    addNewAlert();
+                }
+                
+                // Update active patients count with small variations
+                const currentCount = parseInt(document.getElementById('activePatients').textContent.replace(',', ''));
+                const variation = Math.floor(Math.random() * 20) - 10;
+                const newCount = currentCount + variation;
+                document.getElementById('activePatients').textContent = newCount.toLocaleString();
+            }, 30000);
+        }
+
+        // Navigation active state management
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

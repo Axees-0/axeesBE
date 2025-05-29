@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare GNN - Episode Prediction System</title>
+    <style>
+        :root {
+          /* Medical Blues - Trust, Professionalism */
+          --primary-blue: #2563eb;
+          --primary-blue-dark: #1d4ed8;
+          --primary-blue-light: #3b82f6;
+          
+          /* Medical Greens - Health, Safety */
+          --success-green: #16a34a;
+          --success-green-light: #22c55e;
+          
+          /* Alert Colors - Clinical Urgency */
+          --warning-amber: #f59e0b;
+          --danger-red: #dc2626;
+          --critical-red: #b91c1c;
+          
+          /* Neutral Healthcare Grays */
+          --neutral-50: #f9fafb;
+          --neutral-100: #f3f4f6;
+          --neutral-200: #e5e7eb;
+          --neutral-300: #d1d5db;
+          --neutral-600: #4b5563;
+          --neutral-700: #374151;
+          --neutral-800: #1f2937;
+          --neutral-900: #111827;
+          
+          /* Background Colors */
+          --bg-primary: #ffffff;
+          --bg-secondary: #f9fafb;
+          --bg-accent: #eff6ff;
+          
+          /* Episode Risk Levels */
+          --risk-low: #22c55e;
+          --risk-medium: #f59e0b;
+          --risk-high: #dc2626;
+          --risk-critical: #7c2d12;
+          
+          /* Typography */
+          --font-primary: 'Segoe UI', system-ui, -apple-system, sans-serif;
+          --font-mono: 'Consolas', 'Monaco', 'Courier New', monospace;
+          --text-5xl: 3rem;
+          --text-4xl: 2.25rem;
+          --text-3xl: 1.875rem;
+          --text-2xl: 1.5rem;
+          --text-xl: 1.25rem;
+          --text-lg: 1.125rem;
+          --text-base: 1rem;
+          --text-sm: 0.875rem;
+          --text-xs: 0.75rem;
+          --leading-tight: 1.25;
+          --leading-normal: 1.5;
+          --leading-relaxed: 1.625;
+        }
+
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+
+        body {
+          font-family: var(--font-primary);
+          background: var(--bg-secondary);
+          color: var(--neutral-900);
+          line-height: var(--leading-normal);
+        }
+
+        .main-header {
+          background: var(--bg-primary);
+          border-bottom: 1px solid var(--neutral-200);
+          padding: 1rem 0;
+          position: sticky;
+          top: 0;
+          z-index: 100;
+          backdrop-filter: blur(8px);
+        }
+
+        .main-nav {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        .nav-brand {
+          font-size: var(--text-xl);
+          font-weight: 700;
+          color: var(--primary-blue);
+          text-decoration: none;
+        }
+
+        .nav-menu {
+          display: flex;
+          gap: 2rem;
+          list-style: none;
+          margin: 0;
+          padding: 0;
+        }
+
+        .nav-link {
+          color: var(--neutral-700);
+          text-decoration: none;
+          font-weight: 500;
+          padding: 0.5rem 1rem;
+          border-radius: 0.375rem;
+          transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+          background: var(--bg-accent);
+          color: var(--primary-blue);
+        }
+
+        .container {
+          max-width: 1280px;
+          margin: 0 auto;
+          padding: 0 1rem;
+        }
+
+        .main-content {
+          padding: 2rem 0;
+        }
+
+        .hero-section {
+          background: linear-gradient(135deg, var(--bg-primary), var(--bg-accent));
+          padding: 4rem 0;
+          text-align: center;
+          margin-bottom: 3rem;
+          border-radius: 1rem;
+          border: 1px solid var(--neutral-200);
+        }
+
+        .hero-title {
+          font-size: var(--text-5xl);
+          font-weight: 700;
+          color: var(--neutral-900);
+          margin-bottom: 1rem;
+        }
+
+        .hero-subtitle {
+          font-size: var(--text-xl);
+          color: var(--neutral-600);
+          margin-bottom: 2rem;
+          max-width: 600px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .btn-primary {
+          background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+          color: white;
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: 0.5rem;
+          font-weight: 600;
+          font-size: var(--text-base);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+          text-decoration: none;
+          display: inline-block;
+        }
+
+        .btn-primary:hover {
+          background: linear-gradient(135deg, var(--primary-blue-dark), var(--primary-blue));
+          transform: translateY(-1px);
+          box-shadow: 0 4px 8px rgba(37, 99, 235, 0.3);
+        }
+
+        .grid {
+          display: grid;
+          gap: 1.5rem;
+        }
+
+        .grid-3 {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .card {
+          background: var(--bg-primary);
+          border: 1px solid var(--neutral-200);
+          border-radius: 0.75rem;
+          padding: 1.5rem;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          transition: all 0.2s ease;
+        }
+
+        .card:hover {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          transform: translateY(-2px);
+        }
+
+        .medical-card {
+          border-left: 4px solid var(--primary-blue);
+          background: linear-gradient(135deg, var(--bg-primary), var(--bg-accent));
+        }
+
+        .metric-card {
+          text-align: center;
+        }
+
+        .metric-value {
+          font-size: var(--text-3xl);
+          font-weight: 700;
+          color: var(--primary-blue);
+          margin-bottom: 0.5rem;
+        }
+
+        .metric-label {
+          font-size: var(--text-sm);
+          color: var(--neutral-600);
+          font-weight: 500;
+        }
+
+        .status-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.25rem 0.75rem;
+          border-radius: 9999px;
+          font-size: var(--text-xs);
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+        }
+
+        .status-high {
+          background: #fee2e2;
+          color: #991b1b;
+        }
+
+        .status-medium {
+          background: #fef3c7;
+          color: #92400e;
+        }
+
+        .status-low {
+          background: #dcfce7;
+          color: #166534;
+        }
+
+        .features-section {
+          margin: 3rem 0;
+        }
+
+        .section-title {
+          font-size: var(--text-3xl);
+          font-weight: 700;
+          text-align: center;
+          margin-bottom: 2rem;
+          color: var(--neutral-900);
+        }
+
+        .feature-card {
+          text-align: center;
+          padding: 2rem;
+        }
+
+        .feature-icon {
+          width: 4rem;
+          height: 4rem;
+          background: var(--primary-blue);
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1rem;
+          font-size: var(--text-2xl);
+          color: white;
+        }
+
+        .feature-title {
+          font-size: var(--text-xl);
+          font-weight: 600;
+          margin-bottom: 1rem;
+          color: var(--neutral-800);
+        }
+
+        .feature-description {
+          color: var(--neutral-600);
+          line-height: var(--leading-relaxed);
+        }
+
+        .stats-section {
+          background: var(--bg-primary);
+          border-radius: 1rem;
+          padding: 2rem;
+          margin: 3rem 0;
+          border: 1px solid var(--neutral-200);
+        }
+
+        .loading-spinner {
+          width: 1.5rem;
+          height: 1.5rem;
+          border: 2px solid var(--neutral-200);
+          border-top: 2px solid var(--primary-blue);
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          display: inline-block;
+          margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        .demo-alert {
+          background: linear-gradient(135deg, #fef2f2, #fee2e2);
+          border-left: 4px solid var(--danger-red);
+          padding: 1rem;
+          border-radius: 0.5rem;
+          margin: 1rem 0;
+        }
+
+        .alert-title {
+          font-weight: 600;
+          color: var(--danger-red);
+          margin-bottom: 0.5rem;
+        }
+
+        .alert-content {
+          color: var(--neutral-700);
+          font-size: var(--text-sm);
+        }
+
+        @media (max-width: 768px) {
+          .grid-3 {
+            grid-template-columns: 1fr;
+          }
+          
+          .hero-title {
+            font-size: var(--text-4xl);
+          }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <a href="index.html" class="nav-brand">Healthcare GNN</a>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link active">Home</a></li>
+                <li><a href="gnn-demo.html" class="nav-link">GNN Network</a></li>
+                <li><a href="dashboard.html" class="nav-link">Episode Predictions</a></li>
+                <li><a href="claims.html" class="nav-link">Claims Analysis</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+            </ul>
+        </nav>
+    </header>
+    
+    <main class="main-content">
+        <div class="container">
+            <section class="hero-section">
+                <h1 class="hero-title">Graph Neural Network Episode Prediction</h1>
+                <p class="hero-subtitle">Advanced machine learning system that analyzes medical claims data to predict when patients are entering specific episodes of care, enabling early intervention and cost optimization.</p>
+                <a href="dashboard.html" class="btn-primary">Explore Live Demo</a>
+            </section>
+
+            <div class="demo-alert">
+                <div class="alert-title">🚨 Live Alert: High-Risk Episode Detected</div>
+                <div class="alert-content">
+                    Patient ID: P-2847 showing 89% probability of entering cardiac episode within 72 hours. 
+                    <strong>Intervention recommended.</strong>
+                    <span class="loading-spinner"></span>
+                </div>
+            </div>
+
+            <section class="stats-section">
+                <div class="grid grid-3">
+                    <div class="metric-card">
+                        <div class="metric-value" id="accuracy-metric">94.7%</div>
+                        <div class="metric-label">Prediction Accuracy</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="patients-monitored">12,847</div>
+                        <div class="metric-label">Patients Monitored</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="cost-savings">$2.4M</div>
+                        <div class="metric-label">Cost Savings YTD</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="features-section">
+                <h2 class="section-title">Advanced Healthcare Analytics</h2>
+                <div class="grid grid-3">
+                    <div class="card feature-card medical-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3 class="feature-title">Graph Neural Networks</h3>
+                        <p class="feature-description">Advanced GNN architecture analyzes complex relationships between patients, providers, procedures, and diagnoses to identify episode patterns.</p>
+                    </div>
+                    <div class="card feature-card medical-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3 class="feature-title">Real-Time Predictions</h3>
+                        <p class="feature-description">Continuous monitoring of medical claims data with sub-second prediction updates for immediate intervention opportunities.</p>
+                    </div>
+                    <div class="card feature-card medical-card">
+                        <div class="feature-icon">💰</div>
+                        <h3 class="feature-title">Cost Optimization</h3>
+                        <p class="feature-description">Predictive analytics identify high-cost episodes before they occur, enabling proactive care management and significant cost reductions.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats-section">
+                <h2 class="section-title">Current System Status</h2>
+                <div class="grid grid-3">
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem; color: var(--neutral-800);">High-Risk Patients</h3>
+                        <div style="margin-bottom: 0.5rem;">
+                            <span class="status-badge status-high">Critical</span>
+                            <span style="margin-left: 1rem; font-weight: 600;">23 patients</span>
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <span class="status-badge status-medium">High</span>
+                            <span style="margin-left: 1rem; font-weight: 600;">127 patients</span>
+                        </div>
+                        <div>
+                            <span class="status-badge status-low">Medium</span>
+                            <span style="margin-left: 1rem; font-weight: 600;">341 patients</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem; color: var(--neutral-800);">Episode Categories</h3>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Cardiovascular:</strong> 34% of predictions
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Diabetes:</strong> 28% of predictions
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Surgical:</strong> 22% of predictions
+                        </div>
+                        <div>
+                            <strong>Emergency:</strong> 16% of predictions
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3 style="margin-bottom: 1rem; color: var(--neutral-800);">Model Performance</h3>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Precision:</strong> 96.2%
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>Recall:</strong> 93.1%
+                        </div>
+                        <div style="margin-bottom: 0.5rem;">
+                            <strong>F1-Score:</strong> 94.6%
+                        </div>
+                        <div>
+                            <strong>AUC-ROC:</strong> 0.987
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <script>
+        // Simulate real-time data updates
+        function updateMetrics() {
+            const accuracyElement = document.getElementById('accuracy-metric');
+            const patientsElement = document.getElementById('patients-monitored');
+            const savingsElement = document.getElementById('cost-savings');
+            
+            // Simulate slight variations in real-time metrics
+            const baseAccuracy = 94.7;
+            const basePatientsMonitored = 12847;
+            const baseSavings = 2.4;
+            
+            const accuracyVariation = (Math.random() - 0.5) * 0.2;
+            const patientsVariation = Math.floor((Math.random() - 0.5) * 20);
+            const savingsVariation = (Math.random() - 0.5) * 0.1;
+            
+            accuracyElement.textContent = (baseAccuracy + accuracyVariation).toFixed(1) + '%';
+            patientsElement.textContent = (basePatientsMonitored + patientsVariation).toLocaleString();
+            savingsElement.textContent = '$' + (baseSavings + savingsVariation).toFixed(1) + 'M';
+        }
+        
+        // Update metrics every 3 seconds
+        setInterval(updateMetrics, 3000);
+        
+        // Add subtle animation to cards on scroll
+        function animateCardsOnScroll() {
+            const cards = document.querySelectorAll('.card');
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+            
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        }
+        
+        // Initialize animations when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            animateCardsOnScroll();
+        });
+        
+        // Store demo data in localStorage for other pages
+        const demoData = {
+            patients: [
+                { id: 'P-2847', name: 'Johnson, M.', risk: 89, episode: 'Cardiac', status: 'critical' },
+                { id: 'P-1923', name: 'Williams, S.', risk: 76, episode: 'Diabetes', status: 'high' },
+                { id: 'P-3456', name: 'Brown, K.', risk: 68, episode: 'Surgical', status: 'high' },
+                { id: 'P-7821', name: 'Davis, R.', risk: 54, episode: 'Emergency', status: 'medium' },
+                { id: 'P-5634', name: 'Miller, A.', risk: 43, episode: 'Cardiovascular', status: 'medium' }
+            ],
+            metrics: {
+                accuracy: 94.7,
+                precision: 96.2,
+                recall: 93.1,
+                f1Score: 94.6,
+                aucRoc: 0.987,
+                totalPatients: 12847,
+                costSavings: 2.4
+            },
+            alerts: [
+                {
+                    id: 1,
+                    patientId: 'P-2847',
+                    type: 'critical',
+                    message: 'High probability cardiac episode within 72 hours',
+                    timestamp: new Date().toISOString(),
+                    confidence: 89
+                }
+            ]
+        };
+        
+        localStorage.setItem('healthcareGnnDemo', JSON.stringify(demoData));
+    </script>
+</body>
+</html>

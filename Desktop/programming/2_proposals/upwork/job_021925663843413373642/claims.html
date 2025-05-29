@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Claims Analysis - Healthcare GNN Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #0f172a;
+            color: #e2e8f0;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #6366f1;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .hero-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: #94a3b8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.25rem;
+        }
+
+        .filter-group select,
+        .filter-group input {
+            background: #1e293b;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: #e2e8f0;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: #374151;
+            color: #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.2);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #6366f1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive {
+            color: #10b981;
+        }
+
+        .stat-change.negative {
+            color: #ef4444;
+        }
+
+        /* Chart Sections */
+        .chart-section {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .chart-subtitle {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-top: 0.25rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 1rem;
+        }
+
+        .chart-container.small {
+            height: 300px;
+        }
+
+        /* Data Table */
+        .data-table-container {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #1e293b;
+            color: #e2e8f0;
+            font-weight: 600;
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 2px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+            color: #cbd5e1;
+        }
+
+        .data-table tr:hover {
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .risk-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .risk-high {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+        }
+
+        .risk-medium {
+            background: rgba(251, 146, 60, 0.2);
+            color: #fb923c;
+        }
+
+        .risk-low {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+
+        /* Grid Layout */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Anomaly Detection */
+        .anomaly-card {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .anomaly-info h4 {
+            color: #f87171;
+            margin-bottom: 0.25rem;
+        }
+
+        .anomaly-info p {
+            font-size: 0.875rem;
+            color: #cbd5e1;
+        }
+
+        .anomaly-score {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ef4444;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(99, 102, 241, 0.3);
+            border-radius: 50%;
+            border-top-color: #6366f1;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 300px;
+            }
+            
+            .data-table {
+                font-size: 0.875rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">Healthcare GNN Demo</div>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="claims.html" class="active">Claims Analysis</a></li>
+                <li><a href="predictions.html">Predictions</a></li>
+                <li><a href="network.html">Network</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Medical Claims Analysis</h1>
+            <p>Advanced pattern recognition and predictive analytics for medical claims data using Graph Neural Networks</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label>Date Range</label>
+                    <input type="date" id="startDate" value="2024-01-01">
+                </div>
+                <div class="filter-group">
+                    <label>To</label>
+                    <input type="date" id="endDate" value="2024-12-31">
+                </div>
+                <div class="filter-group">
+                    <label>Claim Type</label>
+                    <select id="claimType">
+                        <option value="all">All Types</option>
+                        <option value="professional">Professional</option>
+                        <option value="institutional">Institutional</option>
+                        <option value="pharmacy">Pharmacy</option>
+                        <option value="dental">Dental</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Provider Network</label>
+                    <select id="providerNetwork">
+                        <option value="all">All Networks</option>
+                        <option value="in-network">In-Network</option>
+                        <option value="out-network">Out-of-Network</option>
+                        <option value="preferred">Preferred Providers</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Risk Category</label>
+                    <select id="riskCategory">
+                        <option value="all">All Categories</option>
+                        <option value="high">High Risk</option>
+                        <option value="medium">Medium Risk</option>
+                        <option value="low">Low Risk</option>
+                    </select>
+                </div>
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset</button>
+                <button class="btn btn-primary" onclick="applyFilters()">Apply Filters</button>
+            </div>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-label">Total Claims Volume</div>
+                <div class="stat-value" id="totalClaims">847,532</div>
+                <div class="stat-change positive">
+                    <span>↑</span> 12.3% from last period
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Claim Amount</div>
+                <div class="stat-value" id="avgClaim">$2,847</div>
+                <div class="stat-change negative">
+                    <span>↓</span> 3.2% from last period
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Fraud Detection Rate</div>
+                <div class="stat-value" id="fraudRate">2.7%</div>
+                <div class="stat-change positive">
+                    <span>↑</span> 0.4% improvement
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Processing Time</div>
+                <div class="stat-value" id="processingTime">3.2d</div>
+                <div class="stat-change positive">
+                    <span>↓</span> 18% faster
+                </div>
+            </div>
+        </div>
+
+        <!-- Claims Volume Analysis -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title">Claims Volume Trend Analysis</h2>
+                    <p class="chart-subtitle">Daily claims volume with 7-day moving average and anomaly detection</p>
+                </div>
+                <div class="loading" id="volumeLoading"></div>
+            </div>
+            <div class="chart-container">
+                <canvas id="volumeChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Cost Distribution -->
+        <div class="grid-2">
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div>
+                        <h2 class="chart-title">Cost Distribution by Category</h2>
+                        <p class="chart-subtitle">Breakdown of claim costs across service categories</p>
+                    </div>
+                </div>
+                <div class="chart-container small">
+                    <canvas id="costDistChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-section">
+                <div class="chart-header">
+                    <div>
+                        <h2 class="chart-title">Provider Network Analysis</h2>
+                        <p class="chart-subtitle">Claims distribution across provider networks</p>
+                    </div>
+                </div>
+                <div class="chart-container small">
+                    <canvas id="networkChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fraud Detection Patterns -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title">Fraud Detection Pattern Recognition</h2>
+                    <p class="chart-subtitle">ML-identified suspicious claim patterns and anomaly scores</p>
+                </div>
+            </div>
+            <div id="anomalyList">
+                <div class="anomaly-card">
+                    <div class="anomaly-info">
+                        <h4>Unusual Billing Pattern Detected</h4>
+                        <p>Provider ID: PRV-8847 | Multiple high-value claims in short timeframe</p>
+                    </div>
+                    <div class="anomaly-score">0.94</div>
+                </div>
+                <div class="anomaly-card">
+                    <div class="anomaly-info">
+                        <h4>Service Code Mismatch</h4>
+                        <p>Claim ID: CLM-229847 | Incompatible procedure codes submitted together</p>
+                    </div>
+                    <div class="anomaly-score">0.87</div>
+                </div>
+                <div class="anomaly-card">
+                    <div class="anomaly-info">
+                        <h4>Geographic Anomaly</h4>
+                        <p>Patient ID: PAT-3392 | Claims from multiple states on same day</p>
+                    </div>
+                    <div class="anomaly-score">0.82</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Episode Prediction -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title">Episode Cost Prediction Model</h2>
+                    <p class="chart-subtitle">GNN-based predictions vs actual episode costs</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="predictionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Claims Data Table -->
+        <div class="data-table-container">
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title">Recent High-Risk Claims</h2>
+                    <p class="chart-subtitle">Claims flagged for review by the GNN model</p>
+                </div>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Claim ID</th>
+                        <th>Date</th>
+                        <th>Provider</th>
+                        <th>Service Type</th>
+                        <th>Amount</th>
+                        <th>Risk Score</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="claimsTableBody">
+                    <tr>
+                        <td>CLM-983742</td>
+                        <td>2024-12-28</td>
+                        <td>Memorial Hospital</td>
+                        <td>Emergency Room</td>
+                        <td>$12,847</td>
+                        <td><span class="risk-badge risk-high">0.92</span></td>
+                        <td>Under Review</td>
+                    </tr>
+                    <tr>
+                        <td>CLM-983698</td>
+                        <td>2024-12-28</td>
+                        <td>Riverside Clinic</td>
+                        <td>Radiology</td>
+                        <td>$3,221</td>
+                        <td><span class="risk-badge risk-medium">0.68</span></td>
+                        <td>Pending</td>
+                    </tr>
+                    <tr>
+                        <td>CLM-983654</td>
+                        <td>2024-12-27</td>
+                        <td>City Medical Group</td>
+                        <td>Surgery</td>
+                        <td>$45,332</td>
+                        <td><span class="risk-badge risk-high">0.89</span></td>
+                        <td>Flagged</td>
+                    </tr>
+                    <tr>
+                        <td>CLM-983612</td>
+                        <td>2024-12-27</td>
+                        <td>Wellness Pharmacy</td>
+                        <td>Prescription</td>
+                        <td>$892</td>
+                        <td><span class="risk-badge risk-low">0.12</span></td>
+                        <td>Approved</td>
+                    </tr>
+                    <tr>
+                        <td>CLM-983587</td>
+                        <td>2024-12-27</td>
+                        <td>Advanced Diagnostics</td>
+                        <td>Lab Work</td>
+                        <td>$1,447</td>
+                        <td><span class="risk-badge risk-medium">0.54</span></td>
+                        <td>Processing</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Patient Journey Visualization -->
+        <div class="chart-section">
+            <div class="chart-header">
+                <div>
+                    <h2 class="chart-title">Patient Journey Analysis</h2>
+                    <p class="chart-subtitle">Temporal patterns in patient care episodes</p>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="journeyChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js default configuration
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = 'rgba(99, 102, 241, 0.2)';
+        
+        // Claims Volume Chart
+        const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+        const volumeChart = new Chart(volumeCtx, {
+            type: 'line',
+            data: {
+                labels: generateDateLabels(90),
+                datasets: [{
+                    label: 'Daily Claims',
+                    data: generateClaimsData(90),
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }, {
+                    label: '7-Day Moving Average',
+                    data: generateMovingAverage(90),
+                    borderColor: '#8b5cf6',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    fill: false
+                }, {
+                    label: 'Anomalies',
+                    data: generateAnomalies(90),
+                    borderColor: '#ef4444',
+                    backgroundColor: '#ef4444',
+                    type: 'scatter',
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            color: 'rgba(99, 102, 241, 0.1)'
+                        }
+                    },
+                    y: {
+                        grid: {
+                            color: 'rgba(99, 102, 241, 0.1)'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Number of Claims'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Cost Distribution Chart
+        const costCtx = document.getElementById('costDistChart').getContext('2d');
+        const costChart = new Chart(costCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Inpatient', 'Outpatient', 'Emergency', 'Pharmacy', 'Lab/Diagnostic', 'Other'],
+                datasets: [{
+                    data: [35, 25, 15, 12, 8, 5],
+                    backgroundColor: [
+                        '#6366f1',
+                        '#8b5cf6',
+                        '#ec4899',
+                        '#f59e0b',
+                        '#10b981',
+                        '#64748b'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+
+        // Network Analysis Chart
+        const networkCtx = document.getElementById('networkChart').getContext('2d');
+        const networkChart = new Chart(networkCtx, {
+            type: 'bar',
+            data: {
+                labels: ['In-Network', 'Out-of-Network', 'Preferred', 'Emergency'],
+                datasets: [{
+                    label: 'Claims Count',
+                    data: [65432, 23847, 45221, 12032],
+                    backgroundColor: '#6366f1'
+                }, {
+                    label: 'Average Cost',
+                    data: [2100, 4500, 1800, 8900],
+                    backgroundColor: '#8b5cf6',
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        title: {
+                            display: true,
+                            text: 'Claims Count'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        title: {
+                            display: true,
+                            text: 'Average Cost ($)'
+                        },
+                        grid: {
+                            drawOnChartArea: false,
+                        }
+                    }
+                }
+            }
+        });
+
+        // Episode Prediction Chart
+        const predictionCtx = document.getElementById('predictionChart').getContext('2d');
+        const predictionChart = new Chart(predictionCtx, {
+            type: 'scatter',
+            data: {
+                datasets: [{
+                    label: 'Predictions',
+                    data: generatePredictionData(200),
+                    backgroundColor: 'rgba(99, 102, 241, 0.6)',
+                    borderColor: '#6366f1',
+                    pointRadius: 4
+                }, {
+                    label: 'Perfect Prediction',
+                    data: [{x: 0, y: 0}, {x: 100000, y: 100000}],
+                    type: 'line',
+                    borderColor: '#94a3b8',
+                    borderDash: [5, 5],
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `Actual: $${context.parsed.x.toLocaleString()}, Predicted: $${context.parsed.y.toLocaleString()}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'Actual Episode Cost ($)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Predicted Episode Cost ($)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Patient Journey Chart
+        const journeyCtx = document.getElementById('journeyChart').getContext('2d');
+        const journeyChart = new Chart(journeyCtx, {
+            type: 'line',
+            data: {
+                labels: ['Initial Visit', 'Diagnostic', 'Specialist Referral', 'Treatment Start', 'Follow-up 1', 'Follow-up 2', 'Resolution'],
+                datasets: [{
+                    label: 'Diabetic Episode',
+                    data: [450, 1200, 850, 3400, 320, 280, 150],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }, {
+                    label: 'Cardiac Episode',
+                    data: [850, 2400, 1500, 12000, 850, 650, 450],
+                    borderColor: '#ec4899',
+                    backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }, {
+                    label: 'Orthopedic Episode',
+                    data: [320, 1800, 2200, 25000, 450, 380, 220],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                    }
+                },
+                scales: {
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Cost per Stage ($)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Helper Functions
+        function generateDateLabels(days) {
+            const labels = [];
+            const today = new Date();
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                labels.push(date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            }
+            return labels;
+        }
+
+        function generateClaimsData(days) {
+            const data = [];
+            const baseValue = 9000;
+            for (let i = 0; i < days; i++) {
+                const variation = Math.sin(i / 7) * 1000 + Math.random() * 2000 - 1000;
+                data.push(Math.max(baseValue + variation, 5000));
+            }
+            return data;
+        }
+
+        function generateMovingAverage(days) {
+            const claimsData = generateClaimsData(days);
+            const movingAvg = [];
+            for (let i = 0; i < days; i++) {
+                if (i < 6) {
+                    movingAvg.push(null);
+                } else {
+                    let sum = 0;
+                    for (let j = i - 6; j <= i; j++) {
+                        sum += claimsData[j];
+                    }
+                    movingAvg.push(sum / 7);
+                }
+            }
+            return movingAvg;
+        }
+
+        function generateAnomalies(days) {
+            const anomalies = [];
+            const baseData = generateClaimsData(days);
+            for (let i = 0; i < days; i++) {
+                if (Math.random() > 0.95) {
+                    anomalies.push({
+                        x: generateDateLabels(days)[i],
+                        y: baseData[i] + Math.random() * 3000 + 2000
+                    });
+                }
+            }
+            return anomalies;
+        }
+
+        function generatePredictionData(count) {
+            const data = [];
+            for (let i = 0; i < count; i++) {
+                const actual = Math.random() * 50000 + 1000;
+                const predicted = actual + (Math.random() - 0.5) * actual * 0.2;
+                data.push({x: actual, y: predicted});
+            }
+            return data;
+        }
+
+        // Filter Functions
+        function applyFilters() {
+            // Simulate applying filters
+            setTimeout(() => {
+                // Update charts with filtered data
+                updateCharts();
+                // Show success message
+                showNotification('Filters applied successfully');
+            }, 500);
+        }
+
+        function resetFilters() {
+            document.getElementById('startDate').value = '2024-01-01';
+            document.getElementById('endDate').value = '2024-12-31';
+            document.getElementById('claimType').value = 'all';
+            document.getElementById('providerNetwork').value = 'all';
+            document.getElementById('riskCategory').value = 'all';
+            updateCharts();
+        }
+
+        function updateCharts() {
+            // Simulate chart updates
+            volumeChart.update();
+            costChart.update();
+            networkChart.update();
+            predictionChart.update();
+            journeyChart.update();
+        }
+
+        function showNotification(message) {
+            // Simple notification implementation
+            console.log(message);
+        }
+
+        // Simulate real-time updates
+        setInterval(() => {
+            // Update stats
+            const totalClaims = parseInt(document.getElementById('totalClaims').textContent.replace(/,/g, ''));
+            document.getElementById('totalClaims').textContent = (totalClaims + Math.floor(Math.random() * 10)).toLocaleString();
+            
+            // Hide loading indicators
+            document.getElementById('volumeLoading').style.display = 'none';
+        }, 3000);
+
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

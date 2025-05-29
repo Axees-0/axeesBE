@@ -1,0 +1,204 @@
+name: "HealthGNN Healthcare Episode Prediction Demo - Automated Testing Workflow"
+description: "Comprehensive testing workflow for healthcare Graph Neural Network demo showcasing episode prediction capabilities for $35k ML project proposal"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 15000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  - type: navigate
+    description: "Navigate to HealthGNN homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/job_021925663843413373642/index.html"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for main navigation to load"
+    selector: ".main-nav"
+    
+  - type: assertText
+    description: "Verify homepage hero title"
+    selector: ".hero-content h1"
+    expected: "Advanced Graph Neural Networks for Healthcare Episode Prediction"
+    
+  - type: wait-for-selector
+    description: "Wait for feature cards to load"
+    selector: ".features-grid"
+    
+  - type: assertText
+    description: "Verify GNN feature card"
+    selector: ".feature-card h3"
+    expected: "Graph Neural Networks"
+    
+  - type: click
+    description: "Navigate to GNN Visualization page"
+    selector: "a[href='gnn-demo.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for GNN visualization to load"
+    selector: "#gnn-svg"
+    timeout: 10000
+    
+  - type: assertText
+    description: "Verify GNN page title"
+    selector: ".page-header h1"
+    expected: "Graph Neural Network Visualization"
+    
+  - type: wait-for-selector
+    description: "Wait for D3.js network to render"
+    selector: ".node"
+    timeout: 8000
+    
+  - type: click
+    description: "Test GNN node interaction"
+    selector: ".node:first-child"
+    
+  - type: click
+    description: "Test prediction simulation"
+    selector: "button[onclick='runPrediction()']"
+    
+  - type: wait
+    description: "Wait for prediction animation"
+    duration: 3000
+    
+  - type: click
+    description: "Navigate to Episode Dashboard"
+    selector: "a[href='dashboard.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for dashboard charts to load"
+    selector: ".chart-container canvas"
+    timeout: 8000
+    
+  - type: assertText
+    description: "Verify dashboard title"
+    selector: ".page-header h1"
+    expected: "Episode Prediction Dashboard"
+    
+  - type: wait-for-selector
+    description: "Wait for real-time metrics"
+    selector: ".metric-card"
+    
+  - type: assertText
+    description: "Verify high-risk patient count"
+    selector: ".metric-value"
+    expected: "247"
+    
+  - type: click
+    description: "Test time range selector"
+    selector: "#timeRange option[value='7d']"
+    
+  - type: click
+    description: "Test refresh functionality"
+    selector: ".btn-secondary"
+    
+  - type: wait
+    description: "Wait for data refresh"
+    duration: 2000
+    
+  - type: click
+    description: "Navigate to Claims Analysis"
+    selector: "a[href='claims.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for claims charts to load"
+    selector: ".chart-container"
+    timeout: 8000
+    
+  - type: assertText
+    description: "Verify claims page title"
+    selector: ".page-header h1"
+    expected: "Medical Claims Analysis"
+    
+  - type: wait-for-selector
+    description: "Wait for claims data table"
+    selector: ".claims-table"
+    
+  - type: click
+    description: "Test claims filtering"
+    selector: "#claimTypeFilter"
+    
+  - type: click
+    description: "Apply high-risk filter"
+    selector: "option[value='high']"
+    
+  - type: wait
+    description: "Wait for filter results"
+    duration: 1500
+    
+  - type: assertText
+    description: "Verify fraud detection metric"
+    selector: ".fraud-score"
+    expected: "0.94"
+    
+  - type: click
+    description: "Navigate to About page"
+    selector: "a[href='about.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for team profiles to load"
+    selector: ".team-grid"
+    
+  - type: assertText
+    description: "Verify about page title"
+    selector: ".page-header h1"
+    expected: "Expert Healthcare ML Team"
+    
+  - type: wait-for-selector
+    description: "Wait for case studies section"
+    selector: ".case-studies"
+    
+  - type: assertText
+    description: "Verify ROI projection"
+    selector: ".roi-value"
+    expected: "340%"
+    
+  - type: click
+    description: "Test timeline expansion"
+    selector: ".timeline-phase"
+    
+  - type: scroll
+    description: "Scroll to contact section"
+    y: 3000
+    
+  - type: wait-for-selector
+    description: "Wait for contact form"
+    selector: ".contact-section"
+    
+  - type: assertText
+    description: "Verify contact heading"
+    selector: ".contact-section h2"
+    expected: "Ready to Transform Healthcare Analytics?"
+    
+  - type: evaluate
+    description: "Verify Chart.js integration"
+    script: "return typeof Chart !== 'undefined'"
+    expected: true
+    
+  - type: evaluate
+    description: "Verify D3.js integration"
+    script: "return typeof d3 !== 'undefined'"
+    expected: true
+    
+  - type: navigate
+    description: "Return to homepage for final verification"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/job_021925663843413373642/index.html"
+    
+  - type: wait-for-selector
+    description: "Wait for final page load"
+    selector: ".hero-section"
+    
+  - type: assertText
+    description: "Final verification of main value proposition"
+    selector: ".hero-content p"
+    expected: "Revolutionizing healthcare cost management through AI-powered early intervention and predictive analytics for better patient outcomes"
+    
+  - type: screenshot
+    description: "Final demo screenshot"
