@@ -1,0 +1,1032 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Demo - AI WebBuilder</title>
+    <style>
+        /* Design System Variables */
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            
+            /* Secondary Colors */
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --secondary-light: #34d399;
+            
+            /* Neutral Colors */
+            --background-color: #ffffff;
+            --background-gray: #f8fafc;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --border-dark: #d1d5db;
+            
+            /* Accent Colors */
+            --accent-color: #8b5cf6;
+            --accent-light: #a78bfa;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background-gray);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text-primary);
+            margin-bottom: 0.875rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .text-large {
+            font-size: 1.125rem;
+            line-height: 1.7;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        /* Layout */
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+        }
+
+        /* Navigation */
+        .main-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .nav-brand a {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Demo Layout */
+        .demo-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: calc(100vh - 120px);
+            padding: 2rem 0;
+        }
+
+        .demo-input {
+            background: var(--background-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .demo-output {
+            background: var(--background-color);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+            background-color: var(--background-color);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 150px;
+            font-family: inherit;
+        }
+
+        .form-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5rem 1.5rem;
+            padding-right: 2.5rem;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            height: 2px;
+            background: var(--border-color);
+            z-index: 1;
+        }
+
+        .progress-line {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            height: 2px;
+            background: var(--primary-color);
+            z-index: 2;
+            transition: width 0.5s ease;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 3;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--background-color);
+            border: 3px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .step.active .step-circle {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .step.completed .step-circle {
+            background: var(--success-color);
+            border-color: var(--success-color);
+            color: white;
+        }
+
+        .step-label {
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        .step.active .step-label {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        /* Output Areas */
+        .output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .output-content {
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .code-preview {
+            background: #1a1a1a;
+            color: #e5e5e5;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            overflow: auto;
+            max-height: 400px;
+        }
+
+        .website-preview {
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            height: 400px;
+        }
+
+        .preview-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-secondary);
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .tab:hover {
+            background: var(--background-gray);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Generation Status */
+        .generation-status {
+            background: var(--background-gray);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0;
+        }
+
+        .status-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .status-pending {
+            background: var(--text-muted);
+            color: white;
+        }
+
+        .status-active {
+            background: var(--warning-color);
+            color: white;
+        }
+
+        .status-completed {
+            background: var(--success-color);
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .demo-container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <a href="index.html">AI WebBuilder</a>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="demo.html" class="nav-link active">Demo</a>
+                    </li>
+                </ul>
+                <div class="nav-actions">
+                    <a href="dashboard.html" class="btn-secondary btn-small">Dashboard</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="container">
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="progress-line" id="progressLine"></div>
+                    <div class="step active" id="step1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Input</div>
+                    </div>
+                    <div class="step" id="step2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Generate</div>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Preview</div>
+                    </div>
+                    <div class="step" id="step4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Deploy</div>
+                    </div>
+                </div>
+
+                <!-- Demo Container -->
+                <div class="demo-container">
+                    <!-- Input Panel -->
+                    <div class="demo-input">
+                        <h2>Project Configuration</h2>
+                        <p class="text-muted" style="margin-bottom: 2rem;">Describe your web application and we'll generate it for you</p>
+                        
+                        <form id="generationForm">
+                            <div class="form-group">
+                                <label class="form-label">Project Name</label>
+                                <input type="text" class="form-input" id="projectName" placeholder="e.g., My E-commerce Store" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Project Description</label>
+                                <textarea class="form-input form-textarea" id="projectDescription" placeholder="Describe your web application in detail..." required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Generation Strategy</label>
+                                <select class="form-input form-select" id="generationStrategy" required>
+                                    <option value="">Choose a strategy</option>
+                                    <option value="rapid">Rapid Prototyping - Quick MVP (2-3 min)</option>
+                                    <option value="standard">Standard Build - Full Features (5-7 min)</option>
+                                    <option value="enterprise">Enterprise Scale - Production Ready (10-15 min)</option>
+                                    <option value="ai">AI-Powered - Intelligent Generation (8-12 min)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Technology Stack (Optional)</label>
+                                <select class="form-input form-select" id="techStack">
+                                    <option value="">Auto-select optimal stack</option>
+                                    <option value="react">React + Node.js + MongoDB</option>
+                                    <option value="vue">Vue.js + Express + PostgreSQL</option>
+                                    <option value="angular">Angular + Django + MySQL</option>
+                                    <option value="nextjs">Next.js + Prisma + Supabase</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 1rem;">
+                                Generate Application
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Output Panel -->
+                    <div class="demo-output">
+                        <div class="output-header">
+                            <h2>Generation Output</h2>
+                            <div id="generationTime" class="text-muted" style="display: none;"></div>
+                        </div>
+
+                        <div class="output-content">
+                            <!-- Loading State -->
+                            <div class="loading-spinner" id="loadingSpinner">
+                                <div class="spinner"></div>
+                                <div class="loading-text">Generating your application...</div>
+                            </div>
+
+                            <!-- Generation Status -->
+                            <div class="generation-status" id="generationStatus">
+                                <div class="status-item">
+                                    <div class="status-icon status-pending" id="status1">1</div>
+                                    <span>Analyzing requirements</span>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-icon status-pending" id="status2">2</div>
+                                    <span>Generating backend architecture</span>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-icon status-pending" id="status3">3</div>
+                                    <span>Creating frontend components</span>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-icon status-pending" id="status4">4</div>
+                                    <span>Setting up database schema</span>
+                                </div>
+                                <div class="status-item">
+                                    <div class="status-icon status-pending" id="status5">5</div>
+                                    <span>Optimizing and testing</span>
+                                </div>
+                            </div>
+
+                            <!-- Initial State -->
+                            <div id="initialState" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">🚀</div>
+                                <p>Fill out the form and click "Generate Application" to see the magic happen!</p>
+                            </div>
+
+                            <!-- Results Tabs -->
+                            <div id="resultsTabs" style="display: none;">
+                                <div class="tabs">
+                                    <div class="tab active" onclick="switchTab('preview')">Live Preview</div>
+                                    <div class="tab" onclick="switchTab('code')">Generated Code</div>
+                                    <div class="tab" onclick="switchTab('architecture')">Architecture</div>
+                                </div>
+
+                                <div class="tab-content active" id="previewTab">
+                                    <div class="website-preview">
+                                        <iframe class="preview-iframe" id="previewIframe" src="about:blank"></iframe>
+                                    </div>
+                                </div>
+
+                                <div class="tab-content" id="codeTab">
+                                    <div class="code-preview" id="codePreview">
+                                        <!-- Code will be populated here -->
+                                    </div>
+                                </div>
+
+                                <div class="tab-content" id="architectureTab">
+                                    <div style="padding: 1rem;">
+                                        <h4>Architecture Overview</h4>
+                                        <div id="architectureContent">
+                                            <!-- Architecture details will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        let generationStartTime = null;
+
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', function() {
+            updateActiveNavigation();
+            loadUrlParameters();
+            setupFormSubmission();
+        });
+
+        function updateActiveNavigation() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        function loadUrlParameters() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.has('name')) {
+                document.getElementById('projectName').value = urlParams.get('name');
+            }
+            
+            if (urlParams.has('description')) {
+                document.getElementById('projectDescription').value = urlParams.get('description');
+            }
+            
+            if (urlParams.has('strategy')) {
+                document.getElementById('generationStrategy').value = urlParams.get('strategy');
+            }
+        }
+
+        function setupFormSubmission() {
+            document.getElementById('generationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                startGeneration();
+            });
+        }
+
+        function startGeneration() {
+            generationStartTime = Date.now();
+            
+            // Hide initial state and show loading
+            document.getElementById('initialState').style.display = 'none';
+            document.getElementById('loadingSpinner').style.display = 'flex';
+            document.getElementById('generationStatus').style.display = 'block';
+            
+            // Update progress steps
+            updateStep(2);
+            
+            // Start generation simulation
+            simulateGeneration();
+        }
+
+        function simulateGeneration() {
+            const strategy = document.getElementById('generationStrategy').value;
+            const durations = {
+                rapid: [800, 1200, 1500, 2000, 2500],
+                standard: [1000, 2000, 3000, 4000, 5000],
+                enterprise: [1500, 3000, 5000, 7000, 9000],
+                ai: [1200, 2500, 4000, 6000, 8000]
+            };
+            
+            const stepDurations = durations[strategy] || durations.standard;
+            
+            let currentStatusStep = 1;
+            
+            function processStep() {
+                if (currentStatusStep <= 5) {
+                    // Mark current step as active
+                    document.getElementById(`status${currentStatusStep}`).className = 'status-icon status-active';
+                    
+                    setTimeout(() => {
+                        // Mark as completed
+                        document.getElementById(`status${currentStatusStep}`).className = 'status-icon status-completed';
+                        document.getElementById(`status${currentStatusStep}`).textContent = '✓';
+                        
+                        currentStatusStep++;
+                        if (currentStatusStep <= 5) {
+                            processStep();
+                        } else {
+                            completeGeneration();
+                        }
+                    }, stepDurations[currentStatusStep - 1]);
+                }
+            }
+            
+            processStep();
+        }
+
+        function completeGeneration() {
+            // Hide loading and status
+            document.getElementById('loadingSpinner').style.display = 'none';
+            document.getElementById('generationStatus').style.display = 'none';
+            
+            // Show results
+            document.getElementById('resultsTabs').style.display = 'block';
+            
+            // Update progress steps
+            updateStep(3);
+            
+            // Show generation time
+            const duration = ((Date.now() - generationStartTime) / 1000).toFixed(1);
+            document.getElementById('generationTime').textContent = `Generated in ${duration}s`;
+            document.getElementById('generationTime').style.display = 'block';
+            
+            // Populate results
+            populateResults();
+            
+            // Auto-advance to final step after preview
+            setTimeout(() => {
+                updateStep(4);
+            }, 2000);
+        }
+
+        function populateResults() {
+            const projectName = document.getElementById('projectName').value;
+            const description = document.getElementById('projectDescription').value;
+            const strategy = document.getElementById('generationStrategy').value;
+            
+            // Generate mock HTML for preview
+            const mockHTML = generateMockWebsite(projectName, description, strategy);
+            const blob = new Blob([mockHTML], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            document.getElementById('previewIframe').src = url;
+            
+            // Populate code preview
+            document.getElementById('codePreview').innerHTML = generateCodePreview(projectName, strategy);
+            
+            // Populate architecture
+            document.getElementById('architectureContent').innerHTML = generateArchitectureOverview(strategy);
+            
+            // Save generation to localStorage
+            saveGenerationHistory(projectName, description, strategy);
+        }
+
+        function generateMockWebsite(name, description, strategy) {
+            return `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>${name}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }
+                        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+                        h1 { color: #2563eb; margin-bottom: 20px; }
+                        .feature { background: #f8fafc; padding: 15px; margin: 15px 0; border-radius: 5px; border-left: 4px solid #2563eb; }
+                        .btn { background: #2563eb; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+                        .btn:hover { background: #1d4ed8; }
+                        .stats { display: flex; gap: 20px; margin: 20px 0; }
+                        .stat { text-align: center; padding: 15px; background: #e0f2fe; border-radius: 5px; flex: 1; }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>${name}</h1>
+                        <p><strong>Description:</strong> ${description}</p>
+                        <p><strong>Strategy Used:</strong> ${strategy.charAt(0).toUpperCase() + strategy.slice(1)}</p>
+                        
+                        <div class="feature">
+                            <h3>🚀 Key Features</h3>
+                            <ul>
+                                <li>User Authentication & Authorization</li>
+                                <li>Responsive Design</li>
+                                <li>Database Integration</li>
+                                <li>API Endpoints</li>
+                                <li>Admin Dashboard</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="stats">
+                            <div class="stat">
+                                <h4>Performance</h4>
+                                <div style="font-size: 2em; color: #10b981;">A+</div>
+                            </div>
+                            <div class="stat">
+                                <h4>Security</h4>
+                                <div style="font-size: 2em; color: #10b981;">95/100</div>
+                            </div>
+                            <div class="stat">
+                                <h4>SEO</h4>
+                                <div style="font-size: 2em; color: #10b981;">98/100</div>
+                            </div>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button class="btn" onclick="alert('Demo deployment would start here!')">Deploy Now</button>
+                            <button class="btn" onclick="alert('Download would start here!')">Download Code</button>
+                            <button class="btn" onclick="alert('Customization panel would open here!')">Customize</button>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+        }
+
+        function generateCodePreview(projectName, strategy) {
+            return `<span style="color: #89ddff;">// Generated ${projectName} - ${strategy} strategy</span>
+<span style="color: #c792ea;">import</span> <span style="color: #82aaff;">React</span> <span style="color: #c792ea;">from</span> <span style="color: #c3e88d;">'react'</span>;
+<span style="color: #c792ea;">import</span> { <span style="color: #82aaff;">BrowserRouter</span>, <span style="color: #82aaff;">Routes</span>, <span style="color: #82aaff;">Route</span> } <span style="color: #c792ea;">from</span> <span style="color: #c3e88d;">'react-router-dom'</span>;
+<span style="color: #c792ea;">import</span> <span style="color: #82aaff;">Header</span> <span style="color: #c792ea;">from</span> <span style="color: #c3e88d;">'./components/Header'</span>;
+<span style="color: #c792ea;">import</span> <span style="color: #82aaff;">HomePage</span> <span style="color: #c792ea;">from</span> <span style="color: #c3e88d;">'./pages/HomePage'</span>;
+<span style="color: #c792ea;">import</span> <span style="color: #82aaff;">Dashboard</span> <span style="color: #c792ea;">from</span> <span style="color: #c3e88d;">'./pages/Dashboard'</span>;
+<span style="color: #c792ea;">import</span> <span style="color: #82aaff;">AuthProvider</span> <span style="color: #c792ea;">from</span> <span style="color: #c3e88d;">'./contexts/AuthContext'</span>;
+
+<span style="color: #c792ea;">function</span> <span style="color: #82aaff;">App</span>() {
+  <span style="color: #c792ea;">return</span> (
+    &lt;<span style="color: #f07178;">AuthProvider</span>&gt;
+      &lt;<span style="color: #f07178;">BrowserRouter</span>&gt;
+        &lt;<span style="color: #f07178;">div</span> <span style="color: #c792ea;">className</span>=<span style="color: #c3e88d;">"app"</span>&gt;
+          &lt;<span style="color: #f07178;">Header</span> /&gt;
+          &lt;<span style="color: #f07178;">Routes</span>&gt;
+            &lt;<span style="color: #f07178;">Route</span> <span style="color: #c792ea;">path</span>=<span style="color: #c3e88d;">"/"</span> <span style="color: #c792ea;">element</span>={&lt;<span style="color: #f07178;">HomePage</span> /&gt;} /&gt;
+            &lt;<span style="color: #f07178;">Route</span> <span style="color: #c792ea;">path</span>=<span style="color: #c3e88d;">"/dashboard"</span> <span style="color: #c792ea;">element</span>={&lt;<span style="color: #f07178;">Dashboard</span> /&gt;} /&gt;
+          &lt;/<span style="color: #f07178;">Routes</span>&gt;
+        &lt;/<span style="color: #f07178;">div</span>&gt;
+      &lt;/<span style="color: #f07178;">BrowserRouter</span>&gt;
+    &lt;/<span style="color: #f07178;">AuthProvider</span>&gt;
+  );
+}
+
+<span style="color: #c792ea;">export default</span> <span style="color: #82aaff;">App</span>;
+
+<span style="color: #89ddff;">// Backend API Structure</span>
+<span style="color: #c792ea;">const</span> <span style="color: #82aaff;">express</span> = <span style="color: #82aaff;">require</span>(<span style="color: #c3e88d;">'express'</span>);
+<span style="color: #c792ea;">const</span> <span style="color: #82aaff;">app</span> = <span style="color: #82aaff;">express</span>();
+
+<span style="color: #82aaff;">app</span>.<span style="color: #82aaff;">use</span>(<span style="color: #82aaff;">express</span>.<span style="color: #82aaff;">json</span>());
+
+<span style="color: #82aaff;">app</span>.<span style="color: #82aaff;">get</span>(<span style="color: #c3e88d;">'/api/users'</span>, <span style="color: #c792ea;">async</span> (<span style="color: #f78c6c;">req</span>, <span style="color: #f78c6c;">res</span>) =&gt; {
+  <span style="color: #89ddff;">// Generated user management logic</span>
+  <span style="color: #c792ea;">const</span> <span style="color: #82aaff;">users</span> = <span style="color: #c792ea;">await</span> <span style="color: #82aaff;">User</span>.<span style="color: #82aaff;">find</span>();
+  <span style="color: #82aaff;">res</span>.<span style="color: #82aaff;">json</span>(<span style="color: #82aaff;">users</span>);
+});`;
+        }
+
+        function generateArchitectureOverview(strategy) {
+            const architectures = {
+                rapid: {
+                    frontend: "React with Create React App",
+                    backend: "Express.js with SQLite",
+                    deployment: "Vercel/Netlify",
+                    features: ["Basic CRUD", "Simple Auth", "Responsive UI"]
+                },
+                standard: {
+                    frontend: "React with Next.js",
+                    backend: "Node.js with PostgreSQL",
+                    deployment: "AWS/Heroku",
+                    features: ["User Management", "API Integration", "Admin Panel", "Payment Processing"]
+                },
+                enterprise: {
+                    frontend: "React with TypeScript",
+                    backend: "Microservices Architecture",
+                    deployment: "Kubernetes/Docker",
+                    features: ["Advanced Security", "Load Balancing", "Monitoring", "CI/CD Pipeline"]
+                },
+                ai: {
+                    frontend: "React with AI-optimized components",
+                    backend: "Intelligent API with ML integration",
+                    deployment: "Cloud-native with AI optimization",
+                    features: ["Smart Recommendations", "Auto-scaling", "Predictive Analytics", "Self-healing"]
+                }
+            };
+            
+            const arch = architectures[strategy] || architectures.standard;
+            
+            return `
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem;">
+                        <h5>Frontend</h5>
+                        <p style="color: #6b7280; margin: 0;">${arch.frontend}</p>
+                    </div>
+                    <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem;">
+                        <h5>Backend</h5>
+                        <p style="color: #6b7280; margin: 0;">${arch.backend}</p>
+                    </div>
+                </div>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem; margin: 1rem 0;">
+                    <h5>Deployment</h5>
+                    <p style="color: #6b7280; margin: 0;">${arch.deployment}</p>
+                </div>
+                <div style="background: #f8fafc; padding: 1rem; border-radius: 0.5rem;">
+                    <h5>Key Features</h5>
+                    <ul style="color: #6b7280; margin: 0.5rem 0;">
+                        ${arch.features.map(feature => `<li>${feature}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Show selected tab
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function updateStep(step) {
+            // Update current step
+            currentStep = step;
+            
+            // Update step states
+            for (let i = 1; i <= 4; i++) {
+                const stepElement = document.getElementById(`step${i}`);
+                stepElement.classList.remove('active', 'completed');
+                
+                if (i < step) {
+                    stepElement.classList.add('completed');
+                    stepElement.querySelector('.step-circle').textContent = '✓';
+                } else if (i === step) {
+                    stepElement.classList.add('active');
+                    stepElement.querySelector('.step-circle').textContent = i;
+                } else {
+                    stepElement.querySelector('.step-circle').textContent = i;
+                }
+            }
+            
+            // Update progress line
+            const progressPercentage = ((step - 1) / 3) * 100;
+            document.getElementById('progressLine').style.width = progressPercentage + '%';
+        }
+
+        function saveGenerationHistory(name, description, strategy) {
+            const generation = {
+                id: Date.now(),
+                name,
+                description,
+                strategy,
+                timestamp: new Date().toISOString(),
+                duration: ((Date.now() - generationStartTime) / 1000).toFixed(1)
+            };
+            
+            const history = JSON.parse(localStorage.getItem('ai_webbuilder_history') || '[]');
+            history.unshift(generation);
+            history.splice(10); // Keep only last 10 generations
+            
+            localStorage.setItem('ai_webbuilder_history', JSON.stringify(history));
+        }
+    </script>
+</body>
+</html>

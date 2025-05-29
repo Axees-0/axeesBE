@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI WebBuilder</title>
+    <style>
+        /* Design System Variables */
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            
+            /* Secondary Colors */
+            --secondary-color: #10b981;
+            --secondary-dark: #059669;
+            --secondary-light: #34d399;
+            
+            /* Neutral Colors */
+            --background-color: #ffffff;
+            --background-gray: #f8fafc;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --border-dark: #d1d5db;
+            
+            /* Accent Colors */
+            --accent-color: #8b5cf6;
+            --accent-light: #a78bfa;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background-gray);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.2;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            line-height: 1.3;
+            color: var(--text-primary);
+            margin-bottom: 0.875rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .text-large {
+            font-size: 1.125rem;
+            line-height: 1.7;
+        }
+
+        .text-muted {
+            color: var(--text-muted);
+        }
+
+        /* Layout */
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+        }
+
+        /* Navigation */
+        .main-nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 80px;
+        }
+
+        .nav-brand a {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: var(--background-color);
+            padding: 2rem 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--background-color);
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .projects-section {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .quick-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Project Cards */
+        .project-card {
+            background: var(--background-color);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-light);
+        }
+
+        .project-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .project-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .project-meta {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .meta-item {
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-completed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-in-progress {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-draft {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--text-muted);
+        }
+
+        /* Strategy Selection */
+        .strategy-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .strategy-option {
+            background: var(--background-gray);
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .strategy-option:hover {
+            border-color: var(--primary-color);
+            background: var(--background-color);
+        }
+
+        .strategy-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(37, 99, 235, 0.05);
+        }
+
+        .strategy-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .strategy-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .strategy-description {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Quick Start Form */
+        .quick-start-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+            background-color: var(--background-color);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Recent Activity */
+        .activity-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem;
+            background: var(--background-gray);
+            border-radius: 0.5rem;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: var(--background-gray);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+            transition: width 0.3s ease;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .strategy-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .nav-menu {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <a href="index.html">AI WebBuilder</a>
+                </div>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="index.html" class="nav-link">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="demo.html" class="nav-link">Demo</a>
+                    </li>
+                </ul>
+                <div class="nav-actions">
+                    <a href="demo.html" class="btn-primary btn-small">Try Demo</a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Dashboard Header -->
+            <section class="dashboard-header">
+                <div class="container">
+                    <div class="header-content">
+                        <div>
+                            <h1>Dashboard</h1>
+                            <p class="text-large text-muted">Manage your AI-generated web applications</p>
+                        </div>
+                        <div class="header-stats">
+                            <div class="stat-item">
+                                <span class="stat-number" id="projectCount">8</span>
+                                <span class="stat-label">Projects</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="completedCount">5</span>
+                                <span class="stat-label">Completed</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="activeCount">3</span>
+                                <span class="stat-label">Active</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="container">
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Projects Section -->
+                    <div class="projects-section">
+                        <!-- Recent Projects -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Recent Projects</h3>
+                                <button class="btn-secondary btn-small" onclick="showAllProjects()">View All</button>
+                            </div>
+                            <div id="projectsList">
+                                <!-- Projects will be populated by JavaScript -->
+                            </div>
+                        </div>
+
+                        <!-- Generation Statistics -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Generation Analytics</h3>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem;">
+                                <div>
+                                    <p style="font-weight: 500; margin-bottom: 0.5rem;">Strategy Usage</p>
+                                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                        <div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                                <span style="font-size: 0.875rem;">Rapid Prototyping</span>
+                                                <span style="font-size: 0.875rem; color: var(--text-muted);">45%</span>
+                                            </div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 45%;"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                                <span style="font-size: 0.875rem;">Standard Build</span>
+                                                <span style="font-size: 0.875rem; color: var(--text-muted);">35%</span>
+                                            </div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 35%;"></div>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                                                <span style="font-size: 0.875rem;">Enterprise Scale</span>
+                                                <span style="font-size: 0.875rem; color: var(--text-muted);">20%</span>
+                                            </div>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 20%;"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <p style="font-weight: 500; margin-bottom: 0.5rem;">Success Metrics</p>
+                                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                        <div style="text-align: center;">
+                                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--success-color);">96%</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Success Rate</div>
+                                        </div>
+                                        <div style="text-align: center;">
+                                            <div style="font-size: 1.5rem; font-weight: 700; color: var(--primary-color);">2.3m</div>
+                                            <div style="font-size: 0.75rem; color: var(--text-muted);">Avg. Gen Time</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="quick-actions">
+                        <!-- Quick Start -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Quick Start</h3>
+                            </div>
+                            <form class="quick-start-form" onsubmit="startQuickGeneration(event)">
+                                <div class="form-group">
+                                    <label class="form-label">Project Name</label>
+                                    <input type="text" class="form-input" placeholder="e.g., E-commerce Store" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Description</label>
+                                    <textarea class="form-input form-textarea" placeholder="Describe your web application..." required></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Generation Strategy</label>
+                                    <div class="strategy-grid">
+                                        <div class="strategy-option selected" data-strategy="rapid">
+                                            <span class="strategy-icon">⚡</span>
+                                            <div class="strategy-name">Rapid</div>
+                                            <div class="strategy-description">Quick MVP</div>
+                                        </div>
+                                        <div class="strategy-option" data-strategy="standard">
+                                            <span class="strategy-icon">🏗️</span>
+                                            <div class="strategy-name">Standard</div>
+                                            <div class="strategy-description">Full Features</div>
+                                        </div>
+                                        <div class="strategy-option" data-strategy="enterprise">
+                                            <span class="strategy-icon">🏢</span>
+                                            <div class="strategy-name">Enterprise</div>
+                                            <div class="strategy-description">Production Ready</div>
+                                        </div>
+                                        <div class="strategy-option" data-strategy="ai">
+                                            <span class="strategy-icon">🧠</span>
+                                            <div class="strategy-name">AI-Powered</div>
+                                            <div class="strategy-description">Intelligent Build</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary" style="width: 100%;">Generate Application</button>
+                            </form>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Recent Activity</h3>
+                            </div>
+                            <div class="activity-list" id="activityList">
+                                <!-- Activity will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Mock data for demonstration
+        const projects = [
+            {
+                id: 1,
+                name: "E-commerce Dashboard",
+                description: "Full-featured online store with payment integration",
+                status: "completed",
+                strategy: "Enterprise Scale",
+                created: "2024-01-15",
+                progress: 100
+            },
+            {
+                id: 2,
+                name: "Portfolio Website",
+                description: "Personal portfolio with blog and contact features",
+                status: "completed",
+                strategy: "Standard Build",
+                created: "2024-01-12",
+                progress: 100
+            },
+            {
+                id: 3,
+                name: "Task Management App",
+                description: "Team collaboration tool with real-time updates",
+                status: "in-progress",
+                strategy: "AI-Powered",
+                created: "2024-01-18",
+                progress: 75
+            },
+            {
+                id: 4,
+                name: "Landing Page",
+                description: "Marketing site for SaaS product launch",
+                status: "completed",
+                strategy: "Rapid Prototyping",
+                created: "2024-01-10",
+                progress: 100
+            },
+            {
+                id: 5,
+                name: "Blog Platform",
+                description: "Content management system with user authentication",
+                status: "in-progress",
+                strategy: "Standard Build",
+                created: "2024-01-20",
+                progress: 60
+            }
+        ];
+
+        const activities = [
+            {
+                icon: "✅",
+                title: "E-commerce Dashboard completed",
+                time: "2 hours ago"
+            },
+            {
+                icon: "🚀",
+                title: "Task Management App deployment started",
+                time: "4 hours ago"
+            },
+            {
+                icon: "📝",
+                title: "Blog Platform generation initiated",
+                time: "1 day ago"
+            },
+            {
+                icon: "🎨",
+                title: "Portfolio Website design updated",
+                time: "2 days ago"
+            },
+            {
+                icon: "⚡",
+                title: "Landing Page generated successfully",
+                time: "3 days ago"
+            }
+        ];
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            updateActiveNavigation();
+            renderProjects();
+            renderActivities();
+            initializeStrategySelection();
+            updateDashboardStats();
+            loadUserPreferences();
+        });
+
+        function updateActiveNavigation() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        function renderProjects() {
+            const projectsList = document.getElementById('projectsList');
+            const recentProjects = projects.slice(0, 3);
+
+            projectsList.innerHTML = recentProjects.map(project => `
+                <div class="project-card" onclick="openProject(${project.id})">
+                    <div class="project-header">
+                        <div>
+                            <div class="project-title">${project.name}</div>
+                            <div class="project-description">${project.description}</div>
+                        </div>
+                        <span class="status-badge status-${project.status}">${project.status.replace('-', ' ')}</span>
+                    </div>
+                    <div class="project-meta">
+                        <span class="meta-item">Strategy: ${project.strategy}</span>
+                        <span class="meta-item">Created: ${new Date(project.created).toLocaleDateString()}</span>
+                        <span class="meta-item">Progress: ${project.progress}%</span>
+                    </div>
+                    ${project.status === 'in-progress' ? `
+                        <div style="margin-top: 1rem;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${project.progress}%;"></div>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        function renderActivities() {
+            const activityList = document.getElementById('activityList');
+            
+            activityList.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">${activity.icon}</div>
+                    <div class="activity-content">
+                        <div class="activity-title">${activity.title}</div>
+                        <div class="activity-time">${activity.time}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function initializeStrategySelection() {
+            const strategyOptions = document.querySelectorAll('.strategy-option');
+            
+            strategyOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    strategyOptions.forEach(opt => opt.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+        }
+
+        function updateDashboardStats() {
+            const completedProjects = projects.filter(p => p.status === 'completed').length;
+            const activeProjects = projects.filter(p => p.status === 'in-progress').length;
+            
+            document.getElementById('projectCount').textContent = projects.length;
+            document.getElementById('completedCount').textContent = completedProjects;
+            document.getElementById('activeCount').textContent = activeProjects;
+        }
+
+        function startQuickGeneration(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const selectedStrategy = document.querySelector('.strategy-option.selected').dataset.strategy;
+            
+            // Show loading state
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            submitButton.textContent = 'Generating...';
+            submitButton.disabled = true;
+            
+            // Simulate generation process
+            setTimeout(() => {
+                // Redirect to demo page with parameters
+                const params = new URLSearchParams({
+                    name: event.target.querySelector('input[type="text"]').value,
+                    description: event.target.querySelector('textarea').value,
+                    strategy: selectedStrategy
+                });
+                
+                window.location.href = `demo.html?${params.toString()}`;
+            }, 1500);
+        }
+
+        function openProject(projectId) {
+            // Store project data for demo page
+            const project = projects.find(p => p.id === projectId);
+            localStorage.setItem('currentProject', JSON.stringify(project));
+            
+            // Redirect to demo page
+            window.location.href = 'demo.html?project=' + projectId;
+        }
+
+        function showAllProjects() {
+            // Store all projects data
+            localStorage.setItem('allProjects', JSON.stringify(projects));
+            
+            // Show expanded view (for demo purposes, just alert)
+            alert('All Projects view would be displayed here in the full application.');
+        }
+
+        function loadUserPreferences() {
+            // Load user preferences from localStorage
+            const preferences = JSON.parse(localStorage.getItem('ai_webbuilder_preferences') || '{}');
+            
+            // Apply any saved preferences
+            if (preferences.preferredStrategy) {
+                const strategyOption = document.querySelector(`[data-strategy="${preferences.preferredStrategy}"]`);
+                if (strategyOption) {
+                    document.querySelectorAll('.strategy-option').forEach(opt => opt.classList.remove('selected'));
+                    strategyOption.classList.add('selected');
+                }
+            }
+        }
+
+        // Save user preferences
+        function saveUserPreferences() {
+            const selectedStrategy = document.querySelector('.strategy-option.selected')?.dataset.strategy;
+            const preferences = {
+                preferredStrategy: selectedStrategy,
+                lastVisit: new Date().toISOString()
+            };
+            
+            localStorage.setItem('ai_webbuilder_preferences', JSON.stringify(preferences));
+        }
+
+        // Auto-save preferences when strategy changes
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.strategy-option')) {
+                setTimeout(saveUserPreferences, 100);
+            }
+        });
+    </script>
+</body>
+</html>
