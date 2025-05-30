@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - RoomStyle AI</title>
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --primary-hover: #34495E;
+            --primary-light: #ECF0F1;
+            --secondary-color: #3498DB;
+            --secondary-hover: #2980B9;
+            --accent-color: #E74C3C;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --text-light: #FFFFFF;
+            --background: #FFFFFF;
+            --background-alt: #F8F9FA;
+            --border-color: #E0E0E0;
+            --shadow-color: rgba(0,0,0,0.1);
+            
+            --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 24px;
+            --font-size-2xl: 32px;
+            --font-size-3xl: 48px;
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            --spacing-3xl: 64px;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            background: var(--background-alt);
+            line-height: 1.6;
+        }
+        
+        .nav-header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+        
+        .brand-logo {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--spacing-xl);
+            align-items: center;
+        }
+        
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--secondary-color);
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--secondary-color);
+        }
+        
+        .cart-link {
+            background: var(--secondary-color);
+            color: white;
+            padding: 8px 20px;
+            border-radius: var(--radius-md);
+        }
+        
+        .cart-link:hover {
+            background: var(--secondary-hover);
+            color: white;
+        }
+        
+        .cart-count {
+            background: var(--accent-color);
+            color: white;
+            font-size: var(--font-size-xs);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+        
+        main {
+            margin-top: 70px;
+            min-height: calc(100vh - 170px);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-2xl) var(--spacing-lg);
+        }
+        
+        .page-title {
+            text-align: center;
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--spacing-2xl);
+            color: var(--primary-color);
+        }
+        
+        .checkout-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: var(--spacing-xl);
+        }
+        
+        .checkout-main {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .checkout-steps {
+            display: flex;
+            margin-bottom: var(--spacing-2xl);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .step {
+            flex: 1;
+            padding: var(--spacing-md) 0;
+            text-align: center;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .step::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--border-color);
+            transition: background 0.3s ease;
+        }
+        
+        .step.active::after {
+            background: var(--secondary-color);
+        }
+        
+        .step.completed::after {
+            background: var(--success-color);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: var(--border-color);
+            color: white;
+            border-radius: 50%;
+            line-height: 30px;
+            margin-right: var(--spacing-sm);
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background: var(--secondary-color);
+        }
+        
+        .step.completed .step-number {
+            background: var(--success-color);
+        }
+        
+        .step-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .section-title {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+        }
+        
+        .cart-items {
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .cart-item {
+            display: grid;
+            grid-template-columns: 100px 1fr auto;
+            gap: var(--spacing-lg);
+            padding: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            align-items: center;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .cart-item-image {
+            width: 100px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: var(--radius-md);
+        }
+        
+        .cart-item-details h4 {
+            font-size: var(--font-size-base);
+            margin-bottom: var(--spacing-xs);
+            color: var(--primary-color);
+        }
+        
+        .cart-item-vendor {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .quantity-controls {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .quantity-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quantity-btn:hover {
+            background: var(--background-alt);
+        }
+        
+        .quantity-value {
+            width: 40px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .cart-item-price {
+            text-align: right;
+        }
+        
+        .item-price {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .remove-btn {
+            color: var(--accent-color);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            transition: opacity 0.3s ease;
+        }
+        
+        .remove-btn:hover {
+            opacity: 0.7;
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: var(--spacing-sm);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+        
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .payment-method {
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .payment-method:hover {
+            border-color: var(--secondary-color);
+        }
+        
+        .payment-method.selected {
+            border-color: var(--secondary-color);
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .payment-icon {
+            font-size: 32px;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .payment-name {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+        
+        .stripe-element {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: white;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .card-input-group {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: var(--spacing-md);
+        }
+        
+        .checkout-sidebar {
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .order-summary {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .summary-row.total {
+            padding-top: var(--spacing-md);
+            border-top: 2px solid var(--border-color);
+            font-size: var(--font-size-lg);
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .promo-code {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .promo-input {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-sm);
+        }
+        
+        .promo-btn {
+            padding: 10px 16px;
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+        
+        .promo-btn:hover {
+            background: var(--secondary-hover);
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+            width: 100%;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--border-color);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            background: var(--background-alt);
+        }
+        
+        .step-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: var(--spacing-xl);
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: var(--spacing-3xl);
+        }
+        
+        .empty-cart-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .empty-cart h3 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+        
+        .empty-cart p {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            color: var(--success-color);
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: var(--spacing-3xl);
+        }
+        
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--success-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto var(--spacing-lg);
+        }
+        
+        .success-title {
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+        
+        .success-details {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header class="nav-header">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1 class="brand-logo" onclick="window.location.href='index.html'">RoomStyle AI</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="design.html" class="nav-link">Design Studio</a>
+                <a href="shop.html" class="nav-link">Shop</a>
+                <a href="checkout.html" class="nav-link cart-link active">
+                    Cart <span class="cart-count">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 class="page-title">Checkout</h1>
+            
+            <div class="checkout-container" id="checkoutContainer">
+                <div class="checkout-main">
+                    <div class="checkout-steps">
+                        <div class="step active" onclick="goToStep(1)">
+                            <span class="step-number">1</span>
+                            <span>Cart</span>
+                        </div>
+                        <div class="step" onclick="goToStep(2)">
+                            <span class="step-number">2</span>
+                            <span>Shipping</span>
+                        </div>
+                        <div class="step" onclick="goToStep(3)">
+                            <span class="step-number">3</span>
+                            <span>Payment</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 1: Cart Review -->
+                    <div class="step-content active" id="step1">
+                        <h2 class="section-title">Review Your Cart</h2>
+                        <div class="cart-items" id="cartItems">
+                        </div>
+                        <div class="step-navigation">
+                            <button class="btn btn-secondary" onclick="window.location.href='shop.html'">Continue Shopping</button>
+                            <button class="btn btn-primary" onclick="nextStep()">Proceed to Shipping</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 2: Shipping Information -->
+                    <div class="step-content" id="step2">
+                        <h2 class="section-title">Shipping Information</h2>
+                        <form id="shippingForm">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-input" id="firstName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-input" id="lastName" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-input" id="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-input" id="phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Street Address</label>
+                                <input type="text" class="form-input" id="address" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">City</label>
+                                    <input type="text" class="form-input" id="city" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">State</label>
+                                    <input type="text" class="form-input" id="state" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">ZIP Code</label>
+                                    <input type="text" class="form-input" id="zip" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Country</label>
+                                    <select class="form-input" id="country" required>
+                                        <option value="US">United States</option>
+                                        <option value="CA">Canada</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="step-navigation">
+                            <button class="btn btn-secondary" onclick="previousStep()">Back to Cart</button>
+                            <button class="btn btn-primary" onclick="nextStep()">Continue to Payment</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Step 3: Payment -->
+                    <div class="step-content" id="step3">
+                        <h2 class="section-title">Payment Method</h2>
+                        <div class="payment-methods">
+                            <div class="payment-method selected" onclick="selectPayment('card')">
+                                <div class="payment-icon">💳</div>
+                                <div class="payment-name">Credit Card</div>
+                            </div>
+                            <div class="payment-method" onclick="selectPayment('paypal')">
+                                <div class="payment-icon">🅿️</div>
+                                <div class="payment-name">PayPal</div>
+                            </div>
+                            <div class="payment-method" onclick="selectPayment('apple')">
+                                <div class="payment-icon">🍎</div>
+                                <div class="payment-name">Apple Pay</div>
+                            </div>
+                        </div>
+                        
+                        <div id="cardPayment">
+                            <div class="form-group">
+                                <label class="form-label">Card Number</label>
+                                <div class="stripe-element">
+                                    <input type="text" class="form-input" placeholder="1234 5678 9012 3456" id="cardNumber">
+                                </div>
+                            </div>
+                            <div class="card-input-group">
+                                <div class="form-group">
+                                    <label class="form-label">Cardholder Name</label>
+                                    <input type="text" class="form-input" id="cardName">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Expiry</label>
+                                    <input type="text" class="form-input" placeholder="MM/YY" id="cardExpiry">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">CVV</label>
+                                    <input type="text" class="form-input" placeholder="123" id="cardCvv">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="step-navigation">
+                            <button class="btn btn-secondary" onclick="previousStep()">Back to Shipping</button>
+                            <button class="btn btn-primary" onclick="processPayment()">Complete Order</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <aside class="checkout-sidebar">
+                    <div class="order-summary">
+                        <h3 class="section-title">Order Summary</h3>
+                        <div class="summary-details" id="summaryDetails">
+                        </div>
+                        <div class="promo-code">
+                            <input type="text" class="promo-input" placeholder="Promo code" id="promoCode">
+                            <button class="promo-btn" onclick="applyPromo()">Apply</button>
+                        </div>
+                        <div class="secure-badge">
+                            <span>🔒</span>
+                            <span>Secure Checkout</span>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+            
+            <div class="empty-cart" id="emptyCart" style="display: none;">
+                <div class="empty-cart-icon">🛒</div>
+                <h3>Your cart is empty</h3>
+                <p>Add some beautiful furniture and decor to get started!</p>
+                <button class="btn btn-primary" onclick="window.location.href='shop.html'">Start Shopping</button>
+            </div>
+            
+            <div class="success-message" id="successMessage">
+                <div class="success-icon">✓</div>
+                <h2 class="success-title">Order Placed Successfully!</h2>
+                <p class="success-details">
+                    Thank you for your order! Your order number is <strong>#<span id="orderNumber"></span></strong>.<br>
+                    We've sent a confirmation email to <span id="confirmEmail"></span>.
+                </p>
+                <button class="btn btn-primary" onclick="window.location.href='shop.html'">Continue Shopping</button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 RoomStyle AI. Transform Your Space with AI.</p>
+        </div>
+    </footer>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script>
+        let cart = [];
+        let currentStep = 1;
+        let shippingData = {};
+        let selectedPaymentMethod = 'card';
+        let discount = 0;
+        
+        // Initialize
+        function init() {
+            loadCart();
+            updateCartCount();
+            renderCart();
+            updateOrderSummary();
+        }
+        
+        // Load cart from localStorage
+        function loadCart() {
+            cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            if (cart.length === 0) {
+                document.getElementById('checkoutContainer').style.display = 'none';
+                document.getElementById('emptyCart').style.display = 'block';
+            }
+        }
+        
+        // Update cart count
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.querySelector('.cart-count').textContent = totalItems;
+        }
+        
+        // Render cart items
+        function renderCart() {
+            const cartItems = document.getElementById('cartItems');
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p>Your cart is empty</p>';
+                return;
+            }
+            
+            cartItems.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                    <div class="cart-item-details">
+                        <h4>${item.name}</h4>
+                        <p class="cart-item-vendor">${item.vendor}</p>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)">-</button>
+                            <span class="quantity-value">${item.quantity}</span>
+                            <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                        </div>
+                    </div>
+                    <div class="cart-item-price">
+                        <span class="item-price">$${(item.price * item.quantity).toFixed(2)}</span>
+                        <span class="remove-btn" onclick="removeItem(${item.id})">Remove</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Update item quantity
+        function updateQuantity(itemId, change) {
+            const item = cart.find(i => i.id === itemId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeItem(itemId);
+                } else {
+                    saveCart();
+                    renderCart();
+                    updateOrderSummary();
+                }
+            }
+        }
+        
+        // Remove item from cart
+        function removeItem(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            saveCart();
+            renderCart();
+            updateOrderSummary();
+            
+            if (cart.length === 0) {
+                document.getElementById('checkoutContainer').style.display = 'none';
+                document.getElementById('emptyCart').style.display = 'block';
+            }
+        }
+        
+        // Save cart to localStorage
+        function saveCart() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+        }
+        
+        // Update order summary
+        function updateOrderSummary() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const shipping = cart.length > 0 ? 9.99 : 0;
+            const tax = subtotal * 0.08;
+            const discountAmount = subtotal * discount;
+            const total = subtotal + shipping + tax - discountAmount;
+            
+            document.getElementById('summaryDetails').innerHTML = `
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span>$${subtotal.toFixed(2)}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span>$${shipping.toFixed(2)}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Tax</span>
+                    <span>$${tax.toFixed(2)}</span>
+                </div>
+                ${discount > 0 ? `
+                <div class="summary-row">
+                    <span>Discount</span>
+                    <span>-$${discountAmount.toFixed(2)}</span>
+                </div>
+                ` : ''}
+                <div class="summary-row total">
+                    <span>Total</span>
+                    <span>$${total.toFixed(2)}</span>
+                </div>
+            `;
+        }
+        
+        // Step navigation
+        function goToStep(step) {
+            if (step < currentStep || validateCurrentStep()) {
+                currentStep = step;
+                updateStepDisplay();
+            }
+        }
+        
+        function nextStep() {
+            if (validateCurrentStep()) {
+                currentStep++;
+                updateStepDisplay();
+            }
+        }
+        
+        function previousStep() {
+            currentStep--;
+            updateStepDisplay();
+        }
+        
+        function updateStepDisplay() {
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                }
+            });
+            
+            // Update step content
+            document.querySelectorAll('.step-content').forEach((content, index) => {
+                content.classList.toggle('active', index + 1 === currentStep);
+            });
+        }
+        
+        function validateCurrentStep() {
+            if (currentStep === 2) {
+                // Validate shipping form
+                const form = document.getElementById('shippingForm');
+                if (!form.checkValidity()) {
+                    form.reportValidity();
+                    return false;
+                }
+                
+                // Save shipping data
+                shippingData = {
+                    firstName: document.getElementById('firstName').value,
+                    lastName: document.getElementById('lastName').value,
+                    email: document.getElementById('email').value,
+                    phone: document.getElementById('phone').value,
+                    address: document.getElementById('address').value,
+                    city: document.getElementById('city').value,
+                    state: document.getElementById('state').value,
+                    zip: document.getElementById('zip').value,
+                    country: document.getElementById('country').value
+                };
+            }
+            return true;
+        }
+        
+        // Payment selection
+        function selectPayment(method) {
+            selectedPaymentMethod = method;
+            document.querySelectorAll('.payment-method').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.target.closest('.payment-method').classList.add('selected');
+            
+            // Show/hide card payment form
+            document.getElementById('cardPayment').style.display = 
+                method === 'card' ? 'block' : 'none';
+        }
+        
+        // Apply promo code
+        function applyPromo() {
+            const promoCode = document.getElementById('promoCode').value.toUpperCase();
+            if (promoCode === 'SAVE10') {
+                discount = 0.1;
+                alert('Promo code applied! 10% discount');
+            } else if (promoCode === 'SAVE20') {
+                discount = 0.2;
+                alert('Promo code applied! 20% discount');
+            } else {
+                alert('Invalid promo code');
+            }
+            updateOrderSummary();
+        }
+        
+        // Process payment
+        function processPayment() {
+            // Validate payment form
+            if (selectedPaymentMethod === 'card') {
+                const cardNumber = document.getElementById('cardNumber').value;
+                const cardName = document.getElementById('cardName').value;
+                const cardExpiry = document.getElementById('cardExpiry').value;
+                const cardCvv = document.getElementById('cardCvv').value;
+                
+                if (!cardNumber || !cardName || !cardExpiry || !cardCvv) {
+                    alert('Please fill in all card details');
+                    return;
+                }
+            }
+            
+            // Show loading
+            document.getElementById('loadingOverlay').style.display = 'flex';
+            
+            // Simulate payment processing
+            setTimeout(() => {
+                // Generate order number
+                const orderNumber = Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+                
+                // Clear cart
+                localStorage.removeItem('cart');
+                cart = [];
+                updateCartCount();
+                
+                // Show success message
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('checkoutContainer').style.display = 'none';
+                document.getElementById('successMessage').style.display = 'block';
+                document.getElementById('orderNumber').textContent = orderNumber;
+                document.getElementById('confirmEmail').textContent = shippingData.email;
+                
+                // Save order to localStorage
+                const orders = JSON.parse(localStorage.getItem('orders') || '[]');
+                orders.push({
+                    orderNumber,
+                    date: new Date().toISOString(),
+                    items: cart,
+                    shipping: shippingData,
+                    total: calculateTotal()
+                });
+                localStorage.setItem('orders', JSON.stringify(orders));
+            }, 3000);
+        }
+        
+        function calculateTotal() {
+            const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const shipping = 9.99;
+            const tax = subtotal * 0.08;
+            const discountAmount = subtotal * discount;
+            return subtotal + shipping + tax - discountAmount;
+        }
+        
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RoomStyle AI - Transform Your Space with AI-Powered Design</title>
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --primary-hover: #34495E;
+            --primary-light: #ECF0F1;
+            --secondary-color: #3498DB;
+            --secondary-hover: #2980B9;
+            --accent-color: #E74C3C;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --text-light: #FFFFFF;
+            --background: #FFFFFF;
+            --background-alt: #F8F9FA;
+            --border-color: #E0E0E0;
+            --shadow-color: rgba(0,0,0,0.1);
+            
+            --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 24px;
+            --font-size-2xl: 32px;
+            --font-size-3xl: 48px;
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            --spacing-3xl: 64px;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            background: var(--background);
+            line-height: 1.6;
+        }
+        
+        .nav-header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+        
+        .brand-logo {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--spacing-xl);
+            align-items: center;
+        }
+        
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--secondary-color);
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--secondary-color);
+        }
+        
+        .cart-link {
+            background: var(--secondary-color);
+            color: white;
+            padding: 8px 20px;
+            border-radius: var(--radius-md);
+        }
+        
+        .cart-link:hover {
+            background: var(--secondary-hover);
+            color: white;
+        }
+        
+        .cart-count {
+            background: var(--accent-color);
+            color: white;
+            font-size: var(--font-size-xs);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+        
+        main {
+            margin-top: 70px;
+        }
+        
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: var(--spacing-3xl) 0;
+            text-align: center;
+        }
+        
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+        
+        .hero-title {
+            font-size: var(--font-size-3xl);
+            margin-bottom: var(--spacing-lg);
+            font-weight: 700;
+        }
+        
+        .hero-subtitle {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-xl);
+            opacity: 0.9;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+        }
+        
+        .btn-primary {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .btn-secondary:hover {
+            background: white;
+            color: var(--primary-color);
+        }
+        
+        .features-section {
+            padding: var(--spacing-3xl) 0;
+            background: var(--background-alt);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--spacing-2xl);
+            color: var(--primary-color);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-xl);
+        }
+        
+        .feature-card {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--spacing-lg);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+        }
+        
+        .feature-title {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+        
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .how-it-works {
+            padding: var(--spacing-3xl) 0;
+        }
+        
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-2xl);
+        }
+        
+        .step-card {
+            text-align: center;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            margin: 0 auto var(--spacing-md);
+        }
+        
+        .step-title {
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--spacing-sm);
+            color: var(--primary-color);
+        }
+        
+        .step-description {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .showcase-section {
+            padding: var(--spacing-3xl) 0;
+            background: var(--background-alt);
+        }
+        
+        .showcase-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-xl);
+            margin-top: var(--spacing-2xl);
+        }
+        
+        .showcase-card {
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        
+        .showcase-card:hover {
+            transform: scale(1.02);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .showcase-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .showcase-content {
+            padding: var(--spacing-lg);
+        }
+        
+        .showcase-title {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+        
+        .showcase-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .showcase-tag {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary-color);
+            padding: 4px 12px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            margin-right: var(--spacing-sm);
+        }
+        
+        .cta-section {
+            padding: var(--spacing-3xl) 0;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            text-align: center;
+        }
+        
+        .cta-title {
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .cta-description {
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--spacing-xl);
+            opacity: 0.9;
+        }
+        
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+        }
+        
+        .footer p {
+            opacity: 0.8;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <header class="nav-header">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1 class="brand-logo">RoomStyle AI</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="design.html" class="nav-link">Design Studio</a>
+                <a href="shop.html" class="nav-link">Shop</a>
+                <a href="checkout.html" class="nav-link cart-link">
+                    Cart <span class="cart-count">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero-section">
+            <div class="hero-content fade-in">
+                <h1 class="hero-title">Transform Your Space with AI-Powered Design</h1>
+                <p class="hero-subtitle">Upload a photo of your room and let AI reimagine it with stunning design options. Shop curated furniture from top vendors.</p>
+                <div class="hero-buttons">
+                    <a href="design.html" class="btn btn-primary">Start Designing</a>
+                    <a href="shop.html" class="btn btn-secondary">Browse Products</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="features-section">
+            <div class="container">
+                <h2 class="section-title">Why Choose RoomStyle AI?</h2>
+                <div class="features-grid">
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">📸</div>
+                        <h3 class="feature-title">Easy Upload</h3>
+                        <p class="feature-description">Simply upload or scan a photo of your room to get started. Our AI analyzes your space instantly.</p>
+                    </div>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">🎨</div>
+                        <h3 class="feature-title">AI Design Magic</h3>
+                        <p class="feature-description">Get multiple professional design variations tailored to your space and style preferences.</p>
+                    </div>
+                    <div class="feature-card fade-in">
+                        <div class="feature-icon">🛍️</div>
+                        <h3 class="feature-title">Shop Real Products</h3>
+                        <p class="feature-description">Purchase furniture and decor from verified vendors directly through our platform.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="how-it-works">
+            <div class="container">
+                <h2 class="section-title">How It Works</h2>
+                <div class="steps-container">
+                    <div class="step-card fade-in">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Upload Photo</h3>
+                        <p class="step-description">Take or upload a photo of your room</p>
+                    </div>
+                    <div class="step-card fade-in">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Choose Style</h3>
+                        <p class="step-description">Select from modern, classic, or minimalist designs</p>
+                    </div>
+                    <div class="step-card fade-in">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">View Results</h3>
+                        <p class="step-description">See AI-generated design options instantly</p>
+                    </div>
+                    <div class="step-card fade-in">
+                        <div class="step-number">4</div>
+                        <h3 class="step-title">Shop & Buy</h3>
+                        <p class="step-description">Purchase matching furniture from top vendors</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="showcase-section">
+            <div class="container">
+                <h2 class="section-title">Recent Transformations</h2>
+                <div class="showcase-grid">
+                    <div class="showcase-card fade-in">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Crect width='600' height='300' fill='%23E8E8E8'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='20'%3EModern Living Room%3C/text%3E%3C/svg%3E" alt="Modern Living Room" class="showcase-image">
+                        <div class="showcase-content">
+                            <h3 class="showcase-title">Sleek Modern Living Room</h3>
+                            <p class="showcase-description">Transformed a traditional space into a contemporary haven with clean lines and neutral tones.</p>
+                            <span class="showcase-tag">Modern</span>
+                            <span class="showcase-tag">Living Room</span>
+                        </div>
+                    </div>
+                    <div class="showcase-card fade-in">
+                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='300'%3E%3Crect width='600' height='300' fill='%23E8E8E8'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='20'%3ECozy Bedroom%3C/text%3E%3C/svg%3E" alt="Cozy Bedroom" class="showcase-image">
+                        <div class="showcase-content">
+                            <h3 class="showcase-title">Cozy Minimalist Bedroom</h3>
+                            <p class="showcase-description">Created a peaceful retreat with soft textures and a calming color palette.</p>
+                            <span class="showcase-tag">Minimalist</span>
+                            <span class="showcase-tag">Bedroom</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <h2 class="cta-title">Ready to Transform Your Space?</h2>
+                <p class="cta-description">Join thousands of happy customers who've redesigned their homes with AI</p>
+                <a href="design.html" class="btn btn-primary">Get Started Free</a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 RoomStyle AI. Transform Your Space with AI.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Animate elements on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+
+        // Update cart count from localStorage
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.querySelector('.cart-count').textContent = totalItems;
+        }
+
+        updateCartCount();
+    </script>
+</body>
+</html>

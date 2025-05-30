@@ -1,0 +1,171 @@
+name: "RoomStyle AI - Room Design & Shopping Demo Workflow"
+description: "Automated testing workflow for AI-powered room design and furniture shopping platform"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 15000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Homepage Navigation
+  - type: navigate
+    description: "Navigate to demo homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021924664975252798818/index.html"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for main content to load"
+    selector: ".hero-section"
+    
+  - type: assertText
+    description: "Verify main heading loaded"
+    selector: ".hero-title"
+    expected: "Transform Your Space with AI-Powered Design"
+    
+  - type: click
+    description: "Click on Start Designing button"
+    selector: ".hero-buttons .btn-primary"
+    screenshot: true
+    
+  # Design Studio Page
+  - type: wait-for-selector
+    description: "Wait for design studio to load"
+    selector: ".upload-area"
+    
+  - type: assertText
+    description: "Verify design studio page title"
+    selector: ".page-title"
+    expected: "AI Design Studio"
+    
+  - type: click
+    description: "Select Modern style"
+    selector: "[data-style='modern']"
+    
+  - type: evaluate
+    description: "Verify style selection"
+    script: "document.querySelector('[data-style=\"modern\"]').classList.contains('selected')"
+    expected: true
+    
+  # Navigate to Shop
+  - type: click
+    description: "Navigate to Shop page"
+    selector: ".nav-link[href='shop.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for products to load"
+    selector: ".products-grid"
+    
+  - type: assertText
+    description: "Verify shop page title"
+    selector: ".page-title"
+    expected: "Shop Furniture & Decor"
+    
+  # Test Product Filtering
+  - type: type
+    description: "Search for sofa products"
+    selector: "#searchInput"
+    text: "sofa"
+    
+  - type: wait
+    description: "Wait for search results"
+    duration: 500
+    
+  - type: click
+    description: "Add first product to cart"
+    selector: ".product-card:first-child .btn-primary"
+    
+  - type: wait
+    description: "Wait for toast notification"
+    duration: 1000
+    
+  - type: evaluate
+    description: "Verify cart count updated"
+    script: "parseInt(document.querySelector('.cart-count').textContent) > 0"
+    expected: true
+    screenshot: true
+    
+  # Navigate to Checkout
+  - type: click
+    description: "Go to checkout"
+    selector: ".cart-link"
+    
+  - type: wait-for-selector
+    description: "Wait for checkout page"
+    selector: ".checkout-container"
+    
+  - type: assertText
+    description: "Verify checkout page loaded"
+    selector: ".step.active span:last-child"
+    expected: "Cart"
+    
+  - type: click
+    description: "Proceed to shipping"
+    selector: "#step1 .btn-primary"
+    
+  # Fill Shipping Information
+  - type: wait-for-selector
+    description: "Wait for shipping form"
+    selector: "#shippingForm"
+    
+  - type: type
+    description: "Enter first name"
+    selector: "#firstName"
+    text: "John"
+    
+  - type: type
+    description: "Enter last name"
+    selector: "#lastName"
+    text: "Doe"
+    
+  - type: type
+    description: "Enter email"
+    selector: "#email"
+    text: "john.doe@example.com"
+    
+  - type: type
+    description: "Enter phone"
+    selector: "#phone"
+    text: "(555) 123-4567"
+    
+  - type: type
+    description: "Enter address"
+    selector: "#address"
+    text: "123 Main Street"
+    
+  - type: type
+    description: "Enter city"
+    selector: "#city"
+    text: "San Francisco"
+    
+  - type: type
+    description: "Enter state"
+    selector: "#state"
+    text: "CA"
+    
+  - type: type
+    description: "Enter ZIP code"
+    selector: "#zip"
+    text: "94105"
+    
+  - type: click
+    description: "Continue to payment"
+    selector: "#step2 .btn-primary"
+    screenshot: true
+    
+  # Payment Step
+  - type: wait-for-selector
+    description: "Wait for payment form"
+    selector: ".payment-methods"
+    
+  - type: assertText
+    description: "Verify payment step"
+    selector: ".step.active span:last-child"
+    expected: "Payment"
+    
+  - type: screenshot
+    description: "Capture final checkout state"
+    fullPage: true

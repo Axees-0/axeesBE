@@ -1,0 +1,12 @@
+{
+  "sessionId": "claude_exec_1748563579087",
+  "execId": "exec_1748563579087",
+  "projectDir": "/Users/Mike/Desktop/programming/2_proposals/upwork/021924664975252798818",
+  "requirementsFile": "instructions.md",
+  "projectType": "web-app",
+  "startTime": "2025-05-30T00:06:19.088Z",
+  "status": "running",
+  "pid": 73787,
+  "monitorCommand": "node /Users/Mike/.claude/user/tmux-claude-mcp-server/scripts/api/monitor_project.js --session-id claude_exec_1748563579087",
+  "attachCommand": "tmux attach -t claude_exec_1748563579087"
+}

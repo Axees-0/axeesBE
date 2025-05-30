@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shop - RoomStyle AI</title>
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --primary-hover: #34495E;
+            --primary-light: #ECF0F1;
+            --secondary-color: #3498DB;
+            --secondary-hover: #2980B9;
+            --accent-color: #E74C3C;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --text-light: #FFFFFF;
+            --background: #FFFFFF;
+            --background-alt: #F8F9FA;
+            --border-color: #E0E0E0;
+            --shadow-color: rgba(0,0,0,0.1);
+            
+            --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 24px;
+            --font-size-2xl: 32px;
+            --font-size-3xl: 48px;
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            --spacing-3xl: 64px;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            background: var(--background-alt);
+            line-height: 1.6;
+        }
+        
+        .nav-header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+        
+        .brand-logo {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--spacing-xl);
+            align-items: center;
+        }
+        
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--secondary-color);
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--secondary-color);
+        }
+        
+        .cart-link {
+            background: var(--secondary-color);
+            color: white;
+            padding: 8px 20px;
+            border-radius: var(--radius-md);
+        }
+        
+        .cart-link:hover {
+            background: var(--secondary-hover);
+            color: white;
+        }
+        
+        .cart-count {
+            background: var(--accent-color);
+            color: white;
+            font-size: var(--font-size-xs);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+        
+        main {
+            margin-top: 70px;
+            min-height: calc(100vh - 170px);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: var(--spacing-2xl) var(--spacing-lg);
+        }
+        
+        .shop-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+        
+        .page-title {
+            font-size: var(--font-size-2xl);
+            color: var(--primary-color);
+        }
+        
+        .view-toggle {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .view-btn {
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .view-btn.active {
+            background: var(--secondary-color);
+            color: white;
+            border-color: var(--secondary-color);
+        }
+        
+        .shop-content {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: var(--spacing-xl);
+        }
+        
+        .filters-sidebar {
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .filter-section {
+            margin-bottom: var(--spacing-xl);
+            padding-bottom: var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .filter-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .filter-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+        
+        .filter-search {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--font-size-base);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .filter-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+            cursor: pointer;
+        }
+        
+        .filter-option input[type="checkbox"] {
+            margin-right: var(--spacing-sm);
+            cursor: pointer;
+        }
+        
+        .filter-option label {
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.3s ease;
+        }
+        
+        .filter-option:hover label {
+            color: var(--text-primary);
+        }
+        
+        .price-range {
+            display: flex;
+            gap: var(--spacing-sm);
+            align-items: center;
+            margin-top: var(--spacing-md);
+        }
+        
+        .price-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+        }
+        
+        .vendor-tag {
+            display: inline-block;
+            background: var(--background-alt);
+            color: var(--text-secondary);
+            padding: 4px 12px;
+            border-radius: var(--radius-sm);
+            font-size: var(--font-size-sm);
+            margin-right: var(--spacing-sm);
+            margin-bottom: var(--spacing-sm);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .vendor-tag.active {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .clear-filters {
+            width: 100%;
+            padding: 10px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: var(--font-size-sm);
+            margin-top: var(--spacing-md);
+        }
+        
+        .clear-filters:hover {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .products-section {
+            background: white;
+            padding: var(--spacing-lg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .results-count {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .sort-dropdown {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: white;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-lg);
+        }
+        
+        .products-list {
+            display: none;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        
+        .product-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+            border-color: transparent;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            background: var(--background-alt);
+        }
+        
+        .product-content {
+            padding: var(--spacing-md);
+        }
+        
+        .product-vendor {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .product-title {
+            font-size: var(--font-size-base);
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-sm);
+            line-height: 1.4;
+        }
+        
+        .product-price {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--secondary-color);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-size-sm);
+            text-align: center;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            background: var(--background-alt);
+        }
+        
+        .list-view .product-card {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+        }
+        
+        .list-view .product-image {
+            height: 150px;
+        }
+        
+        .list-view .product-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .list-view .product-info {
+            flex: 1;
+        }
+        
+        .list-view .product-actions {
+            flex-direction: column;
+            width: 150px;
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: var(--spacing-md) var(--spacing-lg);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1001;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            max-width: 800px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .modal-close {
+            font-size: 28px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+        
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+        
+        .modal-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+        }
+        
+        .modal-image {
+            width: 100%;
+            border-radius: var(--radius-md);
+        }
+        
+        .modal-info h2 {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-md);
+            color: var(--primary-color);
+        }
+        
+        .modal-vendor {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .modal-price {
+            font-size: var(--font-size-2xl);
+            color: var(--secondary-color);
+            font-weight: 700;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .modal-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .modal-specs {
+            background: var(--background-alt);
+            padding: var(--spacing-md);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .spec-row:last-child {
+            border-bottom: none;
+        }
+        
+        .spec-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .spec-value {
+            color: var(--text-secondary);
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+        
+        .modal-actions .btn {
+            flex: 1;
+            padding: 14px 24px;
+            font-size: var(--font-size-base);
+        }
+    </style>
+</head>
+<body>
+    <header class="nav-header">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1 class="brand-logo" onclick="window.location.href='index.html'">RoomStyle AI</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="design.html" class="nav-link">Design Studio</a>
+                <a href="shop.html" class="nav-link active">Shop</a>
+                <a href="checkout.html" class="nav-link cart-link">
+                    Cart <span class="cart-count">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="shop-header">
+                <h1 class="page-title">Shop Furniture & Decor</h1>
+                <div class="view-toggle">
+                    <button class="view-btn active" onclick="setView('grid')">
+                        <span>⊞</span> Grid
+                    </button>
+                    <button class="view-btn" onclick="setView('list')">
+                        <span>☰</span> List
+                    </button>
+                </div>
+            </div>
+            
+            <div class="shop-content">
+                <aside class="filters-sidebar">
+                    <input type="text" class="filter-search" placeholder="Search products..." id="searchInput">
+                    
+                    <div class="filter-section">
+                        <h3 class="filter-title">Categories</h3>
+                        <div class="filter-option">
+                            <input type="checkbox" id="cat-sofas" value="sofas">
+                            <label for="cat-sofas">Sofas & Couches</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="cat-chairs" value="chairs">
+                            <label for="cat-chairs">Chairs & Seating</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="cat-tables" value="tables">
+                            <label for="cat-tables">Tables</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="cat-storage" value="storage">
+                            <label for="cat-storage">Storage</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="cat-lighting" value="lighting">
+                            <label for="cat-lighting">Lighting</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="cat-decor" value="decor">
+                            <label for="cat-decor">Decor & Accessories</label>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h3 class="filter-title">Price Range</h3>
+                        <div class="price-range">
+                            <input type="number" class="price-input" placeholder="Min" id="minPrice">
+                            <span>-</span>
+                            <input type="number" class="price-input" placeholder="Max" id="maxPrice">
+                        </div>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h3 class="filter-title">Style</h3>
+                        <div class="filter-option">
+                            <input type="checkbox" id="style-modern" value="modern">
+                            <label for="style-modern">Modern</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="style-classic" value="classic">
+                            <label for="style-classic">Classic</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="style-minimalist" value="minimalist">
+                            <label for="style-minimalist">Minimalist</label>
+                        </div>
+                        <div class="filter-option">
+                            <input type="checkbox" id="style-industrial" value="industrial">
+                            <label for="style-industrial">Industrial</label>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-section">
+                        <h3 class="filter-title">Vendors</h3>
+                        <div id="vendorTags">
+                            <span class="vendor-tag" data-vendor="HomeStyle Co">HomeStyle Co</span>
+                            <span class="vendor-tag" data-vendor="ModernLiving">ModernLiving</span>
+                            <span class="vendor-tag" data-vendor="Classic Furniture">Classic Furniture</span>
+                            <span class="vendor-tag" data-vendor="Urban Decor">Urban Decor</span>
+                        </div>
+                    </div>
+                    
+                    <button class="clear-filters" onclick="clearAllFilters()">Clear All Filters</button>
+                </aside>
+                
+                <section class="products-section">
+                    <div class="products-header">
+                        <span class="results-count">Showing <span id="productCount">24</span> products</span>
+                        <select class="sort-dropdown" id="sortSelect">
+                            <option value="featured">Featured</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="name">Name: A to Z</option>
+                        </select>
+                    </div>
+                    
+                    <div class="products-grid" id="productsGrid">
+                    </div>
+                    
+                    <div class="products-list" id="productsList">
+                    </div>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 RoomStyle AI. Transform Your Space with AI.</p>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast">
+        <span id="toastMessage">Product added to cart!</span>
+    </div>
+
+    <div class="modal" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <img id="modalImage" src="" alt="" class="modal-image">
+                </div>
+                <div class="modal-info">
+                    <p class="modal-vendor" id="modalVendor"></p>
+                    <p class="modal-price" id="modalPrice"></p>
+                    <p class="modal-description" id="modalDescription"></p>
+                    <div class="modal-specs">
+                        <div class="spec-row">
+                            <span class="spec-label">Dimensions</span>
+                            <span class="spec-value" id="modalDimensions"></span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">Material</span>
+                            <span class="spec-value" id="modalMaterial"></span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">Color</span>
+                            <span class="spec-value" id="modalColor"></span>
+                        </div>
+                        <div class="spec-row">
+                            <span class="spec-label">SKU</span>
+                            <span class="spec-value" id="modalSku"></span>
+                        </div>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" onclick="addToCartFromModal()">Add to Cart</button>
+                        <button class="btn btn-secondary" onclick="closeModal()">Continue Shopping</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Product data
+        const products = [
+            {
+                id: 1,
+                name: "Modern Sectional Sofa",
+                vendor: "HomeStyle Co",
+                price: 1299,
+                category: "sofas",
+                style: "modern",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23E8E8E8'/%3E%3Crect x='20' y='150' width='260' height='80' fill='%23666'/%3E%3Crect x='40' y='120' width='60' height='30' fill='%23888'/%3E%3Crect x='200' y='120' width='60' height='30' fill='%23888'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3ESectional Sofa%3C/text%3E%3C/svg%3E",
+                description: "Spacious L-shaped sectional perfect for modern living rooms",
+                dimensions: "110\" W x 85\" D x 32\" H",
+                material: "Premium fabric upholstery",
+                color: "Charcoal Gray",
+                sku: "HS-SEC-001"
+            },
+            {
+                id: 2,
+                name: "Mid-Century Accent Chair",
+                vendor: "ModernLiving",
+                price: 449,
+                category: "chairs",
+                style: "modern",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23F0F0F0'/%3E%3Crect x='100' y='120' width='100' height='100' fill='%23888'/%3E%3Crect x='120' y='100' width='60' height='20' fill='%23666'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EAccent Chair%3C/text%3E%3C/svg%3E",
+                description: "Stylish accent chair with wooden legs and tufted back",
+                dimensions: "28\" W x 30\" D x 35\" H",
+                material: "Velvet upholstery, solid wood",
+                color: "Emerald Green",
+                sku: "ML-CHR-002"
+            },
+            {
+                id: 3,
+                name: "Glass Coffee Table",
+                vendor: "Urban Decor",
+                price: 599,
+                category: "tables",
+                style: "modern",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23FAFAFA'/%3E%3Crect x='50' y='100' width='200' height='100' fill='%23DDD' opacity='0.5'/%3E%3Crect x='60' y='180' width='20' height='40' fill='%23666'/%3E%3Crect x='220' y='180' width='20' height='40' fill='%23666'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3ECoffee Table%3C/text%3E%3C/svg%3E",
+                description: "Elegant tempered glass coffee table with chrome legs",
+                dimensions: "48\" W x 24\" D x 16\" H",
+                material: "Tempered glass, chrome steel",
+                color: "Clear/Chrome",
+                sku: "UD-TBL-003"
+            },
+            {
+                id: 4,
+                name: "Industrial Bookshelf",
+                vendor: "Urban Decor",
+                price: 799,
+                category: "storage",
+                style: "industrial",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23F5F5F5'/%3E%3Crect x='80' y='30' width='140' height='200' fill='%238B4513'/%3E%3Crect x='90' y='50' width='120' height='35' fill='%23D2691E'/%3E%3Crect x='90' y='95' width='120' height='35' fill='%23D2691E'/%3E%3Crect x='90' y='140' width='120' height='35' fill='%23D2691E'/%3E%3Crect x='90' y='185' width='120' height='35' fill='%23D2691E'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23666' font-family='Arial' font-size='16'%3EBookshelf%3C/text%3E%3C/svg%3E",
+                description: "5-tier industrial style bookshelf with metal frame",
+                dimensions: "36\" W x 14\" D x 72\" H",
+                material: "Reclaimed wood, black metal",
+                color: "Natural Wood/Black",
+                sku: "UD-STO-004"
+            },
+            {
+                id: 5,
+                name: "Pendant Light Fixture",
+                vendor: "ModernLiving",
+                price: 249,
+                category: "lighting",
+                style: "modern",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23FFF'/%3E%3Cline x1='150' y1='0' x2='150' y2='100' stroke='%23333' stroke-width='2'/%3E%3Ccircle cx='150' cy='150' r='50' fill='%23FFD700' opacity='0.3'/%3E%3Ccircle cx='150' cy='150' r='40' fill='none' stroke='%23333' stroke-width='2'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EPendant Light%3C/text%3E%3C/svg%3E",
+                description: "Modern geometric pendant light with adjustable cord",
+                dimensions: "12\" Diameter x 10\" H",
+                material: "Brushed brass, frosted glass",
+                color: "Brass/White",
+                sku: "ML-LGT-005"
+            },
+            {
+                id: 6,
+                name: "Classic Dining Table",
+                vendor: "Classic Furniture",
+                price: 1599,
+                category: "tables",
+                style: "classic",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23F5F5DC'/%3E%3Crect x='40' y='100' width='220' height='100' fill='%238B4513'/%3E%3Crect x='50' y='180' width='30' height='50' fill='%23654321'/%3E%3Crect x='220' y='180' width='30' height='50' fill='%23654321'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23666' font-family='Arial' font-size='16'%3EDining Table%3C/text%3E%3C/svg%3E",
+                description: "Elegant wooden dining table seats 6-8 people",
+                dimensions: "72\" W x 36\" D x 30\" H",
+                material: "Solid oak wood",
+                color: "Walnut",
+                sku: "CF-TBL-006"
+            },
+            {
+                id: 7,
+                name: "Minimalist Floor Lamp",
+                vendor: "Urban Decor",
+                price: 179,
+                category: "lighting",
+                style: "minimalist",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23FAFAFA'/%3E%3Crect x='145' y='180' width='10' height='60' fill='%23333'/%3E%3Crect x='130' y='240' width='40' height='5' fill='%23333'/%3E%3Ccircle cx='150' cy='140' r='30' fill='none' stroke='%23333' stroke-width='2'/%3E%3Ctext x='50%25' y='30%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EFloor Lamp%3C/text%3E%3C/svg%3E",
+                description: "Sleek minimalist floor lamp with adjustable head",
+                dimensions: "10\" W x 10\" D x 60\" H",
+                material: "Matte black metal",
+                color: "Black",
+                sku: "UD-LGT-007"
+            },
+            {
+                id: 8,
+                name: "Velvet Ottoman",
+                vendor: "HomeStyle Co",
+                price: 299,
+                category: "chairs",
+                style: "modern",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23E8E8E8'/%3E%3Crect x='75' y='125' width='150' height='80' rx='10' fill='%239370DB'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23666' font-family='Arial' font-size='16'%3EVelvet Ottoman%3C/text%3E%3C/svg%3E",
+                description: "Luxurious velvet ottoman with storage",
+                dimensions: "36\" W x 24\" D x 18\" H",
+                material: "Velvet fabric, wood frame",
+                color: "Royal Purple",
+                sku: "HS-OTT-008"
+            },
+            {
+                id: 9,
+                name: "Abstract Wall Art",
+                vendor: "Urban Decor",
+                price: 149,
+                category: "decor",
+                style: "modern",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23FFF'/%3E%3Crect x='50' y='50' width='200' height='150' fill='%23F0F0F0' stroke='%23333' stroke-width='2'/%3E%3Ccircle cx='120' cy='125' r='40' fill='%233498DB' opacity='0.7'/%3E%3Crect x='140' y='90' width='80' height='60' fill='%23E74C3C' opacity='0.7'/%3E%3Ctext x='50%25' y='90%25' text-anchor='middle' dy='.3em' fill='%23666' font-family='Arial' font-size='16'%3EAbstract Art%3C/text%3E%3C/svg%3E",
+                description: "Modern abstract canvas art piece",
+                dimensions: "36\" W x 24\" H",
+                material: "Canvas print on wood frame",
+                color: "Multicolor",
+                sku: "UD-ART-009"
+            },
+            {
+                id: 10,
+                name: "Classic Armchair",
+                vendor: "Classic Furniture",
+                price: 899,
+                category: "chairs",
+                style: "classic",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23F5F5DC'/%3E%3Cpath d='M80 150 Q80 100 100 100 L200 100 Q220 100 220 150 L220 200 L80 200 Z' fill='%238B4513'/%3E%3Crect x='70' y='180' width='20' height='50' fill='%23654321'/%3E%3Crect x='210' y='180' width='20' height='50' fill='%23654321'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23666' font-family='Arial' font-size='16'%3EClassic Armchair%3C/text%3E%3C/svg%3E",
+                description: "Traditional wingback armchair with nailhead trim",
+                dimensions: "32\" W x 34\" D x 42\" H",
+                material: "Leather upholstery",
+                color: "Cognac Brown",
+                sku: "CF-CHR-010"
+            },
+            {
+                id: 11,
+                name: "Storage Bench",
+                vendor: "HomeStyle Co",
+                price: 349,
+                category: "storage",
+                style: "modern",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23E8E8E8'/%3E%3Crect x='50' y='130' width='200' height='80' fill='%23696969'/%3E%3Cline x1='50' y1='170' x2='250' y2='170' stroke='%23333' stroke-width='2'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EStorage Bench%3C/text%3E%3C/svg%3E",
+                description: "Upholstered storage bench with lift-top",
+                dimensions: "48\" W x 18\" D x 20\" H",
+                material: "Linen fabric, pine wood",
+                color: "Light Gray",
+                sku: "HS-BEN-011"
+            },
+            {
+                id: 12,
+                name: "Geometric Planters",
+                vendor: "ModernLiving",
+                price: 89,
+                category: "decor",
+                style: "modern",
+                image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='250'%3E%3Crect width='300' height='250' fill='%23FFF'/%3E%3Cpolygon points='100,180 80,220 120,220' fill='%23DDD' stroke='%23333' stroke-width='2'/%3E%3Cpolygon points='180,180 160,220 200,220' fill='%23DDD' stroke='%23333' stroke-width='2'/%3E%3Ccircle cx='100' cy='160' r='20' fill='%2327AE60'/%3E%3Ccircle cx='180' cy='160' r='20' fill='%2327AE60'/%3E%3Ctext x='50%25' y='40%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EPlanters Set%3C/text%3E%3C/svg%3E",
+                description: "Set of 3 geometric ceramic planters",
+                dimensions: "Various sizes",
+                material: "Ceramic",
+                color: "White/Gold rim",
+                sku: "ML-PLT-012"
+            }
+        ];
+
+        let currentView = 'grid';
+        let filteredProducts = [...products];
+        let currentProduct = null;
+
+        // Initialize
+        function init() {
+            renderProducts();
+            setupEventListeners();
+            updateCartCount();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Search
+            document.getElementById('searchInput').addEventListener('input', filterProducts);
+            
+            // Category filters
+            document.querySelectorAll('.filter-option input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', filterProducts);
+            });
+            
+            // Price range
+            document.getElementById('minPrice').addEventListener('input', filterProducts);
+            document.getElementById('maxPrice').addEventListener('input', filterProducts);
+            
+            // Sort
+            document.getElementById('sortSelect').addEventListener('change', sortProducts);
+            
+            // Vendor tags
+            document.querySelectorAll('.vendor-tag').forEach(tag => {
+                tag.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    filterProducts();
+                });
+            });
+        }
+
+        // View toggle
+        function setView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.view-btn').classList.add('active');
+            
+            if (view === 'grid') {
+                document.getElementById('productsGrid').style.display = 'grid';
+                document.getElementById('productsList').style.display = 'none';
+            } else {
+                document.getElementById('productsGrid').style.display = 'none';
+                document.getElementById('productsList').style.display = 'flex';
+            }
+            renderProducts();
+        }
+
+        // Filter products
+        function filterProducts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const selectedCategories = Array.from(document.querySelectorAll('.filter-option input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+            const selectedStyles = Array.from(document.querySelectorAll('.filter-option input[type="checkbox"]:checked'))
+                .filter(cb => cb.id.startsWith('style-'))
+                .map(cb => cb.value);
+            const activeVendors = Array.from(document.querySelectorAll('.vendor-tag.active'))
+                .map(tag => tag.dataset.vendor);
+            const minPrice = parseFloat(document.getElementById('minPrice').value) || 0;
+            const maxPrice = parseFloat(document.getElementById('maxPrice').value) || Infinity;
+            
+            filteredProducts = products.filter(product => {
+                const matchesSearch = product.name.toLowerCase().includes(searchTerm) || 
+                                    product.description.toLowerCase().includes(searchTerm);
+                const matchesCategory = selectedCategories.length === 0 || 
+                                      selectedCategories.includes(product.category);
+                const matchesStyle = selectedStyles.length === 0 || 
+                                   selectedStyles.includes(product.style);
+                const matchesVendor = activeVendors.length === 0 || 
+                                    activeVendors.includes(product.vendor);
+                const matchesPrice = product.price >= minPrice && product.price <= maxPrice;
+                
+                return matchesSearch && matchesCategory && matchesStyle && matchesVendor && matchesPrice;
+            });
+            
+            renderProducts();
+        }
+
+        // Sort products
+        function sortProducts() {
+            const sortBy = document.getElementById('sortSelect').value;
+            
+            switch(sortBy) {
+                case 'price-low':
+                    filteredProducts.sort((a, b) => a.price - b.price);
+                    break;
+                case 'price-high':
+                    filteredProducts.sort((a, b) => b.price - a.price);
+                    break;
+                case 'name':
+                    filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+                    break;
+                default:
+                    filteredProducts.sort((a, b) => a.id - b.id);
+            }
+            
+            renderProducts();
+        }
+
+        // Render products
+        function renderProducts() {
+            const container = currentView === 'grid' ? 
+                document.getElementById('productsGrid') : 
+                document.getElementById('productsList');
+            
+            container.innerHTML = filteredProducts.map(product => `
+                <div class="product-card" onclick="showProductDetails(${product.id})">
+                    <img src="${product.image}" alt="${product.name}" class="product-image">
+                    <div class="product-content">
+                        ${currentView === 'list' ? '<div class="product-info">' : ''}
+                        <p class="product-vendor">${product.vendor}</p>
+                        <h3 class="product-title">${product.name}</h3>
+                        <p class="product-price">$${product.price}</p>
+                        ${currentView === 'list' ? '</div>' : ''}
+                        <div class="product-actions">
+                            <button class="btn btn-primary" onclick="addToCart(event, ${product.id})">Add to Cart</button>
+                            <button class="btn btn-secondary" onclick="showProductDetails(${product.id})">View Details</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            
+            document.getElementById('productCount').textContent = filteredProducts.length;
+        }
+
+        // Show product details modal
+        function showProductDetails(productId) {
+            currentProduct = products.find(p => p.id === productId);
+            if (!currentProduct) return;
+            
+            document.getElementById('modalTitle').textContent = currentProduct.name;
+            document.getElementById('modalImage').src = currentProduct.image;
+            document.getElementById('modalVendor').textContent = `by ${currentProduct.vendor}`;
+            document.getElementById('modalPrice').textContent = `$${currentProduct.price}`;
+            document.getElementById('modalDescription').textContent = currentProduct.description;
+            document.getElementById('modalDimensions').textContent = currentProduct.dimensions;
+            document.getElementById('modalMaterial').textContent = currentProduct.material;
+            document.getElementById('modalColor').textContent = currentProduct.color;
+            document.getElementById('modalSku').textContent = currentProduct.sku;
+            
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('productModal').style.display = 'none';
+        }
+
+        // Add to cart
+        function addToCart(event, productId) {
+            event.stopPropagation();
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+            
+            let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                existingItem.quantity++;
+            } else {
+                cart.push({
+                    ...product,
+                    quantity: 1
+                });
+            }
+            
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showToast(`${product.name} added to cart!`);
+        }
+
+        // Add to cart from modal
+        function addToCartFromModal() {
+            if (currentProduct) {
+                addToCart(new Event('click'), currentProduct.id);
+                closeModal();
+            }
+        }
+
+        // Clear all filters
+        function clearAllFilters() {
+            document.getElementById('searchInput').value = '';
+            document.querySelectorAll('.filter-option input[type="checkbox"]').forEach(cb => {
+                cb.checked = false;
+            });
+            document.getElementById('minPrice').value = '';
+            document.getElementById('maxPrice').value = '';
+            document.querySelectorAll('.vendor-tag').forEach(tag => {
+                tag.classList.remove('active');
+            });
+            filterProducts();
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.querySelector('.cart-count').textContent = totalItems;
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal on outside click
+        document.getElementById('productModal').addEventListener('click', (e) => {
+            if (e.target === document.getElementById('productModal')) {
+                closeModal();
+            }
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

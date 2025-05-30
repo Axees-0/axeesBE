@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Design Studio - RoomStyle AI</title>
+    <style>
+        :root {
+            --primary-color: #2C3E50;
+            --primary-hover: #34495E;
+            --primary-light: #ECF0F1;
+            --secondary-color: #3498DB;
+            --secondary-hover: #2980B9;
+            --accent-color: #E74C3C;
+            --success-color: #27AE60;
+            --warning-color: #F39C12;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --text-light: #FFFFFF;
+            --background: #FFFFFF;
+            --background-alt: #F8F9FA;
+            --border-color: #E0E0E0;
+            --shadow-color: rgba(0,0,0,0.1);
+            
+            --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-xs: 12px;
+            --font-size-sm: 14px;
+            --font-size-base: 16px;
+            --font-size-lg: 18px;
+            --font-size-xl: 24px;
+            --font-size-2xl: 32px;
+            --font-size-3xl: 48px;
+            
+            --spacing-xs: 4px;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+            --spacing-xl: 32px;
+            --spacing-2xl: 48px;
+            --spacing-3xl: 64px;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 16px;
+            
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            background: var(--background-alt);
+            line-height: 1.6;
+        }
+        
+        .nav-header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            background: rgba(255,255,255,0.95);
+        }
+        
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+        
+        .brand-logo {
+            font-size: var(--font-size-xl);
+            font-weight: 700;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: var(--spacing-xl);
+            align-items: center;
+        }
+        
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-primary);
+            font-weight: 500;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+        
+        .nav-link:hover {
+            color: var(--secondary-color);
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--secondary-color);
+        }
+        
+        .cart-link {
+            background: var(--secondary-color);
+            color: white;
+            padding: 8px 20px;
+            border-radius: var(--radius-md);
+        }
+        
+        .cart-link:hover {
+            background: var(--secondary-hover);
+            color: white;
+        }
+        
+        .cart-count {
+            background: var(--accent-color);
+            color: white;
+            font-size: var(--font-size-xs);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-left: 4px;
+        }
+        
+        main {
+            margin-top: 70px;
+            min-height: calc(100vh - 170px);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-2xl) var(--spacing-lg);
+        }
+        
+        .page-title {
+            text-align: center;
+            font-size: var(--font-size-2xl);
+            margin-bottom: var(--spacing-2xl);
+            color: var(--primary-color);
+        }
+        
+        .design-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--spacing-xl);
+            margin-bottom: var(--spacing-2xl);
+        }
+        
+        .upload-section {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--spacing-2xl);
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--secondary-color);
+            background: var(--background-alt);
+        }
+        
+        .upload-area.drag-over {
+            border-color: var(--secondary-color);
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .upload-icon {
+            font-size: 64px;
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .upload-text {
+            font-size: var(--font-size-lg);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .upload-subtext {
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .style-section {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .section-title {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-lg);
+            color: var(--primary-color);
+        }
+        
+        .style-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-xl);
+        }
+        
+        .style-card {
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .style-card:hover {
+            border-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .style-card.selected {
+            border-color: var(--secondary-color);
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .style-icon {
+            font-size: 48px;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .style-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+            font-size: var(--font-size-base);
+        }
+        
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary-hover);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .btn-primary:disabled {
+            background: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--border-color);
+        }
+        
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            background: var(--background-alt);
+        }
+        
+        .results-section {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            display: none;
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .result-card {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .result-card:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .result-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+        
+        .result-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            color: white;
+            padding: var(--spacing-lg);
+        }
+        
+        .result-title {
+            font-size: var(--font-size-lg);
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+        
+        .result-description {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+        }
+        
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: var(--spacing-2xl);
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid var(--border-color);
+            border-top-color: var(--secondary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--spacing-lg);
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .room-gallery {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            margin-top: var(--spacing-xl);
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+        
+        .gallery-item {
+            position: relative;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .gallery-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+        }
+        
+        .gallery-remove {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--accent-color);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .gallery-item:hover .gallery-remove {
+            opacity: 1;
+        }
+        
+        .footer {
+            background: var(--primary-color);
+            color: white;
+            padding: var(--spacing-xl) 0;
+            text-align: center;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: var(--spacing-xl);
+            border-radius: var(--radius-lg);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            max-height: 400px;
+            margin-bottom: var(--spacing-lg);
+            border-radius: var(--radius-md);
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: var(--spacing-md);
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="nav-header">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1 class="brand-logo" onclick="window.location.href='index.html'">RoomStyle AI</h1>
+            </div>
+            <nav class="nav-menu">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="design.html" class="nav-link active">Design Studio</a>
+                <a href="shop.html" class="nav-link">Shop</a>
+                <a href="checkout.html" class="nav-link cart-link">
+                    Cart <span class="cart-count">0</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <h1 class="page-title">AI Design Studio</h1>
+            
+            <div class="design-container">
+                <div class="upload-section">
+                    <h2 class="section-title">Upload Your Room</h2>
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
+                        <div class="upload-icon">📸</div>
+                        <p class="upload-text">Drop images here or click to upload</p>
+                        <p class="upload-subtext">Support for JPG, PNG up to 10MB</p>
+                    </div>
+                </div>
+                
+                <div class="style-section">
+                    <h2 class="section-title">Choose Your Style</h2>
+                    <div class="style-options">
+                        <div class="style-card" data-style="modern">
+                            <div class="style-icon">🏢</div>
+                            <p class="style-name">Modern</p>
+                        </div>
+                        <div class="style-card" data-style="classic">
+                            <div class="style-icon">🏛️</div>
+                            <p class="style-name">Classic</p>
+                        </div>
+                        <div class="style-card" data-style="minimalist">
+                            <div class="style-icon">⬜</div>
+                            <p class="style-name">Minimalist</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="generateBtn" disabled>Generate Design</button>
+                    <button class="btn btn-secondary" id="resetBtn" style="margin-left: 10px;">Reset</button>
+                </div>
+            </div>
+            
+            <div class="loading-spinner" id="loadingSpinner">
+                <div class="spinner"></div>
+                <p>AI is creating your dream room design...</p>
+            </div>
+            
+            <div class="results-section" id="resultsSection">
+                <h2 class="section-title">Your AI-Generated Designs</h2>
+                <div class="results-grid" id="resultsGrid">
+                </div>
+            </div>
+            
+            <div class="room-gallery" id="roomGallery" style="display: none;">
+                <h2 class="section-title">Your Room Gallery</h2>
+                <div class="gallery-grid" id="galleryGrid">
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 RoomStyle AI. Transform Your Space with AI.</p>
+        </div>
+    </footer>
+
+    <div class="modal" id="resultModal">
+        <div class="modal-content">
+            <img src="" alt="Design Result" class="modal-image" id="modalImage">
+            <h3>Love this design?</h3>
+            <p>Shop matching furniture and decor to bring this look to life!</p>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="window.location.href='shop.html'">Shop Now</button>
+                <button class="btn btn-secondary" onclick="closeModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let uploadedImages = [];
+        let selectedStyle = null;
+        let currentImageIndex = 0;
+
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const loadingSpinner = document.getElementById('loadingSpinner');
+        const resultsSection = document.getElementById('resultsSection');
+        const resultsGrid = document.getElementById('resultsGrid');
+        const roomGallery = document.getElementById('roomGallery');
+        const galleryGrid = document.getElementById('galleryGrid');
+        const resultModal = document.getElementById('resultModal');
+        const modalImage = document.getElementById('modalImage');
+
+        // Upload functionality
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('drag-over');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('drag-over');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('drag-over');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        function handleFiles(files) {
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        uploadedImages.push({
+                            id: Date.now() + Math.random(),
+                            url: e.target.result,
+                            name: file.name
+                        });
+                        updateUI();
+                        saveToLocalStorage();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        function updateUI() {
+            if (uploadedImages.length > 0) {
+                // Show current image
+                uploadArea.innerHTML = `
+                    <img src="${uploadedImages[currentImageIndex].url}" alt="Uploaded room" class="preview-image">
+                    <p style="margin-top: 10px;">Image ${currentImageIndex + 1} of ${uploadedImages.length}</p>
+                `;
+                
+                // Show gallery
+                roomGallery.style.display = 'block';
+                updateGallery();
+                
+                // Enable generate button if style is selected
+                checkGenerateButton();
+            }
+        }
+
+        function updateGallery() {
+            galleryGrid.innerHTML = uploadedImages.map((img, index) => `
+                <div class="gallery-item" onclick="selectImage(${index})">
+                    <img src="${img.url}" alt="${img.name}" class="gallery-image">
+                    <div class="gallery-remove" onclick="removeImage(event, ${index})">×</div>
+                </div>
+            `).join('');
+        }
+
+        function selectImage(index) {
+            currentImageIndex = index;
+            updateUI();
+        }
+
+        function removeImage(event, index) {
+            event.stopPropagation();
+            uploadedImages.splice(index, 1);
+            if (currentImageIndex >= uploadedImages.length) {
+                currentImageIndex = Math.max(0, uploadedImages.length - 1);
+            }
+            if (uploadedImages.length === 0) {
+                resetUpload();
+            } else {
+                updateUI();
+            }
+            saveToLocalStorage();
+        }
+
+        // Style selection
+        document.querySelectorAll('.style-card').forEach(card => {
+            card.addEventListener('click', () => {
+                document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                selectedStyle = card.dataset.style;
+                checkGenerateButton();
+            });
+        });
+
+        function checkGenerateButton() {
+            generateBtn.disabled = !(uploadedImages.length > 0 && selectedStyle);
+        }
+
+        // Generate design
+        generateBtn.addEventListener('click', generateDesign);
+
+        function generateDesign() {
+            loadingSpinner.style.display = 'block';
+            resultsSection.style.display = 'none';
+            
+            // Simulate AI processing
+            setTimeout(() => {
+                loadingSpinner.style.display = 'none';
+                resultsSection.style.display = 'block';
+                
+                // Generate mock results based on style
+                const designs = generateMockDesigns(selectedStyle);
+                resultsGrid.innerHTML = designs.map((design, index) => `
+                    <div class="result-card" onclick="showResult('${design.image}', '${design.title}')">
+                        <img src="${design.image}" alt="${design.title}" class="result-image">
+                        <div class="result-overlay">
+                            <h3 class="result-title">${design.title}</h3>
+                            <p class="result-description">${design.description}</p>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Save design to localStorage
+                const designHistory = JSON.parse(localStorage.getItem('designHistory') || '[]');
+                designHistory.push({
+                    originalImage: uploadedImages[currentImageIndex].url,
+                    style: selectedStyle,
+                    results: designs,
+                    timestamp: new Date().toISOString()
+                });
+                localStorage.setItem('designHistory', JSON.stringify(designHistory));
+            }, 3000);
+        }
+
+        function generateMockDesigns(style) {
+            const styleDesigns = {
+                modern: [
+                    {
+                        title: "Sleek Contemporary Design",
+                        description: "Clean lines with neutral palette",
+                        image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23F0F0F0'/%3E%3Crect x='50' y='200' width='300' height='80' fill='%23333'/%3E%3Crect x='100' y='50' width='200' height='120' fill='%23666'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EModern Design%3C/text%3E%3C/svg%3E"
+                    },
+                    {
+                        title: "Industrial Chic",
+                        description: "Exposed elements with modern comfort",
+                        image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23E8E8E8'/%3E%3Crect x='30' y='180' width='340' height='100' fill='%23444'/%3E%3Crect x='80' y='40' width='240' height='100' fill='%23888'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23999' font-family='Arial' font-size='16'%3EIndustrial Style%3C/text%3E%3C/svg%3E"
+                    }
+                ],
+                classic: [
+                    {
+                        title: "Timeless Elegance",
+                        description: "Traditional furniture with rich textures",
+                        image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23F5F5DC'/%3E%3Crect x='60' y='190' width='280' height='90' fill='%238B4513'/%3E%3Crect x='110' y='60' width='180' height='110' fill='%23A0522D'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23666' font-family='Arial' font-size='16'%3EClassic Design%3C/text%3E%3C/svg%3E"
+                    },
+                    {
+                        title: "Victorian Inspired",
+                        description: "Ornate details with modern comfort",
+                        image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23FFF8DC'/%3E%3Crect x='40' y='200' width='320' height='80' fill='%23654321'/%3E%3Crect x='90' y='50' width='220' height='130' fill='%238B6F47'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23666' font-family='Arial' font-size='16'%3EVictorian Style%3C/text%3E%3C/svg%3E"
+                    }
+                ],
+                minimalist: [
+                    {
+                        title: "Zen Minimalism",
+                        description: "Essential pieces with maximum impact",
+                        image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23FAFAFA'/%3E%3Crect x='100' y='220' width='200' height='60' fill='%23DDD'/%3E%3Crect x='150' y='80' width='100' height='100' fill='%23EEE'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23BBB' font-family='Arial' font-size='16'%3EMinimalist%3C/text%3E%3C/svg%3E"
+                    },
+                    {
+                        title: "Scandinavian Simplicity",
+                        description: "Light, airy with natural elements",
+                        image: "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23F8F8F8'/%3E%3Crect x='70' y='210' width='260' height='70' fill='%23E0E0E0'/%3E%3Crect x='130' y='70' width='140' height='120' fill='%23F0F0F0'/%3E%3Ctext x='50%25' y='50%25' text-anchor='middle' dy='.3em' fill='%23AAA' font-family='Arial' font-size='16'%3EScandinavian%3C/text%3E%3C/svg%3E"
+                    }
+                ]
+            };
+            
+            return styleDesigns[style] || [];
+        }
+
+        function showResult(image, title) {
+            modalImage.src = image;
+            resultModal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            resultModal.style.display = 'none';
+        }
+
+        // Reset functionality
+        resetBtn.addEventListener('click', () => {
+            resetUpload();
+            document.querySelectorAll('.style-card').forEach(c => c.classList.remove('selected'));
+            selectedStyle = null;
+            generateBtn.disabled = true;
+            resultsSection.style.display = 'none';
+        });
+
+        function resetUpload() {
+            uploadedImages = [];
+            currentImageIndex = 0;
+            uploadArea.innerHTML = `
+                <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
+                <div class="upload-icon">📸</div>
+                <p class="upload-text">Drop images here or click to upload</p>
+                <p class="upload-subtext">Support for JPG, PNG up to 10MB</p>
+            `;
+            roomGallery.style.display = 'none';
+            fileInput.value = '';
+            saveToLocalStorage();
+        }
+
+        // Local storage
+        function saveToLocalStorage() {
+            localStorage.setItem('uploadedRooms', JSON.stringify(uploadedImages));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('uploadedRooms');
+            if (saved) {
+                uploadedImages = JSON.parse(saved);
+                if (uploadedImages.length > 0) {
+                    updateUI();
+                }
+            }
+        }
+
+        // Update cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.querySelector('.cart-count').textContent = totalItems;
+        }
+
+        // Initialize
+        loadFromLocalStorage();
+        updateCartCount();
+        
+        // Close modal on outside click
+        resultModal.addEventListener('click', (e) => {
+            if (e.target === resultModal) {
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>
