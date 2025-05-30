@@ -1,0 +1,183 @@
+name: "CompareVision Pro - Photo Comparison Demo Workflow"
+description: "Automated testing workflow for professional image comparison software demo created for Upwork project 021921969112660654878"
+version: "1.0.0"
+
+config:
+  headless: false
+  timeout: 15000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Step 1: Navigate to homepage
+  - type: navigate
+    description: "Navigate to CompareVision Pro homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021921969112660654878/index.html"
+    screenshot: true
+    
+  # Step 2: Wait for page load
+  - type: wait-for-selector
+    description: "Wait for main navigation to load"
+    selector: ".nav-links"
+    
+  # Step 3: Verify homepage title
+  - type: assertText
+    description: "Verify main headline is displayed"
+    selector: "h1"
+    expected: "Precision Image Analysis for Static Objects"
+    
+  # Step 4: Take homepage screenshot
+  - type: screenshot
+    description: "Capture homepage hero section"
+    
+  # Step 5: Navigate to compare page
+  - type: click
+    description: "Navigate to comparison tool"
+    selector: "a[href='compare.html']"
+    screenshot: true
+    
+  # Step 6: Wait for compare page load
+  - type: wait-for-selector
+    description: "Wait for upload areas to load"
+    selector: ".upload-area"
+    
+  # Step 7: Verify compare page title
+  - type: assertText
+    description: "Verify compare page title"
+    selector: ".page-title"
+    expected: "Compare Images"
+    
+  # Step 8: Check upload functionality
+  - type: evaluate
+    description: "Verify upload areas are interactive"
+    script: |
+      const uploadAreas = document.querySelectorAll('.upload-area');
+      return uploadAreas.length === 2 && uploadAreas[0].style.cursor === 'pointer';
+    
+  # Step 9: Verify compare button is disabled initially
+  - type: evaluate
+    description: "Verify compare button starts disabled"
+    script: |
+      const compareBtn = document.getElementById('compareBtn');
+      return compareBtn && compareBtn.disabled === true;
+    
+  # Step 10: Navigate to results page
+  - type: navigate
+    description: "Navigate to results page"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021921969112660654878/results.html"
+    
+  # Step 11: Wait for results page
+  - type: wait-for-selector
+    description: "Wait for results container to load"
+    selector: "#resultsContainer"
+    timeout: 10000
+    
+  # Step 12: Verify no results state
+  - type: assertText
+    description: "Verify no results message is shown"
+    selector: ".no-results-text"
+    expected: "No comparison results to display"
+    
+  # Step 13: Screenshot no results state
+  - type: screenshot
+    description: "Capture no results state"
+    
+  # Step 14: Navigate to history page
+  - type: click
+    description: "Navigate to history page"
+    selector: "a[href='history.html']"
+    screenshot: true
+    
+  # Step 15: Wait for history page
+  - type: wait-for-selector
+    description: "Wait for history container to load"
+    selector: "#historyContainer"
+    
+  # Step 16: Verify empty history state
+  - type: assertText
+    description: "Verify empty history message"
+    selector: ".empty-title"
+    expected: "No Comparison History"
+    
+  # Step 17: Navigate to about page
+  - type: click
+    description: "Navigate to about page"
+    selector: "a[href='about.html']"
+    screenshot: true
+    
+  # Step 18: Wait for about page
+  - type: wait-for-selector
+    description: "Wait for about page content"
+    selector: ".hero h1"
+    
+  # Step 19: Verify about page title
+  - type: assertText
+    description: "Verify about page main title"
+    selector: ".hero h1"
+    expected: "About CompareVision Pro"
+    
+  # Step 20: Test FAQ functionality
+  - type: click
+    description: "Test FAQ expansion"
+    selector: ".faq-question"
+    
+  # Step 21: Verify FAQ expanded
+  - type: wait-for-selector
+    description: "Wait for FAQ answer to appear"
+    selector: ".faq-item.active .faq-answer"
+    timeout: 5000
+    
+  # Step 22: Verify FAQ content
+  - type: evaluate
+    description: "Verify FAQ answer is visible"
+    script: |
+      const activeAnswer = document.querySelector('.faq-item.active .faq-answer');
+      return activeAnswer && activeAnswer.style.display !== 'none';
+    
+  # Step 23: Test navigation consistency
+  - type: evaluate
+    description: "Verify navigation is consistent across pages"
+    script: |
+      const navLinks = document.querySelectorAll('.nav-link');
+      const expectedLinks = ['Home', 'Compare', 'Results', 'History', 'About'];
+      const actualLinks = Array.from(navLinks).map(link => link.textContent);
+      return expectedLinks.every(link => actualLinks.includes(link));
+    
+  # Step 24: Test responsive design elements
+  - type: evaluate
+    description: "Verify design system variables are loaded"
+    script: |
+      const root = document.documentElement;
+      const primaryColor = getComputedStyle(root).getPropertyValue('--primary-blue');
+      return primaryColor.trim() === '#2563eb';
+    
+  # Step 25: Back to homepage
+  - type: click
+    description: "Return to homepage"
+    selector: "a[href='index.html']"
+    
+  # Step 26: Final homepage screenshot
+  - type: screenshot
+    description: "Final homepage verification screenshot"
+    
+  # Step 27: Test CTA button
+  - type: click
+    description: "Test main CTA button functionality"
+    selector: ".hero .btn-primary"
+    
+  # Step 28: Verify CTA navigation
+  - type: wait-for-selector
+    description: "Verify CTA navigates to compare page"
+    selector: ".page-title"
+    timeout: 5000
+    
+  # Step 29: Final verification
+  - type: assertText
+    description: "Final verification - confirm on compare page"
+    selector: ".page-title"
+    expected: "Compare Images"
+    
+  # Step 30: Complete workflow
+  - type: screenshot
+    description: "Final workflow completion screenshot"

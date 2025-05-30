@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Comparison History - CompareVision Pro</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            /* Primary Colors */
+            --primary-blue: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            
+            /* Secondary Colors */
+            --secondary-green: #10b981;
+            --secondary-orange: #f59e0b;
+            --secondary-red: #ef4444;
+            
+            /* Neutral Colors */
+            --neutral-50: #f9fafb;
+            --neutral-100: #f3f4f6;
+            --neutral-200: #e5e7eb;
+            --neutral-300: #d1d5db;
+            --neutral-400: #9ca3af;
+            --neutral-500: #6b7280;
+            --neutral-600: #4b5563;
+            --neutral-700: #374151;
+            --neutral-800: #1f2937;
+            --neutral-900: #111827;
+            
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            
+            /* Font Sizes */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            
+            /* Font Weights */
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-0: 0;
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.2s ease;
+            --transition-slow: 0.3s ease;
+        }
+
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: var(--font-sans);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--neutral-700);
+            background: var(--neutral-50);
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--neutral-200);
+            padding: var(--space-4) 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .logo-text {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-800);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--neutral-600);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color var(--transition-base);
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-6);
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .page-title {
+            font-size: var(--text-4xl);
+            color: var(--neutral-900);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--space-4);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--neutral-700);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            border: 1px solid var(--neutral-300);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--neutral-400);
+            background: var(--neutral-50);
+        }
+
+        .btn-danger {
+            background: white;
+            color: var(--secondary-red);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            border: 1px solid var(--secondary-red);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .btn-danger:hover {
+            background: var(--secondary-red);
+            color: white;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            background: white;
+            padding: var(--space-4);
+            border-radius: 0.75rem;
+            margin-bottom: var(--space-6);
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--neutral-300);
+            border-radius: 0.5rem;
+            font-size: var(--text-base);
+            background: white;
+            transition: all var(--transition-base);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .filter-select {
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--neutral-300);
+            border-radius: 0.5rem;
+            font-size: var(--text-base);
+            background: white;
+            cursor: pointer;
+        }
+
+        /* History Grid */
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .history-card {
+            background: white;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            transition: all var(--transition-slow);
+            border: 1px solid var(--neutral-200);
+            cursor: pointer;
+        }
+
+        .history-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue);
+        }
+
+        .history-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 180px;
+            position: relative;
+        }
+
+        .history-image {
+            background: var(--neutral-100);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .history-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .history-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.1) 100%);
+        }
+
+        .vs-badge {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-bold);
+            color: var(--neutral-700);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .history-info {
+            padding: var(--space-5);
+        }
+
+        .history-date {
+            font-size: var(--text-sm);
+            color: var(--neutral-500);
+            margin-bottom: var(--space-2);
+        }
+
+        .history-similarity {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--space-3);
+        }
+
+        .similarity-label {
+            font-weight: var(--font-medium);
+            color: var(--neutral-700);
+        }
+
+        .similarity-value {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--secondary-green);
+        }
+
+        .history-actions {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--neutral-300);
+            background: white;
+            border-radius: 0.375rem;
+            font-size: var(--text-sm);
+            color: var(--neutral-600);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            background: var(--neutral-50);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-16) 0;
+        }
+
+        .empty-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--space-4);
+            color: var(--neutral-400);
+        }
+
+        .empty-title {
+            font-size: var(--text-2xl);
+            color: var(--neutral-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .empty-text {
+            font-size: var(--text-base);
+            color: var(--neutral-500);
+            margin-bottom: var(--space-6);
+        }
+
+        /* Stats Summary */
+        .stats-summary {
+            background: white;
+            padding: var(--space-6);
+            border-radius: 0.75rem;
+            margin-bottom: var(--space-8);
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-6);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-blue);
+            margin-bottom: var(--space-1);
+        }
+
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--neutral-600);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32">
+                        <circle cx="12" cy="16" r="10" fill="#2563eb" opacity="0.8"/>
+                        <circle cx="20" cy="16" r="10" fill="#3b82f6" opacity="0.8"/>
+                    </svg>
+                    <span class="logo-text">CompareVision Pro</span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="compare.html" class="nav-link">Compare</a>
+                <a href="results.html" class="nav-link">Results</a>
+                <a href="history.html" class="nav-link active">History</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Comparison History</h1>
+                <div class="header-actions">
+                    <button class="btn-secondary" onclick="exportHistory()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
+                        </svg>
+                        Export All
+                    </button>
+                    <button class="btn-danger" onclick="clearHistory()">Clear History</button>
+                </div>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="stats-summary" id="statsSummary" style="display: none;">
+                <div class="stat-item">
+                    <div class="stat-value" id="totalComparisons">0</div>
+                    <div class="stat-label">Total Comparisons</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="avgSimilarity">0%</div>
+                    <div class="stat-label">Average Similarity</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="todayCount">0</div>
+                    <div class="stat-label">Today</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="thisWeek">0</div>
+                    <div class="stat-label">This Week</div>
+                </div>
+            </div>
+
+            <!-- Filter Bar -->
+            <div class="filter-bar">
+                <input type="text" class="search-input" placeholder="Search comparisons..." id="searchInput">
+                <select class="filter-select" id="sortSelect">
+                    <option value="newest">Newest First</option>
+                    <option value="oldest">Oldest First</option>
+                    <option value="similarity-high">Highest Similarity</option>
+                    <option value="similarity-low">Lowest Similarity</option>
+                </select>
+            </div>
+
+            <!-- History Grid -->
+            <div id="historyContainer">
+                <!-- Dynamic content will be inserted here -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let historyData = [];
+
+        // Load history on page load
+        loadHistory();
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('comparisonHistory') || '[]');
+            historyData = history;
+            
+            if (history.length === 0) {
+                showEmptyState();
+            } else {
+                showHistory(history);
+                updateStats(history);
+            }
+        }
+
+        function showEmptyState() {
+            const container = document.getElementById('historyContainer');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <svg class="empty-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <h2 class="empty-title">No Comparison History</h2>
+                    <p class="empty-text">Your comparison history will appear here once you start comparing images.</p>
+                    <a href="compare.html" class="btn-primary">Start First Comparison</a>
+                </div>
+            `;
+            document.getElementById('statsSummary').style.display = 'none';
+        }
+
+        function showHistory(history) {
+            const container = document.getElementById('historyContainer');
+            container.className = 'history-grid';
+            
+            container.innerHTML = history.map(item => `
+                <div class="history-card" onclick="viewComparison(${item.id})">
+                    <div class="history-images">
+                        <div class="history-image">
+                            <img src="${item.thumbnail1}" alt="Image 1">
+                        </div>
+                        <div class="history-image">
+                            <img src="${item.thumbnail2}" alt="Image 2">
+                        </div>
+                        <div class="vs-badge">VS</div>
+                    </div>
+                    <div class="history-info">
+                        <div class="history-date">${formatDate(item.timestamp)}</div>
+                        <div class="history-similarity">
+                            <span class="similarity-label">Similarity Score</span>
+                            <span class="similarity-value">${item.similarity}%</span>
+                        </div>
+                        <div class="history-actions">
+                            <button class="action-btn" onclick="recompare(event, ${item.id})">Re-compare</button>
+                            <button class="action-btn" onclick="deleteItem(event, ${item.id})">Delete</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            document.getElementById('statsSummary').style.display = 'grid';
+        }
+
+        function updateStats(history) {
+            // Total comparisons
+            document.getElementById('totalComparisons').textContent = history.length;
+            
+            // Average similarity
+            const avgSim = history.length > 0 
+                ? Math.round(history.reduce((acc, item) => acc + item.similarity, 0) / history.length)
+                : 0;
+            document.getElementById('avgSimilarity').textContent = avgSim + '%';
+            
+            // Today's count
+            const today = new Date().toDateString();
+            const todayCount = history.filter(item => 
+                new Date(item.timestamp).toDateString() === today
+            ).length;
+            document.getElementById('todayCount').textContent = todayCount;
+            
+            // This week's count
+            const weekAgo = new Date();
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            const weekCount = history.filter(item => 
+                new Date(item.timestamp) > weekAgo
+            ).length;
+            document.getElementById('thisWeek').textContent = weekCount;
+        }
+
+        function formatDate(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            
+            return date.toLocaleDateString();
+        }
+
+        function viewComparison(id) {
+            const item = historyData.find(h => h.id === id);
+            if (item) {
+                localStorage.setItem('currentComparison', JSON.stringify({
+                    image1: item.thumbnail1,
+                    image2: item.thumbnail2,
+                    timestamp: item.timestamp
+                }));
+                window.location.href = 'results.html';
+            }
+        }
+
+        function recompare(event, id) {
+            event.stopPropagation();
+            const item = historyData.find(h => h.id === id);
+            if (item) {
+                // Store images for compare page
+                localStorage.setItem('recompareImages', JSON.stringify({
+                    image1: item.thumbnail1,
+                    image2: item.thumbnail2
+                }));
+                window.location.href = 'compare.html';
+            }
+        }
+
+        function deleteItem(event, id) {
+            event.stopPropagation();
+            if (confirm('Are you sure you want to delete this comparison?')) {
+                historyData = historyData.filter(h => h.id !== id);
+                localStorage.setItem('comparisonHistory', JSON.stringify(historyData));
+                loadHistory();
+            }
+        }
+
+        function clearHistory() {
+            if (confirm('Are you sure you want to clear all comparison history? This cannot be undone.')) {
+                localStorage.removeItem('comparisonHistory');
+                localStorage.removeItem('currentComparison');
+                loadHistory();
+            }
+        }
+
+        function exportHistory() {
+            alert('History exported successfully! (This is a demo - no actual file was created)');
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = historyData.filter(item => {
+                const date = new Date(item.timestamp).toLocaleString().toLowerCase();
+                return date.includes(searchTerm) || 
+                       item.similarity.toString().includes(searchTerm);
+            });
+            
+            if (filtered.length === 0 && searchTerm) {
+                document.getElementById('historyContainer').innerHTML = `
+                    <div class="empty-state">
+                        <p class="empty-text">No comparisons found matching "${searchTerm}"</p>
+                    </div>
+                `;
+            } else {
+                showHistory(filtered);
+            }
+        });
+
+        // Sort functionality
+        document.getElementById('sortSelect').addEventListener('change', (e) => {
+            let sorted = [...historyData];
+            
+            switch (e.target.value) {
+                case 'oldest':
+                    sorted.reverse();
+                    break;
+                case 'similarity-high':
+                    sorted.sort((a, b) => b.similarity - a.similarity);
+                    break;
+                case 'similarity-low':
+                    sorted.sort((a, b) => a.similarity - b.similarity);
+                    break;
+                // 'newest' is default
+            }
+            
+            showHistory(sorted);
+        });
+
+        // Add active nav state
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

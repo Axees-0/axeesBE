@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>About - CompareVision Pro</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            /* Primary Colors */
+            --primary-blue: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            
+            /* Secondary Colors */
+            --secondary-green: #10b981;
+            --secondary-orange: #f59e0b;
+            --secondary-red: #ef4444;
+            
+            /* Neutral Colors */
+            --neutral-50: #f9fafb;
+            --neutral-100: #f3f4f6;
+            --neutral-200: #e5e7eb;
+            --neutral-300: #d1d5db;
+            --neutral-400: #9ca3af;
+            --neutral-500: #6b7280;
+            --neutral-600: #4b5563;
+            --neutral-700: #374151;
+            --neutral-800: #1f2937;
+            --neutral-900: #111827;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            --gradient-hero: linear-gradient(180deg, #f9fafb 0%, #e5e7eb 100%);
+            
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            --font-mono: 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
+            
+            /* Font Sizes */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            
+            /* Font Weights */
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-0: 0;
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-20: 5rem;
+            
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.2s ease;
+            --transition-slow: 0.3s ease;
+        }
+
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: var(--font-sans);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--neutral-700);
+            background: var(--neutral-50);
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--neutral-200);
+            padding: var(--space-4) 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .logo-text {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-800);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--neutral-600);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color var(--transition-base);
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 80px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient-hero);
+            padding: var(--space-16) 0;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: var(--text-5xl);
+            color: var(--neutral-900);
+            margin-bottom: var(--space-4);
+        }
+
+        .hero-subtitle {
+            font-size: var(--text-xl);
+            color: var(--neutral-600);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: var(--space-16) 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-12);
+        }
+
+        .section-title {
+            font-size: var(--text-4xl);
+            color: var(--neutral-900);
+            margin-bottom: var(--space-4);
+        }
+
+        .section-subtitle {
+            font-size: var(--text-lg);
+            color: var(--neutral-600);
+        }
+
+        /* Technology Grid */
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-8);
+            margin-bottom: var(--space-16);
+        }
+
+        .tech-card {
+            background: white;
+            padding: var(--space-8);
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .tech-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--gradient-primary);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .tech-title {
+            font-size: var(--text-2xl);
+            color: var(--neutral-800);
+            margin-bottom: var(--space-3);
+            font-weight: var(--font-semibold);
+        }
+
+        .tech-description {
+            color: var(--neutral-600);
+            line-height: 1.6;
+            margin-bottom: var(--space-4);
+        }
+
+        .tech-features {
+            list-style: none;
+        }
+
+        .tech-features li {
+            padding: var(--space-2) 0;
+            padding-left: var(--space-6);
+            position: relative;
+            color: var(--neutral-700);
+        }
+
+        .tech-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--secondary-green);
+            font-weight: var(--font-bold);
+        }
+
+        /* Use Cases */
+        .use-cases-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-6);
+        }
+
+        .use-case-card {
+            background: white;
+            padding: var(--space-6);
+            border-radius: 0.75rem;
+            text-align: center;
+            border: 1px solid var(--neutral-200);
+            transition: all var(--transition-slow);
+        }
+
+        .use-case-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue);
+        }
+
+        .use-case-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto var(--space-3);
+            color: var(--primary-blue);
+        }
+
+        .use-case-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--neutral-800);
+            margin-bottom: var(--space-2);
+        }
+
+        .use-case-text {
+            font-size: var(--text-sm);
+            color: var(--neutral-600);
+        }
+
+        /* FAQ Section */
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: white;
+            margin-bottom: var(--space-4);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            border: 1px solid var(--neutral-200);
+        }
+
+        .faq-question {
+            padding: var(--space-6);
+            font-size: var(--text-lg);
+            font-weight: var(--font-medium);
+            color: var(--neutral-800);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background var(--transition-base);
+        }
+
+        .faq-question:hover {
+            background: var(--neutral-50);
+        }
+
+        .faq-icon {
+            width: 24px;
+            height: 24px;
+            transition: transform var(--transition-base);
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 var(--space-6) var(--space-6);
+            color: var(--neutral-600);
+            line-height: 1.6;
+            display: none;
+        }
+
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: var(--gradient-primary);
+            padding: var(--space-16) 0;
+            text-align: center;
+            color: white;
+        }
+
+        .cta h2 {
+            font-size: var(--text-3xl);
+            margin-bottom: var(--space-4);
+        }
+
+        .cta p {
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-8);
+            opacity: 0.9;
+        }
+
+        .btn-white {
+            background: white;
+            color: var(--primary-blue);
+            padding: var(--space-4) var(--space-8);
+            border-radius: 0.5rem;
+            font-weight: var(--font-semibold);
+            font-size: var(--text-lg);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-3);
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-white:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32">
+                        <circle cx="12" cy="16" r="10" fill="#2563eb" opacity="0.8"/>
+                        <circle cx="20" cy="16" r="10" fill="#3b82f6" opacity="0.8"/>
+                    </svg>
+                    <span class="logo-text">CompareVision Pro</span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="compare.html" class="nav-link">Compare</a>
+                <a href="results.html" class="nav-link">Results</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="about.html" class="nav-link active">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="container">
+                <h1>About CompareVision Pro</h1>
+                <p class="hero-subtitle">
+                    Next-generation image comparison technology designed for precision analysis 
+                    of static objects in professional applications.
+                </p>
+            </div>
+        </section>
+
+        <!-- Technology Section -->
+        <section class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Our Technology</h2>
+                    <p class="section-subtitle">Cutting-edge algorithms for accurate image analysis</p>
+                </div>
+
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <div class="tech-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="white">
+                                <path d="M16 2C8.268 2 2 8.268 2 12v8c0 3.732 6.268 10 14 10s14-6.268 14-10v-8c0-3.732-6.268-10-14-10zm0 4c5.523 0 10 3.358 10 6s-4.477 6-10 6-10-3.358-10-6 4.477-6 10-6z"/>
+                                <circle cx="16" cy="12" r="4"/>
+                            </svg>
+                        </div>
+                        <h3 class="tech-title">Computer Vision</h3>
+                        <p class="tech-description">
+                            Advanced computer vision algorithms trained on millions of images to detect 
+                            subtle differences and patterns in static objects.
+                        </p>
+                        <ul class="tech-features">
+                            <li>Deep learning neural networks</li>
+                            <li>Edge detection algorithms</li>
+                            <li>Pattern recognition</li>
+                            <li>Feature extraction</li>
+                        </ul>
+                    </div>
+
+                    <div class="tech-card">
+                        <div class="tech-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="white">
+                                <path d="M8 4v24l8-8 8 8V4H8zm2 2h12v17.172l-6-6-6 6V6z"/>
+                                <path d="M12 10h8v2h-8zm0 4h8v2h-8z"/>
+                            </svg>
+                        </div>
+                        <h3 class="tech-title">Image Processing</h3>
+                        <p class="tech-description">
+                            State-of-the-art image processing techniques ensure accurate comparison 
+                            regardless of lighting, angle, or environmental conditions.
+                        </p>
+                        <ul class="tech-features">
+                            <li>Automatic alignment</li>
+                            <li>Noise reduction</li>
+                            <li>Color normalization</li>
+                            <li>Resolution matching</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section class="content-section" style="background: white;">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Use Cases</h2>
+                    <p class="section-subtitle">Perfect for various professional applications</p>
+                </div>
+
+                <div class="use-cases-grid">
+                    <div class="use-case-card">
+                        <svg class="use-case-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-9-5z"/>
+                        </svg>
+                        <h3 class="use-case-title">Quality Control</h3>
+                        <p class="use-case-text">Ensure product consistency in manufacturing processes</p>
+                    </div>
+
+                    <div class="use-case-card">
+                        <svg class="use-case-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/>
+                        </svg>
+                        <h3 class="use-case-title">Inventory Management</h3>
+                        <p class="use-case-text">Track and verify inventory items automatically</p>
+                    </div>
+
+                    <div class="use-case-card">
+                        <svg class="use-case-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <h3 class="use-case-title">Defect Detection</h3>
+                        <p class="use-case-text">Identify defects and anomalies in products</p>
+                    </div>
+
+                    <div class="use-case-card">
+                        <svg class="use-case-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                        </svg>
+                        <h3 class="use-case-title">Progress Tracking</h3>
+                        <p class="use-case-text">Monitor changes over time in construction or projects</p>
+                    </div>
+
+                    <div class="use-case-card">
+                        <svg class="use-case-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M21 8c-1.45 0-2.26 1.44-1.93 2.51l-3.55 3.56c-.3-.09-.74-.09-1.04 0l-2.55-2.55C12.27 10.45 11.46 9 10 9c-1.45 0-2.27 1.44-1.93 2.52l-4.56 4.55C2.44 15.74 1 16.55 1 18c0 1.1.9 2 2 2 1.45 0 2.26-1.44 1.93-2.51l4.55-4.56c.3.09.74.09 1.04 0l2.55 2.55C12.73 16.55 13.54 18 15 18c1.45 0 2.27-1.44 1.93-2.52l3.56-3.55C21.56 12.26 23 11.45 23 10c0-1.1-.9-2-2-2z"/>
+                        </svg>
+                        <h3 class="use-case-title">Analytics</h3>
+                        <p class="use-case-text">Generate insights from visual data patterns</p>
+                    </div>
+
+                    <div class="use-case-card">
+                        <svg class="use-case-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                        </svg>
+                        <h3 class="use-case-title">Compliance</h3>
+                        <p class="use-case-text">Ensure regulatory compliance through visual verification</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FAQ Section -->
+        <section class="content-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Frequently Asked Questions</h2>
+                    <p class="section-subtitle">Everything you need to know about CompareVision Pro</p>
+                </div>
+
+                <div class="faq-container">
+                    <div class="faq-item active">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What types of images can CompareVision Pro analyze?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            CompareVision Pro supports over 50 image formats including JPG, PNG, WebP, BMP, GIF, TIFF, and RAW formats. 
+                            It's optimized for static object comparison and works best with high-resolution images of products, 
+                            components, documents, and other non-moving subjects.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>How accurate is the comparison algorithm?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            Our advanced algorithms achieve 99.9% accuracy in controlled conditions. The system uses multiple 
+                            comparison metrics including pixel-level analysis, structural similarity, and feature matching to 
+                            provide comprehensive results. Accuracy may vary based on image quality and lighting conditions.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Is my data secure?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            Absolutely. All image processing happens locally in your browser. Your images are never uploaded 
+                            to our servers, ensuring complete privacy and security. This client-side processing also means 
+                            you can use CompareVision Pro offline once the page is loaded.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>Can I integrate CompareVision Pro into my existing workflow?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            Yes! CompareVision Pro offers flexible integration options including REST API, Python SDK, and 
+                            JavaScript libraries. We also support batch processing and can integrate with popular tools 
+                            like Zapier, Make (formerly Integromat), and custom enterprise systems.
+                        </div>
+                    </div>
+
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(this)">
+                            <span>What makes this different from facial recognition software?</span>
+                            <svg class="faq-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                        <div class="faq-answer">
+                            CompareVision Pro is specifically designed for static object comparison, not facial recognition. 
+                            Our algorithms are optimized for detecting differences in products, components, documents, and 
+                            other non-human subjects. This specialization allows us to achieve higher accuracy for industrial 
+                            and commercial applications.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta">
+            <div class="container">
+                <h2>Ready to Transform Your Image Analysis?</h2>
+                <p>Experience the power of professional image comparison today.</p>
+                <a href="compare.html" class="btn-white">
+                    Start Comparing Now
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+                    </svg>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function toggleFAQ(element) {
+            const faqItem = element.parentElement;
+            const wasActive = faqItem.classList.contains('active');
+            
+            // Close all FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Open clicked item if it wasn't active
+            if (!wasActive) {
+                faqItem.classList.add('active');
+            }
+        }
+
+        // Add active nav state
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Comparison Results - CompareVision Pro</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            /* Primary Colors */
+            --primary-blue: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            
+            /* Secondary Colors */
+            --secondary-green: #10b981;
+            --secondary-orange: #f59e0b;
+            --secondary-red: #ef4444;
+            
+            /* Neutral Colors */
+            --neutral-50: #f9fafb;
+            --neutral-100: #f3f4f6;
+            --neutral-200: #e5e7eb;
+            --neutral-300: #d1d5db;
+            --neutral-400: #9ca3af;
+            --neutral-500: #6b7280;
+            --neutral-600: #4b5563;
+            --neutral-700: #374151;
+            --neutral-800: #1f2937;
+            --neutral-900: #111827;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            --gradient-success: linear-gradient(135deg, #10b981 0%, #34d399 100%);
+            
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            
+            /* Font Sizes */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            
+            /* Font Weights */
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-0: 0;
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.2s ease;
+            --transition-slow: 0.3s ease;
+        }
+
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: var(--font-sans);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--neutral-700);
+            background: var(--neutral-50);
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--neutral-200);
+            padding: var(--space-4) 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .logo-text {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-800);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--neutral-600);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color var(--transition-base);
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-6);
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .page-title {
+            font-size: var(--text-4xl);
+            color: var(--neutral-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .page-subtitle {
+            font-size: var(--text-lg);
+            color: var(--neutral-600);
+        }
+
+        /* Results Summary */
+        .results-summary {
+            background: white;
+            border-radius: 1rem;
+            padding: var(--space-8);
+            margin-bottom: var(--space-8);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .similarity-score {
+            text-align: center;
+            margin-bottom: var(--space-6);
+        }
+
+        .score-circle {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto var(--space-4);
+            position: relative;
+        }
+
+        .score-circle svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-value {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-900);
+        }
+
+        .score-label {
+            font-size: var(--text-lg);
+            color: var(--neutral-600);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-6);
+            margin-top: var(--space-8);
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: var(--space-4);
+            background: var(--neutral-50);
+            border-radius: 0.75rem;
+            border: 1px solid var(--neutral-200);
+        }
+
+        .metric-value {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-blue);
+            margin-bottom: var(--space-1);
+        }
+
+        .metric-label {
+            font-size: var(--text-sm);
+            color: var(--neutral-600);
+        }
+
+        /* Image Comparison */
+        .comparison-container {
+            background: white;
+            border-radius: 1rem;
+            padding: var(--space-8);
+            margin-bottom: var(--space-8);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .comparison-header {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-semibold);
+            color: var(--neutral-800);
+            margin-bottom: var(--space-6);
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .image-box {
+            position: relative;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: var(--neutral-100);
+            border: 1px solid var(--neutral-200);
+        }
+
+        .image-box img {
+            width: 100%;
+            height: 400px;
+            object-fit: contain;
+            display: block;
+        }
+
+        .image-label {
+            position: absolute;
+            top: var(--space-4);
+            left: var(--space-4);
+            background: rgba(255, 255, 255, 0.95);
+            padding: var(--space-2) var(--space-4);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            color: var(--neutral-700);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Comparison Modes */
+        .comparison-modes {
+            display: flex;
+            gap: var(--space-2);
+            justify-content: center;
+            margin-bottom: var(--space-6);
+        }
+
+        .mode-button {
+            padding: var(--space-2) var(--space-4);
+            background: white;
+            border: 1px solid var(--neutral-300);
+            border-radius: 0.375rem;
+            color: var(--neutral-600);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .mode-button:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        .mode-button.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        /* Difference Map */
+        .difference-map {
+            position: relative;
+            background: var(--neutral-100);
+            border-radius: 0.75rem;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--neutral-200);
+        }
+
+        .difference-canvas {
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            margin-top: var(--space-8);
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            border: 2px solid var(--primary-blue);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* No Results State */
+        .no-results {
+            text-align: center;
+            padding: var(--space-16) 0;
+        }
+
+        .no-results-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--space-4);
+            color: var(--neutral-400);
+        }
+
+        .no-results-text {
+            font-size: var(--text-xl);
+            color: var(--neutral-600);
+            margin-bottom: var(--space-4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32">
+                        <circle cx="12" cy="16" r="10" fill="#2563eb" opacity="0.8"/>
+                        <circle cx="20" cy="16" r="10" fill="#3b82f6" opacity="0.8"/>
+                    </svg>
+                    <span class="logo-text">CompareVision Pro</span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="compare.html" class="nav-link">Compare</a>
+                <a href="results.html" class="nav-link active">Results</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container" id="resultsContainer">
+            <!-- Results will be dynamically inserted here -->
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        // Check for comparison data
+        const comparisonData = JSON.parse(localStorage.getItem('currentComparison'));
+        const container = document.getElementById('resultsContainer');
+
+        if (!comparisonData) {
+            // Show no results state
+            container.innerHTML = `
+                <div class="no-results">
+                    <svg class="no-results-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 9a3 3 0 118 8m-5 0a3 3 0 118-8m0 0V3m0 0h6m-6 0H6"/>
+                    </svg>
+                    <p class="no-results-text">No comparison results to display</p>
+                    <a href="compare.html" class="btn-primary">Start New Comparison</a>
+                </div>
+            `;
+        } else {
+            // Generate results
+            const similarity = Math.floor(Math.random() * 30) + 70; // 70-100%
+            const pixelDiff = Math.floor(Math.random() * 50000) + 10000;
+            const structuralSim = similarity + Math.floor(Math.random() * 10) - 5;
+            const colorDiff = 100 - similarity + Math.floor(Math.random() * 10);
+            
+            container.innerHTML = `
+                <!-- Page Header -->
+                <div class="page-header">
+                    <h1 class="page-title">Comparison Results</h1>
+                    <p class="page-subtitle">Analysis completed at ${new Date(comparisonData.timestamp).toLocaleString()}</p>
+                </div>
+
+                <!-- Results Summary -->
+                <div class="results-summary">
+                    <div class="similarity-score">
+                        <div class="score-circle">
+                            <svg width="200" height="200">
+                                <circle cx="100" cy="100" r="90" stroke="#e5e7eb" stroke-width="20" fill="none"/>
+                                <circle cx="100" cy="100" r="90" stroke="#10b981" stroke-width="20" fill="none"
+                                        stroke-dasharray="${similarity * 5.65} 565"
+                                        stroke-linecap="round"/>
+                            </svg>
+                            <div class="score-value">${similarity}%</div>
+                        </div>
+                        <p class="score-label">Overall Similarity Score</p>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-value">${pixelDiff.toLocaleString()}</div>
+                            <div class="metric-label">Pixels Different</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${structuralSim}%</div>
+                            <div class="metric-label">Structural Similarity</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">${colorDiff}%</div>
+                            <div class="metric-label">Color Difference</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-value">0.${Math.floor(Math.random() * 9) + 1}s</div>
+                            <div class="metric-label">Processing Time</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Comparison -->
+                <div class="comparison-container">
+                    <h2 class="comparison-header">Visual Comparison</h2>
+                    
+                    <div class="comparison-modes">
+                        <button class="mode-button active" onclick="showMode('sidebyside')">Side by Side</button>
+                        <button class="mode-button" onclick="showMode('overlay')">Overlay</button>
+                        <button class="mode-button" onclick="showMode('difference')">Difference Map</button>
+                    </div>
+
+                    <div id="sidebyside" class="comparison-view">
+                        <div class="image-grid">
+                            <div class="image-box">
+                                <img src="${comparisonData.image1}" alt="Image 1">
+                                <span class="image-label">Image 1</span>
+                            </div>
+                            <div class="image-box">
+                                <img src="${comparisonData.image2}" alt="Image 2">
+                                <span class="image-label">Image 2</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="overlay" class="comparison-view" style="display: none;">
+                        <div class="difference-map">
+                            <canvas id="overlayCanvas" class="difference-canvas"></canvas>
+                        </div>
+                    </div>
+
+                    <div id="difference" class="comparison-view" style="display: none;">
+                        <div class="difference-map">
+                            <canvas id="diffCanvas" class="difference-canvas"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Analysis Chart -->
+                <div class="comparison-container">
+                    <h2 class="comparison-header">Detailed Analysis</h2>
+                    <canvas id="analysisChart" style="max-height: 300px;"></canvas>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="action-buttons">
+                    <button class="btn-primary" onclick="exportResults()">
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z"/>
+                        </svg>
+                        Export Report
+                    </button>
+                    <a href="compare.html" class="btn-secondary">New Comparison</a>
+                </div>
+            `;
+
+            // Initialize chart
+            const ctx = document.getElementById('analysisChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Overall Match', 'Structure', 'Color', 'Edges', 'Texture', 'Brightness'],
+                    datasets: [{
+                        label: 'Similarity Metrics',
+                        data: [
+                            similarity,
+                            structuralSim,
+                            100 - colorDiff,
+                            Math.floor(Math.random() * 20) + 80,
+                            Math.floor(Math.random() * 20) + 75,
+                            Math.floor(Math.random() * 15) + 85
+                        ],
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        borderColor: '#2563eb',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#2563eb'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+            // Initialize canvases
+            setTimeout(initializeCanvases, 100);
+        }
+
+        function showMode(mode) {
+            // Update active button
+            document.querySelectorAll('.mode-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Show/hide views
+            document.querySelectorAll('.comparison-view').forEach(view => {
+                view.style.display = 'none';
+            });
+            document.getElementById(mode).style.display = 'block';
+        }
+
+        function initializeCanvases() {
+            if (!comparisonData) return;
+
+            // Create overlay canvas
+            const overlayCanvas = document.getElementById('overlayCanvas');
+            const overlayCtx = overlayCanvas.getContext('2d');
+            
+            const img1 = new Image();
+            img1.onload = function() {
+                overlayCanvas.width = img1.width;
+                overlayCanvas.height = img1.height;
+                overlayCtx.globalAlpha = 0.5;
+                overlayCtx.drawImage(img1, 0, 0);
+                
+                const img2 = new Image();
+                img2.onload = function() {
+                    overlayCtx.drawImage(img2, 0, 0);
+                };
+                img2.src = comparisonData.image2;
+            };
+            img1.src = comparisonData.image1;
+
+            // Create difference map (simulated)
+            const diffCanvas = document.getElementById('diffCanvas');
+            const diffCtx = diffCanvas.getContext('2d');
+            
+            const img3 = new Image();
+            img3.onload = function() {
+                diffCanvas.width = img3.width;
+                diffCanvas.height = img3.height;
+                
+                // Draw base image
+                diffCtx.drawImage(img3, 0, 0);
+                
+                // Add random difference highlights
+                diffCtx.globalAlpha = 0.5;
+                diffCtx.fillStyle = '#ef4444';
+                
+                for (let i = 0; i < 10; i++) {
+                    const x = Math.random() * diffCanvas.width;
+                    const y = Math.random() * diffCanvas.height;
+                    const size = Math.random() * 50 + 20;
+                    
+                    diffCtx.beginPath();
+                    diffCtx.arc(x, y, size, 0, 2 * Math.PI);
+                    diffCtx.fill();
+                }
+            };
+            img3.src = comparisonData.image1;
+        }
+
+        function exportResults() {
+            // Simulate export
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<div class="spinner" style="width: 20px; height: 20px; margin: 0 auto;"></div>';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                alert('Report exported successfully! (This is a demo - no actual file was created)');
+            }, 1500);
+        }
+
+        // Add active nav state
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

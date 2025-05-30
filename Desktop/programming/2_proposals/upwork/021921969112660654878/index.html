@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>CompareVision Pro - Professional Image Comparison Software</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            /* Primary Colors */
+            --primary-blue: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            
+            /* Secondary Colors */
+            --secondary-green: #10b981;
+            --secondary-orange: #f59e0b;
+            --secondary-red: #ef4444;
+            
+            /* Neutral Colors */
+            --neutral-50: #f9fafb;
+            --neutral-100: #f3f4f6;
+            --neutral-200: #e5e7eb;
+            --neutral-300: #d1d5db;
+            --neutral-400: #9ca3af;
+            --neutral-500: #6b7280;
+            --neutral-600: #4b5563;
+            --neutral-700: #374151;
+            --neutral-800: #1f2937;
+            --neutral-900: #111827;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            --gradient-hero: linear-gradient(180deg, #f9fafb 0%, #e5e7eb 100%);
+            --gradient-dark: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            --font-mono: 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
+            
+            /* Font Sizes */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            
+            /* Font Weights */
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-0: 0;
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-20: 5rem;
+            
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.2s ease;
+            --transition-slow: 0.3s ease;
+        }
+
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: var(--font-sans);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--neutral-700);
+            background: var(--neutral-50);
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--neutral-200);
+            padding: var(--space-4) 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .logo-text {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-800);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--neutral-600);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color var(--transition-base);
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 80px;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: var(--gradient-hero);
+            padding: var(--space-20) 0;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        .hero h1 {
+            font-size: var(--text-5xl);
+            color: var(--neutral-900);
+            margin-bottom: var(--space-6);
+            font-weight: var(--font-bold);
+            line-height: 1.2;
+        }
+
+        .hero-subtitle {
+            font-size: var(--text-xl);
+            color: var(--neutral-600);
+            margin-bottom: var(--space-8);
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            text-decoration: none;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            border: 2px solid var(--primary-blue);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* Features Section */
+        .features {
+            padding: var(--space-20) 0;
+            background: white;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-16);
+        }
+
+        .section-title {
+            font-size: var(--text-4xl);
+            color: var(--neutral-900);
+            margin-bottom: var(--space-4);
+        }
+
+        .section-subtitle {
+            font-size: var(--text-lg);
+            color: var(--neutral-600);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-8);
+        }
+
+        .feature-card {
+            background: var(--neutral-50);
+            padding: var(--space-8);
+            border-radius: 0.75rem;
+            text-align: center;
+            transition: all var(--transition-slow);
+            border: 1px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary-blue);
+            background: white;
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto var(--space-4);
+            background: var(--gradient-primary);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-title {
+            font-size: var(--text-xl);
+            color: var(--neutral-800);
+            margin-bottom: var(--space-2);
+            font-weight: var(--font-semibold);
+        }
+
+        .feature-description {
+            color: var(--neutral-600);
+            line-height: 1.6;
+        }
+
+        /* Stats Section */
+        .stats {
+            background: var(--gradient-dark);
+            padding: var(--space-16) 0;
+            color: white;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-8);
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: var(--space-4);
+        }
+
+        .stat-number {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            font-size: var(--text-base);
+            opacity: 0.9;
+        }
+
+        /* CTA Section */
+        .cta {
+            background: var(--neutral-50);
+            padding: var(--space-20) 0;
+            text-align: center;
+        }
+
+        .cta-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .cta h2 {
+            font-size: var(--text-3xl);
+            color: var(--neutral-900);
+            margin-bottom: var(--space-4);
+        }
+
+        .cta p {
+            font-size: var(--text-lg);
+            color: var(--neutral-600);
+            margin-bottom: var(--space-8);
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--neutral-900);
+            color: white;
+            padding: var(--space-8) 0;
+            text-align: center;
+        }
+
+        .footer-text {
+            opacity: 0.8;
+            font-size: var(--text-sm);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32">
+                        <circle cx="12" cy="16" r="10" fill="#2563eb" opacity="0.8"/>
+                        <circle cx="20" cy="16" r="10" fill="#3b82f6" opacity="0.8"/>
+                    </svg>
+                    <span class="logo-text">CompareVision Pro</span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="compare.html" class="nav-link">Compare</a>
+                <a href="results.html" class="nav-link">Results</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero">
+            <div class="hero-content">
+                <h1>Precision Image Analysis for Static Objects</h1>
+                <p class="hero-subtitle">
+                    Advanced photo comparison technology designed for professional applications. 
+                    Compare, analyze, and identify differences in static objects with unmatched accuracy.
+                </p>
+                <div class="hero-buttons">
+                    <a href="compare.html" class="btn-primary">
+                        Start Comparing
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"/>
+                        </svg>
+                    </a>
+                    <a href="about.html" class="btn-secondary">Learn More</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Powerful Features</h2>
+                    <p class="section-subtitle">Everything you need for professional image comparison</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="white">
+                                <path d="M16 2C8.268 2 2 8.268 2 16s6.268 14 14 14 14-6.268 14-14S23.732 2 16 2zm0 25.5c-6.351 0-11.5-5.149-11.5-11.5S9.649 4.5 16 4.5 27.5 9.649 27.5 16 22.351 27.5 16 27.5z"/>
+                                <path d="M16 8c-4.418 0-8 3.582-8 8s3.582 8 8 8 8-3.582 8-8-3.582-8-8-8zm0 12c-2.209 0-4-1.791-4-4s1.791-4 4-4 4 1.791 4 4-1.791 4-4 4z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Pixel-Perfect Analysis</h3>
+                        <p class="feature-description">
+                            Advanced algorithms detect even the smallest differences between images with sub-pixel accuracy.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="white">
+                                <path d="M4 6h24v2H4zm0 5h24v2H4zm0 5h16v2H4zm0 5h16v2H4z"/>
+                                <rect x="22" y="16" width="6" height="6" rx="1"/>
+                                <rect x="22" y="21" width="6" height="6" rx="1"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Batch Processing</h3>
+                        <p class="feature-description">
+                            Compare multiple images simultaneously with our efficient batch processing capabilities.
+                        </p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="32" height="32" viewBox="0 0 32 32" fill="white">
+                                <path d="M16 2L2 8v8c0 8.837 6.431 16.157 14 17.851C23.569 32.157 30 24.837 30 16V8L16 2zm0 3.027L27 9.78V16c0 7.168-5.02 13.227-11 14.758C10.02 29.227 5 23.168 5 16V9.78l11-4.753z"/>
+                                <path d="M14 16.414l-3.707-3.707 1.414-1.414L14 13.586l6.293-6.293 1.414 1.414z"/>
+                            </svg>
+                        </div>
+                        <h3 class="feature-title">Secure & Private</h3>
+                        <p class="feature-description">
+                            Your images and comparison data remain completely private with client-side processing.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Accuracy Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">&lt;2s</div>
+                        <div class="stat-label">Average Processing</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Image Formats</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Available</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to Experience Professional Image Comparison?</h2>
+                    <p>Start comparing images with our advanced technology today. No installation required.</p>
+                    <a href="compare.html" class="btn-primary">Get Started Now</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p class="footer-text">&copy; 2024 CompareVision Pro. Professional Image Comparison Software.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Add smooth scroll behavior
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        });
+
+        // Add active nav state
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>

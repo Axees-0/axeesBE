@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Compare Images - CompareVision Pro</title>
+    <style>
+        /* CSS Variables */
+        :root {
+            /* Primary Colors */
+            --primary-blue: #2563eb;
+            --primary-dark: #1e40af;
+            --primary-light: #3b82f6;
+            
+            /* Secondary Colors */
+            --secondary-green: #10b981;
+            --secondary-orange: #f59e0b;
+            --secondary-red: #ef4444;
+            
+            /* Neutral Colors */
+            --neutral-50: #f9fafb;
+            --neutral-100: #f3f4f6;
+            --neutral-200: #e5e7eb;
+            --neutral-300: #d1d5db;
+            --neutral-400: #9ca3af;
+            --neutral-500: #6b7280;
+            --neutral-600: #4b5563;
+            --neutral-700: #374151;
+            --neutral-800: #1f2937;
+            --neutral-900: #111827;
+            
+            /* Gradients */
+            --gradient-primary: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            --gradient-hero: linear-gradient(180deg, #f9fafb 0%, #e5e7eb 100%);
+            --gradient-dark: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            
+            /* Typography */
+            --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            
+            /* Font Sizes */
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            
+            /* Font Weights */
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-0: 0;
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-20: 5rem;
+            
+            /* Transitions */
+            --transition-fast: 0.15s ease;
+            --transition-base: 0.2s ease;
+            --transition-slow: 0.3s ease;
+        }
+
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-family: var(--font-sans);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--neutral-700);
+            background: var(--neutral-50);
+        }
+
+        body {
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            border-bottom: 1px solid var(--neutral-200);
+            padding: var(--space-4) 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .logo-text {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--neutral-800);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--neutral-600);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color var(--transition-base);
+        }
+
+        .nav-link:hover {
+            color: var(--primary-blue);
+        }
+
+        .nav-link.active {
+            color: var(--primary-blue);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 80px;
+            min-height: 100vh;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-6);
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-12);
+        }
+
+        .page-title {
+            font-size: var(--text-4xl);
+            color: var(--neutral-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .page-subtitle {
+            font-size: var(--text-lg);
+            color: var(--neutral-600);
+        }
+
+        /* Compare Layout */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-8);
+            margin-bottom: var(--space-8);
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 2px dashed var(--neutral-300);
+            border-radius: 0.75rem;
+            padding: var(--space-8);
+            text-align: center;
+            background: var(--neutral-50);
+            transition: all var(--transition-slow);
+            cursor: pointer;
+            position: relative;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-blue);
+            background: white;
+        }
+
+        .upload-area.drag-over {
+            border-color: var(--primary-blue);
+            background: rgba(37, 99, 235, 0.05);
+            transform: scale(1.02);
+        }
+
+        .upload-area.has-image {
+            padding: 0;
+            border-style: solid;
+        }
+
+        .upload-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: var(--space-4);
+            color: var(--neutral-400);
+        }
+
+        .upload-text {
+            font-size: var(--text-lg);
+            color: var(--neutral-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .upload-subtext {
+            font-size: var(--text-sm);
+            color: var(--neutral-500);
+            margin-bottom: var(--space-4);
+        }
+
+        .upload-input {
+            display: none;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:disabled {
+            background: var(--neutral-300);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary-blue);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            border: 2px solid var(--primary-blue);
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: var(--neutral-100);
+        }
+
+        .image-remove {
+            position: absolute;
+            top: var(--space-4);
+            right: var(--space-4);
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid var(--neutral-200);
+            color: var(--neutral-700);
+            padding: var(--space-2);
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .image-remove:hover {
+            background: white;
+            color: var(--secondary-red);
+            border-color: var(--secondary-red);
+        }
+
+        /* Compare Controls */
+        .compare-controls {
+            text-align: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .compare-button {
+            background: var(--gradient-primary);
+            color: white;
+            padding: var(--space-4) var(--space-10);
+            border-radius: 0.5rem;
+            font-weight: var(--font-semibold);
+            font-size: var(--text-lg);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-3);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .compare-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .compare-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Processing Overlay */
+        .processing-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .processing-overlay.active {
+            display: flex;
+        }
+
+        .processing-content {
+            background: white;
+            padding: var(--space-8);
+            border-radius: 1rem;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--neutral-300);
+            border-top-color: var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto var(--space-4);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing-text {
+            font-size: var(--text-lg);
+            color: var(--neutral-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .processing-subtext {
+            font-size: var(--text-sm);
+            color: var(--neutral-500);
+        }
+
+        /* Info Cards */
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-6);
+            margin-top: var(--space-12);
+        }
+
+        .info-card {
+            background: white;
+            padding: var(--space-6);
+            border-radius: 0.75rem;
+            border: 1px solid var(--neutral-200);
+            text-align: center;
+        }
+
+        .info-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto var(--space-3);
+            color: var(--primary-blue);
+        }
+
+        .info-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--neutral-800);
+            margin-bottom: var(--space-2);
+        }
+
+        .info-text {
+            font-size: var(--text-sm);
+            color: var(--neutral-600);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="logo">
+                    <svg width="32" height="32" viewBox="0 0 32 32">
+                        <circle cx="12" cy="16" r="10" fill="#2563eb" opacity="0.8"/>
+                        <circle cx="20" cy="16" r="10" fill="#3b82f6" opacity="0.8"/>
+                    </svg>
+                    <span class="logo-text">CompareVision Pro</span>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="compare.html" class="nav-link active">Compare</a>
+                <a href="results.html" class="nav-link">Results</a>
+                <a href="history.html" class="nav-link">History</a>
+                <a href="about.html" class="nav-link">About</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Compare Images</h1>
+                <p class="page-subtitle">Upload two images to analyze their differences</p>
+            </div>
+
+            <!-- Compare Grid -->
+            <div class="compare-grid">
+                <!-- Image 1 Upload -->
+                <div class="upload-area" id="upload1">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <p class="upload-text">Drop your first image here</p>
+                    <p class="upload-subtext">or</p>
+                    <button class="btn-primary">Browse Files</button>
+                    <input type="file" class="upload-input" id="input1" accept="image/*">
+                </div>
+
+                <!-- Image 2 Upload -->
+                <div class="upload-area" id="upload2">
+                    <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                    </svg>
+                    <p class="upload-text">Drop your second image here</p>
+                    <p class="upload-subtext">or</p>
+                    <button class="btn-primary">Browse Files</button>
+                    <input type="file" class="upload-input" id="input2" accept="image/*">
+                </div>
+            </div>
+
+            <!-- Compare Controls -->
+            <div class="compare-controls">
+                <button class="compare-button" id="compareBtn" disabled>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M9 3L5 7l4 4V8h7V6H9V3zm6 14v3h7v-2H15v-3l-4 4 4 4z"/>
+                    </svg>
+                    Start Comparison
+                </button>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="info-cards">
+                <div class="info-card">
+                    <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                    </svg>
+                    <h3 class="info-title">Supported Formats</h3>
+                    <p class="info-text">JPG, PNG, WebP, BMP, GIF and 45+ more image formats</p>
+                </div>
+                <div class="info-card">
+                    <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    <h3 class="info-title">High Accuracy</h3>
+                    <p class="info-text">Sub-pixel precision with advanced comparison algorithms</p>
+                </div>
+                <div class="info-card">
+                    <svg class="info-icon" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
+                    </svg>
+                    <h3 class="info-title">Secure Processing</h3>
+                    <p class="info-text">All processing happens locally in your browser</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Processing Overlay -->
+    <div class="processing-overlay" id="processingOverlay">
+        <div class="processing-content">
+            <div class="spinner"></div>
+            <p class="processing-text">Analyzing Images...</p>
+            <p class="processing-subtext">This may take a few moments</p>
+        </div>
+    </div>
+
+    <script>
+        // Image upload functionality
+        let image1 = null;
+        let image2 = null;
+
+        function setupUploadArea(uploadId, inputId, imageVar) {
+            const uploadArea = document.getElementById(uploadId);
+            const fileInput = document.getElementById(inputId);
+            const browseBtn = uploadArea.querySelector('.btn-primary');
+
+            // Click to browse
+            browseBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                fileInput.click();
+            });
+
+            uploadArea.addEventListener('click', (e) => {
+                if (e.target === uploadArea || e.target.classList.contains('upload-icon')) {
+                    fileInput.click();
+                }
+            });
+
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    handleImageUpload(file, uploadArea, imageVar);
+                }
+            });
+
+            // Drag and drop
+            uploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadArea.classList.add('drag-over');
+            });
+
+            uploadArea.addEventListener('dragleave', () => {
+                uploadArea.classList.remove('drag-over');
+            });
+
+            uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadArea.classList.remove('drag-over');
+                
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    handleImageUpload(file, uploadArea, imageVar);
+                }
+            });
+        }
+
+        function handleImageUpload(file, uploadArea, imageVar) {
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                // Store image data
+                if (imageVar === 'image1') {
+                    image1 = e.target.result;
+                } else {
+                    image2 = e.target.result;
+                }
+
+                // Update UI
+                uploadArea.classList.add('has-image');
+                uploadArea.innerHTML = `
+                    <div class="image-preview">
+                        <img src="${e.target.result}" alt="Uploaded image">
+                        <button class="image-remove" onclick="removeImage('${imageVar}', '${uploadArea.id}')">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"/>
+                            </svg>
+                        </button>
+                    </div>
+                `;
+
+                // Check if both images are uploaded
+                updateCompareButton();
+            };
+
+            reader.readAsDataURL(file);
+        }
+
+        function removeImage(imageVar, uploadId) {
+            if (imageVar === 'image1') {
+                image1 = null;
+            } else {
+                image2 = null;
+            }
+
+            const uploadArea = document.getElementById(uploadId);
+            uploadArea.classList.remove('has-image');
+            uploadArea.innerHTML = `
+                <svg class="upload-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+                </svg>
+                <p class="upload-text">Drop your ${imageVar === 'image1' ? 'first' : 'second'} image here</p>
+                <p class="upload-subtext">or</p>
+                <button class="btn-primary">Browse Files</button>
+                <input type="file" class="upload-input" id="${imageVar === 'image1' ? 'input1' : 'input2'}" accept="image/*">
+            `;
+
+            // Re-setup the upload area
+            setupUploadArea(uploadId, imageVar === 'image1' ? 'input1' : 'input2', imageVar);
+            updateCompareButton();
+        }
+
+        function updateCompareButton() {
+            const compareBtn = document.getElementById('compareBtn');
+            if (image1 && image2) {
+                compareBtn.disabled = false;
+            } else {
+                compareBtn.disabled = true;
+            }
+        }
+
+        // Compare functionality
+        document.getElementById('compareBtn').addEventListener('click', () => {
+            if (image1 && image2) {
+                // Show processing overlay
+                document.getElementById('processingOverlay').classList.add('active');
+
+                // Store images in localStorage for results page
+                const comparisonData = {
+                    image1: image1,
+                    image2: image2,
+                    timestamp: new Date().toISOString()
+                };
+                localStorage.setItem('currentComparison', JSON.stringify(comparisonData));
+
+                // Simulate processing time
+                setTimeout(() => {
+                    // Add to history
+                    let history = JSON.parse(localStorage.getItem('comparisonHistory') || '[]');
+                    history.unshift({
+                        id: Date.now(),
+                        timestamp: comparisonData.timestamp,
+                        thumbnail1: image1,
+                        thumbnail2: image2,
+                        similarity: Math.floor(Math.random() * 30) + 70 // Random similarity for demo
+                    });
+                    
+                    // Keep only last 10 items
+                    history = history.slice(0, 10);
+                    localStorage.setItem('comparisonHistory', JSON.stringify(history));
+
+                    // Redirect to results
+                    window.location.href = 'results.html';
+                }, 2000);
+            }
+        });
+
+        // Initialize upload areas
+        setupUploadArea('upload1', 'input1', 'image1');
+        setupUploadArea('upload2', 'input2', 'image2');
+
+        // Add active nav state
+        const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPage) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+    </script>
+</body>
+</html>
