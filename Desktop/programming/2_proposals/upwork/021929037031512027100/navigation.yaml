@@ -1,0 +1,201 @@
+name: "ERP System Demo - Upwork Proposal Workflow"
+description: "Automated testing workflow for $3000 ERP System Rebuild - Traditional Chinese Big5 support demonstration"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 15000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  - type: navigate
+    description: "Navigate to ERP demo login page"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929037031512027100/login.html"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for login form to load"
+    selector: "#loginForm"
+    
+  - type: assertText
+    description: "Verify Traditional Chinese login title"
+    selector: ".system-title"
+    expected: "企業資源規劃系統"
+    
+  - type: assertText
+    description: "Verify Big5 encoding demo credentials info"
+    selector: ".demo-info h4"
+    expected: "🎯 演示系統登入"
+    
+  - type: type
+    description: "Enter admin username"
+    selector: "#username"
+    text: "admin"
+    
+  - type: type
+    description: "Enter admin password"
+    selector: "#password"
+    text: "123456"
+    
+  - type: click
+    description: "Click login button to access ERP system"
+    selector: "#loginBtn"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for successful login redirect to dashboard"
+    selector: ".main-content"
+    timeout: 5000
+    
+  - type: assertText
+    description: "Verify dashboard main title"
+    selector: ".page-title"
+    expected: "歡迎使用企業資源規劃系統"
+    
+  - type: screenshot
+    description: "Capture main dashboard view"
+    
+  - type: assertText
+    description: "Verify navigation menu Traditional Chinese text"
+    selector: ".navbar-menu .nav-link:first-child"
+    expected: "🏠 首頁"
+    
+  - type: click
+    description: "Navigate to Orders Management module"
+    selector: "a[href='orders.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for orders page to load"
+    selector: "#ordersTableBody"
+    
+  - type: assertText
+    description: "Verify orders page title in Traditional Chinese"
+    selector: ".page-title"
+    expected: "🛒 訂單管理"
+    
+  - type: click
+    description: "Test new order modal functionality"
+    selector: "button[onclick='openNewOrderModal()']"
+    
+  - type: wait-for-selector
+    description: "Wait for order modal to appear"
+    selector: "#orderModal"
+    
+  - type: assertText
+    description: "Verify modal title supports Traditional Chinese"
+    selector: "#modalTitle"
+    expected: "新增訂單"
+    
+  - type: click
+    description: "Close order modal"
+    selector: ".modal-close"
+    
+  - type: click
+    description: "Navigate to Reports Management module"
+    selector: "a[href='reports.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for reports page to load"
+    selector: ".reports-grid"
+    
+  - type: assertText
+    description: "Verify reports page Big5 encoding notice"
+    selector: ".demo-notice strong"
+    expected: "🎯 Big5 編碼報表展示"
+    
+  - type: click
+    description: "Test Excel export functionality simulation"
+    selector: ".format-btn:first-child"
+    
+  - type: click
+    description: "Navigate to Inventory Management module"
+    selector: "a[href='inventory.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for inventory page to load"
+    selector: "#inventoryTableBody"
+    
+  - type: assertText
+    description: "Verify inventory statistics in Traditional Chinese"
+    selector: ".stat-card:first-child .stat-label"
+    expected: "📦 總庫存品項"
+    
+  - type: click
+    description: "Navigate to Accounting/Financial module"
+    selector: "a[href='accounting.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for accounting page to load"
+    selector: ".financial-overview"
+    
+  - type: assertText
+    description: "Verify financial overview Traditional Chinese labels"
+    selector: ".financial-card:first-child .financial-label"
+    expected: "💰 本月營收"
+    
+  - type: click
+    description: "Test accounting tabs functionality"
+    selector: ".tab-button:nth-child(2)"
+    
+  - type: click
+    description: "Navigate to System Settings module"
+    selector: "a[href='settings.html']"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for settings page to load"
+    selector: ".settings-grid"
+    
+  - type: assertText
+    description: "Verify settings page Traditional Chinese navigation"
+    selector: ".sidebar-link:first-child"
+    expected: "🏢 一般設定"
+    
+  - type: click
+    description: "Test settings sidebar navigation"
+    selector: ".sidebar-link:nth-child(2)"
+    
+  - type: evaluate
+    description: "Verify Big5 encoding meta tag is properly set"
+    script: |
+      const metaCharset = document.querySelector('meta[charset]');
+      return metaCharset && metaCharset.getAttribute('charset').toUpperCase() === 'UTF-8';
+    
+  - type: evaluate
+    description: "Verify Traditional Chinese language setting"
+    script: |
+      return document.documentElement.getAttribute('lang') === 'zh-TW';
+    
+  - type: evaluate
+    description: "Verify responsive navigation functionality"
+    script: |
+      const navLinks = document.querySelectorAll('.nav-link');
+      return navLinks.length >= 6;
+    
+  - type: evaluate
+    description: "Check localStorage authentication persistence"
+    script: |
+      return localStorage.getItem('isLoggedIn') === 'true';
+    
+  - type: click
+    description: "Test logout functionality"
+    selector: ".btn-logout"
+    
+  - type: wait-for-selector
+    description: "Verify logout returns to login page"
+    selector: "#loginForm"
+    timeout: 3000
+    
+  - type: screenshot
+    description: "Final screenshot - back to login after complete system tour"
+    
+  - type: assertText
+    description: "Confirm successful completion - back at login screen"
+    selector: ".system-title"
+    expected: "企業資源規劃系統"

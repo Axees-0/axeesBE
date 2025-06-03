@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>財務管理 - 企業資源規劃系統</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #64748b;
+            --secondary-light: #f1f5f9;
+            
+            /* Status Colors */
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #0891b2;
+            
+            /* Neutral Colors */
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            
+            /* Typography */
+            --font-family: 'Microsoft JhengHei', 'PingFang TC', 'Noto Sans TC', 'Source Han Sans TC', system-ui, -apple-system, sans-serif;
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --font-3xl: 1.875rem;
+            --font-4xl: 2.25rem;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .navbar-logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .navbar-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-1);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: var(--space-3) var(--space-4);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .user-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .btn-logout {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: var(--space-2) var(--space-4);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #b91c1c;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--space-6);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: var(--font-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .financial-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .financial-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+            padding: var(--space-6);
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .financial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .financial-card.revenue {
+            background: linear-gradient(135deg, var(--success-color), #10b981);
+        }
+
+        .financial-card.expense {
+            background: linear-gradient(135deg, var(--danger-color), #ef4444);
+        }
+
+        .financial-card.profit {
+            background: linear-gradient(135deg, var(--warning-color), #f59e0b);
+        }
+
+        .financial-card.cash {
+            background: linear-gradient(135deg, var(--info-color), #06b6d4);
+        }
+
+        .financial-number {
+            font-size: var(--font-2xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-2);
+        }
+
+        .financial-label {
+            font-size: var(--font-sm);
+            opacity: 0.9;
+            margin-bottom: var(--space-2);
+        }
+
+        .financial-change {
+            font-size: var(--font-xs);
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+
+        .accounting-tabs {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: var(--space-6);
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab-button {
+            background-color: transparent;
+            border: none;
+            padding: var(--space-4) var(--space-6);
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .tab-content {
+            padding: var(--space-6);
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--surface-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: var(--space-4);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-sm);
+        }
+
+        .data-table th {
+            background-color: var(--secondary-light);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .data-table tr:hover {
+            background-color: var(--secondary-light);
+        }
+
+        .amount-positive {
+            color: var(--success-color);
+            font-weight: var(--font-semibold);
+        }
+
+        .amount-negative {
+            color: var(--danger-color);
+            font-weight: var(--font-semibold);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            font-family: var(--font-family);
+            background-color: var(--surface-color);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+
+        .chart-section {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .chart-container {
+            height: 300px;
+            background: linear-gradient(45deg, var(--primary-light), var(--secondary-light));
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .btn-sm {
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-xs);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #047857;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .balance-sheet {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+        }
+
+        .balance-section {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .balance-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+            text-align: center;
+            padding-bottom: var(--space-2);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .balance-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .balance-item:last-child {
+            border-bottom: none;
+            font-weight: var(--font-bold);
+            background-color: var(--primary-light);
+            padding: var(--space-3);
+            margin-top: var(--space-2);
+            border-radius: 0.375rem;
+        }
+
+        .footer {
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-4);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: var(--font-sm);
+        }
+
+        .quick-entry {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzI1NjNlYiIvPgo8cGF0aCBkPSJNOCAxMmgxNnY4SDh6IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="ERP Logo" class="navbar-logo">
+            <span class="navbar-title">企業資源規劃系統</span>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="index.html" class="nav-link">🏠 首頁</a></li>
+            <li><a href="orders.html" class="nav-link">🛒 訂單管理</a></li>
+            <li><a href="reports.html" class="nav-link">📈 報表管理</a></li>
+            <li><a href="inventory.html" class="nav-link">📦 庫存管理</a></li>
+            <li><a href="accounting.html" class="nav-link active">💰 財務管理</a></li>
+            <li><a href="settings.html" class="nav-link">⚙️ 系統設定</a></li>
+        </ul>
+        <div class="navbar-user">
+            <span class="user-name" id="currentUser">系統管理員</span>
+            <button class="btn-logout" onclick="logout()">🚪 登出</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">💰 財務管理</h1>
+            <div class="page-actions">
+                <button class="btn-primary" onclick="newJournalEntry()">📝 新增分錄</button>
+                <button class="btn-secondary" onclick="generateFinancialReport()">📊 產生報表</button>
+            </div>
+        </div>
+
+        <div class="financial-overview">
+            <div class="financial-card revenue">
+                <div class="financial-number">NT$ 4,892,150</div>
+                <div class="financial-label">💰 本月營收</div>
+                <div class="financial-change">
+                    📈 較上月增長 12.5%
+                </div>
+            </div>
+            <div class="financial-card expense">
+                <div class="financial-number">NT$ 3,247,800</div>
+                <div class="financial-label">💸 本月支出</div>
+                <div class="financial-change">
+                    📉 較上月減少 3.2%
+                </div>
+            </div>
+            <div class="financial-card profit">
+                <div class="financial-number">NT$ 1,644,350</div>
+                <div class="financial-label">💎 本月淨利</div>
+                <div class="financial-change">
+                    📈 較上月增長 28.7%
+                </div>
+            </div>
+            <div class="financial-card cash">
+                <div class="financial-number">NT$ 8,756,420</div>
+                <div class="financial-label">💳 現金餘額</div>
+                <div class="financial-change">
+                    🔄 資金充足
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-entry">
+            <h3 style="margin-bottom: var(--space-4); color: var(--text-primary);">⚡ 快速記帳</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">交易類型</label>
+                    <select class="form-select" id="transactionType">
+                        <option value="income">收入</option>
+                        <option value="expense">支出</option>
+                        <option value="transfer">轉帳</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">金額</label>
+                    <input type="number" class="form-input" id="quickAmount" placeholder="輸入金額" step="0.01">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">科目</label>
+                    <select class="form-select" id="accountCode">
+                        <option value="1001">現金</option>
+                        <option value="1101">應收帳款</option>
+                        <option value="2001">應付帳款</option>
+                        <option value="4001">銷售收入</option>
+                        <option value="5001">銷售成本</option>
+                        <option value="6001">管理費用</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">摘要</label>
+                    <input type="text" class="form-input" id="description" placeholder="交易說明">
+                </div>
+            </div>
+            <div style="display: flex; gap: var(--space-3); justify-content: flex-end;">
+                <button class="btn-primary" onclick="addQuickEntry()">💾 快速記錄</button>
+                <button class="btn-secondary" onclick="clearQuickEntry()">🔄 清除</button>
+            </div>
+        </div>
+
+        <div class="accounting-tabs">
+            <div class="tab-header">
+                <button class="tab-button active" onclick="switchTab('journal')">📖 日記帳</button>
+                <button class="tab-button" onclick="switchTab('ledger')">📊 總帳</button>
+                <button class="tab-button" onclick="switchTab('balance')">⚖️ 資產負債表</button>
+                <button class="tab-button" onclick="switchTab('income')">💹 損益表</button>
+            </div>
+            <div class="tab-content">
+                <div id="journal-panel" class="tab-panel active">
+                    <h4 style="margin-bottom: var(--space-4);">📖 日記帳 - 2024年3月</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>憑證號碼</th>
+                                <th>摘要</th>
+                                <th>科目</th>
+                                <th>借方</th>
+                                <th>貸方</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2024-03-15</td>
+                                <td>JE-2024-0315</td>
+                                <td>銷售商品收入</td>
+                                <td>1001-現金</td>
+                                <td class="amount-positive">NT$ 125,800</td>
+                                <td>-</td>
+                                <td><button class="btn-sm btn-primary">編輯</button></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>4001-銷售收入</td>
+                                <td>-</td>
+                                <td class="amount-positive">NT$ 125,800</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-14</td>
+                                <td>JE-2024-0314</td>
+                                <td>支付辦公用品費用</td>
+                                <td>6001-管理費用</td>
+                                <td class="amount-negative">NT$ 8,500</td>
+                                <td>-</td>
+                                <td><button class="btn-sm btn-primary">編輯</button></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>1001-現金</td>
+                                <td>-</td>
+                                <td class="amount-negative">NT$ 8,500</td>
+                                <td></td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-13</td>
+                                <td>JE-2024-0313</td>
+                                <td>客戶付款</td>
+                                <td>1001-現金</td>
+                                <td class="amount-positive">NT$ 67,200</td>
+                                <td>-</td>
+                                <td><button class="btn-sm btn-primary">編輯</button></td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td>1101-應收帳款</td>
+                                <td>-</td>
+                                <td class="amount-positive">NT$ 67,200</td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="ledger-panel" class="tab-panel">
+                    <h4 style="margin-bottom: var(--space-4);">📊 總帳 - 現金科目</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>日期</th>
+                                <th>憑證號碼</th>
+                                <th>摘要</th>
+                                <th>借方</th>
+                                <th>貸方</th>
+                                <th>餘額</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2024-03-01</td>
+                                <td>期初</td>
+                                <td>期初餘額</td>
+                                <td>-</td>
+                                <td>-</td>
+                                <td class="amount-positive">NT$ 8,500,000</td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-15</td>
+                                <td>JE-2024-0315</td>
+                                <td>銷售商品收入</td>
+                                <td class="amount-positive">NT$ 125,800</td>
+                                <td>-</td>
+                                <td class="amount-positive">NT$ 8,625,800</td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-14</td>
+                                <td>JE-2024-0314</td>
+                                <td>支付辦公用品費用</td>
+                                <td>-</td>
+                                <td class="amount-negative">NT$ 8,500</td>
+                                <td class="amount-positive">NT$ 8,617,300</td>
+                            </tr>
+                            <tr>
+                                <td>2024-03-13</td>
+                                <td>JE-2024-0313</td>
+                                <td>客戶付款</td>
+                                <td class="amount-positive">NT$ 67,200</td>
+                                <td>-</td>
+                                <td class="amount-positive">NT$ 8,684,500</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="balance-panel" class="tab-panel">
+                    <h4 style="margin-bottom: var(--space-4); text-align: center;">⚖️ 資產負債表 - 2024年3月31日</h4>
+                    <div class="balance-sheet">
+                        <div class="balance-section">
+                            <div class="balance-title">資產 Assets</div>
+                            <div class="balance-item">
+                                <span>流動資產:</span>
+                                <span></span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　現金</span>
+                                <span>NT$ 8,756,420</span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　應收帳款</span>
+                                <span>NT$ 2,145,800</span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　存貨</span>
+                                <span>NT$ 12,845,600</span>
+                            </div>
+                            <div class="balance-item">
+                                <span>固定資產:</span>
+                                <span></span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　設備</span>
+                                <span>NT$ 5,250,000</span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　累計折舊</span>
+                                <span>(NT$ 1,200,000)</span>
+                            </div>
+                            <div class="balance-item">
+                                <span><strong>資產總計</strong></span>
+                                <span><strong>NT$ 27,797,820</strong></span>
+                            </div>
+                        </div>
+
+                        <div class="balance-section">
+                            <div class="balance-title">負債與權益 Liabilities & Equity</div>
+                            <div class="balance-item">
+                                <span>流動負債:</span>
+                                <span></span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　應付帳款</span>
+                                <span>NT$ 1,856,400</span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　應付薪資</span>
+                                <span>NT$ 450,000</span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　應付稅款</span>
+                                <span>NT$ 320,000</span>
+                            </div>
+                            <div class="balance-item">
+                                <span>長期負債:</span>
+                                <span></span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　銀行借款</span>
+                                <span>NT$ 5,000,000</span>
+                            </div>
+                            <div class="balance-item">
+                                <span>股東權益:</span>
+                                <span></span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　股本</span>
+                                <span>NT$ 15,000,000</span>
+                            </div>
+                            <div class="balance-item">
+                                <span>　保留盈餘</span>
+                                <span>NT$ 5,171,420</span>
+                            </div>
+                            <div class="balance-item">
+                                <span><strong>負債與權益總計</strong></span>
+                                <span><strong>NT$ 27,797,820</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="income-panel" class="tab-panel">
+                    <h4 style="margin-bottom: var(--space-4); text-align: center;">💹 損益表 - 2024年3月</h4>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>項目</th>
+                                <th>本月金額</th>
+                                <th>累計金額</th>
+                                <th>較上月變動</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>營業收入</strong></td>
+                                <td class="amount-positive">NT$ 4,892,150</td>
+                                <td class="amount-positive">NT$ 14,256,800</td>
+                                <td style="color: var(--success-color);">+12.5%</td>
+                            </tr>
+                            <tr>
+                                <td>　銷售收入</td>
+                                <td class="amount-positive">NT$ 4,650,000</td>
+                                <td class="amount-positive">NT$ 13,580,000</td>
+                                <td style="color: var(--success-color);">+11.8%</td>
+                            </tr>
+                            <tr>
+                                <td>　其他收入</td>
+                                <td class="amount-positive">NT$ 242,150</td>
+                                <td class="amount-positive">NT$ 676,800</td>
+                                <td style="color: var(--success-color);">+18.2%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>營業成本</strong></td>
+                                <td class="amount-negative">NT$ 2,846,200</td>
+                                <td class="amount-negative">NT$ 8,254,800</td>
+                                <td style="color: var(--danger-color);">+8.5%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>營業毛利</strong></td>
+                                <td class="amount-positive">NT$ 2,045,950</td>
+                                <td class="amount-positive">NT$ 6,002,000</td>
+                                <td style="color: var(--success-color);">+18.7%</td>
+                            </tr>
+                            <tr>
+                                <td><strong>營業費用</strong></td>
+                                <td class="amount-negative">NT$ 401,600</td>
+                                <td class="amount-negative">NT$ 1,245,800</td>
+                                <td style="color: var(--success-color);">-5.2%</td>
+                            </tr>
+                            <tr>
+                                <td>　管理費用</td>
+                                <td class="amount-negative">NT$ 285,000</td>
+                                <td class="amount-negative">NT$ 890,000</td>
+                                <td style="color: var(--success-color);">-3.8%</td>
+                            </tr>
+                            <tr>
+                                <td>　銷售費用</td>
+                                <td class="amount-negative">NT$ 116,600</td>
+                                <td class="amount-negative">NT$ 355,800</td>
+                                <td style="color: var(--success-color);">-8.5%</td>
+                            </tr>
+                            <tr style="background-color: var(--primary-light);">
+                                <td><strong>營業淨利</strong></td>
+                                <td class="amount-positive"><strong>NT$ 1,644,350</strong></td>
+                                <td class="amount-positive"><strong>NT$ 4,756,200</strong></td>
+                                <td style="color: var(--success-color);"><strong>+28.7%</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="chart-section">
+            <h4 style="margin-bottom: var(--space-4);">📈 財務趨勢分析</h4>
+            <div class="chart-container">
+                <div class="chart-placeholder">
+                    <div style="font-size: var(--font-lg); margin-bottom: var(--space-2);">📊</div>
+                    <div style="font-weight: var(--font-semibold); margin-bottom: var(--space-2);">營收與支出趨勢圖</div>
+                    <div style="font-size: var(--font-sm); color: var(--text-secondary);">
+                        最近 6 個月的財務數據變化<br>
+                        營收持續成長，支出控制良好<br>
+                        淨利率維持在 33.6% 水準
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 企業資源規劃系統. 版權所有 | 技術支援: +886-2-1234-5678</p>
+    </footer>
+
+    <script>
+        // Authentication check
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (user.displayName) {
+                document.getElementById('currentUser').textContent = user.displayName;
+            }
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('確定要登出系統嗎？')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Tab switching
+        function switchTab(tabName) {
+            // Hide all tab panels
+            document.querySelectorAll('.tab-panel').forEach(panel => {
+                panel.classList.remove('active');
+            });
+            
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Show selected tab panel
+            document.getElementById(tabName + '-panel').classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+
+        // Quick entry functions
+        function addQuickEntry() {
+            const type = document.getElementById('transactionType').value;
+            const amount = document.getElementById('quickAmount').value;
+            const account = document.getElementById('accountCode').value;
+            const description = document.getElementById('description').value;
+            
+            if (!amount || !description) {
+                alert('請填寫金額和摘要');
+                return;
+            }
+            
+            const entryNumber = 'JE-' + new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            
+            alert(`記帳成功！\n\n憑證號碼: ${entryNumber}\n類型: ${getTransactionTypeName(type)}\n金額: NT$ ${parseFloat(amount).toLocaleString()}\n科目: ${getAccountName(account)}\n摘要: ${description}\n\n已自動更新相關帳冊`);
+            
+            clearQuickEntry();
+        }
+
+        function clearQuickEntry() {
+            document.getElementById('quickAmount').value = '';
+            document.getElementById('description').value = '';
+        }
+
+        function getTransactionTypeName(type) {
+            const types = {
+                'income': '收入',
+                'expense': '支出',
+                'transfer': '轉帳'
+            };
+            return types[type] || type;
+        }
+
+        function getAccountName(code) {
+            const accounts = {
+                '1001': '現金',
+                '1101': '應收帳款',
+                '2001': '應付帳款',
+                '4001': '銷售收入',
+                '5001': '銷售成本',
+                '6001': '管理費用'
+            };
+            return accounts[code] || code;
+        }
+
+        // Journal entry functions
+        function newJournalEntry() {
+            alert('📝 新增分錄功能\n\n✅ 支援功能:\n• 複式簿記分錄\n• 自動借貸平衡檢查\n• 多科目分錄處理\n• 憑證附件上傳\n\n📋 分錄流程:\n1. 選擇交易日期\n2. 輸入摘要說明\n3. 設定借方科目金額\n4. 設定貸方科目金額\n5. 系統自動驗證平衡\n\n🔍 驗證機制:\n• 借貸金額必須相等\n• 科目代碼有效性檢查\n• 憑證編號自動生成\n• 過帳狀態追蹤');
+        }
+
+        function generateFinancialReport() {
+            alert('📊 財務報表功能\n\n✅ 報表類型:\n• 資產負債表\n• 損益表 (P&L)\n• 現金流量表\n• 股東權益變動表\n\n📋 報表特色:\n• 即時數據更新\n• 多期間比較分析\n• 圖表視覺化呈現\n• Big5 編碼完全支援\n\n📤 輸出格式:\n• Excel 專業格式\n• PDF 正式報表\n• 線上即時查看\n• 自動排程產生\n\n🔍 分析功能:\n• 財務比率計算\n• 趨勢變動分析\n• 預算實績比較\n• 異常項目標示');
+        }
+
+        // Initialize page
+        function initAccountingPage() {
+            if (!checkAuth()) return;
+            
+            // Add financial animation effects
+            document.querySelectorAll('.financial-card').forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.transform = 'scale(1.02)';
+                    setTimeout(() => {
+                        card.style.transform = 'scale(1)';
+                    }, 200);
+                }, index * 100);
+            });
+            
+            // Update amounts with animation
+            animateFinancialNumbers();
+        }
+
+        function animateFinancialNumbers() {
+            const cards = document.querySelectorAll('.financial-number');
+            cards.forEach(card => {
+                const finalText = card.textContent;
+                card.textContent = 'NT$ 0';
+                
+                // Extract number from text
+                const match = finalText.match(/[\d,]+/);
+                if (match) {
+                    const targetValue = parseInt(match[0].replace(/,/g, ''));
+                    const increment = targetValue / 50;
+                    let current = 0;
+                    
+                    const timer = setInterval(() => {
+                        current += increment;
+                        if (current >= targetValue) {
+                            current = targetValue;
+                            clearInterval(timer);
+                        }
+                        
+                        card.textContent = `NT$ ${Math.floor(current).toLocaleString()}`;
+                    }, 30);
+                }
+            });
+        }
+
+        // Page load event
+        window.addEventListener('load', initAccountingPage);
+
+        // Add hover effects for table rows
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.data-table tbody tr').forEach(row => {
+                row.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'var(--primary-light)';
+                });
+                
+                row.addEventListener('mouseleave', function() {
+                    this.style.backgroundColor = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

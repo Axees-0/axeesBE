@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>庫存管理 - 企業資源規劃系統</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #64748b;
+            --secondary-light: #f1f5f9;
+            
+            /* Status Colors */
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #0891b2;
+            
+            /* Neutral Colors */
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            
+            /* Typography */
+            --font-family: 'Microsoft JhengHei', 'PingFang TC', 'Noto Sans TC', 'Source Han Sans TC', system-ui, -apple-system, sans-serif;
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --font-3xl: 1.875rem;
+            --font-4xl: 2.25rem;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .navbar-logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .navbar-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-1);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: var(--space-3) var(--space-4);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .user-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .btn-logout {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: var(--space-2) var(--space-4);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #b91c1c;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--space-6);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: var(--font-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-sm {
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-xs);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #047857;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-warning:hover {
+            background-color: #b45309;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+            padding: var(--space-6);
+            border-radius: 0.75rem;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(30px, -30px);
+        }
+
+        .stat-number {
+            font-size: var(--font-2xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            font-size: var(--font-sm);
+            opacity: 0.9;
+        }
+
+        .filters-section {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            font-family: var(--font-family);
+            background-color: var(--surface-color);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .table-container {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: var(--space-4);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-sm);
+        }
+
+        .data-table th {
+            background-color: var(--secondary-light);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tr:hover {
+            background-color: var(--secondary-light);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: var(--space-2);
+            justify-content: center;
+        }
+
+        .stock-level {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--space-1) var(--space-3);
+            border-radius: 1rem;
+            font-size: var(--font-xs);
+            font-weight: var(--font-medium);
+            gap: var(--space-1);
+        }
+
+        .stock-sufficient {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .stock-low {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .stock-critical {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .stock-out {
+            background-color: #e5e7eb;
+            color: #374151;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: var(--surface-color);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: var(--font-xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-xl);
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: var(--space-2);
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: var(--space-6);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-3);
+            padding: var(--space-6);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+
+        .alert {
+            padding: var(--space-3);
+            border-radius: 0.375rem;
+            margin-bottom: var(--space-4);
+            border: 1px solid;
+            font-size: var(--font-sm);
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            border-color: #f59e0b;
+            color: #d97706;
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            border-color: #22c55e;
+            color: #15803d;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .action-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-4);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            font-size: var(--font-2xl);
+            margin-bottom: var(--space-2);
+        }
+
+        .action-title {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .action-desc {
+            font-size: var(--font-xs);
+            color: var(--text-secondary);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .footer {
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-4);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: var(--font-sm);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzI1NjNlYiIvPgo8cGF0aCBkPSJNOCAxMmgxNnY4SDh6IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="ERP Logo" class="navbar-logo">
+            <span class="navbar-title">企業資源規劃系統</span>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="index.html" class="nav-link">🏠 首頁</a></li>
+            <li><a href="orders.html" class="nav-link">🛒 訂單管理</a></li>
+            <li><a href="reports.html" class="nav-link">📈 報表管理</a></li>
+            <li><a href="inventory.html" class="nav-link active">📦 庫存管理</a></li>
+            <li><a href="accounting.html" class="nav-link">💰 財務管理</a></li>
+            <li><a href="settings.html" class="nav-link">⚙️ 系統設定</a></li>
+        </ul>
+        <div class="navbar-user">
+            <span class="user-name" id="currentUser">系統管理員</span>
+            <button class="btn-logout" onclick="logout()">🚪 登出</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">📦 庫存管理</h1>
+            <div class="page-actions">
+                <button class="btn-primary" onclick="openNewProductModal()">➕ 新增商品</button>
+                <button class="btn-secondary" onclick="stockAdjustment()">📝 庫存調整</button>
+                <button class="btn-secondary" onclick="exportInventory()">📊 匯出庫存</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">1,523</div>
+                <div class="stat-label">📦 總庫存品項</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, var(--success-color), #10b981);">
+                <div class="stat-number">NT$ 12,845,600</div>
+                <div class="stat-label">💰 庫存總價值</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, var(--warning-color), #f59e0b);">
+                <div class="stat-number">47</div>
+                <div class="stat-label">⚠️ 低庫存預警</div>
+            </div>
+            <div class="stat-card" style="background: linear-gradient(135deg, var(--danger-color), #ef4444);">
+                <div class="stat-number">8</div>
+                <div class="stat-label">🚨 缺貨商品</div>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <div class="action-card" onclick="stockReceiving()">
+                <div class="action-icon">📥</div>
+                <div class="action-title">進貨作業</div>
+                <div class="action-desc">新增進貨單據</div>
+            </div>
+            <div class="action-card" onclick="stockShipping()">
+                <div class="action-icon">📤</div>
+                <div class="action-title">出貨作業</div>
+                <div class="action-desc">處理出貨單據</div>
+            </div>
+            <div class="action-card" onclick="stockCount()">
+                <div class="action-icon">📋</div>
+                <div class="action-title">盤點作業</div>
+                <div class="action-desc">執行庫存盤點</div>
+            </div>
+            <div class="action-card" onclick="stockTransfer()">
+                <div class="action-icon">🔄</div>
+                <div class="action-title">調撥作業</div>
+                <div class="action-desc">庫間調撥轉移</div>
+            </div>
+        </div>
+
+        <div class="alert alert-warning">
+            <strong>⚠️ 庫存預警通知:</strong> 目前有 47 項商品庫存量低於安全水位，8 項商品已缺貨，請及時補貨。
+        </div>
+
+        <div class="filters-section">
+            <h3 style="margin-bottom: var(--space-4); color: var(--text-primary);">🔍 商品篩選</h3>
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label class="form-label">商品編號</label>
+                    <input type="text" class="form-input" id="searchProductCode" placeholder="輸入商品編號">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">商品名稱</label>
+                    <input type="text" class="form-input" id="searchProductName" placeholder="輸入商品名稱">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">商品分類</label>
+                    <select class="form-select" id="filterCategory">
+                        <option value="">全部分類</option>
+                        <option value="electronics">電子零件</option>
+                        <option value="mechanical">機械零件</option>
+                        <option value="raw-materials">原物料</option>
+                        <option value="finished-goods">成品</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">庫存狀態</label>
+                    <select class="form-select" id="filterStockLevel">
+                        <option value="">全部狀態</option>
+                        <option value="sufficient">庫存充足</option>
+                        <option value="low">庫存偏低</option>
+                        <option value="critical">庫存緊急</option>
+                        <option value="out">缺貨</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: var(--space-3);">
+                <button class="btn-primary" onclick="applyFilters()">🔍 搜尋</button>
+                <button class="btn-secondary" onclick="clearFilters()">🔄 清除</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>商品編號</th>
+                        <th>商品名稱</th>
+                        <th>分類</th>
+                        <th>現有庫存</th>
+                        <th>安全庫存</th>
+                        <th>庫存狀態</th>
+                        <th>單位成本</th>
+                        <th>總價值</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTableBody">
+                    <!-- 資料由 JavaScript 動態載入 -->
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- 新增/編輯商品模態框 -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">新增商品</h2>
+                <button class="modal-close" onclick="closeProductModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="productForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">商品編號 *</label>
+                            <input type="text" class="form-input" id="productCode" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">商品名稱 *</label>
+                            <input type="text" class="form-input" id="productName" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">商品分類</label>
+                            <select class="form-select" id="productCategory">
+                                <option value="electronics">電子零件</option>
+                                <option value="mechanical">機械零件</option>
+                                <option value="raw-materials">原物料</option>
+                                <option value="finished-goods">成品</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">計量單位</label>
+                            <select class="form-select" id="productUnit">
+                                <option value="pcs">個</option>
+                                <option value="kg">公斤</option>
+                                <option value="m">公尺</option>
+                                <option value="box">箱</option>
+                                <option value="set">組</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">單位成本</label>
+                            <input type="number" class="form-input" id="unitCost" step="0.01" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">建議售價</label>
+                            <input type="number" class="form-input" id="unitPrice" step="0.01" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">初始庫存</label>
+                            <input type="number" class="form-input" id="initialStock" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">安全庫存</label>
+                            <input type="number" class="form-input" id="safetyStock" min="0" value="10">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">儲存位置</label>
+                        <input type="text" class="form-input" id="storageLocation" placeholder="例: A區-01架-03層">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">商品描述</label>
+                        <textarea class="form-input" id="productDescription" rows="3" placeholder="商品詳細描述"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeProductModal()">取消</button>
+                <button type="button" class="btn-primary" onclick="saveProduct()">💾 儲存商品</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 企業資源規劃系統. 版權所有 | 技術支援: +886-2-1234-5678</p>
+    </footer>
+
+    <script>
+        // Sample inventory data
+        let inventoryData = [
+            { code: 'A1001', name: '精密零件 A1001', category: 'electronics', stock: 150, safety: 50, cost: 1200, status: 'sufficient', location: 'A區-01架-01層' },
+            { code: 'A1002', name: '電子模組 A1002', category: 'electronics', stock: 25, safety: 30, cost: 2500, status: 'low', location: 'A區-01架-02層' },
+            { code: 'B2001', name: '機械齒輪 B2001', category: 'mechanical', stock: 0, safety: 20, cost: 800, status: 'out', location: 'B區-05架-01層' },
+            { code: 'B2002', name: '軸承組 B2002', category: 'mechanical', stock: 5, safety: 15, cost: 450, status: 'critical', location: 'B區-05架-02層' },
+            { code: 'C3001', name: '鋼材原料 C3001', category: 'raw-materials', stock: 500, safety: 100, cost: 150, status: 'sufficient', location: 'C區-原料倉' },
+            { code: 'C3002', name: '塑膠粒子 C3002', category: 'raw-materials', stock: 80, safety: 100, cost: 85, status: 'low', location: 'C區-原料倉' },
+            { code: 'D4001', name: '完成品 D4001', category: 'finished-goods', stock: 200, safety: 50, cost: 3500, status: 'sufficient', location: 'D區-成品倉' },
+            { code: 'D4002', name: '組裝品 D4002', category: 'finished-goods', stock: 15, safety: 25, cost: 2800, status: 'low', location: 'D區-成品倉' },
+        ];
+
+        let filteredInventory = [...inventoryData];
+
+        // Authentication check
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (user.displayName) {
+                document.getElementById('currentUser').textContent = user.displayName;
+            }
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('確定要登出系統嗎？')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Render inventory table
+        function renderInventoryTable() {
+            const tbody = document.getElementById('inventoryTableBody');
+            
+            tbody.innerHTML = filteredInventory.map(item => {
+                const totalValue = item.stock * item.cost;
+                const statusClass = `stock-${item.status}`;
+                const statusText = {
+                    'sufficient': '✅ 庫存充足',
+                    'low': '⚠️ 庫存偏低',
+                    'critical': '🚨 庫存緊急',
+                    'out': '❌ 缺貨'
+                }[item.status];
+
+                return `
+                    <tr>
+                        <td><strong>${item.code}</strong></td>
+                        <td>${item.name}</td>
+                        <td>${getCategoryName(item.category)}</td>
+                        <td><strong>${item.stock}</strong></td>
+                        <td>${item.safety}</td>
+                        <td><span class="stock-level ${statusClass}">${statusText}</span></td>
+                        <td>NT$ ${item.cost.toLocaleString()}</td>
+                        <td><strong>NT$ ${totalValue.toLocaleString()}</strong></td>
+                        <td class="table-actions">
+                            <button class="btn-sm btn-success" onclick="adjustStock('${item.code}')">調整</button>
+                            <button class="btn-sm btn-primary" onclick="editProduct('${item.code}')">編輯</button>
+                            <button class="btn-sm btn-danger" onclick="deleteProduct('${item.code}')">刪除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function getCategoryName(category) {
+            const categories = {
+                'electronics': '電子零件',
+                'mechanical': '機械零件',
+                'raw-materials': '原物料',
+                'finished-goods': '成品'
+            };
+            return categories[category] || category;
+        }
+
+        // Filter functions
+        function applyFilters() {
+            const productCode = document.getElementById('searchProductCode').value.toLowerCase();
+            const productName = document.getElementById('searchProductName').value.toLowerCase();
+            const category = document.getElementById('filterCategory').value;
+            const stockLevel = document.getElementById('filterStockLevel').value;
+
+            filteredInventory = inventoryData.filter(item => {
+                let matches = true;
+                
+                if (productCode && !item.code.toLowerCase().includes(productCode)) matches = false;
+                if (productName && !item.name.toLowerCase().includes(productName)) matches = false;
+                if (category && item.category !== category) matches = false;
+                if (stockLevel && item.status !== stockLevel) matches = false;
+                
+                return matches;
+            });
+
+            renderInventoryTable();
+        }
+
+        function clearFilters() {
+            document.getElementById('searchProductCode').value = '';
+            document.getElementById('searchProductName').value = '';
+            document.getElementById('filterCategory').value = '';
+            document.getElementById('filterStockLevel').value = '';
+            
+            filteredInventory = [...inventoryData];
+            renderInventoryTable();
+        }
+
+        // Modal functions
+        function openNewProductModal() {
+            document.getElementById('modalTitle').textContent = '新增商品';
+            document.getElementById('productModal').style.display = 'block';
+            document.getElementById('productCode').value = generateProductCode();
+        }
+
+        function closeProductModal() {
+            document.getElementById('productModal').style.display = 'none';
+            document.getElementById('productForm').reset();
+        }
+
+        function generateProductCode() {
+            const prefix = 'P';
+            const timestamp = Date.now().toString().slice(-6);
+            return prefix + timestamp;
+        }
+
+        function editProduct(productCode) {
+            const product = inventoryData.find(p => p.code === productCode);
+            if (product) {
+                document.getElementById('modalTitle').textContent = '編輯商品 - ' + productCode;
+                document.getElementById('productCode').value = product.code;
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productCategory').value = product.category;
+                document.getElementById('initialStock').value = product.stock;
+                document.getElementById('safetyStock').value = product.safety;
+                document.getElementById('unitCost').value = product.cost;
+                document.getElementById('storageLocation').value = product.location;
+                document.getElementById('productModal').style.display = 'block';
+            }
+        }
+
+        function saveProduct() {
+            const productCode = document.getElementById('productCode').value;
+            const productName = document.getElementById('productName').value;
+            
+            if (!productCode || !productName) {
+                alert('請填寫必要欄位：商品編號和商品名稱');
+                return;
+            }
+
+            const newProduct = {
+                code: productCode,
+                name: productName,
+                category: document.getElementById('productCategory').value,
+                stock: parseInt(document.getElementById('initialStock').value) || 0,
+                safety: parseInt(document.getElementById('safetyStock').value) || 10,
+                cost: parseFloat(document.getElementById('unitCost').value) || 0,
+                status: 'sufficient',
+                location: document.getElementById('storageLocation').value || ''
+            };
+
+            // Update stock status based on stock level
+            if (newProduct.stock === 0) {
+                newProduct.status = 'out';
+            } else if (newProduct.stock < newProduct.safety * 0.5) {
+                newProduct.status = 'critical';
+            } else if (newProduct.stock < newProduct.safety) {
+                newProduct.status = 'low';
+            }
+
+            const existingIndex = inventoryData.findIndex(p => p.code === productCode);
+            if (existingIndex >= 0) {
+                inventoryData[existingIndex] = newProduct;
+            } else {
+                inventoryData.unshift(newProduct);
+            }
+
+            filteredInventory = [...inventoryData];
+            renderInventoryTable();
+            closeProductModal();
+            
+            alert(`商品 ${productCode} 已成功${existingIndex >= 0 ? '更新' : '新增'}！`);
+        }
+
+        function deleteProduct(productCode) {
+            if (confirm(`確定要刪除商品 ${productCode} 嗎？此操作無法復原。`)) {
+                inventoryData = inventoryData.filter(product => product.code !== productCode);
+                filteredInventory = filteredInventory.filter(product => product.code !== productCode);
+                renderInventoryTable();
+                alert('商品已刪除');
+            }
+        }
+
+        // Stock operations
+        function adjustStock(productCode) {
+            const product = inventoryData.find(p => p.code === productCode);
+            if (product) {
+                const newStock = prompt(`調整庫存數量\n\n商品: ${product.name}\n目前庫存: ${product.stock}\n安全庫存: ${product.safety}\n\n請輸入新的庫存數量:`, product.stock);
+                
+                if (newStock !== null && !isNaN(newStock) && newStock >= 0) {
+                    const oldStock = product.stock;
+                    product.stock = parseInt(newStock);
+                    
+                    // Update stock status
+                    if (product.stock === 0) {
+                        product.status = 'out';
+                    } else if (product.stock < product.safety * 0.5) {
+                        product.status = 'critical';
+                    } else if (product.stock < product.safety) {
+                        product.status = 'low';
+                    } else {
+                        product.status = 'sufficient';
+                    }
+                    
+                    filteredInventory = [...inventoryData];
+                    renderInventoryTable();
+                    
+                    const change = product.stock - oldStock;
+                    const changeText = change > 0 ? `增加 ${change}` : `減少 ${Math.abs(change)}`;
+                    alert(`庫存調整完成\n\n商品: ${product.name}\n原庫存: ${oldStock}\n新庫存: ${product.stock}\n異動: ${changeText}`);
+                }
+            }
+        }
+
+        function stockReceiving() {
+            alert('📥 進貨作業功能\n\n✅ 支援功能:\n• 建立進貨單據\n• 掃描條碼入庫\n• 批次商品驗收\n• 供應商資料管理\n\n📋 進貨流程:\n1. 選擇供應商\n2. 輸入商品明細\n3. 驗收確認\n4. 自動更新庫存\n\n🔍 追蹤記錄:\n• 進貨日期時間\n• 驗收人員\n• 品質檢驗結果\n• 成本計算');
+        }
+
+        function stockShipping() {
+            alert('📤 出貨作業功能\n\n✅ 支援功能:\n• 建立出貨單據\n• 揀貨作業管理\n• 包裝標籤列印\n• 物流追蹤整合\n\n📋 出貨流程:\n1. 訂單轉出貨單\n2. 庫存檢查確認\n3. 揀貨包裝\n4. 自動扣減庫存\n\n🔍 追蹤記錄:\n• 出貨日期時間\n• 揀貨人員\n• 客戶簽收狀態\n• 運費計算');
+        }
+
+        function stockCount() {
+            alert('📋 盤點作業功能\n\n✅ 支援功能:\n• 定期盤點排程\n• 循環盤點管理\n• 盤點差異分析\n• 條碼掃描盤點\n\n📋 盤點流程:\n1. 建立盤點計畫\n2. 凍結庫存異動\n3. 實地盤點作業\n4. 差異調整處理\n\n🔍 分析報表:\n• 盤點準確率\n• 差異原因分析\n• 盤點效率統計\n• 成本差異影響');
+        }
+
+        function stockTransfer() {
+            alert('🔄 調撥作業功能\n\n✅ 支援功能:\n• 倉庫間調撥\n• 部門間轉移\n• 批次調撥處理\n• 在途庫存追蹤\n\n📋 調撥流程:\n1. 建立調撥申請\n2. 審核批准流程\n3. 出庫入庫確認\n4. 庫存自動調整\n\n🔍 管理控制:\n• 調撥權限控制\n• 異動記錄追蹤\n• 成本結轉計算\n• 調撥效率分析');
+        }
+
+        function stockAdjustment() {
+            alert('📝 庫存調整功能\n\n✅ 調整類型:\n• 盤點差異調整\n• 報廢損耗處理\n• 贈品樣品扣減\n• 錯誤更正調整\n\n📋 調整流程:\n1. 選擇調整原因\n2. 輸入調整數量\n3. 審核批准確認\n4. 生成調整單據\n\n🔍 控制機制:\n• 調整權限管控\n• 審批流程管理\n• 差異分析報告\n• 成本影響計算');
+        }
+
+        function exportInventory() {
+            alert('📊 庫存匯出功能\n\n✅ 匯出格式:\n• Excel 庫存明細表\n• PDF 庫存報告\n• CSV 原始資料\n• 條碼標籤列印\n\n🈶 Big5 編碼支援:\n• 繁體中文完美顯示\n• 自訂報表格式\n• 多工作表輸出\n• 圖表統計分析\n\n📋 包含內容:\n• 商品基本資料\n• 庫存數量狀態\n• 價值金額統計\n• 異動歷史記錄');
+        }
+
+        // Initialize page
+        function initInventoryPage() {
+            if (!checkAuth()) return;
+            
+            renderInventoryTable();
+        }
+
+        // Page load event
+        window.addEventListener('load', initInventoryPage);
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('productModal');
+            if (event.target === modal) {
+                closeProductModal();
+            }
+        });
+    </script>
+</body>
+</html>

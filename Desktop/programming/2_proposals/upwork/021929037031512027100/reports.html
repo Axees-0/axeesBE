@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>報表管理 - 企業資源規劃系統</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #64748b;
+            --secondary-light: #f1f5f9;
+            
+            /* Status Colors */
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #0891b2;
+            
+            /* Neutral Colors */
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            
+            /* Typography */
+            --font-family: 'Microsoft JhengHei', 'PingFang TC', 'Noto Sans TC', 'Source Han Sans TC', system-ui, -apple-system, sans-serif;
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --font-3xl: 1.875rem;
+            --font-4xl: 2.25rem;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .navbar-logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .navbar-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-1);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: var(--space-3) var(--space-4);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .user-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .btn-logout {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: var(--space-2) var(--space-4);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #b91c1c;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--space-6);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: var(--font-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .reports-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .card-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .report-card {
+            background: linear-gradient(135deg, var(--surface-color), var(--secondary-light));
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: var(--space-6);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .report-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-color);
+        }
+
+        .report-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-color);
+            transition: width 0.3s ease;
+        }
+
+        .report-card:hover::before {
+            width: 8px;
+        }
+
+        .report-icon {
+            font-size: var(--font-3xl);
+            margin-bottom: var(--space-3);
+        }
+
+        .report-title {
+            font-size: var(--font-xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .report-description {
+            color: var(--text-secondary);
+            font-size: var(--font-sm);
+            line-height: 1.5;
+            margin-bottom: var(--space-4);
+        }
+
+        .report-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .btn-sm {
+            padding: var(--space-2) var(--space-4);
+            font-size: var(--font-xs);
+        }
+
+        .chart-container {
+            height: 400px;
+            background: linear-gradient(45deg, var(--primary-light), var(--secondary-light));
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: var(--space-6);
+        }
+
+        .chart-placeholder {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .chart-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-2);
+        }
+
+        .filter-panel {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            font-family: var(--font-family);
+            background-color: var(--surface-color);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--surface-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: var(--space-4);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-sm);
+        }
+
+        .data-table th {
+            background-color: var(--secondary-light);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .data-table tr:hover {
+            background-color: var(--secondary-light);
+        }
+
+        .export-formats {
+            display: flex;
+            gap: var(--space-3);
+            margin-top: var(--space-4);
+        }
+
+        .format-btn {
+            padding: var(--space-3) var(--space-4);
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: var(--surface-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .format-btn:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .format-icon {
+            font-size: var(--font-lg);
+            margin-bottom: var(--space-2);
+        }
+
+        .format-label {
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .format-desc {
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, var(--primary-color), var(--info-color));
+            color: white;
+            padding: var(--space-6);
+            border-radius: 0.75rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(20px, -20px);
+        }
+
+        .stat-number {
+            font-size: var(--font-2xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            font-size: var(--font-sm);
+            opacity: 0.9;
+        }
+
+        .demo-notice {
+            background: linear-gradient(135deg, var(--warning-color), #f59e0b);
+            color: white;
+            padding: var(--space-4);
+            border-radius: 0.5rem;
+            margin-bottom: var(--space-6);
+            text-align: center;
+        }
+
+        .footer {
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-4);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: var(--font-sm);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzI1NjNlYiIvPgo8cGF0aCBkPSJNOCAxMmgxNnY4SDh6IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="ERP Logo" class="navbar-logo">
+            <span class="navbar-title">企業資源規劃系統</span>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="index.html" class="nav-link">🏠 首頁</a></li>
+            <li><a href="orders.html" class="nav-link">🛒 訂單管理</a></li>
+            <li><a href="reports.html" class="nav-link active">📈 報表管理</a></li>
+            <li><a href="inventory.html" class="nav-link">📦 庫存管理</a></li>
+            <li><a href="accounting.html" class="nav-link">💰 財務管理</a></li>
+            <li><a href="settings.html" class="nav-link">⚙️ 系統設定</a></li>
+        </ul>
+        <div class="navbar-user">
+            <span class="user-name" id="currentUser">系統管理員</span>
+            <button class="btn-logout" onclick="logout()">🚪 登出</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">📈 報表管理</h1>
+            <div class="page-actions">
+                <button class="btn-primary" onclick="scheduleReport()">⏰ 排程報表</button>
+                <button class="btn-secondary" onclick="showReportHistory()">📋 報表歷史</button>
+            </div>
+        </div>
+
+        <div class="demo-notice">
+            <strong>🎯 Big5 編碼報表展示</strong> - 本系統完全支援繁體中文 Big5 編碼，確保匯出的 Excel/PDF 報表正確顯示中文內容
+        </div>
+
+        <div class="stats-overview">
+            <div class="stat-item">
+                <div class="stat-number">47</div>
+                <div class="stat-label">本月已產生報表</div>
+            </div>
+            <div class="stat-item" style="background: linear-gradient(135deg, var(--success-color), #10b981);">
+                <div class="stat-number">156</div>
+                <div class="stat-label">總計匯出次數</div>
+            </div>
+            <div class="stat-item" style="background: linear-gradient(135deg, var(--warning-color), #f59e0b);">
+                <div class="stat-number">12</div>
+                <div class="stat-label">排程報表任務</div>
+            </div>
+            <div class="stat-item" style="background: linear-gradient(135deg, var(--info-color), #06b6d4);">
+                <div class="stat-number">98.5%</div>
+                <div class="stat-label">報表產生成功率</div>
+            </div>
+        </div>
+
+        <div class="filter-panel">
+            <h3 style="margin-bottom: var(--space-4); color: var(--text-primary);">🔍 報表篩選條件</h3>
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label class="form-label">報表類型</label>
+                    <select class="form-select" id="reportType">
+                        <option value="">全部類型</option>
+                        <option value="sales">銷售報表</option>
+                        <option value="inventory">庫存報表</option>
+                        <option value="financial">財務報表</option>
+                        <option value="customer">客戶分析</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">起始日期</label>
+                    <input type="date" class="form-input" id="startDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">結束日期</label>
+                    <input type="date" class="form-input" id="endDate">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">部門</label>
+                    <select class="form-select" id="department">
+                        <option value="">全部部門</option>
+                        <option value="sales">業務部</option>
+                        <option value="logistics">物流部</option>
+                        <option value="finance">財務部</option>
+                        <option value="hr">人資部</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: var(--space-3);">
+                <button class="btn-primary" onclick="generateCustomReport()">📊 產生報表</button>
+                <button class="btn-secondary" onclick="resetFilters()">🔄 重設條件</button>
+            </div>
+        </div>
+
+        <div class="reports-grid">
+            <div class="report-card" onclick="generateSalesReport()">
+                <div class="report-icon">📊</div>
+                <div class="report-title">銷售業績報表</div>
+                <div class="report-description">
+                    詳細的銷售數據分析，包含月度、季度、年度銷售趨勢，客戶成交分析，產品銷售排行等。
+                </div>
+                <div class="report-actions">
+                    <button class="btn-primary btn-sm">立即產生</button>
+                    <button class="btn-secondary btn-sm">預覽範本</button>
+                </div>
+            </div>
+
+            <div class="report-card" onclick="generateInventoryReport()">
+                <div class="report-icon">📦</div>
+                <div class="report-title">庫存狀況報表</div>
+                <div class="report-description">
+                    庫存數量統計、安全庫存預警、進出庫記錄分析、庫存週轉率計算等詳細庫存管理資訊。
+                </div>
+                <div class="report-actions">
+                    <button class="btn-primary btn-sm">立即產生</button>
+                    <button class="btn-secondary btn-sm">預覽範本</button>
+                </div>
+            </div>
+
+            <div class="report-card" onclick="generateFinancialReport()">
+                <div class="report-icon">💰</div>
+                <div class="report-title">財務收支報表</div>
+                <div class="report-description">
+                    營收統計、成本分析、毛利率計算、應收應付款項管理、現金流量分析等財務關鍵指標。
+                </div>
+                <div class="report-actions">
+                    <button class="btn-primary btn-sm">立即產生</button>
+                    <button class="btn-secondary btn-sm">預覽範本</button>
+                </div>
+            </div>
+
+            <div class="report-card" onclick="generateCustomerReport()">
+                <div class="report-icon">👥</div>
+                <div class="report-title">客戶分析報表</div>
+                <div class="report-description">
+                    客戶消費行為分析、客戶價值評估、客戶滿意度調查、客戶留存率統計等客戶關係管理數據。
+                </div>
+                <div class="report-actions">
+                    <button class="btn-primary btn-sm">立即產生</button>
+                    <button class="btn-secondary btn-sm">預覽範本</button>
+                </div>
+            </div>
+
+            <div class="report-card" onclick="generateProductReport()">
+                <div class="report-icon">🏷️</div>
+                <div class="report-title">產品效能報表</div>
+                <div class="report-description">
+                    產品銷售排行、產品獲利分析、產品生命週期追蹤、新產品推廣效果評估等產品管理資訊。
+                </div>
+                <div class="report-actions">
+                    <button class="btn-primary btn-sm">立即產生</button>
+                    <button class="btn-secondary btn-sm">預覽範本</button>
+                </div>
+            </div>
+
+            <div class="report-card" onclick="generateOperationalReport()">
+                <div class="report-icon">⚙️</div>
+                <div class="report-title">營運效率報表</div>
+                <div class="report-description">
+                    訂單處理時間、出貨效率、退貨率分析、員工績效統計、部門協作效率等營運管理指標。
+                </div>
+                <div class="report-actions">
+                    <button class="btn-primary btn-sm">立即產生</button>
+                    <button class="btn-secondary btn-sm">預覽範本</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">📊 即時數據視覺化</h3>
+            </div>
+            <div class="chart-container">
+                <div class="chart-placeholder">
+                    <div class="chart-title">銷售趨勢圖表</div>
+                    <div style="font-size: var(--font-sm); margin-bottom: var(--space-4); color: var(--text-secondary);">
+                        展示最近 12 個月的銷售數據變化趨勢
+                    </div>
+                    <div style="font-size: var(--font-lg);">📈</div>
+                    <div style="margin-top: var(--space-2);">
+                        本月銷售額: <strong>NT$ 4,892,150</strong><br>
+                        較上月成長: <span style="color: var(--success-color);">↗️ +12.5%</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h4 style="margin-bottom: var(--space-4);">📤 匯出格式選擇</h4>
+            <div class="export-formats">
+                <div class="format-btn" onclick="exportToExcel()">
+                    <div class="format-icon">📊</div>
+                    <div class="format-label">Excel 檔案</div>
+                    <div class="format-desc">Big5 完全支援</div>
+                </div>
+                <div class="format-btn" onclick="exportToPDF()">
+                    <div class="format-icon">📄</div>
+                    <div class="format-label">PDF 報表</div>
+                    <div class="format-desc">專業格式</div>
+                </div>
+                <div class="format-btn" onclick="exportToCSV()">
+                    <div class="format-icon">📋</div>
+                    <div class="format-label">CSV 資料</div>
+                    <div class="format-desc">通用格式</div>
+                </div>
+                <div class="format-btn" onclick="exportToWord()">
+                    <div class="format-icon">📝</div>
+                    <div class="format-label">Word 文件</div>
+                    <div class="format-desc">詳細報告</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" style="margin-top: var(--space-6);">
+            <div class="card-header">
+                <h3 class="card-title">📋 最近產生的報表</h3>
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>報表名稱</th>
+                        <th>類型</th>
+                        <th>產生時間</th>
+                        <th>檔案大小</th>
+                        <th>狀態</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>2024年3月銷售報表</strong></td>
+                        <td>銷售報表</td>
+                        <td>2024-03-15 14:30</td>
+                        <td>2.5 MB</td>
+                        <td><span style="color: var(--success-color);">✅ 已完成</span></td>
+                        <td>
+                            <button class="btn-primary btn-sm" onclick="downloadReport('sales-202403')">下載</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>庫存週報_第11週</strong></td>
+                        <td>庫存報表</td>
+                        <td>2024-03-14 09:15</td>
+                        <td>1.8 MB</td>
+                        <td><span style="color: var(--success-color);">✅ 已完成</span></td>
+                        <td>
+                            <button class="btn-primary btn-sm" onclick="downloadReport('inventory-w11')">下載</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>客戶分析月報</strong></td>
+                        <td>客戶分析</td>
+                        <td>2024-03-13 16:45</td>
+                        <td>3.2 MB</td>
+                        <td><span style="color: var(--info-color);">🔄 處理中</span></td>
+                        <td>
+                            <button class="btn-secondary btn-sm" disabled>等待中</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>財務收支統計表</strong></td>
+                        <td>財務報表</td>
+                        <td>2024-03-12 11:20</td>
+                        <td>4.1 MB</td>
+                        <td><span style="color: var(--success-color);">✅ 已完成</span></td>
+                        <td>
+                            <button class="btn-primary btn-sm" onclick="downloadReport('finance-202403')">下載</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 企業資源規劃系統. 版權所有 | 技術支援: +886-2-1234-5678</p>
+    </footer>
+
+    <script>
+        // Authentication check
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (user.displayName) {
+                document.getElementById('currentUser').textContent = user.displayName;
+            }
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('確定要登出系統嗎？')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Report generation functions
+        function generateSalesReport() {
+            showGeneratingProgress('銷售業績報表');
+        }
+
+        function generateInventoryReport() {
+            showGeneratingProgress('庫存狀況報表');
+        }
+
+        function generateFinancialReport() {
+            showGeneratingProgress('財務收支報表');
+        }
+
+        function generateCustomerReport() {
+            showGeneratingProgress('客戶分析報表');
+        }
+
+        function generateProductReport() {
+            showGeneratingProgress('產品效能報表');
+        }
+
+        function generateOperationalReport() {
+            showGeneratingProgress('營運效率報表');
+        }
+
+        function generateCustomReport() {
+            const reportType = document.getElementById('reportType').value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            const department = document.getElementById('department').value;
+            
+            if (!startDate || !endDate) {
+                alert('請選擇起始日期和結束日期');
+                return;
+            }
+            
+            const reportName = reportType ? `${getReportTypeName(reportType)}自訂報表` : '綜合分析報表';
+            showGeneratingProgress(reportName);
+        }
+
+        function getReportTypeName(type) {
+            const types = {
+                'sales': '銷售',
+                'inventory': '庫存',
+                'financial': '財務',
+                'customer': '客戶'
+            };
+            return types[type] || '綜合';
+        }
+
+        function showGeneratingProgress(reportName) {
+            const progressHtml = `
+                <div style="text-align: center; padding: var(--space-8);">
+                    <div style="font-size: var(--font-2xl); margin-bottom: var(--space-4);">⏳</div>
+                    <h3>正在產生報表...</h3>
+                    <p style="color: var(--text-secondary); margin: var(--space-4) 0;">
+                        ${reportName}<br>
+                        預計完成時間: 2-3 分鐘
+                    </p>
+                    <div style="background-color: var(--border-color); height: 8px; border-radius: 4px; overflow: hidden; margin: var(--space-4) auto; max-width: 300px;">
+                        <div id="progressBar" style="background-color: var(--primary-color); height: 100%; width: 0%; transition: width 0.5s ease;"></div>
+                    </div>
+                    <p style="font-size: var(--font-sm); color: var(--text-muted);">
+                        ✅ 支援 Big5 編碼<br>
+                        ✅ 自動 Excel/PDF 格式化<br>
+                        ✅ 繁體中文完美支援
+                    </p>
+                </div>
+            `;
+            
+            // 創建模態框
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                background: rgba(0,0,0,0.5); z-index: 1000; display: flex; 
+                align-items: center; justify-content: center;
+            `;
+            
+            const content = document.createElement('div');
+            content.style.cssText = `
+                background: white; padding: var(--space-8); border-radius: 0.5rem; 
+                max-width: 500px; width: 90%; box-shadow: var(--shadow-lg);
+            `;
+            content.innerHTML = progressHtml;
+            
+            modal.appendChild(content);
+            document.body.appendChild(modal);
+            
+            // 模擬進度
+            let progress = 0;
+            const progressBar = content.querySelector('#progressBar');
+            const interval = setInterval(() => {
+                progress += Math.random() * 30;
+                if (progress > 100) progress = 100;
+                progressBar.style.width = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        modal.remove();
+                        showReportComplete(reportName);
+                    }, 500);
+                }
+            }, 300);
+        }
+
+        function showReportComplete(reportName) {
+            alert(`報表產生完成！\n\n📊 報表名稱: ${reportName}\n📁 檔案格式: Excel (.xlsx) + PDF\n💾 檔案大小: 2.3 MB\n🈶 編碼格式: Big5 完全支援\n\n✅ 報表已儲存至系統，可至「報表歷史」查看下載`);
+        }
+
+        // Export functions
+        function exportToExcel() {
+            alert('📊 Excel 匯出功能展示\n\n✅ 支援格式:\n• .xlsx (Excel 2007+)\n• .xls (Excel 97-2003)\n\n🈶 Big5 編碼特色:\n• 繁體中文完美顯示\n• 自動欄位寬度調整\n• 專業圖表格式\n• 多工作表支援\n\n📋 包含內容:\n• 詳細資料表格\n• 統計圖表\n• 摘要分析');
+        }
+
+        function exportToPDF() {
+            alert('📄 PDF 匯出功能展示\n\n✅ 專業特色:\n• A4 標準格式\n• 企業級版面設計\n• 高品質圖表輸出\n• 數位簽章支援\n\n🈶 Big5 編碼優勢:\n• 繁體中文字體內嵌\n• PDF/A 長期保存格式\n• 列印品質優化\n• 跨平台相容性\n\n📋 報表內容:\n• 封面頁與目錄\n• 數據分析圖表\n• 詳細附錄資料');
+        }
+
+        function exportToCSV() {
+            alert('📋 CSV 匯出功能展示\n\n✅ 通用格式:\n• UTF-8 with BOM\n• Big5 編碼選項\n• 自訂分隔符號\n• 批量匯出支援\n\n🔄 相容性:\n• Excel 直接開啟\n• 資料庫匯入\n• 程式分析處理\n• 雲端平台整合\n\n📊 資料完整性:\n• 原始數據保留\n• 格式化選項\n• 空值處理');
+        }
+
+        function exportToWord() {
+            alert('📝 Word 匯出功能展示\n\n✅ 文件特色:\n• .docx 格式\n• 專業範本設計\n• 圖表嵌入\n• 目錄自動產生\n\n🈶 Big5 支援:\n• 繁體中文字體\n• 版面格式優化\n• 列印預覽\n• 協作編輯\n\n📖 報告結構:\n• 執行摘要\n• 詳細分析\n• 建議事項\n• 附件資料');
+        }
+
+        // Utility functions
+        function resetFilters() {
+            document.getElementById('reportType').value = '';
+            document.getElementById('startDate').value = '';
+            document.getElementById('endDate').value = '';
+            document.getElementById('department').value = '';
+        }
+
+        function scheduleReport() {
+            alert('⏰ 排程報表功能\n\n✅ 支援排程:\n• 每日自動產生\n• 每週固定時間\n• 每月月底執行\n• 自訂時間設定\n\n📧 通知機制:\n• Email 自動發送\n• 系統內通知\n• 手機推播\n• 報表完成提醒\n\n⚙️ 進階功能:\n• 條件式觸發\n• 多格式同時產生\n• 自動備份\n• 失敗重試機制');
+        }
+
+        function showReportHistory() {
+            alert('📋 報表歷史功能\n\n📊 歷史記錄:\n• 過去 12 個月報表\n• 產生時間記錄\n• 檔案大小統計\n• 下載次數追蹤\n\n🔍 搜尋功能:\n• 依類型篩選\n• 日期範圍查詢\n• 關鍵字搜尋\n• 狀態過濾\n\n💾 檔案管理:\n• 雲端儲存\n• 本地備份\n• 批量下載\n• 自動清理舊檔');
+        }
+
+        function downloadReport(reportId) {
+            alert(`📥 下載報表: ${reportId}\n\n✅ 下載選項:\n• Excel 格式 (2.5MB)\n• PDF 格式 (1.8MB)\n• 壓縮檔 (1.2MB)\n\n🈶 Big5 編碼保證:\n• 繁體中文正確顯示\n• 檔案名稱中文支援\n• 內容格式完整\n\n🔐 安全機制:\n• 下載權限驗證\n• 檔案完整性檢查\n• 病毒掃描\n• 下載記錄追蹤`);
+        }
+
+        // Initialize page
+        function initReportsPage() {
+            if (!checkAuth()) return;
+            
+            // Set default date range (last 30 days)
+            const endDate = new Date();
+            const startDate = new Date();
+            startDate.setDate(startDate.getDate() - 30);
+            
+            document.getElementById('endDate').value = endDate.toISOString().split('T')[0];
+            document.getElementById('startDate').value = startDate.toISOString().split('T')[0];
+            
+            // Add hover effects to report cards
+            document.querySelectorAll('.report-card').forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.borderColor = 'var(--primary-color)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.borderColor = 'var(--border-color)';
+                });
+            });
+        }
+
+        // Page load event
+        window.addEventListener('load', initReportsPage);
+    </script>
+</body>
+</html>

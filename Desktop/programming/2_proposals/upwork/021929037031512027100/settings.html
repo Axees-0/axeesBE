@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系統設定 - 企業資源規劃系統</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #64748b;
+            --secondary-light: #f1f5f9;
+            
+            /* Status Colors */
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #0891b2;
+            
+            /* Neutral Colors */
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            
+            /* Typography */
+            --font-family: 'Microsoft JhengHei', 'PingFang TC', 'Noto Sans TC', 'Source Han Sans TC', system-ui, -apple-system, sans-serif;
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --font-3xl: 1.875rem;
+            --font-4xl: 2.25rem;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .navbar-logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .navbar-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-1);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: var(--space-3) var(--space-4);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .user-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .btn-logout {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: var(--space-2) var(--space-4);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #b91c1c;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--space-6);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: var(--font-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: var(--space-6);
+        }
+
+        .settings-sidebar {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 0;
+            box-shadow: var(--shadow-sm);
+            height: fit-content;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-item:last-child {
+            border-bottom: none;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .settings-content {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .settings-section {
+            display: none;
+        }
+
+        .settings-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: var(--font-xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-2);
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-5);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            font-family: var(--font-family);
+            background-color: var(--surface-color);
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+
+        .form-help {
+            font-size: var(--font-xs);
+            color: var(--text-muted);
+            margin-top: var(--space-1);
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--border-color);
+            transition: 0.3s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .settings-card {
+            background-color: var(--secondary-light);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .card-title {
+            font-size: var(--font-base);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .card-description {
+            font-size: var(--font-sm);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-3);
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--surface-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin-top: var(--space-4);
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: var(--space-3);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-sm);
+        }
+
+        .user-table th {
+            background-color: var(--secondary-light);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .role-badge {
+            display: inline-block;
+            padding: var(--space-1) var(--space-2);
+            border-radius: 0.25rem;
+            font-size: var(--font-xs);
+            font-weight: var(--font-medium);
+        }
+
+        .role-admin {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .role-manager {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .role-user {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: var(--space-1) var(--space-2);
+            font-size: var(--font-xs);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-success:hover {
+            background-color: #047857;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .alert {
+            padding: var(--space-3);
+            border-radius: 0.375rem;
+            margin-bottom: var(--space-4);
+            border: 1px solid;
+            font-size: var(--font-sm);
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            border-color: #22c55e;
+            color: #15803d;
+        }
+
+        .alert-warning {
+            background-color: #fffbeb;
+            border-color: #f59e0b;
+            color: #d97706;
+        }
+
+        .alert-info {
+            background-color: #f0f9ff;
+            border-color: #0ea5e9;
+            color: #0284c7;
+        }
+
+        .backup-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            background-color: var(--success-color);
+            color: white;
+            border-radius: 0.375rem;
+            margin-top: var(--space-2);
+        }
+
+        .footer {
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-4);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: var(--font-sm);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzI1NjNlYiIvPgo8cGF0aCBkPSJNOCAxMmgxNnY4SDh6IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="ERP Logo" class="navbar-logo">
+            <span class="navbar-title">企業資源規劃系統</span>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="index.html" class="nav-link">🏠 首頁</a></li>
+            <li><a href="orders.html" class="nav-link">🛒 訂單管理</a></li>
+            <li><a href="reports.html" class="nav-link">📈 報表管理</a></li>
+            <li><a href="inventory.html" class="nav-link">📦 庫存管理</a></li>
+            <li><a href="accounting.html" class="nav-link">💰 財務管理</a></li>
+            <li><a href="settings.html" class="nav-link active">⚙️ 系統設定</a></li>
+        </ul>
+        <div class="navbar-user">
+            <span class="user-name" id="currentUser">系統管理員</span>
+            <button class="btn-logout" onclick="logout()">🚪 登出</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">⚙️ 系統設定</h1>
+            <div class="page-actions">
+                <button class="btn-primary" onclick="saveAllSettings()">💾 儲存所有設定</button>
+                <button class="btn-secondary" onclick="resetToDefaults()">🔄 重設為預設值</button>
+            </div>
+        </div>
+
+        <div class="settings-grid">
+            <div class="settings-sidebar">
+                <ul class="sidebar-menu">
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link active" onclick="showSection('general')">
+                            🏢 一般設定
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('users')">
+                            👥 使用者管理
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('security')">
+                            🔒 安全設定
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('backup')">
+                            💾 備份還原
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('integration')">
+                            🔗 系統整合
+                        </a>
+                    </li>
+                    <li class="sidebar-item">
+                        <a href="#" class="sidebar-link" onclick="showSection('advanced')">
+                            🛠️ 進階設定
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="settings-content">
+                <!-- 一般設定 -->
+                <div id="general-section" class="settings-section active">
+                    <h2 class="section-title">🏢 一般設定</h2>
+                    
+                    <div class="settings-card">
+                        <h3 class="card-title">公司基本資訊</h3>
+                        <p class="card-description">設定公司基本資料，這些資訊將顯示在報表和文件中</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">公司名稱</label>
+                            <input type="text" class="form-input" value="台灣精密工業股份有限公司">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">統一編號</label>
+                                <input type="text" class="form-input" value="12345678">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">負責人</label>
+                                <input type="text" class="form-input" value="王大明">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">公司地址</label>
+                            <input type="text" class="form-input" value="台北市信義區信義路五段7號">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">聯絡電話</label>
+                                <input type="tel" class="form-input" value="+886-2-1234-5678">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">傳真號碼</label>
+                                <input type="tel" class="form-input" value="+886-2-1234-5679">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="card-title">系統偏好設定</h3>
+                        <p class="card-description">自訂系統行為和顯示選項</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">預設語言</label>
+                                <select class="form-select">
+                                    <option value="zh-TW" selected>繁體中文</option>
+                                    <option value="zh-CN">简体中文</option>
+                                    <option value="en-US">English</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">時區設定</label>
+                                <select class="form-select">
+                                    <option value="Asia/Taipei" selected>Asia/Taipei (UTC+8)</option>
+                                    <option value="Asia/Shanghai">Asia/Shanghai (UTC+8)</option>
+                                    <option value="UTC">UTC (UTC+0)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">貨幣單位</label>
+                                <select class="form-select">
+                                    <option value="TWD" selected>新台幣 (TWD)</option>
+                                    <option value="USD">美金 (USD)</option>
+                                    <option value="CNY">人民幣 (CNY)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">數字格式</label>
+                                <select class="form-select">
+                                    <option value="comma" selected>1,234,567.89</option>
+                                    <option value="space">1 234 567.89</option>
+                                    <option value="none">1234567.89</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 使用者管理 -->
+                <div id="users-section" class="settings-section">
+                    <h2 class="section-title">👥 使用者管理</h2>
+                    
+                    <div class="alert alert-info">
+                        <strong>ℹ️ 使用者權限說明:</strong> 管理員可以完全控制系統，主管可以查看報表和管理部門資料，一般使用者只能操作被授權的功能模組。
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-4);">
+                        <h3>現有使用者列表</h3>
+                        <button class="btn-primary" onclick="addNewUser()">➕ 新增使用者</button>
+                    </div>
+                    
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>帳號</th>
+                                <th>姓名</th>
+                                <th>部門</th>
+                                <th>角色</th>
+                                <th>最後登入</th>
+                                <th>狀態</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>admin</strong></td>
+                                <td>系統管理員</td>
+                                <td>資訊部</td>
+                                <td><span class="role-badge role-admin">管理員</span></td>
+                                <td>2024-03-15 14:30</td>
+                                <td>🟢 啟用</td>
+                                <td>
+                                    <button class="btn-sm btn-primary">編輯</button>
+                                    <button class="btn-sm btn-danger">停用</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>manager01</strong></td>
+                                <td>王小明</td>
+                                <td>業務部</td>
+                                <td><span class="role-badge role-manager">主管</span></td>
+                                <td>2024-03-15 12:15</td>
+                                <td>🟢 啟用</td>
+                                <td>
+                                    <button class="btn-sm btn-primary">編輯</button>
+                                    <button class="btn-sm btn-danger">停用</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>user01</strong></td>
+                                <td>陳美芳</td>
+                                <td>財務部</td>
+                                <td><span class="role-badge role-user">使用者</span></td>
+                                <td>2024-03-15 10:45</td>
+                                <td>🟢 啟用</td>
+                                <td>
+                                    <button class="btn-sm btn-primary">編輯</button>
+                                    <button class="btn-sm btn-danger">停用</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>user02</strong></td>
+                                <td>李志強</td>
+                                <td>倉管部</td>
+                                <td><span class="role-badge role-user">使用者</span></td>
+                                <td>2024-03-14 16:20</td>
+                                <td>🔴 停用</td>
+                                <td>
+                                    <button class="btn-sm btn-primary">編輯</button>
+                                    <button class="btn-sm btn-success">啟用</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- 安全設定 -->
+                <div id="security-section" class="settings-section">
+                    <h2 class="section-title">🔒 安全設定</h2>
+                    
+                    <div class="settings-card">
+                        <h3 class="card-title">密碼政策</h3>
+                        <p class="card-description">設定使用者密碼的安全要求</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>密碼最小長度</span>
+                                <label class="switch" style="float: right;">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                            <input type="number" class="form-input" value="8" min="6" max="20">
+                            <div class="form-help">密碼至少需要 8 個字元</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>需要包含數字</span>
+                                <label class="switch" style="float: right;">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>需要包含特殊字元</span>
+                                <label class="switch" style="float: right;">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">密碼過期天數</label>
+                            <input type="number" class="form-input" value="90" min="30" max="365">
+                            <div class="form-help">使用者必須在指定天數內更換密碼</div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="card-title">登入安全</h3>
+                        <p class="card-description">防止惡意登入嘗試的安全措施</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>啟用登入失敗鎖定</span>
+                                <label class="switch" style="float: right;">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">最大失敗次數</label>
+                            <input type="number" class="form-input" value="5" min="3" max="10">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">鎖定時間（分鐘）</label>
+                            <input type="number" class="form-input" value="30" min="5" max="120">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>記錄登入活動</span>
+                                <label class="switch" style="float: right;">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                            <div class="form-help">記錄所有登入嘗試，包括成功和失敗的登入</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 備份還原 -->
+                <div id="backup-section" class="settings-section">
+                    <h2 class="section-title">💾 備份還原</h2>
+                    
+                    <div class="alert alert-warning">
+                        <strong>⚠️ 重要提醒:</strong> 定期備份是保護資料安全的重要措施，建議至少每日執行一次完整備份。
+                    </div>
+                    
+                    <div class="settings-card">
+                        <h3 class="card-title">自動備份設定</h3>
+                        <p class="card-description">設定系統自動備份排程</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>啟用自動備份</span>
+                                <label class="switch" style="float: right;">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">備份頻率</label>
+                            <select class="form-select">
+                                <option value="daily" selected>每日</option>
+                                <option value="weekly">每週</option>
+                                <option value="monthly">每月</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">備份時間</label>
+                            <input type="time" class="form-input" value="02:00">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">保留份數</label>
+                            <input type="number" class="form-input" value="7" min="1" max="30">
+                            <div class="form-help">系統將保留最近的備份檔案</div>
+                        </div>
+                        
+                        <div class="backup-status">
+                            <span>✅</span>
+                            <span>最後備份時間: 2024-03-15 02:00:00 (成功)</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="card-title">手動備份與還原</h3>
+                        <p class="card-description">立即執行備份或從備份檔案還原系統</p>
+                        
+                        <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-4);">
+                            <button class="btn-primary" onclick="createBackup()">💾 立即備份</button>
+                            <button class="btn-secondary" onclick="downloadBackup()">📥 下載備份</button>
+                            <button class="btn-secondary" onclick="uploadRestore()">📤 上傳還原</button>
+                        </div>
+                        
+                        <h4 style="margin-bottom: var(--space-2);">最近備份記錄</h4>
+                        <ul style="list-style: none; padding: 0;">
+                            <li style="padding: var(--space-2); border-bottom: 1px solid var(--border-color);">
+                                📁 backup_2024-03-15_02-00-00.sql (15.2 MB)
+                            </li>
+                            <li style="padding: var(--space-2); border-bottom: 1px solid var(--border-color);">
+                                📁 backup_2024-03-14_02-00-00.sql (14.8 MB)
+                            </li>
+                            <li style="padding: var(--space-2); border-bottom: 1px solid var(--border-color);">
+                                📁 backup_2024-03-13_02-00-00.sql (14.5 MB)
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 系統整合 -->
+                <div id="integration-section" class="settings-section">
+                    <h2 class="section-title">🔗 系統整合</h2>
+                    
+                    <div class="settings-card">
+                        <h3 class="card-title">資料庫連線</h3>
+                        <p class="card-description">設定 MsSQL 和 MySQL 資料庫連線參數</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">MsSQL 伺服器</label>
+                                <input type="text" class="form-input" value="localhost\SQLEXPRESS">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">MsSQL 埠號</label>
+                                <input type="number" class="form-input" value="1433">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">MySQL 伺服器</label>
+                                <input type="text" class="form-input" value="localhost">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">MySQL 埠號</label>
+                                <input type="number" class="form-input" value="3306">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button class="btn-primary">🔍 測試連線</button>
+                            <span style="margin-left: var(--space-2); color: var(--success-color);">✅ 連線正常</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="card-title">Email 設定</h3>
+                        <p class="card-description">設定系統發送通知信件的 SMTP 參數</p>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">SMTP 伺服器</label>
+                                <input type="text" class="form-input" value="smtp.gmail.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">SMTP 埠號</label>
+                                <input type="number" class="form-input" value="587">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">寄件者信箱</label>
+                                <input type="email" class="form-input" value="system@company.com.tw">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">寄件者名稱</label>
+                                <input type="text" class="form-input" value="ERP系統">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>啟用 SSL/TLS</span>
+                                <label class="switch" style="float: right;">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 進階設定 -->
+                <div id="advanced-section" class="settings-section">
+                    <h2 class="section-title">🛠️ 進階設定</h2>
+                    
+                    <div class="settings-card">
+                        <h3 class="card-title">效能最佳化</h3>
+                        <p class="card-description">調整系統效能相關參數</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>啟用快取機制</span>
+                                <label class="switch" style="float: right;">
+                                    <input type="checkbox" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                            <div class="form-help">啟用後可提升系統回應速度</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">快取時間（分鐘）</label>
+                            <input type="number" class="form-input" value="15" min="1" max="60">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">每頁顯示筆數</label>
+                            <select class="form-select">
+                                <option value="10" selected>10 筆</option>
+                                <option value="20">20 筆</option>
+                                <option value="50">50 筆</option>
+                                <option value="100">100 筆</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="card-title">系統維護</h3>
+                        <p class="card-description">系統維護和除錯相關設定</p>
+                        
+                        <div class="form-group">
+                            <label class="form-label">
+                                <span>啟用除錯模式</span>
+                                <label class="switch" style="float: right;">
+                                    <input type="checkbox">
+                                    <span class="slider"></span>
+                                </label>
+                            </label>
+                            <div class="form-help">僅在開發或問題排查時啟用</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">日誌記錄等級</label>
+                            <select class="form-select">
+                                <option value="error">僅錯誤</option>
+                                <option value="warning" selected>警告以上</option>
+                                <option value="info">資訊以上</option>
+                                <option value="debug">全部記錄</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">日誌保留天數</label>
+                            <input type="number" class="form-input" value="30" min="7" max="365">
+                        </div>
+                        
+                        <div style="display: flex; gap: var(--space-3);">
+                            <button class="btn-primary" onclick="clearCache()">🗑️ 清除快取</button>
+                            <button class="btn-secondary" onclick="clearLogs()">📝 清除日誌</button>
+                            <button class="btn-secondary" onclick="systemCheck()">🔍 系統檢查</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2024 企業資源規劃系統. 版權所有 | 技術支援: +886-2-1234-5678</p>
+    </footer>
+
+    <script>
+        // Authentication check
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (user.displayName) {
+                document.getElementById('currentUser').textContent = user.displayName;
+            }
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('確定要登出系統嗎？')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Section switching
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all sidebar links
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionName + '-section').classList.add('active');
+            
+            // Add active class to clicked link
+            event.target.classList.add('active');
+        }
+
+        // Settings functions
+        function saveAllSettings() {
+            alert('✅ 設定儲存成功！\n\n所有設定已儲存至系統資料庫\n某些設定可能需要重新啟動系統才會生效\n\n儲存項目:\n• 公司基本資訊\n• 系統偏好設定\n• 安全政策\n• 備份設定\n• 整合參數');
+        }
+
+        function resetToDefaults() {
+            if (confirm('確定要重設所有設定為預設值嗎？\n\n⚠️ 此操作將會:\n• 清除所有自訂設定\n• 恢復原廠預設值\n• 需要重新設定公司資訊\n\n此操作無法復原！')) {
+                alert('🔄 設定已重設為預設值\n\n請重新設定必要的系統參數');
+            }
+        }
+
+        // User management functions
+        function addNewUser() {
+            alert('➕ 新增使用者功能\n\n✅ 設定項目:\n• 基本資料 (帳號、姓名、部門)\n• 角色權限 (管理員、主管、使用者)\n• 密碼設定\n• 功能模組授權\n\n📋 權限分級:\n• 管理員：完整系統控制權\n• 主管：部門資料管理權\n• 使用者：指定功能操作權\n\n🔒 安全機制:\n• 帳號唯一性檢查\n• 密碼強度驗證\n• 權限最小化原則');
+        }
+
+        // Security functions
+        function createBackup() {
+            alert('💾 正在建立備份...\n\n備份進度:\n□ 資料庫結構匯出\n□ 資料內容匯出  \n□ 設定檔備份\n□ 檔案系統備份\n□ 壓縮封裝\n\n預計完成時間: 3-5 分鐘\n備份檔案將包含完整系統資料');
+            
+            // Simulate backup progress
+            setTimeout(() => {
+                alert('✅ 備份建立完成！\n\n檔案名稱: backup_2024-03-15_14-30-00.sql\n檔案大小: 15.6 MB\n備份內容: 完整資料庫 + 設定檔\n\n備份檔已儲存至系統備份目錄');
+            }, 2000);
+        }
+
+        function downloadBackup() {
+            alert('📥 下載備份檔案\n\n可下載的備份檔案:\n• backup_2024-03-15_02-00-00.sql (15.2 MB)\n• backup_2024-03-14_02-00-00.sql (14.8 MB)\n• backup_2024-03-13_02-00-00.sql (14.5 MB)\n\n選擇要下載的備份檔案\n檔案將以加密格式下載');
+        }
+
+        function uploadRestore() {
+            alert('📤 上傳還原檔案\n\n⚠️ 重要提醒:\n• 還原操作將覆蓋現有資料\n• 建議先建立當前系統備份\n• 上傳檔案必須是有效的備份格式\n• 還原過程中系統將暫時停止服務\n\n支援格式:\n• .sql 資料庫備份檔\n• .zip 完整系統備份');
+        }
+
+        function clearCache() {
+            if (confirm('確定要清除系統快取嗎？\n\n清除後可能會暫時影響系統效能')) {
+                alert('🗑️ 快取清除完成\n\n已清除項目:\n• 頁面快取\n• 資料快取\n• 查詢快取\n• 暫存檔案\n\n系統效能將在短時間內恢復正常');
+            }
+        }
+
+        function clearLogs() {
+            if (confirm('確定要清除系統日誌嗎？\n\n⚠️ 清除後將無法查看歷史記錄')) {
+                alert('📝 日誌清除完成\n\n已清除:\n• 系統操作日誌\n• 錯誤記錄\n• 登入記錄\n• 效能記錄\n\n日誌記錄將重新開始');
+            }
+        }
+
+        function systemCheck() {
+            alert('🔍 系統檢查中...\n\n檢查項目:\n□ 資料庫連線狀態\n□ 檔案系統權限\n□ 服務執行狀態\n□ 記憶體使用量\n□ 磁碟空間\n□ 網路連線\n\n預計完成時間: 1-2 分鐘');
+            
+            setTimeout(() => {
+                alert('✅ 系統檢查完成\n\n檢查結果:\n✅ 資料庫連線：正常\n✅ 檔案系統：正常\n✅ 服務狀態：正常\n✅ 記憶體使用：72% (正常)\n✅ 磁碟空間：45% (充足)\n✅ 網路連線：正常\n\n系統運行狀態良好');
+            }, 2000);
+        }
+
+        // Initialize page
+        function initSettingsPage() {
+            if (!checkAuth()) return;
+            
+            // Add form validation
+            document.querySelectorAll('input, select, textarea').forEach(element => {
+                element.addEventListener('change', function() {
+                    this.style.borderColor = 'var(--success-color)';
+                    setTimeout(() => {
+                        this.style.borderColor = 'var(--border-color)';
+                    }, 1000);
+                });
+            });
+        }
+
+        // Page load event
+        window.addEventListener('load', initSettingsPage);
+    </script>
+</body>
+</html>

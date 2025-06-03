@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>訂單管理 - 企業資源規劃系統</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #64748b;
+            --secondary-light: #f1f5f9;
+            
+            /* Status Colors */
+            --success-color: #059669;
+            --warning-color: #d97706;
+            --danger-color: #dc2626;
+            --info-color: #0891b2;
+            
+            /* Neutral Colors */
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            
+            /* Typography */
+            --font-family: 'Microsoft JhengHei', 'PingFang TC', 'Noto Sans TC', 'Source Han Sans TC', system-ui, -apple-system, sans-serif;
+            --font-xs: 0.75rem;
+            --font-sm: 0.875rem;
+            --font-base: 1rem;
+            --font-lg: 1.125rem;
+            --font-xl: 1.25rem;
+            --font-2xl: 1.5rem;
+            --font-3xl: 1.875rem;
+            --font-4xl: 2.25rem;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-4) var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .navbar-logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .navbar-title {
+            font-size: var(--font-lg);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+        }
+
+        .navbar-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-1);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            padding: var(--space-3) var(--space-4);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+        }
+
+        .user-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .btn-logout {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: var(--space-2) var(--space-4);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background-color: #b91c1c;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--space-6);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-6);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: var(--font-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.375rem;
+            font-weight: var(--font-medium);
+            font-size: var(--font-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-sm {
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--font-xs);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #b91c1c;
+        }
+
+        .filters-section {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-4);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: var(--font-sm);
+            font-family: var(--font-family);
+            background-color: var(--surface-color);
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .table-container {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: var(--space-4);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: var(--font-sm);
+        }
+
+        .data-table th {
+            background-color: var(--secondary-light);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table tr:hover {
+            background-color: var(--secondary-light);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: var(--space-2);
+            justify-content: center;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--space-1) var(--space-3);
+            border-radius: 1rem;
+            font-size: var(--font-xs);
+            font-weight: var(--font-medium);
+            gap: var(--space-1);
+        }
+
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-processing {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-cancelled {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background-color: var(--surface-color);
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 0.5rem;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: var(--shadow-lg);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: var(--font-xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: var(--font-xl);
+            cursor: pointer;
+            color: var(--text-muted);
+            padding: var(--space-2);
+        }
+
+        .modal-close:hover {
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: var(--space-6);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: var(--space-3);
+            padding: var(--space-6);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+
+        .total-summary {
+            background-color: var(--primary-light);
+            border: 1px solid var(--primary-color);
+            border-radius: 0.5rem;
+            padding: var(--space-4);
+            margin-top: var(--space-4);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-2);
+            font-size: var(--font-sm);
+        }
+
+        .total-row.final {
+            font-weight: var(--font-bold);
+            font-size: var(--font-lg);
+            border-top: 1px solid var(--primary-color);
+            padding-top: var(--space-2);
+            margin-top: var(--space-2);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-2);
+            margin-top: var(--space-6);
+        }
+
+        .pagination button {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: var(--space-2) var(--space-3);
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: var(--font-sm);
+        }
+
+        .pagination button:hover {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+        }
+
+        .pagination button.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .footer {
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-4);
+            text-align: center;
+            color: var(--text-muted);
+            font-size: var(--font-sm);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjMyIiBoZWlnaHQ9IjMyIiByeD0iOCIgZmlsbD0iIzI1NjNlYiIvPgo8cGF0aCBkPSJNOCAxMmgxNnY4SDh6IiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K" alt="ERP Logo" class="navbar-logo">
+            <span class="navbar-title">企業資源規劃系統</span>
+        </div>
+        <ul class="navbar-menu">
+            <li><a href="index.html" class="nav-link">🏠 首頁</a></li>
+            <li><a href="orders.html" class="nav-link active">🛒 訂單管理</a></li>
+            <li><a href="reports.html" class="nav-link">📈 報表管理</a></li>
+            <li><a href="inventory.html" class="nav-link">📦 庫存管理</a></li>
+            <li><a href="accounting.html" class="nav-link">💰 財務管理</a></li>
+            <li><a href="settings.html" class="nav-link">⚙️ 系統設定</a></li>
+        </ul>
+        <div class="navbar-user">
+            <span class="user-name" id="currentUser">系統管理員</span>
+            <button class="btn-logout" onclick="logout()">🚪 登出</button>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <div class="page-header">
+            <h1 class="page-title">🛒 訂單管理</h1>
+            <div class="page-actions">
+                <button class="btn-primary" onclick="openNewOrderModal()">📝 新增訂單</button>
+                <button class="btn-secondary" onclick="exportOrders()">📊 匯出資料</button>
+            </div>
+        </div>
+
+        <div class="filters-section">
+            <h3 style="margin-bottom: var(--space-4); color: var(--text-primary);">🔍 搜尋與篩選</h3>
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label class="form-label">訂單編號</label>
+                    <input type="text" class="form-input" id="searchOrderId" placeholder="輸入訂單編號">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">客戶名稱</label>
+                    <input type="text" class="form-input" id="searchCustomer" placeholder="輸入客戶名稱">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">訂單狀態</label>
+                    <select class="form-select" id="filterStatus">
+                        <option value="">全部狀態</option>
+                        <option value="pending">待處理</option>
+                        <option value="processing">處理中</option>
+                        <option value="completed">已完成</option>
+                        <option value="cancelled">已取消</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">日期範圍</label>
+                    <input type="date" class="form-input" id="dateFrom">
+                </div>
+            </div>
+            <div style="display: flex; gap: var(--space-3);">
+                <button class="btn-primary" onclick="applyFilters()">🔍 搜尋</button>
+                <button class="btn-secondary" onclick="clearFilters()">🔄 清除</button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>訂單編號</th>
+                        <th>客戶名稱</th>
+                        <th>訂單日期</th>
+                        <th>總金額</th>
+                        <th>狀態</th>
+                        <th>負責人</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersTableBody">
+                    <!-- 資料由 JavaScript 動態載入 -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- 分頁由 JavaScript 動態產生 -->
+        </div>
+    </main>
+
+    <!-- 新增/編輯訂單模態框 -->
+    <div id="orderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">新增訂單</h2>
+                <button class="modal-close" onclick="closeOrderModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="orderForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">客戶名稱 *</label>
+                            <input type="text" class="form-input" id="customerName" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">客戶電話</label>
+                            <input type="tel" class="form-input" id="customerPhone">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">訂單日期 *</label>
+                            <input type="date" class="form-input" id="orderDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">預計交貨日期</label>
+                            <input type="date" class="form-input" id="deliveryDate">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">送貨地址</label>
+                        <input type="text" class="form-input" id="deliveryAddress" placeholder="輸入完整送貨地址">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">產品項目</label>
+                        <div id="productItems">
+                            <div class="form-row" style="align-items: end; margin-bottom: var(--space-3);">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label class="form-label">產品名稱</label>
+                                    <input type="text" class="form-input" placeholder="產品名稱" value="精密零件 A1001">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0; max-width: 100px;">
+                                    <label class="form-label">數量</label>
+                                    <input type="number" class="form-input" placeholder="數量" value="50" min="1">
+                                </div>
+                                <div class="form-group" style="margin-bottom: 0; max-width: 120px;">
+                                    <label class="form-label">單價</label>
+                                    <input type="number" class="form-input" placeholder="單價" value="1200" min="0" step="0.01">
+                                </div>
+                                <button type="button" class="btn-danger btn-sm" onclick="removeProductRow(this)">🗑️</button>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-secondary btn-sm" onclick="addProductRow()">➕ 新增產品</button>
+                    </div>
+
+                    <div class="total-summary">
+                        <div class="total-row">
+                            <span>小計:</span>
+                            <span id="subtotal">NT$ 60,000</span>
+                        </div>
+                        <div class="total-row">
+                            <span>稅金 (5%):</span>
+                            <span id="tax">NT$ 3,000</span>
+                        </div>
+                        <div class="total-row final">
+                            <span>總計:</span>
+                            <span id="total">NT$ 63,000</span>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">備註</label>
+                        <textarea class="form-input" id="orderNotes" rows="3" placeholder="訂單備註事項"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="closeOrderModal()">取消</button>
+                <button type="button" class="btn-primary" onclick="saveOrder()">💾 儲存訂單</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2024 企業資源規劃系統. 版權所有 | 技術支援: +886-2-1234-5678</p>
+    </footer>
+
+    <script>
+        // Sample orders data
+        let ordersData = [
+            { id: 'ORD-2024-0342', customer: '台灣科技有限公司', date: '2024-03-15', amount: 125800, status: 'processing', assignee: '王小明' },
+            { id: 'ORD-2024-0341', customer: '精密工業股份有限公司', date: '2024-03-14', amount: 89500, status: 'completed', assignee: '陳美芳' },
+            { id: 'ORD-2024-0340', customer: '智慧製造企業社', date: '2024-03-13', amount: 67200, status: 'pending', assignee: '李志強' },
+            { id: 'ORD-2024-0339', customer: '國際貿易商行', date: '2024-03-12', amount: 156300, status: 'completed', assignee: '張雅婷' },
+            { id: 'ORD-2024-0338', customer: '綠能科技公司', date: '2024-03-11', amount: 78900, status: 'processing', assignee: '劉建華' },
+            { id: 'ORD-2024-0337', customer: '電子元件供應商', date: '2024-03-10', amount: 234500, status: 'cancelled', assignee: '黃淑玲' },
+            { id: 'ORD-2024-0336', customer: '自動化設備廠', date: '2024-03-09', amount: 145600, status: 'completed', assignee: '吳志明' },
+            { id: 'ORD-2024-0335', customer: '半導體材料商', date: '2024-03-08', amount: 198700, status: 'processing', assignee: '林佳蓉' },
+        ];
+
+        let filteredOrders = [...ordersData];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // Authentication check
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn');
+            if (isLoggedIn !== 'true') {
+                window.location.href = 'login.html';
+                return false;
+            }
+            
+            const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+            if (user.displayName) {
+                document.getElementById('currentUser').textContent = user.displayName;
+            }
+            return true;
+        }
+
+        // Logout function
+        function logout() {
+            if (confirm('確定要登出系統嗎？')) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        // Render orders table
+        function renderOrdersTable() {
+            const tbody = document.getElementById('ordersTableBody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const pageOrders = filteredOrders.slice(startIndex, endIndex);
+
+            tbody.innerHTML = pageOrders.map(order => {
+                const statusClass = `status-${order.status}`;
+                const statusText = {
+                    'pending': '⏳ 待處理',
+                    'processing': '🔄 處理中',
+                    'completed': '✅ 已完成',
+                    'cancelled': '❌ 已取消'
+                }[order.status];
+
+                return `
+                    <tr>
+                        <td><strong>${order.id}</strong></td>
+                        <td>${order.customer}</td>
+                        <td>${order.date}</td>
+                        <td><strong>NT$ ${order.amount.toLocaleString()}</strong></td>
+                        <td><span class="status-badge ${statusClass}">${statusText}</span></td>
+                        <td>${order.assignee}</td>
+                        <td class="table-actions">
+                            <button class="btn-sm btn-primary" onclick="editOrder('${order.id}')">編輯</button>
+                            <button class="btn-sm btn-secondary" onclick="viewOrder('${order.id}')">查看</button>
+                            <button class="btn-sm btn-danger" onclick="deleteOrder('${order.id}')">刪除</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            renderPagination();
+        }
+
+        // Render pagination
+        function renderPagination() {
+            const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+            const pagination = document.getElementById('pagination');
+            
+            let html = `
+                <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>上一頁</button>
+            `;
+            
+            for (let i = 1; i <= totalPages; i++) {
+                html += `
+                    <button onclick="changePage(${i})" ${i === currentPage ? 'class="active"' : ''}>${i}</button>
+                `;
+            }
+            
+            html += `
+                <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>下一頁</button>
+            `;
+            
+            pagination.innerHTML = html;
+        }
+
+        // Change page
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderOrdersTable();
+            }
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const orderId = document.getElementById('searchOrderId').value.toLowerCase();
+            const customer = document.getElementById('searchCustomer').value.toLowerCase();
+            const status = document.getElementById('filterStatus').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+
+            filteredOrders = ordersData.filter(order => {
+                let matches = true;
+                
+                if (orderId && !order.id.toLowerCase().includes(orderId)) matches = false;
+                if (customer && !order.customer.toLowerCase().includes(customer)) matches = false;
+                if (status && order.status !== status) matches = false;
+                if (dateFrom && order.date < dateFrom) matches = false;
+                
+                return matches;
+            });
+
+            currentPage = 1;
+            renderOrdersTable();
+        }
+
+        // Clear filters
+        function clearFilters() {
+            document.getElementById('searchOrderId').value = '';
+            document.getElementById('searchCustomer').value = '';
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('dateFrom').value = '';
+            
+            filteredOrders = [...ordersData];
+            currentPage = 1;
+            renderOrdersTable();
+        }
+
+        // Modal functions
+        function openNewOrderModal() {
+            document.getElementById('modalTitle').textContent = '新增訂單';
+            document.getElementById('orderModal').style.display = 'block';
+            document.getElementById('orderDate').value = new Date().toISOString().split('T')[0];
+            calculateTotal();
+        }
+
+        function closeOrderModal() {
+            document.getElementById('orderModal').style.display = 'none';
+            document.getElementById('orderForm').reset();
+        }
+
+        function editOrder(orderId) {
+            const order = ordersData.find(o => o.id === orderId);
+            if (order) {
+                document.getElementById('modalTitle').textContent = '編輯訂單 - ' + orderId;
+                document.getElementById('customerName').value = order.customer;
+                document.getElementById('orderDate').value = order.date;
+                document.getElementById('orderModal').style.display = 'block';
+            }
+        }
+
+        function viewOrder(orderId) {
+            const order = ordersData.find(o => o.id === orderId);
+            if (order) {
+                alert(`訂單詳細資訊：\n\n訂單編號: ${order.id}\n客戶名稱: ${order.customer}\n訂單日期: ${order.date}\n總金額: NT$ ${order.amount.toLocaleString()}\n狀態: ${order.status}\n負責人: ${order.assignee}`);
+            }
+        }
+
+        function deleteOrder(orderId) {
+            if (confirm(`確定要刪除訂單 ${orderId} 嗎？此操作無法復原。`)) {
+                ordersData = ordersData.filter(order => order.id !== orderId);
+                filteredOrders = filteredOrders.filter(order => order.id !== orderId);
+                renderOrdersTable();
+                alert('訂單已刪除');
+            }
+        }
+
+        // Product row functions
+        function addProductRow() {
+            const productItems = document.getElementById('productItems');
+            const newRow = document.createElement('div');
+            newRow.className = 'form-row';
+            newRow.style.alignItems = 'end';
+            newRow.style.marginBottom = 'var(--space-3)';
+            newRow.innerHTML = `
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">產品名稱</label>
+                    <input type="text" class="form-input" placeholder="產品名稱">
+                </div>
+                <div class="form-group" style="margin-bottom: 0; max-width: 100px;">
+                    <label class="form-label">數量</label>
+                    <input type="number" class="form-input" placeholder="數量" min="1" onchange="calculateTotal()">
+                </div>
+                <div class="form-group" style="margin-bottom: 0; max-width: 120px;">
+                    <label class="form-label">單價</label>
+                    <input type="number" class="form-input" placeholder="單價" min="0" step="0.01" onchange="calculateTotal()">
+                </div>
+                <button type="button" class="btn-danger btn-sm" onclick="removeProductRow(this)">🗑️</button>
+            `;
+            productItems.appendChild(newRow);
+        }
+
+        function removeProductRow(button) {
+            button.parentNode.remove();
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const productRows = document.querySelectorAll('#productItems .form-row');
+            let subtotal = 0;
+
+            productRows.forEach(row => {
+                const quantity = parseFloat(row.querySelectorAll('input')[1].value) || 0;
+                const price = parseFloat(row.querySelectorAll('input')[2].value) || 0;
+                subtotal += quantity * price;
+            });
+
+            const tax = subtotal * 0.05;
+            const total = subtotal + tax;
+
+            document.getElementById('subtotal').textContent = `NT$ ${subtotal.toLocaleString()}`;
+            document.getElementById('tax').textContent = `NT$ ${tax.toLocaleString()}`;
+            document.getElementById('total').textContent = `NT$ ${total.toLocaleString()}`;
+        }
+
+        function saveOrder() {
+            const customerName = document.getElementById('customerName').value;
+            const orderDate = document.getElementById('orderDate').value;
+            
+            if (!customerName || !orderDate) {
+                alert('請填寫必要欄位：客戶名稱和訂單日期');
+                return;
+            }
+
+            // Generate new order ID
+            const newOrderId = `ORD-2024-${String(Date.now()).slice(-4)}`;
+            const totalAmount = parseFloat(document.getElementById('total').textContent.replace(/[NT$\s,]/g, ''));
+
+            const newOrder = {
+                id: newOrderId,
+                customer: customerName,
+                date: orderDate,
+                amount: totalAmount,
+                status: 'pending',
+                assignee: '系統管理員'
+            };
+
+            ordersData.unshift(newOrder);
+            filteredOrders = [...ordersData];
+            renderOrdersTable();
+            closeOrderModal();
+            
+            alert(`訂單 ${newOrderId} 已成功建立！`);
+        }
+
+        function exportOrders() {
+            alert('匯出功能展示：\n\n✅ 支援匯出格式：\n• Excel (.xlsx)\n• PDF 報表\n• CSV 檔案\n\n✅ 匯出內容：\n• 篩選後的訂單資料\n• 統計分析報表\n• 客戶明細資料\n\n📋 Big5 編碼完全支援，確保中文資料正確顯示');
+        }
+
+        // Initialize page
+        function initOrdersPage() {
+            if (!checkAuth()) return;
+            
+            renderOrdersTable();
+            
+            // Add event listeners for real-time calculation
+            document.addEventListener('input', function(e) {
+                if (e.target.type === 'number' && e.target.closest('#productItems')) {
+                    calculateTotal();
+                }
+            });
+        }
+
+        // Page load event
+        window.addEventListener('load', initOrdersPage);
+
+        // Close modal when clicking outside
+        window.addEventListener('click', function(event) {
+            const modal = document.getElementById('orderModal');
+            if (event.target === modal) {
+                closeOrderModal();
+            }
+        });
+    </script>
+</body>
+</html>
