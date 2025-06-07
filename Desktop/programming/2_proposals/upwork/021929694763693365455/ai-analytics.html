@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Analytics - AI Analytics Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --secondary-light: #d1fae5;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --ai-accent: #8b5cf6;
+            --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .main-nav {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-4) 0;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-6);
+        }
+
+        .page-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .page-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .single-column {
+            grid-column: 1 / -1;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-md);
+        }
+
+        .chart-container {
+            height: 400px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: var(--space-2);
+            margin-left: auto;
+        }
+
+        .control-btn {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--border-color);
+            background: var(--surface-color);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .control-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: var(--space-4);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            background: var(--surface-color);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: var(--space-2);
+        }
+
+        .model-comparison {
+            overflow-x: auto;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-4);
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: var(--space-3);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .comparison-table th {
+            background: var(--background-color);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .performance-score {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .score-excellent {
+            background: var(--secondary-light);
+            color: var(--secondary-color);
+        }
+
+        .score-good {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .score-average {
+            background: #fef3c7;
+            color: var(--warning-color);
+        }
+
+        .real-time-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--success-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-footer {
+            background: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-6) 0;
+            margin-top: var(--space-12);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h1>AI Analytics Pro</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="ai-analytics.html" class="nav-link active">Analytics</a></li>
+                    <li><a href="model-management.html" class="nav-link">Models</a></li>
+                    <li><a href="data-insights.html" class="nav-link">Insights</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="page-header fade-in">
+            <h1 class="page-title">AI Analytics & Performance</h1>
+            <p class="page-subtitle">Deep dive into model performance, accuracy trends, and predictive analytics</p>
+            <div class="real-time-indicator">
+                <div class="live-dot"></div>
+                Real-time Analytics Active
+            </div>
+        </div>
+
+        <!-- Key Statistics -->
+        <div class="stats-grid fade-in">
+            <div class="stat-item">
+                <span class="stat-value" id="total-predictions">847,329</span>
+                <span class="stat-label">Total Predictions</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="avg-accuracy">94.7%</span>
+                <span class="stat-label">Average Accuracy</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="model-uptime">99.2%</span>
+                <span class="stat-label">Model Uptime</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-value" id="processing-speed">1.2ms</span>
+                <span class="stat-label">Avg Response Time</span>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="analytics-grid fade-in">
+            <div class="card">
+                <div class="chart-title">
+                    Accuracy Trends
+                    <div class="chart-controls">
+                        <button class="control-btn active" onclick="setTimeRange('24h')">24H</button>
+                        <button class="control-btn" onclick="setTimeRange('7d')">7D</button>
+                        <button class="control-btn" onclick="setTimeRange('30d')">30D</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="accuracyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="chart-title">
+                    Prediction Volume
+                    <div class="chart-controls">
+                        <button class="control-btn active" onclick="setVolumeView('hourly')">Hourly</button>
+                        <button class="control-btn" onclick="setVolumeView('daily')">Daily</button>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="volumeChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Comparison -->
+        <div class="analytics-grid fade-in">
+            <div class="card single-column">
+                <h3 class="chart-title">Model Performance Comparison</h3>
+                <div class="chart-container">
+                    <canvas id="comparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Model Comparison Table -->
+        <div class="analytics-grid fade-in">
+            <div class="card single-column model-comparison">
+                <h3 class="chart-title">Detailed Model Analysis</h3>
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Model Name</th>
+                            <th>Accuracy</th>
+                            <th>Predictions/Hour</th>
+                            <th>Avg Response Time</th>
+                            <th>Uptime</th>
+                            <th>Performance Score</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>GPT-4 Analytics Engine</strong></td>
+                            <td>96.2%</td>
+                            <td>2,847</td>
+                            <td>0.8ms</td>
+                            <td>99.9%</td>
+                            <td><span class="performance-score score-excellent">Excellent</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Predictive Analytics ML</strong></td>
+                            <td>91.7%</td>
+                            <td>1,234</td>
+                            <td>1.2ms</td>
+                            <td>98.1%</td>
+                            <td><span class="performance-score score-good">Good</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Deep Learning Classifier</strong></td>
+                            <td>89.3%</td>
+                            <td>956</td>
+                            <td>2.1ms</td>
+                            <td>97.5%</td>
+                            <td><span class="performance-score score-good">Good</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Neural Network Predictor</strong></td>
+                            <td>87.9%</td>
+                            <td>1,567</td>
+                            <td>1.5ms</td>
+                            <td>95.8%</td>
+                            <td><span class="performance-score score-average">Average</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Real-time Analyzer</strong></td>
+                            <td>93.4%</td>
+                            <td>3,421</td>
+                            <td>0.6ms</td>
+                            <td>99.2%</td>
+                            <td><span class="performance-score score-excellent">Excellent</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2024 AI Analytics Pro. Advanced AI performance monitoring and analytics.</p>
+    </footer>
+
+    <script>
+        let accuracyChart, volumeChart, comparisonChart;
+
+        // Initialize all charts
+        function initializeCharts() {
+            initAccuracyChart();
+            initVolumeChart();
+            initComparisonChart();
+        }
+
+        // Accuracy Trends Chart
+        function initAccuracyChart() {
+            const ctx = document.getElementById('accuracyChart').getContext('2d');
+            accuracyChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: generateHourlyLabels(),
+                    datasets: [{
+                        label: 'GPT-4 Analytics',
+                        data: generateAccuracyData(96, 0.5),
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Predictive ML',
+                        data: generateAccuracyData(91, 1),
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Deep Learning',
+                        data: generateAccuracyData(89, 1.5),
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            min: 85,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Volume Chart
+        function initVolumeChart() {
+            const ctx = document.getElementById('volumeChart').getContext('2d');
+            volumeChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: generateHourlyLabels(),
+                    datasets: [{
+                        label: 'Predictions',
+                        data: generateVolumeData(),
+                        backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                        borderColor: '#2563eb',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Comparison Chart
+        function initComparisonChart() {
+            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            comparisonChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Accuracy', 'Speed', 'Uptime', 'Reliability', 'Efficiency'],
+                    datasets: [{
+                        label: 'GPT-4 Analytics',
+                        data: [96, 92, 99, 95, 94],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        pointBackgroundColor: '#2563eb'
+                    }, {
+                        label: 'Predictive ML',
+                        data: [91, 88, 98, 90, 89],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        pointBackgroundColor: '#10b981'
+                    }, {
+                        label: 'Deep Learning',
+                        data: [89, 85, 97, 87, 86],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.2)',
+                        pointBackgroundColor: '#8b5cf6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                stepSize: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Data generation functions
+        function generateHourlyLabels() {
+            const labels = [];
+            const now = new Date();
+            for (let i = 23; i >= 0; i--) {
+                const time = new Date(now.getTime() - i * 60 * 60 * 1000);
+                labels.push(time.getHours().toString().padStart(2, '0') + ':00');
+            }
+            return labels;
+        }
+
+        function generateAccuracyData(baseline, variance) {
+            const data = [];
+            for (let i = 0; i < 24; i++) {
+                data.push(baseline + (Math.random() - 0.5) * variance * 2);
+            }
+            return data;
+        }
+
+        function generateVolumeData() {
+            const data = [];
+            for (let i = 0; i < 24; i++) {
+                const hour = (23 - i) % 24;
+                let baseVolume = 500;
+                
+                // Simulate business hours pattern
+                if (hour >= 9 && hour <= 17) {
+                    baseVolume = 1200;
+                } else if (hour >= 18 && hour <= 22) {
+                    baseVolume = 800;
+                }
+                
+                data.push(Math.floor(baseVolume + Math.random() * 400));
+            }
+            return data;
+        }
+
+        // Real-time updates
+        function updateStatistics() {
+            const stats = {
+                'total-predictions': Math.floor(Math.random() * 1000) + 847000,
+                'avg-accuracy': (Math.random() * 2 + 93).toFixed(1) + '%',
+                'model-uptime': (Math.random() * 1 + 99).toFixed(1) + '%',
+                'processing-speed': (Math.random() * 0.5 + 0.8).toFixed(1) + 'ms'
+            };
+
+            Object.entries(stats).forEach(([id, value]) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value;
+                    element.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        element.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            });
+        }
+
+        // Chart control functions
+        function setTimeRange(range) {
+            // Update active button
+            document.querySelectorAll('.chart-controls .control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update chart data based on range
+            let newLabels, newData;
+            switch(range) {
+                case '24h':
+                    newLabels = generateHourlyLabels();
+                    break;
+                case '7d':
+                    newLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                    break;
+                case '30d':
+                    newLabels = Array.from({length: 30}, (_, i) => `Day ${i + 1}`);
+                    break;
+            }
+
+            accuracyChart.data.labels = newLabels;
+            accuracyChart.data.datasets.forEach(dataset => {
+                dataset.data = generateAccuracyData(
+                    dataset.label.includes('GPT-4') ? 96 : 
+                    dataset.label.includes('Predictive') ? 91 : 89,
+                    1
+                );
+            });
+            accuracyChart.update();
+        }
+
+        function setVolumeView(view) {
+            // Update active button
+            event.target.parentElement.querySelectorAll('.control-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update volume chart
+            volumeChart.data.datasets[0].data = generateVolumeData();
+            volumeChart.update();
+        }
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            updateStatistics();
+            
+            // Real-time updates every 3 seconds
+            setInterval(updateStatistics, 3000);
+            
+            // Add fade-in animations
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.animation = `fadeIn 0.6s ease-in forwards`;
+                }, index * 100);
+            });
+        });
+
+        // Store analytics interactions
+        function logAnalyticsAction(action) {
+            const interactions = JSON.parse(localStorage.getItem('analyticsInteractions') || '[]');
+            interactions.push({
+                action: action,
+                timestamp: new Date().toISOString(),
+                page: 'analytics'
+            });
+            localStorage.setItem('analyticsInteractions', JSON.stringify(interactions));
+        }
+
+        // Track chart interactions
+        document.querySelectorAll('.control-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                logAnalyticsAction('chart_filter_change');
+            });
+        });
+    </script>
+</body>
+</html>

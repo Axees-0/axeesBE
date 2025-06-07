@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Insights - AI Analytics Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --secondary-light: #d1fae5;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --ai-accent: #8b5cf6;
+            --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .main-nav {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-4) 0;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-6);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .page-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-top: var(--space-2);
+        }
+
+        .header-controls {
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-md);
+        }
+
+        .chart-container {
+            height: 400px;
+            position: relative;
+        }
+
+        .chart-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-4);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .insights-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .insight-card {
+            background: linear-gradient(135deg, var(--primary-color), var(--ai-accent));
+            color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .insight-icon {
+            font-size: 2rem;
+            margin-bottom: var(--space-4);
+        }
+
+        .insight-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--space-2);
+        }
+
+        .insight-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: var(--space-2);
+        }
+
+        .insight-description {
+            opacity: 0.9;
+            font-size: 0.875rem;
+        }
+
+        .data-table {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: var(--space-4);
+        }
+
+        .table th,
+        .table td {
+            padding: var(--space-3);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table th {
+            background: var(--background-color);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .trend-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-md);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .trend-up {
+            background: var(--secondary-light);
+            color: var(--secondary-color);
+        }
+
+        .trend-down {
+            background: #fee2e2;
+            color: var(--error-color);
+        }
+
+        .trend-stable {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .ai-recommendation {
+            background: linear-gradient(135deg, var(--ai-accent), var(--primary-color));
+            color: white;
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .recommendation-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .recommendation-content {
+            line-height: 1.6;
+            margin-bottom: var(--space-4);
+        }
+
+        .recommendation-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        .btn-ai {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-ai:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .prediction-panel {
+            background: var(--surface-color);
+            border: 2px solid var(--ai-accent);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+        }
+
+        .prediction-title {
+            color: var(--ai-accent);
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: var(--space-4);
+        }
+
+        .prediction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .prediction-item:last-child {
+            border-bottom: none;
+        }
+
+        .prediction-metric {
+            font-weight: 500;
+        }
+
+        .prediction-value {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .confidence-bar {
+            width: 100px;
+            height: 6px;
+            background: var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-left: var(--space-3);
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--warning-color), var(--success-color));
+            border-radius: var(--radius-md);
+        }
+
+        .real-time-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--success-color);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-footer {
+            background: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-6) 0;
+            margin-top: var(--space-12);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h1>AI Analytics Pro</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="ai-analytics.html" class="nav-link">Analytics</a></li>
+                    <li><a href="model-management.html" class="nav-link">Models</a></li>
+                    <li><a href="data-insights.html" class="nav-link active">Insights</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="page-header fade-in">
+            <div>
+                <h1 class="page-title">Data Insights & Predictions</h1>
+                <p class="page-subtitle">AI-powered analytics and predictive insights from your data</p>
+                <div class="real-time-indicator">
+                    <div class="live-dot"></div>
+                    Real-time Analysis Active
+                </div>
+            </div>
+            <div class="header-controls">
+                <button class="btn btn-outline" onclick="generateReport()">📊 Generate Report</button>
+                <button class="btn btn-primary" onclick="runAnalysis()">🔍 Run Analysis</button>
+            </div>
+        </div>
+
+        <!-- AI Recommendations -->
+        <div class="ai-recommendation fade-in">
+            <div class="recommendation-title">
+                🤖 AI Recommendation
+            </div>
+            <div class="recommendation-content">
+                Based on current data trends, we recommend increasing prediction frequency during peak hours (9 AM - 5 PM) 
+                to improve accuracy by an estimated 3.2%. Your customer engagement patterns show highest activity during 
+                these periods, which could benefit from enhanced AI model responsiveness.
+            </div>
+            <div class="recommendation-actions">
+                <button class="btn btn-ai" onclick="implementRecommendation()">Implement Now</button>
+                <button class="btn btn-ai" onclick="learnMore()">Learn More</button>
+                <button class="btn btn-ai" onclick="dismissRecommendation()">Dismiss</button>
+            </div>
+        </div>
+
+        <!-- Key Insights Summary -->
+        <div class="insights-summary fade-in">
+            <div class="insight-card">
+                <div class="insight-icon">📈</div>
+                <div class="insight-title">Revenue Growth Prediction</div>
+                <div class="insight-value">+23.4%</div>
+                <div class="insight-description">Projected growth for next quarter based on current trends</div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">🎯</div>
+                <div class="insight-title">Customer Retention Rate</div>
+                <div class="insight-value">87.2%</div>
+                <div class="insight-description">Predicted retention based on engagement patterns</div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">⚡</div>
+                <div class="insight-title">Peak Performance Window</div>
+                <div class="insight-value">2-4 PM</div>
+                <div class="insight-description">Optimal time for model deployment and updates</div>
+            </div>
+
+            <div class="insight-card">
+                <div class="insight-icon">🔮</div>
+                <div class="insight-title">Market Demand Forecast</div>
+                <div class="insight-value">+15.8%</div>
+                <div class="insight-description">Expected increase in demand over next 30 days</div>
+            </div>
+        </div>
+
+        <!-- Main Analytics Grid -->
+        <div class="insights-grid fade-in">
+            <div class="card">
+                <div class="chart-title">
+                    Customer Behavior Trends
+                </div>
+                <div class="chart-container">
+                    <canvas id="behaviorChart"></canvas>
+                </div>
+            </div>
+
+            <div class="prediction-panel">
+                <div class="prediction-title">🔮 AI Predictions</div>
+                
+                <div class="prediction-item">
+                    <span class="prediction-metric">Sales Forecast (7 days)</span>
+                    <div style="display: flex; align-items: center;">
+                        <span class="prediction-value">+12.4%</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: 89%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <span class="prediction-metric">User Engagement</span>
+                    <div style="display: flex; align-items: center;">
+                        <span class="prediction-value">+8.7%</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: 76%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <span class="prediction-metric">Churn Risk</span>
+                    <div style="display: flex; align-items: center;">
+                        <span class="prediction-value">-2.1%</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: 94%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <span class="prediction-metric">Market Share</span>
+                    <div style="display: flex; align-items: center;">
+                        <span class="prediction-value">+5.3%</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: 82%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="prediction-item">
+                    <span class="prediction-metric">Revenue Optimization</span>
+                    <div style="display: flex; align-items: center;">
+                        <span class="prediction-value">+18.9%</span>
+                        <div class="confidence-bar">
+                            <div class="confidence-fill" style="width: 91%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Revenue Insights -->
+        <div class="insights-grid fade-in">
+            <div class="card">
+                <div class="chart-title">Revenue & Profit Analysis</div>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="chart-title">Market Segment Performance</div>
+                <div class="chart-container">
+                    <canvas id="segmentChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Analytics Table -->
+        <div class="card full-width fade-in">
+            <h3 class="chart-title">Detailed Performance Metrics</h3>
+            <div class="data-table">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Current Value</th>
+                            <th>Previous Period</th>
+                            <th>Change</th>
+                            <th>Trend</th>
+                            <th>AI Prediction (30d)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Total Revenue</strong></td>
+                            <td>$847,329</td>
+                            <td>$769,234</td>
+                            <td>+10.1%</td>
+                            <td><span class="trend-indicator trend-up">↗ Increasing</span></td>
+                            <td>$923,450 (+9.0%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Customer Acquisition</strong></td>
+                            <td>2,347 users</td>
+                            <td>2,156 users</td>
+                            <td>+8.9%</td>
+                            <td><span class="trend-indicator trend-up">↗ Growing</span></td>
+                            <td>2,689 users (+14.6%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Conversion Rate</strong></td>
+                            <td>4.72%</td>
+                            <td>4.31%</td>
+                            <td>+0.41%</td>
+                            <td><span class="trend-indicator trend-up">↗ Improving</span></td>
+                            <td>5.23% (+10.8%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Average Order Value</strong></td>
+                            <td>$234.56</td>
+                            <td>$228.43</td>
+                            <td>+2.7%</td>
+                            <td><span class="trend-indicator trend-stable">→ Stable</span></td>
+                            <td>$247.89 (+5.7%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Customer Lifetime Value</strong></td>
+                            <td>$1,847</td>
+                            <td>$1,692</td>
+                            <td>+9.2%</td>
+                            <td><span class="trend-indicator trend-up">↗ Rising</span></td>
+                            <td>$2,034 (+10.1%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Churn Rate</strong></td>
+                            <td>3.2%</td>
+                            <td>3.8%</td>
+                            <td>-0.6%</td>
+                            <td><span class="trend-indicator trend-up">↗ Decreasing</span></td>
+                            <td>2.7% (-15.6%)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Market Share</strong></td>
+                            <td>12.4%</td>
+                            <td>11.8%</td>
+                            <td>+0.6%</td>
+                            <td><span class="trend-indicator trend-up">↗ Expanding</span></td>
+                            <td>13.7% (+10.5%)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="main-footer">
+        <p>&copy; 2024 AI Analytics Pro. Advanced data insights and predictive analytics.</p>
+    </footer>
+
+    <script>
+        let behaviorChart, revenueChart, segmentChart;
+
+        // Initialize all charts
+        function initializeCharts() {
+            initBehaviorChart();
+            initRevenueChart();
+            initSegmentChart();
+        }
+
+        // Customer Behavior Trends Chart
+        function initBehaviorChart() {
+            const ctx = document.getElementById('behaviorChart').getContext('2d');
+            behaviorChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                    datasets: [{
+                        label: 'Page Views',
+                        data: [45000, 52000, 48000, 61000, 55000, 67000, 73000, 69000, 81000, 76000, 89000, 94000],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'User Sessions',
+                        data: [12000, 14000, 13500, 16800, 15200, 18900, 21000, 19500, 23400, 22100, 26800, 28500],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Conversions',
+                        data: [560, 680, 620, 780, 720, 890, 980, 920, 1100, 1040, 1260, 1340],
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toLocaleString();
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Revenue & Profit Chart
+        function initRevenueChart() {
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            revenueChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Q1 2023', 'Q2 2023', 'Q3 2023', 'Q4 2023', 'Q1 2024', 'Q2 2024'],
+                    datasets: [{
+                        label: 'Revenue',
+                        data: [580000, 720000, 650000, 890000, 780000, 940000],
+                        backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                        borderColor: '#2563eb',
+                        borderWidth: 2
+                    }, {
+                        label: 'Profit',
+                        data: [145000, 216000, 195000, 267000, 234000, 329000],
+                        backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                        borderColor: '#10b981',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000) + 'K';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Market Segment Performance Chart
+        function initSegmentChart() {
+            const ctx = document.getElementById('segmentChart').getContext('2d');
+            segmentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Enterprise', 'SMB', 'Startups', 'Government', 'Education'],
+                    datasets: [{
+                        data: [35, 28, 18, 12, 7],
+                        backgroundColor: [
+                            '#2563eb',
+                            '#10b981',
+                            '#8b5cf6',
+                            '#f59e0b',
+                            '#ef4444'
+                        ],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update predictions with real-time data
+        function updatePredictions() {
+            const predictions = document.querySelectorAll('.prediction-value');
+            const confidenceBars = document.querySelectorAll('.confidence-fill');
+
+            predictions.forEach((pred, index) => {
+                const currentValue = parseFloat(pred.textContent.replace('%', '').replace('+', '').replace('-', ''));
+                const variation = (Math.random() - 0.5) * 0.5; // Small random variation
+                const newValue = currentValue + variation;
+                const sign = newValue >= 0 ? '+' : '';
+                
+                pred.textContent = sign + newValue.toFixed(1) + '%';
+                
+                // Update confidence bars
+                if (confidenceBars[index]) {
+                    const confidence = Math.min(Math.max(Math.random() * 100, 70), 95);
+                    confidenceBars[index].style.width = confidence + '%';
+                }
+            });
+
+            // Add visual feedback
+            predictions.forEach(pred => {
+                pred.style.transform = 'scale(1.1)';
+                setTimeout(() => {
+                    pred.style.transform = 'scale(1)';
+                }, 300);
+            });
+        }
+
+        // Action functions
+        function runAnalysis() {
+            alert('🔍 Running Advanced AI Analysis...\n\nAnalyzing:\n• Customer behavior patterns\n• Revenue optimization opportunities\n• Market trend predictions\n• Risk assessment factors\n\nEstimated completion: 2 minutes');
+            
+            // Simulate analysis progress
+            setTimeout(() => {
+                alert('✅ Analysis Complete!\n\nKey findings:\n• 23% increase in customer engagement detected\n• New revenue opportunity identified in Enterprise segment\n• Recommended action: Increase model prediction frequency\n• 94% confidence in next quarter projections');
+            }, 3000);
+        }
+
+        function generateReport() {
+            alert('📊 Generating Comprehensive Analytics Report...\n\nIncluding:\n• Executive summary with key insights\n• Detailed performance metrics\n• AI-powered predictions and recommendations\n• Market analysis and competitive intelligence\n• ROI projections and strategic recommendations\n\nReport will be ready for download in 3 minutes.');
+        }
+
+        function implementRecommendation() {
+            alert('🚀 Implementing AI Recommendation...\n\nActions taken:\n• Increased prediction frequency during peak hours\n• Optimized model parameters for better accuracy\n• Enhanced real-time monitoring alerts\n• Updated auto-scaling thresholds\n\nExpected improvement: +3.2% accuracy within 24 hours');
+        }
+
+        function learnMore() {
+            alert('📚 AI Recommendation Details\n\nAnalysis Basis:\n• 30 days of customer interaction data\n• Peak usage patterns (9 AM - 5 PM)\n• Historical accuracy improvements\n• Resource utilization optimization\n\nImplementation Strategy:\n• Gradual rollout over 3 days\n• A/B testing with control groups\n• Continuous monitoring and adjustment\n• Rollback capability if needed');
+        }
+
+        function dismissRecommendation() {
+            document.querySelector('.ai-recommendation').style.display = 'none';
+            alert('Recommendation dismissed. You can view dismissed recommendations in the Settings panel.');
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            
+            // Update predictions every 8 seconds
+            setInterval(updatePredictions, 8000);
+            
+            // Add fade-in animations
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.animation = `fadeIn 0.6s ease-in forwards`;
+                }, index * 100);
+            });
+        });
+
+        // Store insights interactions
+        function logInsightAction(action) {
+            const interactions = JSON.parse(localStorage.getItem('insightInteractions') || '[]');
+            interactions.push({
+                action: action,
+                timestamp: new Date().toISOString(),
+                page: 'data-insights'
+            });
+            localStorage.setItem('insightInteractions', JSON.stringify(interactions));
+        }
+
+        // Track button clicks
+        document.querySelectorAll('.btn, .btn-ai').forEach(btn => {
+            btn.addEventListener('click', function() {
+                logInsightAction('insight_action_clicked');
+            });
+        });
+    </script>
+</body>
+</html>

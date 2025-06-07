@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Management - AI Analytics Pro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --secondary-light: #d1fae5;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #3b82f6;
+            --ai-accent: #8b5cf6;
+            --font-primary: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .main-nav {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-4) 0;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h1 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: var(--space-2) var(--space-4);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--space-8) var(--space-6);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .page-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.125rem;
+            margin-top: var(--space-2);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: var(--space-4);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            padding: var(--space-3) var(--space-6);
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-sm {
+            padding: var(--space-2) var(--space-4);
+            font-size: 0.75rem;
+        }
+
+        .models-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .model-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-md);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .model-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .model-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-4);
+        }
+
+        .model-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .model-type {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .model-status {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .status-active {
+            background-color: var(--success-color);
+            animation: pulse 2s infinite;
+        }
+
+        .status-training {
+            background-color: var(--warning-color);
+            animation: pulse 2s infinite;
+        }
+
+        .status-stopped {
+            background-color: var(--error-color);
+        }
+
+        .status-text {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .status-text.active {
+            color: var(--success-color);
+        }
+
+        .status-text.training {
+            color: var(--warning-color);
+        }
+
+        .status-text.stopped {
+            color: var(--error-color);
+        }
+
+        .model-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            margin: var(--space-4) 0;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            margin-top: var(--space-2);
+        }
+
+        .model-actions {
+            display: flex;
+            gap: var(--space-2);
+            justify-content: flex-end;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin: var(--space-3) 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-md);
+            transition: width 0.3s ease;
+        }
+
+        .training-info {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-3);
+        }
+
+        .model-form {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-8);
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: 0.875rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: flex-end;
+            margin-top: var(--space-6);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .main-footer {
+            background: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            padding: var(--space-6) 0;
+            margin-top: var(--space-12);
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--surface-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-8);
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            margin-bottom: var(--space-6);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: var(--space-4);
+            right: var(--space-4);
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <h1>AI Analytics Pro</h1>
+                </div>
+                <ul class="nav-links">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="ai-analytics.html" class="nav-link">Analytics</a></li>
+                    <li><a href="model-management.html" class="nav-link active">Models</a></li>
+                    <li><a href="data-insights.html" class="nav-link">Insights</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main class="main-content">
+        <div class="page-header fade-in">
+            <div>
+                <h1 class="page-title">AI Model Management</h1>
+                <p class="page-subtitle">Deploy, train, and monitor your AI models</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-outline" onclick="importModel()">Import Model</button>
+                <button class="btn btn-primary" onclick="showNewModelForm()">+ New Model</button>
+            </div>
+        </div>
+
+        <!-- New Model Form -->
+        <div class="model-form" id="newModelForm">
+            <h3 style="margin-bottom: var(--space-6);">Create New AI Model</h3>
+            <form onsubmit="createModel(event)">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="modelName">Model Name</label>
+                        <input class="form-input" type="text" id="modelName" placeholder="Enter model name" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="modelType">Model Type</label>
+                        <select class="form-select" id="modelType" required>
+                            <option value="">Select model type</option>
+                            <option value="classification">Classification</option>
+                            <option value="regression">Regression</option>
+                            <option value="clustering">Clustering</option>
+                            <option value="neural-network">Neural Network</option>
+                            <option value="deep-learning">Deep Learning</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label" for="dataset">Dataset</label>
+                        <select class="form-select" id="dataset" required>
+                            <option value="">Select dataset</option>
+                            <option value="customer-data">Customer Data (2.1M records)</option>
+                            <option value="transaction-logs">Transaction Logs (890K records)</option>
+                            <option value="user-behavior">User Behavior (1.5M records)</option>
+                            <option value="sales-history">Sales History (750K records)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="algorithm">Algorithm</label>
+                        <select class="form-select" id="algorithm" required>
+                            <option value="">Select algorithm</option>
+                            <option value="random-forest">Random Forest</option>
+                            <option value="gradient-boosting">Gradient Boosting</option>
+                            <option value="neural-network">Neural Network</option>
+                            <option value="svm">Support Vector Machine</option>
+                            <option value="logistic-regression">Logistic Regression</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="description">Description</label>
+                    <textarea class="form-textarea" id="description" rows="3" placeholder="Describe the model's purpose and use case"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" onclick="hideNewModelForm()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create Model</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Models Grid -->
+        <div class="models-grid fade-in">
+            <!-- Active Models -->
+            <div class="model-card">
+                <div class="model-header">
+                    <div>
+                        <h3 class="model-name">GPT-4 Analytics Engine</h3>
+                        <p class="model-type">Deep Learning • Neural Network</p>
+                    </div>
+                    <div class="model-status">
+                        <div class="status-indicator status-active"></div>
+                        <span class="status-text active">Active</span>
+                    </div>
+                </div>
+                <div class="model-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value">96.2%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">99.9%</div>
+                        <div class="metric-label">Uptime</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">2,847</div>
+                        <div class="metric-label">Predictions/Hour</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">0.8ms</div>
+                        <div class="metric-label">Response Time</div>
+                    </div>
+                </div>
+                <div class="model-actions">
+                    <button class="btn btn-sm btn-outline" onclick="configureModel('gpt4')">Configure</button>
+                    <button class="btn btn-sm btn-secondary" onclick="viewLogs('gpt4')">View Logs</button>
+                    <button class="btn btn-sm btn-primary" onclick="stopModel('gpt4')">Stop</button>
+                </div>
+            </div>
+
+            <div class="model-card">
+                <div class="model-header">
+                    <div>
+                        <h3 class="model-name">Predictive Analytics ML</h3>
+                        <p class="model-type">Machine Learning • Regression</p>
+                    </div>
+                    <div class="model-status">
+                        <div class="status-indicator status-active"></div>
+                        <span class="status-text active">Active</span>
+                    </div>
+                </div>
+                <div class="model-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value">91.7%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">98.1%</div>
+                        <div class="metric-label">Uptime</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">1,234</div>
+                        <div class="metric-label">Predictions/Hour</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">1.2ms</div>
+                        <div class="metric-label">Response Time</div>
+                    </div>
+                </div>
+                <div class="model-actions">
+                    <button class="btn btn-sm btn-outline" onclick="configureModel('predictive')">Configure</button>
+                    <button class="btn btn-sm btn-secondary" onclick="viewLogs('predictive')">View Logs</button>
+                    <button class="btn btn-sm btn-primary" onclick="stopModel('predictive')">Stop</button>
+                </div>
+            </div>
+
+            <!-- Training Model -->
+            <div class="model-card">
+                <div class="model-header">
+                    <div>
+                        <h3 class="model-name">Deep Learning Classifier</h3>
+                        <p class="model-type">Deep Learning • Classification</p>
+                    </div>
+                    <div class="model-status">
+                        <div class="status-indicator status-training"></div>
+                        <span class="status-text training">Training</span>
+                    </div>
+                </div>
+                <div class="training-info">
+                    <strong>Training Progress:</strong> Epoch 142/200 • ETA: 2.3 hours
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 67%"></div>
+                </div>
+                <div class="model-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value">89.3%</div>
+                        <div class="metric-label">Current Accuracy</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">0.0023</div>
+                        <div class="metric-label">Loss</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">2.1M</div>
+                        <div class="metric-label">Samples</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">67%</div>
+                        <div class="metric-label">Progress</div>
+                    </div>
+                </div>
+                <div class="model-actions">
+                    <button class="btn btn-sm btn-outline" onclick="pauseTraining('classifier')">Pause</button>
+                    <button class="btn btn-sm btn-secondary" onclick="viewTrainingLogs('classifier')">View Logs</button>
+                    <button class="btn btn-sm btn-primary" onclick="stopTraining('classifier')">Stop Training</button>
+                </div>
+            </div>
+
+            <!-- Stopped Model -->
+            <div class="model-card">
+                <div class="model-header">
+                    <div>
+                        <h3 class="model-name">Neural Network Predictor</h3>
+                        <p class="model-type">Neural Network • Prediction</p>
+                    </div>
+                    <div class="model-status">
+                        <div class="status-indicator status-stopped"></div>
+                        <span class="status-text stopped">Stopped</span>
+                    </div>
+                </div>
+                <div class="model-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value">87.9%</div>
+                        <div class="metric-label">Last Accuracy</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">95.8%</div>
+                        <div class="metric-label">Last Uptime</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">1,567</div>
+                        <div class="metric-label">Avg Predictions/Hour</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">1.5ms</div>
+                        <div class="metric-label">Avg Response Time</div>
+                    </div>
+                </div>
+                <div class="model-actions">
+                    <button class="btn btn-sm btn-outline" onclick="configureModel('neural')">Configure</button>
+                    <button class="btn btn-sm btn-secondary" onclick="viewLogs('neural')">View Logs</button>
+                    <button class="btn btn-sm btn-primary" onclick="startModel('neural')">Start</button>
+                </div>
+            </div>
+
+            <!-- Real-time Analyzer -->
+            <div class="model-card">
+                <div class="model-header">
+                    <div>
+                        <h3 class="model-name">Real-time Analyzer</h3>
+                        <p class="model-type">Real-time • Stream Processing</p>
+                    </div>
+                    <div class="model-status">
+                        <div class="status-indicator status-active"></div>
+                        <span class="status-text active">Active</span>
+                    </div>
+                </div>
+                <div class="model-metrics">
+                    <div class="metric-item">
+                        <div class="metric-value">93.4%</div>
+                        <div class="metric-label">Accuracy</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">99.2%</div>
+                        <div class="metric-label">Uptime</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">3,421</div>
+                        <div class="metric-label">Predictions/Hour</div>
+                    </div>
+                    <div class="metric-item">
+                        <div class="metric-value">0.6ms</div>
+                        <div class="metric-label">Response Time</div>
+                    </div>
+                </div>
+                <div class="model-actions">
+                    <button class="btn btn-sm btn-outline" onclick="configureModel('realtime')">Configure</button>
+                    <button class="btn btn-sm btn-secondary" onclick="viewLogs('realtime')">View Logs</button>
+                    <button class="btn btn-sm btn-primary" onclick="stopModel('realtime')">Stop</button>
+                </div>
+            </div>
+
+            <!-- Placeholder for new model -->
+            <div class="model-card" style="border: 2px dashed var(--border-color); display: flex; align-items: center; justify-content: center; min-height: 300px;">
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; color: var(--text-muted); margin-bottom: var(--space-4);">+</div>
+                    <h3 style="color: var(--text-secondary); margin-bottom: var(--space-2);">Add New Model</h3>
+                    <p style="color: var(--text-muted); margin-bottom: var(--space-4);">Create a new AI model from scratch</p>
+                    <button class="btn btn-primary" onclick="showNewModelForm()">Get Started</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for configurations -->
+    <div class="modal" id="configModal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="closeModal()">&times;</button>
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Model Configuration</h2>
+            </div>
+            <div id="modalBody">
+                <!-- Dynamic content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <footer class="main-footer">
+        <p>&copy; 2024 AI Analytics Pro. Advanced AI model management and deployment.</p>
+    </footer>
+
+    <script>
+        // Model management functions
+        function showNewModelForm() {
+            const form = document.getElementById('newModelForm');
+            form.style.display = form.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function hideNewModelForm() {
+            document.getElementById('newModelForm').style.display = 'none';
+        }
+
+        function createModel(event) {
+            event.preventDefault();
+            
+            const formData = {
+                name: document.getElementById('modelName').value,
+                type: document.getElementById('modelType').value,
+                dataset: document.getElementById('dataset').value,
+                algorithm: document.getElementById('algorithm').value,
+                description: document.getElementById('description').value
+            };
+
+            // Simulate model creation
+            alert(`🚀 Creating new AI model: "${formData.name}"\n\nType: ${formData.type}\nAlgorithm: ${formData.algorithm}\nDataset: ${formData.dataset}\n\nTraining will begin shortly...`);
+            
+            hideNewModelForm();
+            event.target.reset();
+            
+            // Log action
+            logModelAction('model_created', formData.name);
+        }
+
+        function configureModel(modelId) {
+            const modelNames = {
+                'gpt4': 'GPT-4 Analytics Engine',
+                'predictive': 'Predictive Analytics ML',
+                'classifier': 'Deep Learning Classifier',
+                'neural': 'Neural Network Predictor',
+                'realtime': 'Real-time Analyzer'
+            };
+
+            showModal(`Configure ${modelNames[modelId]}`, `
+                <div class="form-group">
+                    <label class="form-label">Batch Size</label>
+                    <input class="form-input" type="number" value="32" min="1" max="512">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Learning Rate</label>
+                    <input class="form-input" type="number" value="0.001" step="0.0001" min="0.0001" max="1">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Max Predictions/Hour</label>
+                    <input class="form-input" type="number" value="5000" min="100" max="10000">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Auto-scaling</label>
+                    <select class="form-select">
+                        <option value="enabled">Enabled</option>
+                        <option value="disabled">Disabled</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveConfiguration('${modelId}')">Save Configuration</button>
+                </div>
+            `);
+            
+            logModelAction('model_configured', modelNames[modelId]);
+        }
+
+        function saveConfiguration(modelId) {
+            alert('✅ Configuration saved successfully!\n\nChanges will take effect after the next model restart.');
+            closeModal();
+        }
+
+        function startModel(modelId) {
+            alert('🟢 Starting model...\n\nThe model will be available for predictions in approximately 30 seconds.');
+            logModelAction('model_started', modelId);
+        }
+
+        function stopModel(modelId) {
+            if (confirm('Are you sure you want to stop this model?\n\nThis will interrupt any ongoing predictions.')) {
+                alert('🔴 Model stopped successfully.\n\nAll prediction requests have been gracefully terminated.');
+                logModelAction('model_stopped', modelId);
+            }
+        }
+
+        function pauseTraining(modelId) {
+            alert('⏸️ Training paused.\n\nYou can resume training at any time. Current progress has been saved.');
+            logModelAction('training_paused', modelId);
+        }
+
+        function stopTraining(modelId) {
+            if (confirm('Are you sure you want to stop training?\n\nThis will terminate the training process and you may lose some progress.')) {
+                alert('⏹️ Training stopped.\n\nModel has been saved at current checkpoint (Epoch 142).');
+                logModelAction('training_stopped', modelId);
+            }
+        }
+
+        function viewLogs(modelId) {
+            showModal('Model Logs', `
+                <div style="background: #1e293b; color: #e2e8f0; padding: var(--space-4); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.875rem; max-height: 400px; overflow-y: auto;">
+                    <div>2024-01-15 10:32:15 [INFO] Model ${modelId} started successfully</div>
+                    <div>2024-01-15 10:32:16 [INFO] Loading model weights... (98.2 MB)</div>
+                    <div>2024-01-15 10:32:18 [INFO] Model ready for predictions</div>
+                    <div>2024-01-15 10:35:22 [INFO] Processed prediction batch (size: 32)</div>
+                    <div>2024-01-15 10:35:24 [INFO] Accuracy: 96.2% | Response time: 0.8ms</div>
+                    <div>2024-01-15 10:38:11 [INFO] Auto-scaling triggered: +2 instances</div>
+                    <div>2024-01-15 10:42:05 [INFO] Performance optimization applied</div>
+                    <div>2024-01-15 10:45:18 [INFO] Cache hit rate: 87.3%</div>
+                    <div>2024-01-15 10:48:33 [WARN] High memory usage detected (78%)</div>
+                    <div>2024-01-15 10:48:34 [INFO] Memory optimization triggered</div>
+                    <div>2024-01-15 10:52:07 [INFO] System health check: All systems operational</div>
+                </div>
+                <div class="form-actions" style="margin-top: var(--space-4);">
+                    <button class="btn btn-outline" onclick="closeModal()">Close</button>
+                    <button class="btn btn-secondary" onclick="downloadLogs('${modelId}')">Download Logs</button>
+                </div>
+            `);
+        }
+
+        function viewTrainingLogs(modelId) {
+            showModal('Training Logs', `
+                <div style="background: #1e293b; color: #e2e8f0; padding: var(--space-4); border-radius: var(--radius-md); font-family: var(--font-mono); font-size: 0.875rem; max-height: 400px; overflow-y: auto;">
+                    <div>2024-01-15 08:00:00 [TRAIN] Starting training session</div>
+                    <div>2024-01-15 08:00:02 [TRAIN] Dataset loaded: 2.1M samples</div>
+                    <div>2024-01-15 08:00:05 [TRAIN] Validation split: 20% (420K samples)</div>
+                    <div>2024-01-15 08:15:30 [TRAIN] Epoch 1/200 - Loss: 0.8234 - Accuracy: 76.2%</div>
+                    <div>2024-01-15 08:31:45 [TRAIN] Epoch 2/200 - Loss: 0.6891 - Accuracy: 81.5%</div>
+                    <div>2024-01-15 09:48:12 [TRAIN] Epoch 50/200 - Loss: 0.2156 - Accuracy: 87.3%</div>
+                    <div>2024-01-15 10:45:33 [TRAIN] Epoch 100/200 - Loss: 0.0891 - Accuracy: 89.1%</div>
+                    <div>2024-01-15 11:32:18 [TRAIN] Epoch 142/200 - Loss: 0.0234 - Accuracy: 89.3%</div>
+                    <div>2024-01-15 11:32:19 [TRAIN] Early stopping criteria evaluated</div>
+                    <div>2024-01-15 11:32:20 [TRAIN] Training continues... ETA: 2.3 hours</div>
+                </div>
+                <div class="form-actions" style="margin-top: var(--space-4);">
+                    <button class="btn btn-outline" onclick="closeModal()">Close</button>
+                    <button class="btn btn-secondary" onclick="downloadLogs('${modelId}')">Download Logs</button>
+                </div>
+            `);
+        }
+
+        function downloadLogs(modelId) {
+            alert('📥 Downloading logs...\n\nLog file will be saved as: ' + modelId + '_logs_' + new Date().toISOString().split('T')[0] + '.txt');
+        }
+
+        function importModel() {
+            alert('📁 Import Model\n\nSupported formats:\n• TensorFlow (.pb, .h5)\n• PyTorch (.pt, .pth)\n• ONNX (.onnx)\n• Scikit-learn (.pkl)\n\nSelect your model file to import...');
+        }
+
+        // Modal functions
+        function showModal(title, content) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').innerHTML = content;
+            document.getElementById('configModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('configModal').style.display = 'none';
+        }
+
+        // Update training progress simulation
+        function updateTrainingProgress() {
+            const progressFill = document.querySelector('.progress-fill');
+            const currentWidth = parseInt(progressFill.style.width) || 67;
+            
+            if (currentWidth < 100) {
+                const newWidth = Math.min(currentWidth + Math.random() * 0.5, 100);
+                progressFill.style.width = newWidth + '%';
+                
+                // Update epoch and ETA
+                const epoch = Math.floor(142 + (newWidth - 67) * 1.8);
+                const eta = Math.max(2.3 - (newWidth - 67) * 0.05, 0).toFixed(1);
+                
+                document.querySelector('.training-info').innerHTML = 
+                    `<strong>Training Progress:</strong> Epoch ${epoch}/200 • ETA: ${eta} hours`;
+            }
+        }
+
+        // Logging function
+        function logModelAction(action, modelId) {
+            const actions = JSON.parse(localStorage.getItem('modelActions') || '[]');
+            actions.push({
+                action: action,
+                model: modelId,
+                timestamp: new Date().toISOString(),
+                page: 'model-management'
+            });
+            localStorage.setItem('modelActions', JSON.stringify(actions));
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add fade-in animations
+            const elements = document.querySelectorAll('.fade-in');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.animation = `fadeIn 0.6s ease-in forwards`;
+                }, index * 100);
+            });
+
+            // Update training progress periodically
+            setInterval(updateTrainingProgress, 10000);
+
+            // Close modal when clicking outside
+            document.getElementById('configModal').addEventListener('click', function(e) {
+                if (e.target === this) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

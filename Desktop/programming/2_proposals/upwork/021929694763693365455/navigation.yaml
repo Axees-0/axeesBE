@@ -1,0 +1,141 @@
+name: "AI Analytics Pro - AI-Driven MVP Dashboard Demo"
+description: "Interactive demo showcasing AI model management, real-time analytics, and predictive insights for Upwork proposal"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 15000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  - type: navigate
+    description: "Navigate to AI Analytics Pro dashboard"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929694763693365455/index.html"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for dashboard to load"
+    selector: ".dashboard-title"
+    
+  - type: assertText
+    description: "Verify dashboard title"
+    selector: ".dashboard-title"
+    expected: "AI Analytics Dashboard"
+    
+  - type: wait
+    description: "Allow real-time metrics to update"
+    value: 3000
+    
+  - type: screenshot
+    description: "Capture main dashboard with live metrics"
+    
+  - type: click
+    description: "Test model configuration button"
+    selector: ".btn-outline"
+    screenshot: true
+    
+  - type: wait
+    description: "Wait for interaction feedback"
+    value: 1000
+    
+  - type: navigate
+    description: "Navigate to AI Analytics page"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929694763693365455/ai-analytics.html"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for analytics charts to load"
+    selector: "#accuracyChart"
+    
+  - type: assertText
+    description: "Verify analytics page title"
+    selector: ".page-title"
+    expected: "AI Analytics & Performance"
+    
+  - type: click
+    description: "Test chart time range controls"
+    selector: ".control-btn"
+    screenshot: true
+    
+  - type: wait
+    description: "Allow chart update animation"
+    value: 2000
+    
+  - type: navigate
+    description: "Navigate to Model Management page"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929694763693365455/model-management.html"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for model cards to load"
+    selector: ".model-card"
+    
+  - type: assertText
+    description: "Verify model management title"
+    selector: ".page-title"
+    expected: "AI Model Management"
+    
+  - type: click
+    description: "Test new model creation"
+    selector: ".btn-primary"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for model form to appear"
+    selector: ".model-form"
+    
+  - type: type
+    description: "Enter model name"
+    selector: "#modelName"
+    text: "Demo AI Model"
+    
+  - type: click
+    description: "Select model type"
+    selector: "#modelType"
+    
+  - type: screenshot
+    description: "Capture model creation form"
+    
+  - type: navigate
+    description: "Navigate to Data Insights page"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929694763693365455/data-insights.html"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for insights to load"
+    selector: ".ai-recommendation"
+    
+  - type: assertText
+    description: "Verify insights page title"
+    selector: ".page-title"
+    expected: "Data Insights & Predictions"
+    
+  - type: wait
+    description: "Allow predictions to update"
+    value: 5000
+    
+  - type: click
+    description: "Test AI recommendation action"
+    selector: ".btn-ai"
+    screenshot: true
+    
+  - type: wait
+    description: "Wait for recommendation interaction"
+    value: 1000
+    
+  - type: evaluate
+    description: "Verify interactive elements are working"
+    script: |
+      const activeModels = document.querySelector('#active-models');
+      const predictions = document.querySelectorAll('.prediction-value');
+      const charts = document.querySelectorAll('canvas');
+      console.log('Active elements found:', {
+        activeModels: !!activeModels,
+        predictions: predictions.length,
+        charts: charts.length
+      });
+    
+  - type: screenshot
+    description: "Final demo state capture"
