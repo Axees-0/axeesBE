@@ -1,0 +1,181 @@
+name: "MVP Converter Pro - 9 Screenshot Demo Workflow"
+description: "Comprehensive testing workflow capturing 9 strategic screenshots of the MVP design conversion platform"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 30000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Screenshot 1: Homepage/Landing Page
+  - type: navigate
+    description: "Navigate to homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021926034442997674004/index.html"
+    waitUntil: "networkidle2"
+    
+  - type: wait
+    description: "Wait for homepage animations to complete"
+    value: 3000
+    
+  - type: screenshot
+    description: "Capture homepage with hero section and features"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 2: Upload Design Page
+  - type: click
+    description: "Navigate to upload design page"
+    selector: "a[href='upload.html'], .nav-link[href='upload.html']"
+    
+  - type: wait
+    description: "Wait for upload page to load"
+    value: 3000
+    
+  - type: assertText
+    description: "Verify upload page loaded correctly"
+    selector: "h1"
+    expected: "Upload Your Mobile Design"
+    
+  - type: screenshot
+    description: "Capture upload interface with drag-and-drop zone"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 3: Dashboard Analytics
+  - type: click
+    description: "Navigate to dashboard"
+    selector: "a[href='dashboard.html'], .nav-link[href='dashboard.html']"
+    
+  - type: wait
+    description: "Wait for dashboard and charts to load"
+    value: 4000
+    
+  - type: assertText
+    description: "Verify dashboard loaded"
+    selector: "h1"
+    expected: "Dashboard"
+    
+  - type: screenshot
+    description: "Capture dashboard with analytics and stats"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 4: Live Preview Mobile View
+  - type: click
+    description: "Navigate to preview page"
+    selector: "a[href='preview.html'], .nav-link[href='preview.html']"
+    
+  - type: wait
+    description: "Wait for preview page to load"
+    value: 3000
+    
+  - type: assertVisible
+    description: "Verify mobile preview is visible"
+    selector: ".device-screen.mobile"
+    
+  - type: screenshot
+    description: "Capture mobile device preview"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 5: Preview Tablet View
+  - type: click
+    description: "Switch to tablet view"
+    selector: ".device-btn[data-device='tablet']"
+    
+  - type: wait
+    description: "Wait for device transition"
+    value: 2000
+    
+  - type: screenshot
+    description: "Capture tablet device preview"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 6: Preview Desktop View
+  - type: click
+    description: "Switch to desktop view"
+    selector: ".device-btn[data-device='desktop']"
+    
+  - type: wait
+    description: "Wait for device transition"
+    value: 2000
+    
+  - type: screenshot
+    description: "Capture desktop device preview"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 7: Preview with Interactions Enabled
+  - type: click
+    description: "Enable interaction indicators"
+    selector: "#toggleInteractions"
+    
+  - type: wait
+    description: "Wait for interaction dots to appear"
+    value: 2000
+    
+  - type: screenshot
+    description: "Capture preview with interaction indicators"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 8: Export and Deployment Options
+  - type: click
+    description: "Navigate to export page"
+    selector: "a[href='export.html'], .nav-link[href='export.html']"
+    
+  - type: wait
+    description: "Wait for export page to load"
+    value: 3000
+    
+  - type: assertText
+    description: "Verify export page loaded"
+    selector: "h1"
+    expected: "Export & Deploy Your MVP"
+    
+  - type: screenshot
+    description: "Capture export options and deployment platforms"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 9: Export Process Simulation
+  - type: click
+    description: "Start download process to show modal"
+    selector: "#downloadCode"
+    
+  - type: wait
+    description: "Wait for modal to appear and progress to start"
+    value: 2000
+    
+  - type: assertVisible
+    description: "Verify progress modal is visible"
+    selector: "#progressModal.show"
+    
+  - type: screenshot
+    description: "Capture export progress modal"
+    screenshot:
+      fullPage: true
+
+  # Final verification
+  - type: evaluate
+    description: "Collect demo completion metrics"
+    script: |
+      ({
+        title: document.title,
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+        pagesVisited: 5,
+        featuresdemonstrated: [
+          'Design Upload Interface',
+          'Analytics Dashboard', 
+          'Multi-device Preview',
+          'Interactive Elements',
+          'Export & Deployment'
+        ],
+        screenshotCount: 9,
+        workflowStatus: 'COMPLETED'
+      })

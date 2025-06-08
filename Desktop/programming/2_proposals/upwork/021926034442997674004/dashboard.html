@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - MVP Converter Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #6366F1;
+            --primary-hover: #4F46E5;
+            --primary-light: #E0E7FF;
+            --secondary-color: #10B981;
+            --secondary-hover: #059669;
+            --secondary-light: #D1FAE5;
+            --accent-color: #F59E0B;
+            --accent-hover: #D97706;
+            --accent-light: #FEF3C7;
+            --background: #F9FAFB;
+            --surface: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background);
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h2 {
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .nav-brand a {
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+
+        .dashboard-header {
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background-color: var(--surface);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .stat-change.positive {
+            color: var(--secondary-color);
+        }
+
+        .stat-change.negative {
+            color: #EF4444;
+        }
+
+        /* Main Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .dashboard-section {
+            background-color: var(--surface);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Conversion Pipeline */
+        .pipeline-step {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .pipeline-step.completed {
+            border-left-color: var(--secondary-color);
+        }
+
+        .pipeline-step.in-progress {
+            border-left-color: var(--accent-color);
+            animation: pulse 2s infinite;
+        }
+
+        .pipeline-step-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .pipeline-step.completed .pipeline-step-icon {
+            background-color: var(--secondary-light);
+            color: var(--secondary-color);
+        }
+
+        .pipeline-step.in-progress .pipeline-step-icon {
+            background-color: var(--accent-light);
+            color: var(--accent-color);
+        }
+
+        .pipeline-step-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .pipeline-step-content p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Recent Projects */
+        .project-list {
+            list-style: none;
+        }
+
+        .project-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .project-item:hover {
+            background-color: var(--primary-light);
+            cursor: pointer;
+        }
+
+        .project-thumbnail {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            border-radius: 0.5rem;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .project-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .project-info p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .project-status {
+            margin-left: auto;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .project-status.completed {
+            background-color: var(--secondary-light);
+            color: var(--secondary-color);
+        }
+
+        .project-status.in-progress {
+            background-color: var(--accent-light);
+            color: var(--accent-color);
+        }
+
+        .project-status.draft {
+            background-color: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .action-button {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            background-color: var(--background);
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .action-button:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .action-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            color: white;
+        }
+
+        .action-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .action-content p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-content">
+                    <div class="nav-brand">
+                        <a href="index.html">
+                            <h2>MVP Converter Pro</h2>
+                        </a>
+                    </div>
+                    <ul class="nav-menu">
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="upload.html" class="nav-link">Upload Design</a></li>
+                        <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+                        <li><a href="preview.html" class="nav-link">Preview</a></li>
+                        <li><a href="export.html" class="nav-link">Export</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            <div class="container">
+                <div class="dashboard-header">
+                    <h1>Dashboard</h1>
+                    <p class="dashboard-subtitle">Monitor your MVP conversion projects and track development progress</p>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Total Projects</span>
+                            <div class="stat-icon" style="background-color: var(--primary-light); color: var(--primary-color);">
+                                📊
+                            </div>
+                        </div>
+                        <div class="stat-value">12</div>
+                        <div class="stat-change positive">+3 this month</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Completed MVPs</span>
+                            <div class="stat-icon" style="background-color: var(--secondary-light); color: var(--secondary-color);">
+                                ✅
+                            </div>
+                        </div>
+                        <div class="stat-value">8</div>
+                        <div class="stat-change positive">+2 this week</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Code Quality</span>
+                            <div class="stat-icon" style="background-color: var(--accent-light); color: var(--accent-color);">
+                                ⭐
+                            </div>
+                        </div>
+                        <div class="stat-value">94%</div>
+                        <div class="stat-change positive">+5% improvement</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="stat-title">Avg. Conversion Time</span>
+                            <div class="stat-icon" style="background-color: var(--primary-light); color: var(--primary-color);">
+                                ⚡
+                            </div>
+                        </div>
+                        <div class="stat-value">2.4h</div>
+                        <div class="stat-change positive">-30min faster</div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Conversion Pipeline -->
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Current Conversion Pipeline</h3>
+                            <a href="preview.html" class="btn-secondary">View Details</a>
+                        </div>
+
+                        <div class="pipeline-step completed">
+                            <div class="pipeline-step-icon">✅</div>
+                            <div class="pipeline-step-content">
+                                <h4>Design Analysis Complete</h4>
+                                <p>Successfully extracted 12 components and 5 layout patterns</p>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-step completed">
+                            <div class="pipeline-step-icon">🎨</div>
+                            <div class="pipeline-step-content">
+                                <h4>Component Library Generated</h4>
+                                <p>React components with TypeScript and styled-components</p>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-step in-progress">
+                            <div class="pipeline-step-icon">⚙️</div>
+                            <div class="pipeline-step-content">
+                                <h4>Code Optimization</h4>
+                                <p>Applying performance optimizations and best practices</p>
+                            </div>
+                        </div>
+
+                        <div class="pipeline-step">
+                            <div class="pipeline-step-icon">🚀</div>
+                            <div class="pipeline-step-content">
+                                <h4>Deployment Ready</h4>
+                                <p>Final testing and deployment package generation</p>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 2rem;">
+                            <a href="export.html" class="btn-primary">Continue to Export</a>
+                        </div>
+                    </div>
+
+                    <!-- Recent Projects -->
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Recent Projects</h3>
+                            <a href="upload.html" class="btn-primary">New Project</a>
+                        </div>
+
+                        <ul class="project-list">
+                            <li class="project-item">
+                                <div class="project-thumbnail">E</div>
+                                <div class="project-info">
+                                    <h4>E-commerce Mobile App</h4>
+                                    <p>React Native • 2 hours ago</p>
+                                </div>
+                                <span class="project-status in-progress">In Progress</span>
+                            </li>
+
+                            <li class="project-item">
+                                <div class="project-thumbnail">F</div>
+                                <div class="project-info">
+                                    <h4>Fitness Tracking App</h4>
+                                    <p>Flutter • Yesterday</p>
+                                </div>
+                                <span class="project-status completed">Completed</span>
+                            </li>
+
+                            <li class="project-item">
+                                <div class="project-thumbnail">S</div>
+                                <div class="project-info">
+                                    <h4>Social Media Dashboard</h4>
+                                    <p>Vue.js • 3 days ago</p>
+                                </div>
+                                <span class="project-status completed">Completed</span>
+                            </li>
+
+                            <li class="project-item">
+                                <div class="project-thumbnail">B</div>
+                                <div class="project-info">
+                                    <h4>Banking App UI</h4>
+                                    <p>React • 1 week ago</p>
+                                </div>
+                                <span class="project-status draft">Draft</span>
+                            </li>
+                        </ul>
+
+                        <div class="quick-actions">
+                            <a href="preview.html" class="action-button">
+                                <div class="action-icon">👁️</div>
+                                <div class="action-content">
+                                    <h4>Preview Current Project</h4>
+                                    <p>See live preview and test interactions</p>
+                                </div>
+                            </a>
+
+                            <a href="export.html" class="action-button">
+                                <div class="action-icon">📦</div>
+                                <div class="action-content">
+                                    <h4>Export & Deploy</h4>
+                                    <p>Download code or deploy to cloud</p>
+                                </div>
+                            </a>
+
+                            <a href="upload.html" class="action-button">
+                                <div class="action-icon">📱</div>
+                                <div class="action-content">
+                                    <h4>Upload New Design</h4>
+                                    <p>Start converting another design</p>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Chart -->
+                <div class="dashboard-section" style="margin-top: 2rem;">
+                    <div class="section-header">
+                        <h3 class="section-title">Conversion Performance</h3>
+                        <select id="chartPeriod" style="padding: 0.5rem; border: 1px solid var(--border-color); border-radius: 0.25rem;">
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                        </select>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize performance chart
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const performanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Conversions',
+                    data: [2, 4, 3, 5, 2, 3, 4],
+                    borderColor: '#6366F1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Quality Score',
+                    data: [85, 92, 88, 95, 91, 89, 94],
+                    borderColor: '#10B981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        beginAtZero: true,
+                        max: 10
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                    }
+                }
+            }
+        });
+
+        // Chart period selector
+        document.getElementById('chartPeriod').addEventListener('change', (e) => {
+            const period = e.target.value;
+            let labels, data1, data2;
+            
+            if (period === '7') {
+                labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                data1 = [2, 4, 3, 5, 2, 3, 4];
+                data2 = [85, 92, 88, 95, 91, 89, 94];
+            } else if (period === '30') {
+                labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                data1 = [12, 18, 15, 22];
+                data2 = [88, 91, 89, 93];
+            } else {
+                labels = ['Month 1', 'Month 2', 'Month 3'];
+                data1 = [45, 52, 38];
+                data2 = [87, 90, 92];
+            }
+            
+            performanceChart.data.labels = labels;
+            performanceChart.data.datasets[0].data = data1;
+            performanceChart.data.datasets[1].data = data2;
+            performanceChart.update();
+        });
+
+        // Simulate real-time updates
+        function updateStats() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                if (Math.random() > 0.9) { // 10% chance to update
+                    const currentValue = parseInt(stat.textContent);
+                    const change = Math.random() > 0.5 ? 1 : -1;
+                    if (stat.textContent.includes('%')) {
+                        stat.textContent = Math.max(0, Math.min(100, currentValue + change)) + '%';
+                    } else if (stat.textContent.includes('h')) {
+                        stat.textContent = Math.max(1, currentValue + (change * 0.1)).toFixed(1) + 'h';
+                    } else {
+                        stat.textContent = Math.max(0, currentValue + change);
+                    }
+                }
+            });
+        }
+
+        // Update stats every 30 seconds
+        setInterval(updateStats, 30000);
+
+        // Project item click handlers
+        document.querySelectorAll('.project-item').forEach(item => {
+            item.addEventListener('click', () => {
+                window.location.href = 'preview.html';
+            });
+        });
+
+        // Active navigation highlighting
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath.split('/').pop()) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+
+        // Animation on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = document.querySelectorAll('.stat-card, .dashboard-section');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('fade-in');
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

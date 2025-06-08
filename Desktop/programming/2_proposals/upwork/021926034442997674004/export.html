@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Export & Deploy - MVP Converter Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366F1;
+            --primary-hover: #4F46E5;
+            --primary-light: #E0E7FF;
+            --secondary-color: #10B981;
+            --secondary-hover: #059669;
+            --secondary-light: #D1FAE5;
+            --accent-color: #F59E0B;
+            --accent-hover: #D97706;
+            --accent-light: #FEF3C7;
+            --background: #F9FAFB;
+            --surface: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background);
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h2 {
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .nav-brand a {
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 3rem 0;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .page-description {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Export Options Grid */
+        .export-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .export-section {
+            background-color: var(--surface);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-icon {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        /* Export Options */
+        .export-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .export-option {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .export-option:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .option-info {
+            flex: 1;
+        }
+
+        .option-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: var(--text-primary);
+        }
+
+        .option-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .option-format {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* Deployment Platforms */
+        .deployment-platforms {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .platform-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            border: 2px solid var(--border-color);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .platform-card:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .platform-card.selected {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .platform-logo {
+            width: 40px;
+            height: 40px;
+            background-color: var(--surface);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .platform-card.selected .platform-logo {
+            background-color: white;
+            color: var(--primary-color);
+        }
+
+        .platform-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .platform-features {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background-color: var(--surface);
+            color: var(--text-primary);
+            padding: 1rem 2rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+            width: 100%;
+            text-align: center;
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Progress Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--surface);
+            border-radius: 0.75rem;
+            padding: 3rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .modal-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            animation: spin 2s linear infinite;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .modal-description {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Success State */
+        .success-content {
+            display: none;
+        }
+
+        .success-content.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--secondary-color);
+            margin-bottom: 1rem;
+        }
+
+        .success-links {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .success-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+
+        .success-link:hover {
+            background-color: var(--primary-light);
+        }
+
+        .link-info {
+            flex: 1;
+        }
+
+        .link-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .link-url {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-family: 'Courier New', monospace;
+        }
+
+        .link-icon {
+            margin-left: 1rem;
+            font-size: 1.25rem;
+        }
+
+        /* Animations */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .export-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .deployment-platforms {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-content">
+                    <div class="nav-brand">
+                        <a href="index.html">
+                            <h2>MVP Converter Pro</h2>
+                        </a>
+                    </div>
+                    <ul class="nav-menu">
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="upload.html" class="nav-link">Upload Design</a></li>
+                        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                        <li><a href="preview.html" class="nav-link">Preview</a></li>
+                        <li><a href="export.html" class="nav-link active">Export</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            <div class="container">
+                <h1>Export & Deploy Your MVP</h1>
+                <p class="page-description">
+                    Your MVP is ready! Choose how you'd like to export your code or deploy your application to the cloud.
+                </p>
+
+                <!-- Export Options Grid -->
+                <div class="export-grid">
+                    <!-- Code Export -->
+                    <div class="export-section">
+                        <div class="section-header">
+                            <div class="section-icon">💻</div>
+                            <div>
+                                <h3 class="section-title">Download Code</h3>
+                            </div>
+                        </div>
+                        <p class="section-description">
+                            Download your complete codebase with all components, styles, and configurations ready for development.
+                        </p>
+
+                        <div class="export-options">
+                            <div class="export-option" data-format="react">
+                                <div class="option-info">
+                                    <div class="option-title">React + TypeScript</div>
+                                    <div class="option-description">Complete React app with TypeScript, components, and build tools</div>
+                                </div>
+                                <div class="option-format">ZIP</div>
+                            </div>
+
+                            <div class="export-option" data-format="vue">
+                                <div class="option-info">
+                                    <div class="option-title">Vue.js 3 + Composition API</div>
+                                    <div class="option-description">Vue application with modern composition API and Vite</div>
+                                </div>
+                                <div class="option-format">ZIP</div>
+                            </div>
+
+                            <div class="export-option" data-format="vanilla">
+                                <div class="option-info">
+                                    <div class="option-title">Vanilla HTML/CSS/JS</div>
+                                    <div class="option-description">Pure web technologies with no framework dependencies</div>
+                                </div>
+                                <div class="option-format">ZIP</div>
+                            </div>
+
+                            <div class="export-option" data-format="figma">
+                                <div class="option-info">
+                                    <div class="option-title">Figma Design Tokens</div>
+                                    <div class="option-description">Export design system as tokens for design tools</div>
+                                </div>
+                                <div class="option-format">JSON</div>
+                            </div>
+                        </div>
+
+                        <button class="btn-primary" id="downloadCode" style="margin-top: 2rem;">
+                            📦 Download Selected Format
+                        </button>
+                    </div>
+
+                    <!-- Cloud Deployment -->
+                    <div class="export-section">
+                        <div class="section-header">
+                            <div class="section-icon">🚀</div>
+                            <div>
+                                <h3 class="section-title">Deploy to Cloud</h3>
+                            </div>
+                        </div>
+                        <p class="section-description">
+                            Deploy your MVP directly to popular hosting platforms with automatic CI/CD setup and SSL certificates.
+                        </p>
+
+                        <div class="deployment-platforms">
+                            <div class="platform-card" data-platform="vercel">
+                                <div class="platform-logo">▲</div>
+                                <div class="platform-name">Vercel</div>
+                                <div class="platform-features">Edge Functions • Analytics</div>
+                            </div>
+
+                            <div class="platform-card" data-platform="netlify">
+                                <div class="platform-logo">🌐</div>
+                                <div class="platform-name">Netlify</div>
+                                <div class="platform-features">Forms • Functions</div>
+                            </div>
+
+                            <div class="platform-card" data-platform="aws">
+                                <div class="platform-logo">☁️</div>
+                                <div class="platform-name">AWS S3</div>
+                                <div class="platform-features">CDN • Custom Domain</div>
+                            </div>
+
+                            <div class="platform-card" data-platform="github">
+                                <div class="platform-logo">📂</div>
+                                <div class="platform-name">GitHub Pages</div>
+                                <div class="platform-features">Free • Git Integration</div>
+                            </div>
+                        </div>
+
+                        <button class="btn-success" id="deployApp" style="margin-top: 2rem;" disabled>
+                            🚀 Deploy to Selected Platform
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Additional Options -->
+                <div class="export-section" style="margin-bottom: 2rem;">
+                    <div class="section-header">
+                        <div class="section-icon">🔧</div>
+                        <div>
+                            <h3 class="section-title">Advanced Options</h3>
+                        </div>
+                    </div>
+                    <p class="section-description">
+                        Additional export options for developers and teams.
+                    </p>
+
+                    <div class="export-options">
+                        <div class="export-option" data-format="docker">
+                            <div class="option-info">
+                                <div class="option-title">Docker Container</div>
+                                <div class="option-description">Complete containerized application with Dockerfile and docker-compose</div>
+                            </div>
+                            <div class="option-format">TAR</div>
+                        </div>
+
+                        <div class="export-option" data-format="storybook">
+                            <div class="option-info">
+                                <div class="option-title">Storybook Documentation</div>
+                                <div class="option-description">Interactive component documentation and testing environment</div>
+                            </div>
+                            <div class="option-format">ZIP</div>
+                        </div>
+
+                        <div class="export-option" data-format="tests">
+                            <div class="option-info">
+                                <div class="option-title">Test Suite</div>
+                                <div class="option-description">Complete testing setup with Jest, React Testing Library, and E2E tests</div>
+                            </div>
+                            <div class="option-format">ZIP</div>
+                        </div>
+                    </div>
+
+                    <button class="btn-secondary" id="exportAdvanced" style="margin-top: 2rem;">
+                        ⚙️ Export Advanced Package
+                    </button>
+                </div>
+            </div>
+        </main>
+
+        <!-- Progress Modal -->
+        <div class="modal" id="progressModal">
+            <div class="modal-content">
+                <div class="loading-content" id="loadingContent">
+                    <div class="modal-icon">⚙️</div>
+                    <h3 class="modal-title">Processing Your Export</h3>
+                    <p class="modal-description">Generating code, optimizing assets, and preparing your download...</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <p class="progress-text" id="progressText">Initializing...</p>
+                </div>
+
+                <div class="success-content" id="successContent">
+                    <div class="success-icon">✅</div>
+                    <h3 class="modal-title">Export Complete!</h3>
+                    <p class="modal-description">Your MVP has been successfully processed and is ready.</p>
+                    
+                    <div class="success-links">
+                        <a href="#" class="success-link" id="downloadLink">
+                            <div class="link-info">
+                                <div class="link-title">Download Package</div>
+                                <div class="link-url">mvp-converter-export.zip</div>
+                            </div>
+                            <div class="link-icon">📥</div>
+                        </a>
+                        
+                        <a href="#" class="success-link" id="livePreview" style="display: none;">
+                            <div class="link-info">
+                                <div class="link-title">Live Preview</div>
+                                <div class="link-url">https://your-app.vercel.app</div>
+                            </div>
+                            <div class="link-icon">🌐</div>
+                        </a>
+                        
+                        <a href="#" class="success-link" id="githubRepo" style="display: none;">
+                            <div class="link-info">
+                                <div class="link-title">GitHub Repository</div>
+                                <div class="link-url">github.com/user/mvp-project</div>
+                            </div>
+                            <div class="link-icon">📂</div>
+                        </a>
+                    </div>
+
+                    <button class="btn-primary" onclick="closeModal()" style="margin-top: 2rem;">
+                        🎉 Complete
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFormat = 'react';
+        let selectedPlatform = null;
+
+        // Format selection
+        document.querySelectorAll('.export-option').forEach(option => {
+            option.addEventListener('click', () => {
+                // Remove active class from all options in the same section
+                const section = option.closest('.export-section');
+                section.querySelectorAll('.export-option').forEach(opt => {
+                    opt.style.borderColor = 'var(--border-color)';
+                    opt.style.backgroundColor = 'var(--background)';
+                });
+                
+                // Add active state to clicked option
+                option.style.borderColor = 'var(--primary-color)';
+                option.style.backgroundColor = 'var(--primary-light)';
+                
+                selectedFormat = option.dataset.format;
+            });
+        });
+
+        // Platform selection
+        document.querySelectorAll('.platform-card').forEach(card => {
+            card.addEventListener('click', () => {
+                // Remove selected class from all cards
+                document.querySelectorAll('.platform-card').forEach(c => {
+                    c.classList.remove('selected');
+                });
+                
+                // Add selected class to clicked card
+                card.classList.add('selected');
+                selectedPlatform = card.dataset.platform;
+                
+                // Enable deploy button
+                document.getElementById('deployApp').disabled = false;
+            });
+        });
+
+        // Download code functionality
+        document.getElementById('downloadCode').addEventListener('click', () => {
+            startExportProcess('download', selectedFormat);
+        });
+
+        // Deploy app functionality
+        document.getElementById('deployApp').addEventListener('click', () => {
+            if (selectedPlatform) {
+                startExportProcess('deploy', selectedPlatform);
+            }
+        });
+
+        // Advanced export functionality
+        document.getElementById('exportAdvanced').addEventListener('click', () => {
+            startExportProcess('advanced', 'complete');
+        });
+
+        function startExportProcess(type, format) {
+            const modal = document.getElementById('progressModal');
+            const loadingContent = document.getElementById('loadingContent');
+            const successContent = document.getElementById('successContent');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            // Reset modal state
+            loadingContent.style.display = 'block';
+            successContent.classList.remove('show');
+            progressFill.style.width = '0%';
+            
+            // Show modal
+            modal.classList.add('show');
+            
+            // Simulate export process
+            const steps = [
+                { progress: 15, text: 'Analyzing components...', duration: 800 },
+                { progress: 30, text: 'Generating code structure...', duration: 1200 },
+                { progress: 50, text: 'Optimizing assets and styles...', duration: 1000 },
+                { progress: 70, text: 'Building production bundle...', duration: 1500 },
+                { progress: 85, text: 'Running quality checks...', duration: 800 },
+                { progress: 100, text: 'Finalizing package...', duration: 600 }
+            ];
+            
+            let currentStep = 0;
+            
+            function executeStep() {
+                if (currentStep < steps.length) {
+                    const step = steps[currentStep];
+                    progressFill.style.width = step.progress + '%';
+                    progressText.textContent = step.text;
+                    
+                    setTimeout(() => {
+                        currentStep++;
+                        executeStep();
+                    }, step.duration);
+                } else {
+                    // Export complete
+                    setTimeout(() => {
+                        showSuccessState(type, format);
+                    }, 500);
+                }
+            }
+            
+            executeStep();
+        }
+
+        function showSuccessState(type, format) {
+            const loadingContent = document.getElementById('loadingContent');
+            const successContent = document.getElementById('successContent');
+            const downloadLink = document.getElementById('downloadLink');
+            const livePreview = document.getElementById('livePreview');
+            const githubRepo = document.getElementById('githubRepo');
+            
+            // Hide loading, show success
+            loadingContent.style.display = 'none';
+            successContent.classList.add('show');
+            
+            // Configure success links based on export type
+            if (type === 'download' || type === 'advanced') {
+                downloadLink.style.display = 'flex';
+                livePreview.style.display = 'none';
+                githubRepo.style.display = 'none';
+                
+                const fileName = type === 'advanced' ? 'mvp-complete-package.zip' : `mvp-${format}-export.zip`;
+                downloadLink.querySelector('.link-url').textContent = fileName;
+                
+                // Simulate download
+                downloadLink.onclick = (e) => {
+                    e.preventDefault();
+                    simulateDownload(fileName);
+                };
+                
+            } else if (type === 'deploy') {
+                downloadLink.style.display = 'flex';
+                livePreview.style.display = 'flex';
+                githubRepo.style.display = 'flex';
+                
+                const platformUrls = {
+                    vercel: 'https://mvp-demo.vercel.app',
+                    netlify: 'https://mvp-demo.netlify.app',
+                    aws: 'https://mvp-demo.s3-website.us-east-1.amazonaws.com',
+                    github: 'https://username.github.io/mvp-demo'
+                };
+                
+                livePreview.querySelector('.link-url').textContent = platformUrls[format];
+                livePreview.href = platformUrls[format];
+                
+                githubRepo.querySelector('.link-url').textContent = 'github.com/user/mvp-demo';
+                githubRepo.href = 'https://github.com/user/mvp-demo';
+            }
+            
+            // Store export completion
+            localStorage.setItem('lastExport', JSON.stringify({
+                type: type,
+                format: format,
+                timestamp: new Date().toISOString()
+            }));
+        }
+
+        function simulateDownload(fileName) {
+            // Create a blob with some sample content
+            const content = `# ${fileName}\n\nThis is a simulated download for the MVP Converter Pro demo.\n\nGenerated on: ${new Date().toLocaleString()}\nFormat: ${selectedFormat}\nType: Download\n\nIn a real implementation, this would contain:\n- Complete source code\n- Component library\n- Build configuration\n- Documentation\n- Deployment scripts`;
+            
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('progressModal');
+            modal.classList.remove('show');
+            
+            // Optional: redirect to dashboard or show success message
+            setTimeout(() => {
+                // Could redirect to dashboard or show a success notification
+                // window.location.href = 'dashboard.html';
+            }, 300);
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('progressModal').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) {
+                closeModal();
+            }
+        });
+
+        // Active navigation highlighting
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath.split('/').pop()) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+
+        // Initialize with React selected
+        document.addEventListener('DOMContentLoaded', () => {
+            const firstOption = document.querySelector('.export-option[data-format="react"]');
+            if (firstOption) {
+                firstOption.click();
+            }
+            
+            // Add fade-in animations
+            const elements = document.querySelectorAll('.export-section, .export-option, .platform-card');
+            elements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.classList.add('fade-in');
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+</html>

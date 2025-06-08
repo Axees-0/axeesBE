@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Design - MVP Converter Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #6366F1;
+            --primary-hover: #4F46E5;
+            --primary-light: #E0E7FF;
+            
+            /* Secondary Colors */
+            --secondary-color: #10B981;
+            --secondary-hover: #059669;
+            --secondary-light: #D1FAE5;
+            
+            /* Accent Colors */
+            --accent-color: #F59E0B;
+            --accent-hover: #D97706;
+            --accent-light: #FEF3C7;
+            
+            /* Neutral Colors */
+            --background: #F9FAFB;
+            --surface: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background);
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h2 {
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .nav-brand a {
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 4rem 0;
+        }
+
+        .upload-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .page-description {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Upload Area */
+        .upload-zone {
+            background-color: var(--surface);
+            border: 3px dashed var(--border-color);
+            border-radius: 0.75rem;
+            padding: 3rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 2rem;
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .upload-zone.drag-over {
+            border-color: var(--primary-color);
+            background-color: var(--primary-light);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-zone h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-zone p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Supported Formats */
+        .supported-formats {
+            background-color: var(--surface);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .supported-formats h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .format-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .format-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+        }
+
+        .format-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--primary-light);
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        /* Upload Progress */
+        .upload-progress {
+            display: none;
+            background-color: var(--surface);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            color: var(--text-secondary);
+        }
+
+        /* Analysis Results */
+        .analysis-results {
+            display: none;
+            background-color: var(--surface);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .analysis-item {
+            text-align: center;
+            padding: 1.5rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+        }
+
+        .analysis-item .icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .analysis-item h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .analysis-item p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        /* Next Steps */
+        .next-steps {
+            display: none;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .btn-secondary {
+            background-color: var(--surface);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin: 0 0.5rem;
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-content">
+                    <div class="nav-brand">
+                        <a href="index.html">
+                            <h2>MVP Converter Pro</h2>
+                        </a>
+                    </div>
+                    <ul class="nav-menu">
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="upload.html" class="nav-link active">Upload Design</a></li>
+                        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                        <li><a href="preview.html" class="nav-link">Preview</a></li>
+                        <li><a href="export.html" class="nav-link">Export</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main>
+            <div class="container">
+                <div class="upload-container">
+                    <h1>Upload Your Mobile Design</h1>
+                    <p class="page-description">
+                        Upload your mobile app design and watch our AI analyze it to generate a complete technical blueprint for development.
+                    </p>
+
+                    <!-- Upload Zone -->
+                    <div class="upload-zone" id="uploadZone">
+                        <div class="upload-icon">📱</div>
+                        <h3>Drag & Drop Your Design File</h3>
+                        <p>or click to browse and select your design file</p>
+                        <input type="file" id="fileInput" class="file-input" accept=".fig,.sketch,.xd,.psd,.png,.jpg,.jpeg,.svg">
+                        <button class="btn-primary" onclick="document.getElementById('fileInput').click()">
+                            Choose File
+                        </button>
+                    </div>
+
+                    <!-- Supported Formats -->
+                    <div class="supported-formats">
+                        <h3>Supported Design Formats</h3>
+                        <div class="format-grid">
+                            <div class="format-item">
+                                <div class="format-icon">FIG</div>
+                                <div>
+                                    <strong>Figma Files</strong>
+                                    <br><small>Direct integration support</small>
+                                </div>
+                            </div>
+                            <div class="format-item">
+                                <div class="format-icon">XD</div>
+                                <div>
+                                    <strong>Adobe XD</strong>
+                                    <br><small>Full component extraction</small>
+                                </div>
+                            </div>
+                            <div class="format-item">
+                                <div class="format-icon">SK</div>
+                                <div>
+                                    <strong>Sketch Files</strong>
+                                    <br><small>Symbol and artboard support</small>
+                                </div>
+                            </div>
+                            <div class="format-item">
+                                <div class="format-icon">IMG</div>
+                                <div>
+                                    <strong>Images</strong>
+                                    <br><small>PNG, JPG, SVG files</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upload Progress -->
+                    <div class="upload-progress" id="uploadProgress">
+                        <h3>Analyzing Your Design...</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <p class="progress-text" id="progressText">Uploading and processing your design file...</p>
+                    </div>
+
+                    <!-- Analysis Results -->
+                    <div class="analysis-results" id="analysisResults">
+                        <h3>✅ Analysis Complete!</h3>
+                        <p>Your design has been successfully analyzed. Here's what we found:</p>
+                        
+                        <div class="analysis-grid">
+                            <div class="analysis-item">
+                                <div class="icon">🎨</div>
+                                <h4>12 Components</h4>
+                                <p>Buttons, cards, forms, and navigation elements identified</p>
+                            </div>
+                            <div class="analysis-item">
+                                <div class="icon">📐</div>
+                                <h4>5 Layouts</h4>
+                                <p>Different screen layouts and responsive breakpoints</p>
+                            </div>
+                            <div class="analysis-item">
+                                <div class="icon">🎯</div>
+                                <h4>8 Interactions</h4>
+                                <p>User interactions and navigation flows detected</p>
+                            </div>
+                            <div class="analysis-item">
+                                <div class="icon">🎨</div>
+                                <h4>Design System</h4>
+                                <p>Colors, typography, and spacing extracted</p>
+                            </div>
+                        </div>
+
+                        <div class="next-steps" id="nextSteps">
+                            <h3>Ready to Generate Your MVP?</h3>
+                            <p>Your design analysis is complete. Choose your next step:</p>
+                            <div style="margin-top: 1.5rem;">
+                                <a href="dashboard.html" class="btn-success">Go to Dashboard</a>
+                                <a href="preview.html" class="btn-secondary">Preview Results</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // File upload handling
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const analysisResults = document.getElementById('analysisResults');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const nextSteps = document.getElementById('nextSteps');
+
+        // Drag and drop functionality
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('drag-over');
+        });
+
+        uploadZone.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileUpload(files[0]);
+            }
+        });
+
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileUpload(e.target.files[0]);
+            }
+        });
+
+        function handleFileUpload(file) {
+            // Validate file type
+            const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml'];
+            const allowedExtensions = ['.fig', '.sketch', '.xd', '.psd'];
+            
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            const isValidFile = allowedTypes.includes(file.type) || allowedExtensions.includes(fileExtension);
+            
+            if (!isValidFile) {
+                alert('Please upload a valid design file (Figma, Sketch, XD, PSD, or image file)');
+                return;
+            }
+
+            // Hide upload zone and show progress
+            uploadZone.style.display = 'none';
+            uploadProgress.style.display = 'block';
+
+            // Simulate upload and analysis process
+            simulateUploadProcess(file);
+        }
+
+        function simulateUploadProcess(file) {
+            const steps = [
+                { progress: 20, text: 'Uploading design file...', duration: 800 },
+                { progress: 40, text: 'Extracting design elements...', duration: 1200 },
+                { progress: 60, text: 'Analyzing component structure...', duration: 1000 },
+                { progress: 80, text: 'Detecting interactions and flows...', duration: 900 },
+                { progress: 100, text: 'Finalizing analysis report...', duration: 700 }
+            ];
+
+            let currentStep = 0;
+
+            function executeStep() {
+                if (currentStep < steps.length) {
+                    const step = steps[currentStep];
+                    progressFill.style.width = step.progress + '%';
+                    progressText.textContent = step.text;
+
+                    setTimeout(() => {
+                        currentStep++;
+                        executeStep();
+                    }, step.duration);
+                } else {
+                    // Analysis complete
+                    setTimeout(() => {
+                        uploadProgress.style.display = 'none';
+                        analysisResults.style.display = 'block';
+                        analysisResults.classList.add('fade-in');
+                        
+                        // Store upload state
+                        localStorage.setItem('designUploaded', 'true');
+                        localStorage.setItem('designFileName', file.name);
+                        localStorage.setItem('uploadTimestamp', new Date().toISOString());
+
+                        // Show next steps after a delay
+                        setTimeout(() => {
+                            nextSteps.style.display = 'block';
+                            nextSteps.classList.add('fade-in');
+                        }, 1000);
+                    }, 500);
+                }
+            }
+
+            executeStep();
+        }
+
+        // Active navigation highlighting
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath.split('/').pop()) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+
+        // Check if user has already uploaded a design
+        document.addEventListener('DOMContentLoaded', () => {
+            const designUploaded = localStorage.getItem('designUploaded');
+            if (designUploaded === 'true') {
+                const fileName = localStorage.getItem('designFileName') || 'design-file.fig';
+                uploadZone.style.display = 'none';
+                analysisResults.style.display = 'block';
+                nextSteps.style.display = 'block';
+                
+                // Update the analysis to show it's based on previously uploaded file
+                progressText.textContent = `Analysis complete for: ${fileName}`;
+            }
+        });
+    </script>
+</body>
+</html>

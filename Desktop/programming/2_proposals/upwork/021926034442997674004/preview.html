@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Preview - MVP Converter Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #6366F1;
+            --primary-hover: #4F46E5;
+            --primary-light: #E0E7FF;
+            --secondary-color: #10B981;
+            --secondary-hover: #059669;
+            --secondary-light: #D1FAE5;
+            --accent-color: #F59E0B;
+            --accent-hover: #D97706;
+            --accent-light: #FEF3C7;
+            --background: #F9FAFB;
+            --surface: #FFFFFF;
+            --text-primary: #111827;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background);
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface);
+            box-shadow: var(--shadow-sm);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand h2 {
+            color: var(--primary-color);
+            font-weight: 800;
+            font-size: 1.5rem;
+        }
+
+        .nav-brand a {
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 600;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+        }
+
+        /* Main Content */
+        main {
+            flex: 1;
+            padding: 1rem 0;
+        }
+
+        /* Preview Controls */
+        .preview-controls {
+            background-color: var(--surface);
+            padding: 1rem 0;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 1rem;
+        }
+
+        .controls-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .device-selector {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .device-btn {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .device-btn.active {
+            border-color: var(--primary-color);
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .device-btn:hover:not(.active) {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .preview-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface);
+            color: var(--text-primary);
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            font-size: 0.875rem;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        /* Preview Layout */
+        .preview-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 1rem;
+            height: calc(100vh - 200px);
+        }
+
+        /* Sidebar */
+        .preview-sidebar {
+            background-color: var(--surface);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .component-list {
+            list-style: none;
+        }
+
+        .component-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background-color: var(--background);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .component-item:hover {
+            background-color: var(--primary-light);
+            border-color: var(--primary-color);
+        }
+
+        .component-item.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .component-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .component-type {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Device Frame */
+        .device-frame {
+            background-color: var(--surface);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: hidden;
+        }
+
+        .device-screen {
+            background: #000;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .device-screen.mobile {
+            width: 375px;
+            height: 812px;
+        }
+
+        .device-screen.tablet {
+            width: 768px;
+            height: 1024px;
+        }
+
+        .device-screen.desktop {
+            width: 1200px;
+            height: 800px;
+            border-radius: 0.5rem;
+        }
+
+        .screen-content {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .device-screen.desktop .screen-content {
+            border-radius: 0.25rem;
+        }
+
+        /* Mock App Content */
+        .mock-app {
+            width: 100%;
+            height: 100%;
+            background: white;
+            border-radius: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-header {
+            background: var(--primary-color);
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            color: white;
+        }
+
+        .app-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .app-menu {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .menu-dot {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .app-content {
+            padding: 2rem;
+            height: calc(100% - 80px);
+            overflow-y: auto;
+        }
+
+        .content-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .preview-card {
+            background: var(--surface);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .preview-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+        }
+
+        .card-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .card-description {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        /* Interaction Indicators */
+        .interaction-dot {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent-color);
+            border-radius: 50%;
+            z-index: 10;
+            animation: pulse 2s infinite;
+            cursor: pointer;
+        }
+
+        .interaction-dot::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Stats Panel */
+        .stats-panel {
+            background: var(--background);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { 
+                opacity: 1; 
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7; 
+                transform: scale(1.1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .preview-layout {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .device-screen.desktop {
+                width: 100%;
+                max-width: 800px;
+                height: 600px;
+            }
+            
+            .device-screen.tablet {
+                width: 100%;
+                max-width: 600px;
+                height: 800px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-content">
+                    <div class="nav-brand">
+                        <a href="index.html">
+                            <h2>MVP Converter Pro</h2>
+                        </a>
+                    </div>
+                    <ul class="nav-menu">
+                        <li><a href="index.html" class="nav-link">Home</a></li>
+                        <li><a href="upload.html" class="nav-link">Upload Design</a></li>
+                        <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                        <li><a href="preview.html" class="nav-link active">Preview</a></li>
+                        <li><a href="export.html" class="nav-link">Export</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Preview Controls -->
+        <div class="preview-controls">
+            <div class="container">
+                <div class="controls-content">
+                    <div class="device-selector">
+                        <button class="device-btn active" data-device="mobile">📱 Mobile</button>
+                        <button class="device-btn" data-device="tablet">📱 Tablet</button>
+                        <button class="device-btn" data-device="desktop">💻 Desktop</button>
+                    </div>
+                    <div class="preview-actions">
+                        <button class="btn-secondary" id="toggleInteractions">🎯 Show Interactions</button>
+                        <a href="export.html" class="btn-primary">Export Code</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <main>
+            <div class="container">
+                <div class="preview-layout">
+                    <!-- Sidebar -->
+                    <div class="preview-sidebar">
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-title">Project Stats</h3>
+                            <div class="stats-panel">
+                                <div class="stats-grid">
+                                    <div class="stat-item">
+                                        <div class="stat-value">12</div>
+                                        <div class="stat-label">Components</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">5</div>
+                                        <div class="stat-label">Screens</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">94%</div>
+                                        <div class="stat-label">Accuracy</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">2.4h</div>
+                                        <div class="stat-label">Dev Time</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-title">Components</h3>
+                            <ul class="component-list">
+                                <li class="component-item active" data-component="header">
+                                    <div class="component-name">Navigation Header</div>
+                                    <div class="component-type">Layout Component</div>
+                                </li>
+                                <li class="component-item" data-component="cards">
+                                    <div class="component-name">Feature Cards</div>
+                                    <div class="component-type">UI Component</div>
+                                </li>
+                                <li class="component-item" data-component="buttons">
+                                    <div class="component-name">Action Buttons</div>
+                                    <div class="component-type">Interactive</div>
+                                </li>
+                                <li class="component-item" data-component="forms">
+                                    <div class="component-name">Input Forms</div>
+                                    <div class="component-type">Form Component</div>
+                                </li>
+                                <li class="component-item" data-component="navigation">
+                                    <div class="component-name">Bottom Navigation</div>
+                                    <div class="component-type">Navigation</div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="sidebar-section">
+                            <h3 class="sidebar-title">Technologies</h3>
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                <div style="padding: 0.5rem; background: var(--primary-light); border-radius: 0.25rem; font-size: 0.875rem; font-weight: 600; color: var(--primary-color);">
+                                    React 18
+                                </div>
+                                <div style="padding: 0.5rem; background: var(--secondary-light); border-radius: 0.25rem; font-size: 0.875rem; font-weight: 600; color: var(--secondary-color);">
+                                    TypeScript
+                                </div>
+                                <div style="padding: 0.5rem; background: var(--accent-light); border-radius: 0.25rem; font-size: 0.875rem; font-weight: 600; color: var(--accent-color);">
+                                    Styled Components
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Device Preview -->
+                    <div class="device-frame">
+                        <div class="device-screen mobile" id="deviceScreen">
+                            <div class="screen-content">
+                                <div class="mock-app">
+                                    <div class="app-header">
+                                        <div class="app-title">FinanceApp</div>
+                                        <div class="app-menu">
+                                            <div class="menu-dot"></div>
+                                            <div class="menu-dot"></div>
+                                            <div class="menu-dot"></div>
+                                        </div>
+                                    </div>
+                                    <div class="app-content">
+                                        <div class="content-section">
+                                            <div class="section-header">Quick Actions</div>
+                                            <div class="card-grid">
+                                                <div class="preview-card">
+                                                    <div class="card-icon">💰</div>
+                                                    <div class="card-title">Send Money</div>
+                                                    <div class="card-description">Transfer funds to contacts</div>
+                                                </div>
+                                                <div class="preview-card">
+                                                    <div class="card-icon">📊</div>
+                                                    <div class="card-title">View Reports</div>
+                                                    <div class="card-description">Monthly spending analysis</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="content-section">
+                                            <div class="section-header">Recent Transactions</div>
+                                            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--background); border-radius: 0.5rem;">
+                                                    <div>
+                                                        <div style="font-weight: 600;">Coffee Shop</div>
+                                                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Today, 2:30 PM</div>
+                                                    </div>
+                                                    <div style="font-weight: 600; color: #EF4444;">-$4.50</div>
+                                                </div>
+                                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: var(--background); border-radius: 0.5rem;">
+                                                    <div>
+                                                        <div style="font-weight: 600;">Salary Deposit</div>
+                                                        <div style="font-size: 0.875rem; color: var(--text-secondary);">Yesterday</div>
+                                                    </div>
+                                                    <div style="font-weight: 600; color: var(--secondary-color);">+$3,200</div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="content-section">
+                                            <div class="section-header">Account Balance</div>
+                                            <div style="text-align: center; padding: 2rem; background: var(--primary-color); border-radius: 1rem; color: white;">
+                                                <div style="font-size: 0.875rem; opacity: 0.8; margin-bottom: 0.5rem;">Current Balance</div>
+                                                <div style="font-size: 2.5rem; font-weight: 700;">$12,847.92</div>
+                                                <div style="font-size: 0.875rem; opacity: 0.8; margin-top: 0.5rem;">+2.4% from last month</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Interaction Dots -->
+                                    <div class="interaction-dot" style="top: 90px; right: 30px; display: none;" data-interaction="menu"></div>
+                                    <div class="interaction-dot" style="top: 200px; left: 50px; display: none;" data-interaction="send-money"></div>
+                                    <div class="interaction-dot" style="top: 200px; right: 50px; display: none;" data-interaction="reports"></div>
+                                    <div class="interaction-dot" style="bottom: 150px; left: 50%; transform: translateX(-50%); display: none;" data-interaction="balance"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Device switching functionality
+        const deviceButtons = document.querySelectorAll('.device-btn');
+        const deviceScreen = document.getElementById('deviceScreen');
+
+        deviceButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons
+                deviceButtons.forEach(b => b.classList.remove('active'));
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // Update device screen
+                const device = btn.dataset.device;
+                deviceScreen.className = `device-screen ${device}`;
+                
+                // Add animation
+                deviceScreen.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    deviceScreen.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        // Component highlighting
+        const componentItems = document.querySelectorAll('.component-item');
+        componentItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all items
+                componentItems.forEach(i => i.classList.remove('active'));
+                // Add active class to clicked item
+                item.classList.add('active');
+                
+                // Highlight corresponding elements in preview
+                const component = item.dataset.component;
+                highlightComponent(component);
+            });
+        });
+
+        function highlightComponent(component) {
+            // Remove existing highlights
+            document.querySelectorAll('.highlighted').forEach(el => {
+                el.classList.remove('highlighted');
+            });
+            
+            // Add highlight based on component type
+            let selector;
+            switch(component) {
+                case 'header':
+                    selector = '.app-header';
+                    break;
+                case 'cards':
+                    selector = '.preview-card';
+                    break;
+                case 'buttons':
+                    selector = '.preview-card';
+                    break;
+                case 'forms':
+                    selector = '.content-section:last-child';
+                    break;
+                case 'navigation':
+                    selector = '.app-header';
+                    break;
+                default:
+                    return;
+            }
+            
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                el.style.outline = '2px solid var(--accent-color)';
+                el.style.outlineOffset = '2px';
+                setTimeout(() => {
+                    el.style.outline = '';
+                    el.style.outlineOffset = '';
+                }, 2000);
+            });
+        }
+
+        // Interaction indicators toggle
+        const toggleBtn = document.getElementById('toggleInteractions');
+        const interactionDots = document.querySelectorAll('.interaction-dot');
+        let interactionsVisible = false;
+
+        toggleBtn.addEventListener('click', () => {
+            interactionsVisible = !interactionsVisible;
+            
+            interactionDots.forEach(dot => {
+                dot.style.display = interactionsVisible ? 'block' : 'none';
+            });
+            
+            toggleBtn.textContent = interactionsVisible ? '🎯 Hide Interactions' : '🎯 Show Interactions';
+        });
+
+        // Interaction dot click handlers
+        interactionDots.forEach(dot => {
+            dot.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const interaction = dot.dataset.interaction;
+                showInteractionTooltip(dot, interaction);
+            });
+        });
+
+        function showInteractionTooltip(dot, interaction) {
+            // Remove existing tooltips
+            document.querySelectorAll('.interaction-tooltip').forEach(tooltip => {
+                tooltip.remove();
+            });
+            
+            const tooltip = document.createElement('div');
+            tooltip.className = 'interaction-tooltip';
+            tooltip.style.cssText = `
+                position: absolute;
+                background: var(--text-primary);
+                color: white;
+                padding: 0.5rem 1rem;
+                border-radius: 0.5rem;
+                font-size: 0.875rem;
+                font-weight: 600;
+                z-index: 1000;
+                transform: translateX(-50%);
+                white-space: nowrap;
+                box-shadow: var(--shadow-lg);
+            `;
+            
+            const tooltipText = {
+                'menu': 'Opens navigation menu',
+                'send-money': 'Initiates money transfer',
+                'reports': 'Shows analytics dashboard',
+                'balance': 'Displays account details'
+            };
+            
+            tooltip.textContent = tooltipText[interaction] || 'Interactive element';
+            
+            const rect = dot.getBoundingClientRect();
+            tooltip.style.left = rect.left + rect.width / 2 + 'px';
+            tooltip.style.top = rect.top - 40 + 'px';
+            
+            document.body.appendChild(tooltip);
+            
+            // Auto-remove after 3 seconds
+            setTimeout(() => {
+                tooltip.remove();
+            }, 3000);
+        }
+
+        // Simulate real-time updates
+        function updateStats() {
+            const statValues = document.querySelectorAll('.stat-value');
+            statValues.forEach(stat => {
+                if (Math.random() > 0.8) { // 20% chance to update
+                    if (stat.textContent.includes('%')) {
+                        const current = parseInt(stat.textContent);
+                        stat.textContent = Math.max(85, Math.min(100, current + (Math.random() > 0.5 ? 1 : -1))) + '%';
+                    } else if (stat.textContent.includes('h')) {
+                        const current = parseFloat(stat.textContent);
+                        stat.textContent = Math.max(1, current + (Math.random() > 0.5 ? 0.1 : -0.1)).toFixed(1) + 'h';
+                    }
+                }
+            });
+        }
+
+        // Update stats every 15 seconds
+        setInterval(updateStats, 15000);
+
+        // Card hover effects
+        document.querySelectorAll('.preview-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-4px) scale(1.02)';
+                card.style.boxShadow = 'var(--shadow-lg)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+                card.style.boxShadow = '';
+            });
+        });
+
+        // Active navigation highlighting
+        const currentPath = window.location.pathname;
+        const navLinks = document.querySelectorAll('.nav-link');
+        navLinks.forEach(link => {
+            if (link.getAttribute('href') === currentPath.split('/').pop()) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+
+        // Initialize animations
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                document.querySelectorAll('.preview-card, .component-item').forEach((el, index) => {
+                    setTimeout(() => {
+                        el.classList.add('fade-in');
+                    }, index * 100);
+                });
+            }, 500);
+        });
+    </script>
+</body>
+</html>
