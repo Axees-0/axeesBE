@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Lead Scoring - AI Sales Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --accent-color: #f59e0b;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 4rem;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-xl);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-lg);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgb(37 99 235 / 0.1);
+        }
+
+        /* Page Container */
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-md);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+
+        .page-header h1 {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-header p {
+            font-size: var(--font-size-lg);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--primary-color);
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: var(--spacing-sm);
+        }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .card-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin: 0.25rem 0 0 0;
+        }
+
+        /* AI Demo Section */
+        .ai-demo {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 0.75rem;
+            padding: var(--spacing-2xl);
+            margin: var(--spacing-2xl) 0;
+            text-align: center;
+        }
+
+        .ai-demo h2 {
+            font-size: var(--font-size-3xl);
+            margin-bottom: var(--spacing-md);
+            color: white;
+        }
+
+        .ai-demo p {
+            font-size: var(--font-size-lg);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        /* Lead Scoring Form */
+        .scoring-form {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .form-input, .form-select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: var(--font-size-base);
+            color: var(--text-primary);
+            background-color: var(--surface-color);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgb(37 99 235 / 0.1);
+        }
+
+        /* Score Display */
+        .score-display {
+            text-align: center;
+            padding: var(--spacing-xl);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 0.75rem;
+            color: white;
+            margin-top: var(--spacing-lg);
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: conic-gradient(from 0deg, #10b981 0deg, #10b981 var(--score-deg, 270deg), rgba(255,255,255,0.3) var(--score-deg, 270deg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-md);
+            position: relative;
+        }
+
+        .score-inner {
+            width: 90px;
+            height: 90px;
+            background-color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .score-number {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+        }
+
+        .score-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Factor Breakdown */
+        .factor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .factor-item:last-child {
+            border-bottom: none;
+        }
+
+        .factor-name {
+            font-weight: var(--font-weight-medium);
+        }
+
+        .factor-score {
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+        }
+
+        .factor-bar {
+            width: 100px;
+            height: 6px;
+            background-color: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-left: var(--spacing-md);
+        }
+
+        .factor-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--error-color), var(--warning-color), var(--success-color));
+            transition: width 0.5s ease;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .chart-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+        }
+
+        /* AI Insights */
+        .ai-insight {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid var(--primary-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            margin: var(--spacing-md) 0;
+        }
+
+        .ai-insight-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .ai-insight-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-sm);
+        }
+
+        .ai-insight-title {
+            font-weight: var(--font-weight-semibold);
+            color: var(--primary-color);
+        }
+
+        /* Lead Examples */
+        .lead-examples {
+            margin-top: var(--spacing-2xl);
+        }
+
+        .lead-card {
+            border-left: 4px solid;
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .lead-card.hot {
+            border-left-color: var(--success-color);
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+
+        .lead-card.warm {
+            border-left-color: var(--warning-color);
+            background-color: rgba(245, 158, 11, 0.05);
+        }
+
+        .lead-card.cold {
+            border-left-color: var(--error-color);
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+
+        .lead-name {
+            font-weight: var(--font-weight-semibold);
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .lead-score {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .lead-factors {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header h1 {
+                font-size: var(--font-size-3xl);
+            }
+            
+            .score-circle {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .score-inner {
+                width: 75px;
+                height: 75px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>AI Sales Pro</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="lead-scoring.html" class="nav-link active">AI Lead Scoring</a></li>
+                    <li><a href="workflows.html" class="nav-link">Automation</a></li>
+                    <li><a href="campaigns.html" class="nav-link">Campaigns</a></li>
+                    <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>AI-Powered Lead Scoring</h1>
+                <p>Advanced machine learning algorithms analyze multiple data points to predict lead quality and conversion probability, automatically prioritizing your sales efforts for maximum ROI.</p>
+            </header>
+
+            <!-- AI Demo Section -->
+            <section class="ai-demo">
+                <h2>🤖 See AI in Action</h2>
+                <p>Enter lead information below and watch our GPT-4 powered algorithm analyze multiple factors to generate a predictive lead score in real-time.</p>
+                <button class="btn-primary" onclick="scrollToDemo()" style="background-color: white; color: var(--primary-color);">Try Live Demo</button>
+            </section>
+
+            <!-- Scoring Factors Overview -->
+            <section class="grid grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🎯 Behavioral Analysis</h3>
+                        <p class="card-subtitle">Website and content engagement patterns</p>
+                    </div>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li>• Page views and session duration</li>
+                        <li>• Content downloads and interactions</li>
+                        <li>• Email engagement rates</li>
+                        <li>• Social media activity</li>
+                        <li>• Return visit frequency</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">🏢 Firmographic Data</h3>
+                        <p class="card-subtitle">Company and demographic information</p>
+                    </div>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li>• Company size and revenue</li>
+                        <li>• Industry and market segment</li>
+                        <li>• Geographic location</li>
+                        <li>• Technology stack</li>
+                        <li>• Growth indicators</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">⚡ Intent Signals</h3>
+                        <p class="card-subtitle">Purchase intent and timing indicators</p>
+                    </div>
+                    <ul style="margin-left: 1.5rem; color: var(--text-secondary);">
+                        <li>• Pricing page visits</li>
+                        <li>• Demo requests and trials</li>
+                        <li>• Competitor research</li>
+                        <li>• Budget timeline indicators</li>
+                        <li>• Decision maker involvement</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Live Scoring Demo -->
+            <section id="scoringDemo">
+                <h2 style="text-align: center; margin-bottom: 2rem; font-size: 1.875rem; font-weight: 700;">Live AI Scoring Demo</h2>
+                <div class="grid grid-2">
+                    <div class="scoring-form">
+                        <h3 style="margin-bottom: 1.5rem; color: var(--primary-color);">Lead Information</h3>
+                        <form id="leadScoringForm">
+                            <div class="form-group">
+                                <label class="form-label" for="companyName">Company Name</label>
+                                <input type="text" id="companyName" class="form-input" placeholder="e.g., TechStart Inc" value="TechStart Inc">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="industry">Industry</label>
+                                <select id="industry" class="form-select">
+                                    <option value="technology">Technology</option>
+                                    <option value="healthcare">Healthcare</option>
+                                    <option value="finance">Finance</option>
+                                    <option value="manufacturing">Manufacturing</option>
+                                    <option value="retail">Retail</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="companySize">Company Size</label>
+                                <select id="companySize" class="form-select">
+                                    <option value="startup">Startup (1-10)</option>
+                                    <option value="small">Small (11-50)</option>
+                                    <option value="medium" selected>Medium (51-200)</option>
+                                    <option value="large">Large (201-1000)</option>
+                                    <option value="enterprise">Enterprise (1000+)</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="revenue">Annual Revenue</label>
+                                <select id="revenue" class="form-select">
+                                    <option value="under1m">Under $1M</option>
+                                    <option value="1m-10m" selected>$1M - $10M</option>
+                                    <option value="10m-50m">$10M - $50M</option>
+                                    <option value="50m-100m">$50M - $100M</option>
+                                    <option value="over100m">Over $100M</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="engagement">Engagement Level</label>
+                                <select id="engagement" class="form-select">
+                                    <option value="low">Low - Basic website visit</option>
+                                    <option value="medium">Medium - Downloaded content</option>
+                                    <option value="high" selected>High - Requested demo</option>
+                                    <option value="very_high">Very High - Multiple touchpoints</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label" for="budget">Budget Timeline</label>
+                                <select id="budget" class="form-select">
+                                    <option value="immediate">Immediate (This quarter)</option>
+                                    <option value="near" selected>Near-term (Next quarter)</option>
+                                    <option value="future">Future (6+ months)</option>
+                                    <option value="unknown">Unknown</option>
+                                </select>
+                            </div>
+                            
+                            <button type="button" class="btn-primary" style="width: 100%; margin-top: 1rem;" onclick="calculateScore()">
+                                🤖 Calculate AI Score
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">AI Scoring Result</h3>
+                            <p class="card-subtitle">Real-time analysis powered by GPT-4</p>
+                        </div>
+                        
+                        <div id="scoreResult" style="display: none;">
+                            <div class="score-display">
+                                <div class="score-circle" id="scoreCircle">
+                                    <div class="score-inner">
+                                        <div class="score-number" id="scoreNumber">87</div>
+                                        <div class="score-label">Score</div>
+                                    </div>
+                                </div>
+                                <h3 id="scoreCategory" style="margin-bottom: 0.5rem;">High-Priority Lead</h3>
+                                <p id="scoreDescription">Strong conversion probability with immediate action required</p>
+                            </div>
+                            
+                            <div style="margin-top: 1.5rem;">
+                                <h4 style="margin-bottom: 1rem;">Scoring Factor Breakdown</h4>
+                                <div id="factorBreakdown">
+                                    <!-- Populated by JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div id="scorePlaceholder" style="text-align: center; padding: 2rem; color: var(--text-secondary);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">🎯</div>
+                            <p>Fill out the form and click "Calculate AI Score" to see the machine learning algorithm in action.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Insights -->
+            <section>
+                <div class="ai-insight">
+                    <div class="ai-insight-header">
+                        <div class="ai-insight-icon">🧠</div>
+                        <div class="ai-insight-title">AI Recommendation Engine</div>
+                    </div>
+                    <p id="aiRecommendation">Complete the scoring demo above to receive personalized AI-powered recommendations for lead nurturing and engagement strategies.</p>
+                </div>
+            </section>
+
+            <!-- Scoring Performance -->
+            <section class="grid grid-2">
+                <div class="chart-container">
+                    <h3 class="chart-title">AI Model Performance</h3>
+                    <canvas id="performanceChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Score Distribution</h3>
+                    <canvas id="distributionChart" class="chart-canvas"></canvas>
+                </div>
+            </section>
+
+            <!-- Example Scored Leads -->
+            <section class="lead-examples">
+                <h2 style="text-align: center; margin-bottom: 2rem; font-size: 1.875rem; font-weight: 700;">Example Scored Leads</h2>
+                <div class="grid grid-3">
+                    <div class="card lead-card hot">
+                        <div class="lead-name">Global Solutions Inc</div>
+                        <div class="lead-score" style="color: var(--success-color);">95</div>
+                        <div class="lead-factors">
+                            <strong>Key Factors:</strong> Enterprise client, immediate budget, multiple stakeholder engagement, technology match: 98%
+                        </div>
+                    </div>
+                    
+                    <div class="card lead-card warm">
+                        <div class="lead-name">Innovation Labs</div>
+                        <div class="lead-score" style="color: var(--warning-color);">78</div>
+                        <div class="lead-factors">
+                            <strong>Key Factors:</strong> Mid-market opportunity, Q2 budget timeline, moderate engagement, industry fit: 85%
+                        </div>
+                    </div>
+                    
+                    <div class="card lead-card cold">
+                        <div class="lead-name">Startup Ventures</div>
+                        <div class="lead-score" style="color: var(--error-color);">42</div>
+                        <div class="lead-factors">
+                            <strong>Key Factors:</strong> Early-stage company, limited budget, low engagement, requires nurturing sequence
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // AI Lead Scoring Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            trackPageInteraction();
+        });
+
+        function scrollToDemo() {
+            document.getElementById('scoringDemo').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        function calculateScore() {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = '🤖 Analyzing...';
+            button.disabled = true;
+            
+            // Simulate AI processing delay
+            setTimeout(() => {
+                const formData = {
+                    companyName: document.getElementById('companyName').value,
+                    industry: document.getElementById('industry').value,
+                    companySize: document.getElementById('companySize').value,
+                    revenue: document.getElementById('revenue').value,
+                    engagement: document.getElementById('engagement').value,
+                    budget: document.getElementById('budget').value
+                };
+                
+                const score = generateAIScore(formData);
+                displayScore(score, formData);
+                
+                button.textContent = originalText;
+                button.disabled = false;
+                
+                // Store interaction
+                const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+                interactions.push({
+                    type: 'ai_score_calculation',
+                    score: score.total,
+                    company: formData.companyName,
+                    timestamp: new Date().toISOString(),
+                    page: 'lead-scoring'
+                });
+                localStorage.setItem('userInteractions', JSON.stringify(interactions));
+                
+            }, 2000);
+        }
+
+        function generateAIScore(data) {
+            // AI scoring algorithm simulation
+            const factors = {
+                industry: getIndustryScore(data.industry),
+                companySize: getCompanySizeScore(data.companySize),
+                revenue: getRevenueScore(data.revenue),
+                engagement: getEngagementScore(data.engagement),
+                budget: getBudgetScore(data.budget)
+            };
+            
+            // Weighted scoring
+            const weights = {
+                industry: 0.15,
+                companySize: 0.20,
+                revenue: 0.25,
+                engagement: 0.25,
+                budget: 0.15
+            };
+            
+            const total = Math.round(
+                factors.industry * weights.industry +
+                factors.companySize * weights.companySize +
+                factors.revenue * weights.revenue +
+                factors.engagement * weights.engagement +
+                factors.budget * weights.budget
+            );
+            
+            return {
+                total: total,
+                factors: factors,
+                category: getScoreCategory(total),
+                recommendation: getAIRecommendation(total, data)
+            };
+        }
+
+        function getIndustryScore(industry) {
+            const scores = {
+                technology: 90,
+                healthcare: 85,
+                finance: 80,
+                manufacturing: 75,
+                retail: 70
+            };
+            return scores[industry] || 60;
+        }
+
+        function getCompanySizeScore(size) {
+            const scores = {
+                startup: 60,
+                small: 70,
+                medium: 85,
+                large: 90,
+                enterprise: 95
+            };
+            return scores[size] || 50;
+        }
+
+        function getRevenueScore(revenue) {
+            const scores = {
+                under1m: 50,
+                '1m-10m': 70,
+                '10m-50m': 85,
+                '50m-100m': 90,
+                over100m: 95
+            };
+            return scores[revenue] || 40;
+        }
+
+        function getEngagementScore(engagement) {
+            const scores = {
+                low: 40,
+                medium: 65,
+                high: 85,
+                very_high: 95
+            };
+            return scores[engagement] || 30;
+        }
+
+        function getBudgetScore(budget) {
+            const scores = {
+                immediate: 95,
+                near: 80,
+                future: 60,
+                unknown: 45
+            };
+            return scores[budget] || 30;
+        }
+
+        function getScoreCategory(score) {
+            if (score >= 85) return 'Hot Lead - Immediate Action Required';
+            if (score >= 70) return 'Warm Lead - High Priority';
+            if (score >= 55) return 'Qualified Lead - Standard Follow-up';
+            return 'Cold Lead - Nurture Sequence';
+        }
+
+        function getAIRecommendation(score, data) {
+            if (score >= 85) {
+                return `High-priority lead with excellent conversion potential. Recommended actions: Immediate personal outreach, priority demo scheduling, and executive-level engagement. Estimated close probability: 75-85%.`;
+            } else if (score >= 70) {
+                return `Strong lead with good conversion potential. Recommended actions: Targeted content delivery, product demo, and regular follow-up cadence. Estimated close probability: 45-65%.`;
+            } else if (score >= 55) {
+                return `Qualified lead requiring nurturing. Recommended actions: Educational content series, case study sharing, and quarterly check-ins. Estimated close probability: 25-45%.`;
+            }
+            return `Early-stage lead requiring long-term nurturing. Recommended actions: Newsletter subscription, thought leadership content, and semi-annual outreach. Focus on relationship building.`;
+        }
+
+        function displayScore(score, data) {
+            document.getElementById('scorePlaceholder').style.display = 'none';
+            document.getElementById('scoreResult').style.display = 'block';
+            
+            // Update score display
+            document.getElementById('scoreNumber').textContent = score.total;
+            document.getElementById('scoreCategory').textContent = score.category;
+            
+            // Update circular progress
+            const scoreDeg = (score.total / 100) * 360;
+            document.getElementById('scoreCircle').style.setProperty('--score-deg', scoreDeg + 'deg');
+            
+            // Color coding
+            const scoreElement = document.getElementById('scoreNumber');
+            if (score.total >= 85) {
+                scoreElement.style.color = 'var(--success-color)';
+                document.getElementById('scoreDescription').textContent = 'Excellent conversion probability - immediate action recommended';
+            } else if (score.total >= 70) {
+                scoreElement.style.color = 'var(--warning-color)';
+                document.getElementById('scoreDescription').textContent = 'Good conversion potential - high priority follow-up';
+            } else {
+                scoreElement.style.color = 'var(--error-color)';
+                document.getElementById('scoreDescription').textContent = 'Requires nurturing - long-term opportunity';
+            }
+            
+            // Update factor breakdown
+            const factorBreakdown = document.getElementById('factorBreakdown');
+            factorBreakdown.innerHTML = Object.entries(score.factors).map(([factor, value]) => `
+                <div class="factor-item">
+                    <span class="factor-name">${factor.charAt(0).toUpperCase() + factor.slice(1)}</span>
+                    <div class="factor-bar">
+                        <div class="factor-fill" style="width: ${value}%"></div>
+                    </div>
+                    <span class="factor-score">${value}</span>
+                </div>
+            `).join('');
+            
+            // Update AI recommendation
+            document.getElementById('aiRecommendation').textContent = score.recommendation;
+        }
+
+        function initializeCharts() {
+            // AI Model Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Prediction Accuracy',
+                        data: [89, 91, 93, 94, 95, 94],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Conversion Rate',
+                        data: [15, 17, 19, 21, 23, 22],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Score Distribution Chart
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            new Chart(distributionCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['0-20', '21-40', '41-60', '61-80', '81-100'],
+                    datasets: [{
+                        label: 'Number of Leads',
+                        data: [145, 320, 890, 1240, 760],
+                        backgroundColor: [
+                            '#ef4444',
+                            '#f59e0b',
+                            '#6b7280',
+                            '#10b981',
+                            '#2563eb'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function trackPageInteraction() {
+            const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+            interactions.push({
+                type: 'page_view',
+                page: 'lead-scoring',
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('userInteractions', JSON.stringify(interactions));
+        }
+
+        // Add form interaction tracking
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('#leadScoringForm input, #leadScoringForm select')) {
+                const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+                interactions.push({
+                    type: 'form_interaction',
+                    field: e.target.id,
+                    value: e.target.value,
+                    timestamp: new Date().toISOString(),
+                    page: 'lead-scoring'
+                });
+                localStorage.setItem('userInteractions', JSON.stringify(interactions));
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+name: "AI Sales Pro - Enterprise Automation Platform Demo"
+description: "Comprehensive workflow for capturing 9 strategic screenshots of the AI-powered sales and marketing automation platform demonstration"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 30000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Screenshot 1: Homepage - Platform Overview
+  - type: navigate
+    description: "Navigate to homepage showcasing AI Sales Pro platform"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021928793827655663887/index.html"
+    waitUntil: "networkidle2"
+    
+  - type: wait
+    description: "Wait for homepage content to fully load"
+    value: 3000
+    
+  - type: screenshot
+    description: "Capture homepage with platform overview and value proposition"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 2: Dashboard - Real-time Metrics
+  - type: click
+    description: "Navigate to real-time dashboard"
+    selector: "a[href='dashboard.html'], .nav-link[href='dashboard.html']"
+    
+  - type: wait
+    description: "Wait for dashboard charts and metrics to load"
+    value: 4000
+    
+  - type: screenshot
+    description: "Capture dashboard with real-time KPIs and lead management"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 3: AI Lead Scoring - Machine Learning Demo
+  - type: click
+    description: "Navigate to AI lead scoring page"
+    selector: "a[href='lead-scoring.html'], .nav-link[href='lead-scoring.html']"
+    
+  - type: wait
+    description: "Wait for AI scoring interface to load"
+    value: 3000
+    
+  - type: screenshot
+    description: "Capture AI lead scoring with GPT-4 powered analysis"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 4: AI Lead Scoring Demo Interaction
+  - type: click
+    description: "Trigger AI scoring calculation demo"
+    selector: "button[onclick='calculateScore()'], .btn-primary"
+    
+  - type: wait
+    description: "Wait for AI scoring calculation to complete"
+    value: 3000
+    
+  - type: screenshot
+    description: "Capture AI scoring results with factor breakdown"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 5: Automation Workflows - Integration Hub
+  - type: click
+    description: "Navigate to automation workflows page"
+    selector: "a[href='workflows.html'], .nav-link[href='workflows.html']"
+    
+  - type: wait
+    description: "Wait for workflow diagrams and integrations to load"
+    value: 3000
+    
+  - type: screenshot
+    description: "Capture automation workflows with HubSpot/GHL integration"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 6: Campaign Management - Multi-channel Orchestration
+  - type: click
+    description: "Navigate to campaign management page"
+    selector: "a[href='campaigns.html'], .nav-link[href='campaigns.html']"
+    
+  - type: wait
+    description: "Wait for campaign data and charts to load"
+    value: 3000
+    
+  - type: screenshot
+    description: "Capture campaign management with multi-channel coordination"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 7: Campaign Builder Demo
+  - type: click
+    description: "Activate campaign builder demo"
+    selector: "button[onclick='createCampaign()'], .btn-primary"
+    
+  - type: wait
+    description: "Wait for campaign builder interface to activate"
+    value: 2000
+    
+  - type: screenshot
+    description: "Capture campaign builder with step-by-step workflow"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 8: Analytics & ROI - Performance Insights
+  - type: click
+    description: "Navigate to analytics and ROI page"
+    selector: "a[href='analytics.html'], .nav-link[href='analytics.html']"
+    
+  - type: wait
+    description: "Wait for analytics charts and ROI metrics to load"
+    value: 4000
+    
+  - type: screenshot
+    description: "Capture analytics dashboard with ROI insights and predictions"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 9: Complete Platform Demo - Return to Homepage
+  - type: click
+    description: "Return to homepage for final overview"
+    selector: "a[href='index.html'], .nav-link[href='index.html']"
+    
+  - type: wait
+    description: "Wait for homepage to reload with updated demo state"
+    value: 3000
+    
+  - type: evaluate
+    description: "Verify demo completion and data persistence"
+    script: |
+      const demoData = localStorage.getItem('demoData');
+      const interactions = localStorage.getItem('userInteractions');
+      const workflowData = localStorage.getItem('workflowData');
+      return {
+        demoInitialized: !!demoData,
+        userInteractions: interactions ? JSON.parse(interactions).length : 0,
+        workflowsActive: workflowData ? JSON.parse(workflowData).activeWorkflows : 0,
+        timestamp: new Date().toISOString()
+      };
+    
+  - type: screenshot
+    description: "Final capture - Complete AI Sales Pro platform demonstration"
+    screenshot:
+      fullPage: true

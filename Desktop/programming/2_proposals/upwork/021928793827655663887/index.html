@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sales Pro - Enterprise AI-Powered Sales & Marketing Platform</title>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --accent-color: #f59e0b;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 4rem;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-xl);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-lg);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgb(37 99 235 / 0.1);
+        }
+
+        /* Page Container */
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-md);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: var(--spacing-3xl) 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            margin: -var(--spacing-xl) -var(--spacing-md) var(--spacing-3xl);
+        }
+
+        .hero h1 {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .hero p {
+            font-size: var(--font-size-xl);
+            margin-bottom: var(--spacing-2xl);
+            opacity: 0.9;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--surface-color);
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: var(--spacing-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid white;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background-color: white;
+            color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .card-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin: 0.25rem 0 0 0;
+        }
+
+        /* Feature Icons */
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background-color: var(--primary-color);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--spacing-md);
+            color: white;
+            font-size: var(--font-size-xl);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-2xl);
+            margin: var(--spacing-3xl) 0;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-xl);
+            text-align: center;
+        }
+
+        .stat-item h3 {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-item p {
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        /* Integrations Section */
+        .integrations {
+            text-align: center;
+            margin: var(--spacing-3xl) 0;
+        }
+
+        .integration-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--spacing-2xl);
+            margin-top: var(--spacing-2xl);
+            flex-wrap: wrap;
+        }
+
+        .integration-logo {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background-color: var(--surface-color);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-secondary);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--text-primary);
+            color: white;
+            margin-top: var(--spacing-3xl);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: var(--spacing-2xl) var(--spacing-md) var(--spacing-md);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-2xl);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .footer-section h4 {
+            margin-bottom: var(--spacing-md);
+            color: white;
+        }
+
+        .footer-section h5 {
+            margin-bottom: var(--spacing-sm);
+            color: var(--text-muted);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .footer-section a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-section a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: var(--spacing-md);
+            border-top: 1px solid #374151;
+            color: var(--text-muted);
+        }
+
+        /* Demo Banner */
+        .demo-banner {
+            background: linear-gradient(45deg, var(--accent-color), var(--warning-color));
+            color: white;
+            padding: var(--spacing-sm);
+            text-align: center;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-sm);
+        }
+
+        /* Section Headers */
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .section-header h2 {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .section-header p {
+            font-size: var(--font-size-lg);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .grid-3, .grid-2, .stats-grid, .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: var(--font-size-3xl);
+            }
+            
+            .integration-logos {
+                gap: var(--spacing-md);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-banner">
+        🚀 DEMO ENVIRONMENT - Showcasing AI-Powered Sales & Marketing Automation Capabilities
+    </div>
+
+    <div class="page-container">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>AI Sales Pro</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link active">Home</a></li>
+                    <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="lead-scoring.html" class="nav-link">AI Lead Scoring</a></li>
+                    <li><a href="workflows.html" class="nav-link">Automation</a></li>
+                    <li><a href="campaigns.html" class="nav-link">Campaigns</a></li>
+                    <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="hero">
+                <h1>Enterprise AI-Powered Sales & Marketing Platform</h1>
+                <p>Transform your lead generation, qualification, and conversion processes with advanced AI automation, multi-channel nurturing, and real-time analytics.</p>
+                <a href="dashboard.html" class="btn-primary">Explore Dashboard</a>
+                <a href="lead-scoring.html" class="btn-secondary">See AI in Action</a>
+            </section>
+
+            <section class="stats-section">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <h3>300%</h3>
+                        <p>Lead Conversion Increase</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>85%</h3>
+                        <p>Automation Efficiency</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>45%</h3>
+                        <p>Sales Cycle Reduction</p>
+                    </div>
+                    <div class="stat-item">
+                        <h3>$2.4M</h3>
+                        <p>Revenue Generated</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <div class="section-header">
+                    <h2>Core Platform Capabilities</h2>
+                    <p>Comprehensive AI-driven sales and marketing automation designed for enterprise scale</p>
+                </div>
+
+                <div class="grid grid-3">
+                    <div class="card">
+                        <div class="feature-icon">🤖</div>
+                        <div class="card-header">
+                            <h3 class="card-title">AI-Powered Lead Scoring</h3>
+                            <p class="card-subtitle">Predictive analytics for high-value prospect identification</p>
+                        </div>
+                        <p>Advanced machine learning algorithms analyze behavioral patterns, demographics, and engagement data to identify prospects most likely to convert, increasing sales efficiency by 85%.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="feature-icon">⚡</div>
+                        <div class="card-header">
+                            <h3 class="card-title">Multi-Platform Integration</h3>
+                            <p class="card-subtitle">Seamless HubSpot, GoHighLevel & Airtable connectivity</p>
+                        </div>
+                        <p>Native integrations with HubSpot, GoHighLevel, Airtable, Make.com, and Zapier enable unified data flow and automated workflow orchestration across your entire tech stack.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="feature-icon">📈</div>
+                        <div class="card-header">
+                            <h3 class="card-title">Real-Time Analytics</h3>
+                            <p class="card-subtitle">Comprehensive performance monitoring & ROI tracking</p>
+                        </div>
+                        <p>Live dashboards provide instant visibility into lead lifecycle, campaign performance, conversion metrics, and revenue attribution with customizable KPI tracking.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="feature-icon">🎯</div>
+                        <div class="card-header">
+                            <h3 class="card-title">Behavioral Nurturing</h3>
+                            <p class="card-subtitle">Dynamic multi-channel campaign automation</p>
+                        </div>
+                        <p>AI-generated personalized content delivered across email, SMS, and social DMs based on prospect behavior, preferences, and engagement history.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="feature-icon">🔄</div>
+                        <div class="card-header">
+                            <h3 class="card-title">Workflow Automation</h3>
+                            <p class="card-subtitle">Intelligent task assignment & follow-up management</p>
+                        </div>
+                        <p>Automated sales task distribution, lead routing, and follow-up scheduling based on team capacity, expertise, and historical performance data.</p>
+                    </div>
+
+                    <div class="card">
+                        <div class="feature-icon">🧠</div>
+                        <div class="card-header">
+                            <h3 class="card-title">GPT-4 Intelligence</h3>
+                            <p class="card-subtitle">Advanced AI for content generation & insights</p>
+                        </div>
+                        <p>Leverages OpenAI GPT-4 for dynamic content creation, lead qualification scoring, sentiment analysis, and predictive sales forecasting.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="integrations">
+                <div class="section-header">
+                    <h2>Seamless Platform Integrations</h2>
+                    <p>Connect with your existing tools for unified automation</p>
+                </div>
+                <div class="integration-logos">
+                    <div class="integration-logo">HubSpot CRM</div>
+                    <div class="integration-logo">GoHighLevel</div>
+                    <div class="integration-logo">Airtable</div>
+                    <div class="integration-logo">Make.com</div>
+                    <div class="integration-logo">Zapier</div>
+                    <div class="integration-logo">OpenAI GPT-4</div>
+                    <div class="integration-logo">Salesforce</div>
+                    <div class="integration-logo">Mailchimp</div>
+                </div>
+            </section>
+
+            <section>
+                <div class="section-header">
+                    <h2>Implementation Approach</h2>
+                    <p>Structured delivery methodology ensuring on-time, on-budget results</p>
+                </div>
+
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Phase 1: Architecture & Integration</h3>
+                            <p class="card-subtitle">Foundation setup and platform connectivity</p>
+                        </div>
+                        <ul style="margin-left: 1.5rem; margin-top: 1rem; color: var(--text-secondary);">
+                            <li>• API integration mapping and authentication setup</li>
+                            <li>• Data flow architecture design and implementation</li>
+                            <li>• Custom webhook configuration for real-time sync</li>
+                            <li>• Security protocols and access control implementation</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Phase 2: AI Implementation</h3>
+                            <p class="card-subtitle">Machine learning and automation deployment</p>
+                        </div>
+                        <ul style="margin-left: 1.5rem; margin-top: 1rem; color: var(--text-secondary);">
+                            <li>• Lead scoring algorithm development and training</li>
+                            <li>• GPT-4 content generation system integration</li>
+                            <li>• Behavioral tracking and segmentation logic</li>
+                            <li>• Predictive analytics model deployment</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Phase 3: Campaign Automation</h3>
+                            <p class="card-subtitle">Multi-channel nurturing and workflow setup</p>
+                        </div>
+                        <ul style="margin-left: 1.5rem; margin-top: 1rem; color: var(--text-secondary);">
+                            <li>• Email sequence automation with dynamic content</li>
+                            <li>• SMS campaign triggers and personalization</li>
+                            <li>• Social media DM automation setup</li>
+                            <li>• Cross-channel attribution tracking</li>
+                        </ul>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Phase 4: Analytics & Optimization</h3>
+                            <p class="card-subtitle">Dashboard deployment and performance tuning</p>
+                        </div>
+                        <ul style="margin-left: 1.5rem; margin-top: 1rem; color: var(--text-secondary);">
+                            <li>• Real-time dashboard configuration in Airtable</li>
+                            <li>• KPI tracking and ROI measurement setup</li>
+                            <li>• A/B testing framework implementation</li>
+                            <li>• Performance optimization and scaling</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h4>AI Sales Pro</h4>
+                        <p>Enterprise-grade AI-powered sales & marketing automation platform designed for consulting firms and high-growth businesses.</p>
+                    </div>
+                    <div class="footer-section">
+                        <h5>Platform Features</h5>
+                        <ul>
+                            <li><a href="dashboard.html">Real-Time Dashboard</a></li>
+                            <li><a href="lead-scoring.html">AI Lead Scoring</a></li>
+                            <li><a href="workflows.html">Automation Workflows</a></li>
+                            <li><a href="campaigns.html">Campaign Management</a></li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h5>Integrations</h5>
+                        <ul>
+                            <li><a href="#">HubSpot CRM</a></li>
+                            <li><a href="#">GoHighLevel</a></li>
+                            <li><a href="#">Airtable</a></li>
+                            <li><a href="analytics.html">Analytics & ROI</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2025 AI Sales Pro. Enterprise automation platform demonstration.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Simple page interaction tracking
+        document.addEventListener('DOMContentLoaded', function() {
+            // Track button clicks
+            const buttons = document.querySelectorAll('.btn-primary, .btn-secondary');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // Add visual feedback
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                    
+                    // Store interaction in localStorage for demo purposes
+                    const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+                    interactions.push({
+                        type: 'button_click',
+                        element: this.textContent,
+                        timestamp: new Date().toISOString(),
+                        page: 'home'
+                    });
+                    localStorage.setItem('userInteractions', JSON.stringify(interactions));
+                });
+            });
+
+            // Add hover effects to cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(-2px)';
+                });
+            });
+
+            // Animate stats on scroll
+            const observerOptions = {
+                threshold: 0.5,
+                rootMargin: '0px 0px -100px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const stats = entry.target.querySelectorAll('.stat-item h3');
+                        stats.forEach((stat, index) => {
+                            setTimeout(() => {
+                                stat.style.transform = 'scale(1.1)';
+                                stat.style.color = 'var(--secondary-color)';
+                                setTimeout(() => {
+                                    stat.style.transform = 'scale(1)';
+                                    stat.style.color = 'var(--primary-color)';
+                                }, 200);
+                            }, index * 100);
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            const statsSection = document.querySelector('.stats-section');
+            if (statsSection) {
+                observer.observe(statsSection);
+            }
+
+            // Initialize demo data in localStorage
+            if (!localStorage.getItem('demoInitialized')) {
+                const demoData = {
+                    leads: [
+                        { id: 1, name: 'Acme Corp', score: 95, status: 'hot', value: 125000, source: 'Website' },
+                        { id: 2, name: 'TechStart Inc', score: 87, status: 'warm', value: 75000, source: 'LinkedIn' },
+                        { id: 3, name: 'Global Solutions', score: 92, status: 'hot', value: 200000, source: 'Referral' },
+                        { id: 4, name: 'Innovation Labs', score: 78, status: 'warm', value: 85000, source: 'Email Campaign' },
+                        { id: 5, name: 'Digital Dynamics', score: 83, status: 'warm', value: 95000, source: 'Content Download' }
+                    ],
+                    campaigns: [
+                        { id: 1, name: 'Q1 Enterprise Outreach', status: 'active', leads: 1247, conversions: 89, roi: 285 },
+                        { id: 2, name: 'AI Product Launch', status: 'active', leads: 892, conversions: 156, roi: 412 },
+                        { id: 3, name: 'SMB Nurture Sequence', status: 'paused', leads: 2156, conversions: 234, roi: 178 }
+                    ],
+                    metrics: {
+                        totalLeads: 4295,
+                        qualifiedLeads: 1847,
+                        conversionRate: 18.2,
+                        avgDealSize: 125000,
+                        salesCycleReduction: 45,
+                        automationEfficiency: 85
+                    }
+                };
+                localStorage.setItem('demoData', JSON.stringify(demoData));
+                localStorage.setItem('demoInitialized', 'true');
+            }
+        });
+    </script>
+</body>
+</html>

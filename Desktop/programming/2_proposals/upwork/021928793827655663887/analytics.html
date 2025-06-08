@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics & ROI - AI Sales Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --accent-color: #f59e0b;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 4rem;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-xl);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-lg);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgb(37 99 235 / 0.1);
+        }
+
+        /* Page Container */
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-md);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+
+        .page-title h1 {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-xs);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .page-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--primary-color);
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: var(--spacing-sm);
+        }
+
+        /* Filter Controls */
+        .filter-controls {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background-color: var(--surface-color);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+        }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        /* ROI Showcase */
+        .roi-showcase {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            border-radius: 0.75rem;
+            padding: var(--spacing-2xl);
+            margin-bottom: var(--spacing-2xl);
+            text-align: center;
+        }
+
+        .roi-showcase h2 {
+            font-size: var(--font-size-4xl);
+            margin-bottom: var(--spacing-md);
+            color: white;
+        }
+
+        .roi-showcase p {
+            font-size: var(--font-size-lg);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .roi-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+
+        .roi-metric {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            backdrop-filter: blur(10px);
+        }
+
+        .roi-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-xs);
+            color: white;
+        }
+
+        .roi-label {
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+        }
+
+        .roi-growth {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            margin-top: var(--spacing-xs);
+            color: #dcfce7;
+        }
+
+        /* Performance KPIs */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .kpi-card {
+            text-align: center;
+            padding: var(--spacing-xl);
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.05), rgba(16, 185, 129, 0.05));
+            border: 1px solid rgba(37, 99, 235, 0.2);
+        }
+
+        .kpi-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--spacing-md);
+            color: white;
+            font-size: var(--font-size-xl);
+        }
+
+        .kpi-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .kpi-label {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .kpi-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .chart-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 350px;
+        }
+
+        /* Attribution Table */
+        .attribution-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .attribution-table th {
+            background-color: var(--background-color);
+            padding: var(--spacing-md);
+            text-align: left;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .attribution-table td {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .attribution-table tbody tr:hover {
+            background-color: var(--background-color);
+        }
+
+        /* Progress Indicators */
+        .progress-indicator {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .progress-bar {
+            flex: 1;
+            height: 6px;
+            background-color: var(--border-color);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            color: var(--text-secondary);
+        }
+
+        /* Real-time Updates */
+        .real-time-panel {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            border-left: 4px solid var(--secondary-color);
+        }
+
+        .real-time-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .live-indicator {
+            width: 12px;
+            height: 12px;
+            background-color: var(--secondary-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .real-time-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .real-time-item:last-child {
+            border-bottom: none;
+        }
+
+        /* Predictive Analytics */
+        .prediction-card {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(239, 68, 68, 0.1));
+            border: 1px solid var(--warning-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+        }
+
+        .prediction-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .prediction-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--warning-color), var(--error-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-lg);
+        }
+
+        .prediction-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--warning-color);
+        }
+
+        /* Export Controls */
+        .export-panel {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            margin-top: var(--spacing-2xl);
+        }
+
+        .export-options {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .export-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border: 1px solid var(--border-color);
+            background-color: var(--surface-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .export-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .grid-4, .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: start;
+                gap: var(--spacing-md);
+            }
+            
+            .filter-controls {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .roi-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .export-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>AI Sales Pro</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="lead-scoring.html" class="nav-link">AI Lead Scoring</a></li>
+                    <li><a href="workflows.html" class="nav-link">Automation</a></li>
+                    <li><a href="campaigns.html" class="nav-link">Campaigns</a></li>
+                    <li><a href="analytics.html" class="nav-link active">Analytics</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="page-header">
+                <div class="page-title">
+                    <h1>Analytics & ROI Insights</h1>
+                    <p class="page-subtitle">Comprehensive performance tracking with predictive analytics and revenue attribution across all marketing channels</p>
+                </div>
+                <div class="filter-controls">
+                    <select class="filter-select" id="timeRange" onchange="updateAnalytics()">
+                        <option value="30d">Last 30 Days</option>
+                        <option value="90d" selected>Last 90 Days</option>
+                        <option value="6m">Last 6 Months</option>
+                        <option value="1y">Last Year</option>
+                    </select>
+                    <select class="filter-select" id="dataSource" onchange="updateAnalytics()">
+                        <option value="all" selected>All Channels</option>
+                        <option value="email">Email Only</option>
+                        <option value="social">Social Media</option>
+                        <option value="paid">Paid Ads</option>
+                    </select>
+                    <button class="btn-primary" onclick="generateReport()">Generate Report</button>
+                </div>
+            </header>
+
+            <!-- ROI Showcase -->
+            <section class="roi-showcase">
+                <h2>$2.4M Revenue Generated</h2>
+                <p>Advanced AI-powered automation and multi-channel campaigns have delivered exceptional ROI across all customer segments and touchpoints.</p>
+                
+                <div class="roi-metrics">
+                    <div class="roi-metric">
+                        <div class="roi-value">285%</div>
+                        <div class="roi-label">Average Campaign ROI</div>
+                        <div class="roi-growth">↗ +47% vs. previous period</div>
+                    </div>
+                    <div class="roi-metric">
+                        <div class="roi-value">$125K</div>
+                        <div class="roi-label">Average Deal Size</div>
+                        <div class="roi-growth">↗ +23% vs. previous period</div>
+                    </div>
+                    <div class="roi-metric">
+                        <div class="roi-value">45%</div>
+                        <div class="roi-label">Sales Cycle Reduction</div>
+                        <div class="roi-growth">↗ 18 days faster close</div>
+                    </div>
+                    <div class="roi-metric">
+                        <div class="roi-value">18.2%</div>
+                        <div class="roi-label">Lead Conversion Rate</div>
+                        <div class="roi-growth">↗ +5.7% vs. industry average</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Key Performance Indicators -->
+            <section class="kpi-grid">
+                <div class="card kpi-card">
+                    <div class="kpi-icon">🎯</div>
+                    <div class="kpi-value" id="totalLeads">4,295</div>
+                    <div class="kpi-label">Total Leads Generated</div>
+                    <div class="kpi-description">AI-scored and qualified prospects across all channels</div>
+                </div>
+                
+                <div class="card kpi-card">
+                    <div class="kpi-icon">⚡</div>
+                    <div class="kpi-value" id="automationEfficiency">94.7%</div>
+                    <div class="kpi-label">Automation Efficiency</div>
+                    <div class="kpi-description">Tasks automated with AI-powered workflows</div>
+                </div>
+                
+                <div class="card kpi-card">
+                    <div class="kpi-icon">📈</div>
+                    <div class="kpi-value" id="revenueGrowth">+127%</div>
+                    <div class="kpi-label">Revenue Growth</div>
+                    <div class="kpi-description">Year-over-year revenue increase from automation</div>
+                </div>
+                
+                <div class="card kpi-card">
+                    <div class="kpi-icon">🤖</div>
+                    <div class="kpi-value" id="aiAccuracy">87.3%</div>
+                    <div class="kpi-label">AI Prediction Accuracy</div>
+                    <div class="kpi-description">Machine learning model accuracy for lead scoring</div>
+                </div>
+            </section>
+
+            <!-- Analytics Charts -->
+            <section class="grid grid-2">
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Revenue Attribution Analysis</h3>
+                        <button class="btn-secondary" onclick="drillDownRevenue()">Drill Down</button>
+                    </div>
+                    <canvas id="revenueChart" class="chart-canvas"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Channel Performance Comparison</h3>
+                        <button class="btn-secondary" onclick="optimizeChannels()">Optimize</button>
+                    </div>
+                    <canvas id="channelChart" class="chart-canvas"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Customer Lifecycle Value</h3>
+                        <button class="btn-secondary" onclick="analyzeCLV()">Analyze</button>
+                    </div>
+                    <canvas id="clvChart" class="chart-canvas"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <div class="chart-header">
+                        <h3 class="chart-title">AI Performance Trends</h3>
+                        <button class="btn-secondary" onclick="tuneAI()">Tune Models</button>
+                    </div>
+                    <canvas id="aiPerformanceChart" class="chart-canvas"></canvas>
+                </div>
+            </section>
+
+            <!-- Revenue Attribution Table -->
+            <section class="grid grid-3">
+                <div class="card" style="grid-column: span 2;">
+                    <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem; font-weight: 600;">Multi-Touch Attribution Analysis</h3>
+                    <div style="overflow-x: auto;">
+                        <table class="attribution-table">
+                            <thead>
+                                <tr>
+                                    <th>Campaign</th>
+                                    <th>Channel Mix</th>
+                                    <th>Touches</th>
+                                    <th>Conversions</th>
+                                    <th>Revenue</th>
+                                    <th>Attribution %</th>
+                                </tr>
+                            </thead>
+                            <tbody id="attributionTableBody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="real-time-panel">
+                    <div class="real-time-header">
+                        <div class="live-indicator"></div>
+                        <h3 style="font-size: 1.125rem; font-weight: 600;">Live Performance Feed</h3>
+                    </div>
+                    <div id="realTimeFeed">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Predictive Analytics -->
+            <section class="grid grid-2">
+                <div class="prediction-card">
+                    <div class="prediction-header">
+                        <div class="prediction-icon">🔮</div>
+                        <div class="prediction-title">Predictive Revenue Forecast</div>
+                    </div>
+                    <p style="margin-bottom: 1rem;">Based on current trends and AI analysis, projected revenue for next quarter:</p>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--primary-color); margin-bottom: 0.5rem;" id="revenueForecast">$3.7M</div>
+                        <div style="color: var(--text-secondary);">85% confidence interval: $3.2M - $4.1M</div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <h4 style="margin-bottom: 0.5rem;">Key Growth Drivers:</h4>
+                        <ul style="margin-left: 1.5rem; color: var(--text-secondary); font-size: 0.875rem;">
+                            <li>• AI lead scoring optimization (+15% conversion)</li>
+                            <li>• Multi-channel campaign expansion (+22% reach)</li>
+                            <li>• Automation efficiency improvements (+8% close rate)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Performance Optimization Opportunities</h3>
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500;">Email Send Time Optimization</span>
+                            <span style="color: var(--success-color); font-weight: 600;">+12% Open Rate</span>
+                        </div>
+                        <div class="progress-indicator">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 78%"></div>
+                            </div>
+                            <span class="progress-text">78% Complete</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500;">Lead Scoring Model Tuning</span>
+                            <span style="color: var(--success-color); font-weight: 600;">+8% Accuracy</span>
+                        </div>
+                        <div class="progress-indicator">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 92%"></div>
+                            </div>
+                            <span class="progress-text">92% Complete</span>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-weight: 500;">Channel Budget Reallocation</span>
+                            <span style="color: var(--warning-color); font-weight: 600;">+25% ROI</span>
+                        </div>
+                        <div class="progress-indicator">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 45%"></div>
+                            </div>
+                            <span class="progress-text">45% Complete</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn-primary" style="width: 100%; margin-top: 1rem;" onclick="implementOptimizations()">Implement Optimizations</button>
+                </div>
+            </section>
+
+            <!-- Export Panel -->
+            <section class="export-panel">
+                <h3 style="margin-bottom: 1rem; color: var(--primary-color);">Export Analytics Reports</h3>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Generate comprehensive reports for stakeholders, board presentations, or detailed analysis.</p>
+                
+                <div class="export-options">
+                    <a href="#" class="export-btn" onclick="exportReport('executive')">
+                        <span>📊</span>
+                        Executive Summary
+                    </a>
+                    <a href="#" class="export-btn" onclick="exportReport('detailed')">
+                        <span>📈</span>
+                        Detailed Analytics
+                    </a>
+                    <a href="#" class="export-btn" onclick="exportReport('roi')">
+                        <span>💰</span>
+                        ROI Analysis
+                    </a>
+                    <a href="#" class="export-btn" onclick="exportReport('forecast')">
+                        <span>🔮</span>
+                        Predictive Forecast
+                    </a>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Analytics and ROI Tracking
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAnalyticsData();
+            initializeCharts();
+            populateAttributionTable();
+            startRealTimeFeed();
+            trackPageInteraction();
+        });
+
+        function initializeAnalyticsData() {
+            const analyticsData = {
+                totalLeads: 4295,
+                automationEfficiency: 94.7,
+                revenueGrowth: 127,
+                aiAccuracy: 87.3,
+                revenueForecast: 3700000,
+                campaigns: [
+                    { name: 'Q1 Enterprise', channels: ['Email', 'LinkedIn', 'Direct Mail'], touches: 847, conversions: 89, revenue: 875000, attribution: 36.5 },
+                    { name: 'AI Product Launch', channels: ['Email', 'SMS', 'Social'], touches: 1203, conversions: 156, revenue: 1240000, attribution: 51.7 },
+                    { name: 'SMB Nurture', channels: ['Email', 'SMS'], touches: 2156, conversions: 234, revenue: 285000, attribution: 11.8 }
+                ]
+            };
+            
+            localStorage.setItem('analyticsData', JSON.stringify(analyticsData));
+        }
+
+        function updateAnalytics() {
+            const timeRange = document.getElementById('timeRange').value;
+            const dataSource = document.getElementById('dataSource').value;
+            
+            showNotification(`Analytics updated for ${timeRange} period with ${dataSource} data source`, 'info');
+            
+            // Simulate data updates
+            setTimeout(() => {
+                updateKPIValues();
+                refreshCharts();
+            }, 1000);
+        }
+
+        function updateKPIValues() {
+            const kpis = ['totalLeads', 'automationEfficiency', 'revenueGrowth', 'aiAccuracy'];
+            kpis.forEach(kpi => {
+                const element = document.getElementById(kpi);
+                if (element) {
+                    const currentValue = parseFloat(element.textContent.replace(/[^\d.-]/g, ''));
+                    const change = (Math.random() * 10 - 5); // Random change
+                    let newValue;
+                    
+                    if (kpi === 'totalLeads') {
+                        newValue = Math.max(0, Math.round(currentValue + change * 10));
+                        element.textContent = newValue.toLocaleString();
+                    } else if (kpi === 'revenueGrowth') {
+                        newValue = Math.max(0, (currentValue + change).toFixed(0));
+                        element.textContent = '+' + newValue + '%';
+                    } else {
+                        newValue = Math.max(0, (currentValue + change).toFixed(1));
+                        element.textContent = newValue + '%';
+                    }
+                }
+            });
+        }
+
+        function populateAttributionTable() {
+            const tbody = document.getElementById('attributionTableBody');
+            const analyticsData = JSON.parse(localStorage.getItem('analyticsData') || '{}');
+            const campaigns = analyticsData.campaigns || [];
+            
+            tbody.innerHTML = campaigns.map(campaign => `
+                <tr>
+                    <td><strong>${campaign.name}</strong></td>
+                    <td>
+                        <div style="display: flex; gap: 0.25rem;">
+                            ${campaign.channels.map(channel => `<span style="background-color: var(--primary-color); color: white; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-size: 0.75rem;">${channel}</span>`).join('')}
+                        </div>
+                    </td>
+                    <td>${campaign.touches.toLocaleString()}</td>
+                    <td><strong>${campaign.conversions}</strong></td>
+                    <td style="color: var(--success-color); font-weight: 600;">$${(campaign.revenue / 1000).toFixed(0)}K</td>
+                    <td>
+                        <div class="progress-indicator">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${campaign.attribution}%"></div>
+                            </div>
+                            <span class="progress-text">${campaign.attribution}%</span>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function startRealTimeFeed() {
+            const feed = document.getElementById('realTimeFeed');
+            const updates = [
+                { text: 'New lead scored: TechStart Inc (87)', time: 'Just now' },
+                { text: 'Campaign conversion: Enterprise Outreach', time: '2 min ago' },
+                { text: 'AI model accuracy improved to 88.1%', time: '5 min ago' },
+                { text: 'Revenue milestone: $2.4M reached', time: '12 min ago' },
+                { text: 'Workflow automation triggered: 23 leads', time: '18 min ago' }
+            ];
+            
+            feed.innerHTML = updates.map(update => `
+                <div class="real-time-item">
+                    <span style="font-size: 0.875rem;">${update.text}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">${update.time}</span>
+                </div>
+            `).join('');
+            
+            // Simulate real-time updates
+            setInterval(() => {
+                const newUpdate = {
+                    text: generateRandomUpdate(),
+                    time: 'Just now'
+                };
+                
+                const firstItem = feed.querySelector('.real-time-item');
+                const newItem = document.createElement('div');
+                newItem.className = 'real-time-item';
+                newItem.innerHTML = `
+                    <span style="font-size: 0.875rem;">${newUpdate.text}</span>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);">${newUpdate.time}</span>
+                `;
+                newItem.style.backgroundColor = 'rgba(16, 185, 129, 0.1)';
+                feed.insertBefore(newItem, firstItem);
+                
+                // Remove last item if more than 5
+                const items = feed.querySelectorAll('.real-time-item');
+                if (items.length > 5) {
+                    items[items.length - 1].remove();
+                }
+                
+                // Remove highlight after 3 seconds
+                setTimeout(() => {
+                    newItem.style.backgroundColor = '';
+                }, 3000);
+            }, 15000);
+        }
+
+        function generateRandomUpdate() {
+            const updates = [
+                'Lead qualified: Innovation Labs (92 score)',
+                'Email campaign opened: 234 new opens',
+                'SMS conversion: Direct response received',
+                'AI prediction accuracy increased to 88.5%',
+                'Workflow completed: Lead routing successful',
+                'Revenue update: +$45K attributed to campaigns',
+                'New high-value prospect: Global Solutions',
+                'Automation efficiency improved to 95.2%'
+            ];
+            return updates[Math.floor(Math.random() * updates.length)];
+        }
+
+        function initializeCharts() {
+            // Revenue Attribution Chart
+            const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(revenueCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Email', 'Social Media', 'Direct Mail', 'SMS', 'LinkedIn', 'Webinars'],
+                    datasets: [{
+                        label: 'Revenue Attribution ($K)',
+                        data: [875, 425, 285, 180, 320, 155],
+                        backgroundColor: [
+                            '#2563eb',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#8b5cf6',
+                            '#06b6d4'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Revenue ($K)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Channel Performance Chart
+            const channelCtx = document.getElementById('channelChart').getContext('2d');
+            new Chart(channelCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Reach', 'Engagement', 'Conversion', 'ROI', 'Retention', 'Growth'],
+                    datasets: [{
+                        label: 'Email',
+                        data: [85, 72, 68, 85, 78, 82],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)'
+                    }, {
+                        label: 'Social Media',
+                        data: [92, 85, 45, 62, 58, 75],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)'
+                    }, {
+                        label: 'Direct Mail',
+                        data: [35, 45, 78, 95, 85, 42],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.2)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: false
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+
+            // Customer Lifecycle Value Chart
+            const clvCtx = document.getElementById('clvChart').getContext('2d');
+            new Chart(clvCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Month 1', 'Month 3', 'Month 6', 'Month 12', 'Month 18', 'Month 24'],
+                    datasets: [{
+                        label: 'Average CLV',
+                        data: [1250, 3200, 8500, 15800, 22400, 28900],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Customer Lifetime Value ($)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // AI Performance Chart
+            const aiCtx = document.getElementById('aiPerformanceChart').getContext('2d');
+            new Chart(aiCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                    datasets: [{
+                        label: 'Lead Scoring Accuracy',
+                        data: [82, 84, 86, 87, 88, 87],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Prediction Confidence',
+                        data: [75, 78, 81, 84, 86, 85],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            title: {
+                                display: true,
+                                text: 'Accuracy (%)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function refreshCharts() {
+            // Simulate chart data updates
+            showNotification('Charts refreshed with latest data', 'success');
+        }
+
+        // Interactive Functions
+        function drillDownRevenue() {
+            showNotification('Opening detailed revenue attribution analysis...', 'info');
+        }
+
+        function optimizeChannels() {
+            showNotification('Channel optimization recommendations generated', 'success');
+        }
+
+        function analyzeCLV() {
+            showNotification('Customer lifecycle value analysis updated', 'info');
+        }
+
+        function tuneAI() {
+            showNotification('AI model tuning initiated - performance optimization in progress', 'info');
+        }
+
+        function generateReport() {
+            const button = event.target;
+            button.textContent = 'Generating...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Generate Report';
+                button.disabled = false;
+                showNotification('Analytics report generated successfully!', 'success');
+            }, 2000);
+        }
+
+        function implementOptimizations() {
+            const button = event.target;
+            button.textContent = 'Implementing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Optimizations Applied ✓';
+                button.className = 'btn-primary';
+                button.style.backgroundColor = 'var(--success-color)';
+                showNotification('All optimizations have been successfully implemented!', 'success');
+                
+                // Update some KPI values to show improvement
+                setTimeout(() => {
+                    document.getElementById('automationEfficiency').textContent = '96.2%';
+                    document.getElementById('aiAccuracy').textContent = '89.7%';
+                }, 1000);
+            }, 3000);
+        }
+
+        function exportReport(type) {
+            const reportTypes = {
+                executive: 'Executive Summary Report',
+                detailed: 'Detailed Analytics Report',
+                roi: 'ROI Analysis Report',
+                forecast: 'Predictive Forecast Report'
+            };
+            
+            showNotification(`Generating ${reportTypes[type]}...`, 'info');
+            
+            setTimeout(() => {
+                const data = {
+                    type: type,
+                    generated: new Date().toISOString(),
+                    summary: {
+                        totalRevenue: '$2.4M',
+                        averageROI: '285%',
+                        leadsGenerated: '4,295',
+                        conversionRate: '18.2%'
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${type}-analytics-report-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                showNotification(`${reportTypes[type]} exported successfully!`, 'success');
+            }, 1500);
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+            `;
+            
+            const colors = {
+                success: 'var(--success-color)',
+                error: 'var(--error-color)',
+                info: 'var(--primary-color)',
+                warning: 'var(--warning-color)'
+            };
+            
+            notification.style.backgroundColor = colors[type] || colors.info;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => notification.style.transform = 'translateX(400px)', 4000);
+            setTimeout(() => notification.remove(), 4500);
+        }
+
+        function trackPageInteraction() {
+            const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+            interactions.push({
+                type: 'page_view',
+                page: 'analytics',
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('userInteractions', JSON.stringify(interactions));
+        }
+
+        // Add button click tracking
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('button') || e.target.matches('.export-btn')) {
+                const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+                interactions.push({
+                    type: 'analytics_interaction',
+                    element: e.target.textContent || e.target.innerText,
+                    timestamp: new Date().toISOString(),
+                    page: 'analytics'
+                });
+                localStorage.setItem('userInteractions', JSON.stringify(interactions));
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - AI Sales Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --accent-color: #f59e0b;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 4rem;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-xl);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-lg);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgb(37 99 235 / 0.1);
+        }
+
+        /* Page Container */
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-md);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .dashboard-title h1 {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            font-size: var(--font-size-lg);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--primary-color);
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: var(--spacing-sm);
+        }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .card-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin: 0.25rem 0 0 0;
+        }
+
+        /* KPI Cards */
+        .kpi-card {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+        }
+
+        .kpi-value {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .kpi-label {
+            font-size: var(--font-size-sm);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .kpi-change {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            opacity: 0.8;
+        }
+
+        .kpi-change.positive {
+            color: #dcfce7;
+        }
+
+        .kpi-change.negative {
+            color: #fee2e2;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .chart-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+        }
+
+        /* Lead Table */
+        .leads-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .leads-table th {
+            background-color: var(--background-color);
+            padding: var(--spacing-md);
+            text-align: left;
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .leads-table td {
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .leads-table tbody tr:hover {
+            background-color: var(--background-color);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-hot {
+            background-color: rgb(254 226 226);
+            color: rgb(153 27 27);
+        }
+
+        .status-warm {
+            background-color: rgb(254 243 199);
+            color: rgb(146 64 14);
+        }
+
+        .status-cold {
+            background-color: rgb(219 234 254);
+            color: rgb(30 64 175);
+        }
+
+        /* Activity Feed */
+        .activity-feed {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: start;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-sm);
+            flex-shrink: 0;
+        }
+
+        .activity-content h4 {
+            font-size: var(--font-size-sm);
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .activity-content p {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+        }
+
+        .activity-time {
+            font-size: var(--font-size-xs);
+            color: var(--text-muted);
+        }
+
+        /* Real-time indicator */
+        .real-time-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: var(--font-size-sm);
+            color: var(--success-color);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(16, 185, 129, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+            flex-wrap: wrap;
+        }
+
+        .quick-action-btn {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.5rem;
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .quick-action-btn:hover {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        @media (max-width: 768px) {
+            .grid-4, .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: start;
+                gap: var(--spacing-md);
+            }
+            
+            .quick-actions {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>AI Sales Pro</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+                    <li><a href="lead-scoring.html" class="nav-link">AI Lead Scoring</a></li>
+                    <li><a href="workflows.html" class="nav-link">Automation</a></li>
+                    <li><a href="campaigns.html" class="nav-link">Campaigns</a></li>
+                    <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="dashboard-header">
+                <div class="dashboard-title">
+                    <h1>Sales & Marketing Dashboard</h1>
+                    <p class="dashboard-subtitle">
+                        <span class="real-time-indicator">
+                            <span class="pulse-dot"></span>
+                            Live Data
+                        </span>
+                        • Last updated: <span id="lastUpdated"></span>
+                    </p>
+                </div>
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="refreshDashboard()">🔄 Refresh</button>
+                    <button class="quick-action-btn" onclick="exportData()">📊 Export</button>
+                    <a href="lead-scoring.html" class="btn-primary">View AI Insights</a>
+                </div>
+            </header>
+
+            <!-- KPI Cards -->
+            <section class="grid grid-4">
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="totalLeads">4,295</div>
+                    <div class="kpi-label">Total Leads</div>
+                    <div class="kpi-change positive">+12.3% this month</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="qualifiedLeads">1,847</div>
+                    <div class="kpi-label">Qualified Leads</div>
+                    <div class="kpi-change positive">+18.7% this month</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="conversionRate">18.2%</div>
+                    <div class="kpi-label">Conversion Rate</div>
+                    <div class="kpi-change positive">+3.1% this month</div>
+                </div>
+                <div class="card kpi-card">
+                    <div class="kpi-value" id="avgDealSize">$125K</div>
+                    <div class="kpi-label">Avg Deal Size</div>
+                    <div class="kpi-change positive">+8.9% this month</div>
+                </div>
+            </section>
+
+            <!-- Charts Section -->
+            <section class="grid grid-2">
+                <div class="chart-container">
+                    <h3 class="chart-title">Lead Generation Trends</h3>
+                    <canvas id="leadTrendsChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Lead Sources Distribution</h3>
+                    <canvas id="leadSourcesChart" class="chart-canvas"></canvas>
+                </div>
+            </section>
+
+            <!-- Main Dashboard Content -->
+            <section class="grid grid-3">
+                <!-- Recent High-Value Leads -->
+                <div class="card" style="grid-column: span 2;">
+                    <div class="card-header">
+                        <h3 class="card-title">High-Priority Leads</h3>
+                        <p class="card-subtitle">AI-scored prospects requiring immediate attention</p>
+                    </div>
+                    <div style="overflow-x: auto;">
+                        <table class="leads-table">
+                            <thead>
+                                <tr>
+                                    <th>Company</th>
+                                    <th>AI Score</th>
+                                    <th>Status</th>
+                                    <th>Value</th>
+                                    <th>Source</th>
+                                    <th>Last Activity</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leadsTableBody">
+                                <!-- Populated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Activity Feed -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                        <p class="card-subtitle">Real-time platform events</p>
+                    </div>
+                    <div class="activity-feed" id="activityFeed">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics -->
+            <section class="grid grid-3">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">AI Performance</h3>
+                        <p class="card-subtitle">Machine learning accuracy metrics</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--secondary-color); margin-bottom: 0.5rem;">94.7%</div>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Lead Scoring Accuracy</p>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color); margin-bottom: 0.5rem;">87.3%</div>
+                        <p style="color: var(--text-secondary);">Prediction Confidence</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Automation Efficiency</h3>
+                        <p class="card-subtitle">Workflow performance indicators</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--secondary-color); margin-bottom: 0.5rem;">85%</div>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Tasks Automated</p>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color); margin-bottom: 0.5rem;">45%</div>
+                        <p style="color: var(--text-secondary);">Time Saved</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Campaign ROI</h3>
+                        <p class="card-subtitle">Revenue attribution metrics</p>
+                    </div>
+                    <div style="text-align: center;">
+                        <div style="font-size: 2rem; font-weight: bold; color: var(--secondary-color); margin-bottom: 0.5rem;">285%</div>
+                        <p style="color: var(--text-secondary); margin-bottom: 1rem;">Average ROI</p>
+                        <div style="font-size: 1.5rem; font-weight: bold; color: var(--primary-color); margin-bottom: 0.5rem;">$2.4M</div>
+                        <p style="color: var(--text-secondary);">Revenue Generated</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Dashboard Data and Functionality
+        let dashboardData = {};
+        
+        // Initialize Dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+            initializeCharts();
+            populateLeadsTable();
+            populateActivityFeed();
+            updateTimestamp();
+            
+            // Refresh data every 30 seconds
+            setInterval(updateDashboardData, 30000);
+            setInterval(updateTimestamp, 1000);
+        });
+
+        function loadDashboardData() {
+            const storedData = localStorage.getItem('demoData');
+            if (storedData) {
+                dashboardData = JSON.parse(storedData);
+            } else {
+                // Fallback demo data
+                dashboardData = {
+                    leads: [
+                        { id: 1, name: 'Acme Corp', score: 95, status: 'hot', value: 125000, source: 'Website', lastActivity: '2 hours ago' },
+                        { id: 2, name: 'TechStart Inc', score: 87, status: 'warm', value: 75000, source: 'LinkedIn', lastActivity: '5 hours ago' },
+                        { id: 3, name: 'Global Solutions', score: 92, status: 'hot', value: 200000, source: 'Referral', lastActivity: '1 hour ago' },
+                        { id: 4, name: 'Innovation Labs', score: 78, status: 'warm', value: 85000, source: 'Email Campaign', lastActivity: '3 hours ago' },
+                        { id: 5, name: 'Digital Dynamics', score: 83, status: 'warm', value: 95000, source: 'Content Download', lastActivity: '4 hours ago' }
+                    ],
+                    metrics: {
+                        totalLeads: 4295,
+                        qualifiedLeads: 1847,
+                        conversionRate: 18.2,
+                        avgDealSize: 125000
+                    }
+                };
+            }
+        }
+
+        function populateLeadsTable() {
+            const tbody = document.getElementById('leadsTableBody');
+            const leads = dashboardData.leads || [];
+            
+            tbody.innerHTML = leads.map(lead => `
+                <tr>
+                    <td><strong>${lead.name}</strong></td>
+                    <td>
+                        <span style="font-weight: bold; color: ${lead.score >= 90 ? 'var(--success-color)' : lead.score >= 80 ? 'var(--warning-color)' : 'var(--text-secondary)'}">
+                            ${lead.score}
+                        </span>
+                    </td>
+                    <td><span class="status-badge status-${lead.status}">${lead.status}</span></td>
+                    <td><strong>$${(lead.value / 1000).toFixed(0)}K</strong></td>
+                    <td>${lead.source}</td>
+                    <td style="color: var(--text-secondary); font-size: var(--font-size-sm);">${lead.lastActivity || 'Recent'}</td>
+                </tr>
+            `).join('');
+        }
+
+        function populateActivityFeed() {
+            const feed = document.getElementById('activityFeed');
+            const activities = [
+                { icon: '🤖', title: 'AI scored new lead', desc: 'TechStart Inc received score of 87', time: '2 min ago' },
+                { icon: '📧', title: 'Email campaign sent', desc: 'Q1 Enterprise Outreach to 1,247 contacts', time: '15 min ago' },
+                { icon: '🎯', title: 'Lead qualified', desc: 'Global Solutions moved to hot status', time: '1 hour ago' },
+                { icon: '📊', title: 'Report generated', desc: 'Weekly performance analytics ready', time: '2 hours ago' },
+                { icon: '⚡', title: 'Workflow triggered', desc: 'Follow-up sequence activated for 23 leads', time: '3 hours ago' },
+                { icon: '💰', title: 'Deal closed', desc: 'Innovation Labs - $85K deal completed', time: '4 hours ago' }
+            ];
+
+            feed.innerHTML = activities.map(activity => `
+                <div class="activity-item">
+                    <div class="activity-icon">${activity.icon}</div>
+                    <div class="activity-content">
+                        <h4>${activity.title}</h4>
+                        <p>${activity.desc}</p>
+                    </div>
+                    <div class="activity-time">${activity.time}</div>
+                </div>
+            `).join('');
+        }
+
+        function initializeCharts() {
+            // Lead Trends Chart
+            const leadTrendsCtx = document.getElementById('leadTrendsChart').getContext('2d');
+            new Chart(leadTrendsCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'Total Leads',
+                        data: [320, 450, 380, 520, 670, 890],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Qualified Leads',
+                        data: [180, 250, 220, 310, 420, 550],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Lead Sources Chart
+            const leadSourcesCtx = document.getElementById('leadSourcesChart').getContext('2d');
+            new Chart(leadSourcesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Website', 'LinkedIn', 'Email Campaign', 'Referral', 'Content Download', 'Direct'],
+                    datasets: [{
+                        data: [35, 25, 20, 10, 7, 3],
+                        backgroundColor: [
+                            '#2563eb',
+                            '#10b981',
+                            '#f59e0b',
+                            '#ef4444',
+                            '#8b5cf6',
+                            '#06b6d4'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('lastUpdated').textContent = now.toLocaleTimeString();
+        }
+
+        function updateDashboardData() {
+            // Simulate real-time data updates
+            const kpis = ['totalLeads', 'qualifiedLeads'];
+            kpis.forEach(kpi => {
+                const element = document.getElementById(kpi);
+                if (element) {
+                    const currentValue = parseInt(element.textContent.replace(/,/g, ''));
+                    const change = Math.floor(Math.random() * 10) - 5; // Random change -5 to +5
+                    const newValue = Math.max(0, currentValue + change);
+                    element.textContent = newValue.toLocaleString();
+                }
+            });
+            
+            // Update conversion rate
+            const conversionElement = document.getElementById('conversionRate');
+            if (conversionElement) {
+                const change = (Math.random() * 0.2 - 0.1); // Random change -0.1 to +0.1
+                const currentRate = parseFloat(conversionElement.textContent.replace('%', ''));
+                const newRate = Math.max(0, currentRate + change).toFixed(1);
+                conversionElement.textContent = newRate + '%';
+            }
+        }
+
+        function refreshDashboard() {
+            const button = event.target;
+            button.textContent = '🔄 Refreshing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                updateDashboardData();
+                populateActivityFeed();
+                button.textContent = '🔄 Refresh';
+                button.disabled = false;
+                
+                // Add flash effect
+                document.querySelectorAll('.kpi-value').forEach(el => {
+                    el.style.transform = 'scale(1.05)';
+                    el.style.color = 'var(--secondary-color)';
+                    setTimeout(() => {
+                        el.style.transform = 'scale(1)';
+                        el.style.color = '';
+                    }, 300);
+                });
+            }, 1500);
+        }
+
+        function exportData() {
+            const button = event.target;
+            button.textContent = '📊 Exporting...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                const data = {
+                    exported: new Date().toISOString(),
+                    metrics: dashboardData.metrics,
+                    leads: dashboardData.leads,
+                    summary: {
+                        totalLeads: document.getElementById('totalLeads').textContent,
+                        qualifiedLeads: document.getElementById('qualifiedLeads').textContent,
+                        conversionRate: document.getElementById('conversionRate').textContent,
+                        avgDealSize: document.getElementById('avgDealSize').textContent
+                    }
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `dashboard-export-${new Date().toISOString().split('T')[0]}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                button.textContent = '📊 Export';
+                button.disabled = false;
+            }, 1000);
+        }
+
+        // Store page interaction
+        const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+        interactions.push({
+            type: 'page_view',
+            page: 'dashboard',
+            timestamp: new Date().toISOString()
+        });
+        localStorage.setItem('userInteractions', JSON.stringify(interactions));
+    </script>
+</body>
+</html>

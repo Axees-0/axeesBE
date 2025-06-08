@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automation Workflows - AI Sales Pro</title>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --accent-color: #f59e0b;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 4rem;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-xl);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-lg);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgb(37 99 235 / 0.1);
+        }
+
+        /* Page Container */
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-md);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+
+        .page-header h1 {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-md);
+            color: var(--text-primary);
+        }
+
+        .page-header p {
+            font-size: var(--font-size-lg);
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--primary-color);
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: var(--spacing-sm);
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-success:hover {
+            background-color: var(--secondary-hover);
+        }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .card-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin: 0.25rem 0 0 0;
+        }
+
+        /* Workflow Cards */
+        .workflow-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-status {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-active {
+            background-color: rgb(220 252 231);
+            color: rgb(22 101 52);
+        }
+
+        .status-paused {
+            background-color: rgb(254 243 199);
+            color: rgb(146 64 14);
+        }
+
+        .status-draft {
+            background-color: rgb(219 234 254);
+            color: rgb(30 64 175);
+        }
+
+        /* Integration Icons */
+        .integration-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-lg);
+            margin-bottom: var(--spacing-md);
+        }
+
+        /* Workflow Steps */
+        .workflow-steps {
+            margin-top: var(--spacing-lg);
+        }
+
+        .workflow-step {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-sm) 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .workflow-step:last-child {
+            border-bottom: none;
+        }
+
+        .step-number {
+            width: 24px;
+            height: 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-bold);
+            margin-right: var(--spacing-md);
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .step-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Platform Integration Section */
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .platform-card {
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .platform-card h3 {
+            color: white;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .platform-card p {
+            opacity: 0.9;
+            font-size: var(--font-size-sm);
+        }
+
+        /* Workflow Builder */
+        .workflow-builder {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-xl);
+            margin: var(--spacing-2xl) 0;
+            border: 2px dashed var(--border-color);
+            text-align: center;
+        }
+
+        .workflow-builder.active {
+            border-color: var(--primary-color);
+            background-color: rgb(37 99 235 / 0.05);
+        }
+
+        .workflow-canvas {
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .workflow-node {
+            background-color: var(--surface-color);
+            border: 2px solid var(--primary-color);
+            border-radius: 0.5rem;
+            padding: var(--spacing-md);
+            margin: var(--spacing-sm);
+            display: inline-block;
+            position: relative;
+            cursor: move;
+            transition: all 0.2s ease;
+        }
+
+        .workflow-node:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+        }
+
+        .workflow-connector {
+            width: 2px;
+            height: 30px;
+            background-color: var(--primary-color);
+            margin: 0 auto;
+        }
+
+        /* Performance Metrics */
+        .metrics-row {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-xl);
+            margin: var(--spacing-2xl) 0;
+        }
+
+        .metric-item {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: var(--font-size-2xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .metric-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .platform-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-row {
+                flex-direction: column;
+                gap: var(--spacing-lg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>AI Sales Pro</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="lead-scoring.html" class="nav-link">AI Lead Scoring</a></li>
+                    <li><a href="workflows.html" class="nav-link active">Automation</a></li>
+                    <li><a href="campaigns.html" class="nav-link">Campaigns</a></li>
+                    <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="page-header">
+                <h1>Automation Workflows</h1>
+                <p>Design and deploy intelligent automation workflows that connect HubSpot, GoHighLevel, Airtable, and AI-powered decision engines for seamless lead processing and nurturing.</p>
+            </header>
+
+            <!-- Platform Integrations -->
+            <section>
+                <h2 style="text-align: center; margin-bottom: 2rem; font-size: 1.875rem; font-weight: 700;">Platform Integrations</h2>
+                <div class="platform-grid">
+                    <div class="card platform-card">
+                        <div class="integration-icon">🎯</div>
+                        <h3>HubSpot CRM</h3>
+                        <p>Lead capture, contact management, and sales pipeline automation with custom properties and workflows</p>
+                    </div>
+                    <div class="card platform-card">
+                        <div class="integration-icon">🚀</div>
+                        <h3>GoHighLevel</h3>
+                        <p>Multi-channel campaign execution, SMS automation, and funnel management with AI-driven personalization</p>
+                    </div>
+                    <div class="card platform-card">
+                        <div class="integration-icon">📊</div>
+                        <h3>Airtable</h3>
+                        <p>Centralized data hub, project management, and real-time dashboard with custom views and automations</p>
+                    </div>
+                    <div class="card platform-card">
+                        <div class="integration-icon">⚡</div>
+                        <h3>Make.com</h3>
+                        <p>Complex workflow automation, API integrations, and data transformation with visual workflow builder</p>
+                    </div>
+                    <div class="card platform-card">
+                        <div class="integration-icon">🔗</div>
+                        <h3>Zapier</h3>
+                        <p>App connectivity, trigger-based automations, and seamless data synchronization across platforms</p>
+                    </div>
+                    <div class="card platform-card">
+                        <div class="integration-icon">🤖</div>
+                        <h3>OpenAI GPT-4</h3>
+                        <p>AI-powered content generation, lead scoring, sentiment analysis, and predictive insights</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Workflows -->
+            <section>
+                <h2 style="margin-bottom: 2rem; font-size: 1.875rem; font-weight: 700;">Active Automation Workflows</h2>
+                <div class="grid grid-3">
+                    <div class="card workflow-card">
+                        <div class="workflow-status status-active">Active</div>
+                        <div class="card-header">
+                            <h3 class="card-title">Lead Qualification Pipeline</h3>
+                            <p class="card-subtitle">HubSpot → AI Scoring → GoHighLevel</p>
+                        </div>
+                        <p style="margin-bottom: 1rem;">Automatically qualify and score incoming leads using AI analysis, then route high-value prospects to targeted nurture sequences.</p>
+                        <div class="workflow-steps">
+                            <div class="workflow-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Lead Capture</div>
+                                    <div class="step-description">HubSpot form submission triggers workflow</div>
+                                </div>
+                            </div>
+                            <div class="workflow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">AI Analysis</div>
+                                    <div class="step-description">GPT-4 analyzes lead data and assigns score</div>
+                                </div>
+                            </div>
+                            <div class="workflow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Route & Nurture</div>
+                                    <div class="step-description">High-score leads enter GoHighLevel sequences</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-success" style="margin-top: 1rem;" onclick="showWorkflowDetails('qualification')">View Details</button>
+                    </div>
+
+                    <div class="card workflow-card">
+                        <div class="workflow-status status-active">Active</div>
+                        <div class="card-header">
+                            <h3 class="card-title">Multi-Channel Nurturing</h3>
+                            <p class="card-subtitle">GoHighLevel → Make.com → Airtable</p>
+                        </div>
+                        <p style="margin-bottom: 1rem;">Coordinate email, SMS, and social media outreach based on prospect behavior and engagement patterns across multiple touchpoints.</p>
+                        <div class="workflow-steps">
+                            <div class="workflow-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Trigger Analysis</div>
+                                    <div class="step-description">Monitor engagement across all channels</div>
+                                </div>
+                            </div>
+                            <div class="workflow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Channel Selection</div>
+                                    <div class="step-description">AI determines optimal outreach method</div>
+                                </div>
+                            </div>
+                            <div class="workflow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Personalized Outreach</div>
+                                    <div class="step-description">Deploy targeted messages via preferred channel</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-success" style="margin-top: 1rem;" onclick="showWorkflowDetails('nurturing')">View Details</button>
+                    </div>
+
+                    <div class="card workflow-card">
+                        <div class="workflow-status status-paused">Paused</div>
+                        <div class="card-header">
+                            <h3 class="card-title">Sales Task Automation</h3>
+                            <p class="card-subtitle">Airtable → HubSpot → Team Assignment</p>
+                        </div>
+                        <p style="margin-bottom: 1rem;">Intelligently distribute sales tasks and follow-ups based on team capacity, expertise, and lead characteristics for optimal conversion rates.</p>
+                        <div class="workflow-steps">
+                            <div class="workflow-step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <div class="step-title">Task Generation</div>
+                                    <div class="step-description">Create follow-up tasks from lead activity</div>
+                                </div>
+                            </div>
+                            <div class="workflow-step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <div class="step-title">Team Matching</div>
+                                    <div class="step-description">AI matches tasks to optimal team member</div>
+                                </div>
+                            </div>
+                            <div class="workflow-step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <div class="step-title">Assignment & Tracking</div>
+                                    <div class="step-description">Assign tasks with priority and deadlines</div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn-secondary" style="margin-top: 1rem;" onclick="resumeWorkflow('tasks')">Resume Workflow</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Performance Metrics -->
+            <section class="metrics-row">
+                <div class="metric-item">
+                    <div class="metric-value">127</div>
+                    <div class="metric-label">Active Workflows</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">94.7%</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">45%</div>
+                    <div class="metric-label">Time Saved</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">2.4M</div>
+                    <div class="metric-label">Actions Processed</div>
+                </div>
+            </section>
+
+            <!-- Workflow Builder -->
+            <section>
+                <h2 style="margin-bottom: 2rem; font-size: 1.875rem; font-weight: 700;">Visual Workflow Builder</h2>
+                <div class="workflow-builder" id="workflowBuilder">
+                    <div class="workflow-canvas" id="workflowCanvas">
+                        <div style="color: var(--text-secondary); text-align: center;">
+                            <h3>Drag & Drop Workflow Designer</h3>
+                            <p>Click "Start Building" to create custom automation workflows with our visual designer</p>
+                            <button class="btn-primary" style="margin-top: 1rem;" onclick="startWorkflowBuilder()">Start Building Workflow</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Integration Templates -->
+            <section>
+                <h2 style="margin-bottom: 2rem; font-size: 1.875rem; font-weight: 700;">Pre-Built Integration Templates</h2>
+                <div class="grid grid-2">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">HubSpot Lead Sync</h3>
+                            <p class="card-subtitle">Bi-directional data synchronization</p>
+                        </div>
+                        <p>Automatically sync lead data, activities, and custom properties between HubSpot and other platforms while maintaining data integrity and avoiding duplicates.</p>
+                        <ul style="margin: 1rem 0; margin-left: 1.5rem; color: var(--text-secondary);">
+                            <li>• Real-time contact synchronization</li>
+                            <li>• Custom field mapping and transformation</li>
+                            <li>• Duplicate detection and merge logic</li>
+                            <li>• Activity timeline integration</li>
+                        </ul>
+                        <button class="btn-primary" onclick="deployTemplate('hubspot-sync')">Deploy Template</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">GoHighLevel Campaign Orchestration</h3>
+                            <p class="card-subtitle">Multi-channel campaign automation</p>
+                        </div>
+                        <p>Coordinate complex multi-touch campaigns across email, SMS, and social channels with intelligent timing and personalization based on prospect behavior.</p>
+                        <ul style="margin: 1rem 0; margin-left: 1.5rem; color: var(--text-secondary);">
+                            <li>• Behavioral trigger automation</li>
+                            <li>• Dynamic content personalization</li>
+                            <li>• Cross-channel attribution tracking</li>
+                            <li>• A/B testing and optimization</li>
+                        </ul>
+                        <button class="btn-primary" onclick="deployTemplate('ghl-orchestration')">Deploy Template</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Airtable Dashboard Integration</h3>
+                            <p class="card-subtitle">Centralized data visualization</p>
+                        </div>
+                        <p>Create comprehensive business intelligence dashboards that aggregate data from all platforms into actionable insights with real-time updates and custom views.</p>
+                        <ul style="margin: 1rem 0; margin-left: 1.5rem; color: var(--text-secondary);">
+                            <li>• Multi-platform data aggregation</li>
+                            <li>• Custom dashboard creation</li>
+                            <li>• Automated report generation</li>
+                            <li>• Real-time performance monitoring</li>
+                        </ul>
+                        <button class="btn-primary" onclick="deployTemplate('airtable-dashboard')">Deploy Template</button>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">AI-Powered Lead Scoring</h3>
+                            <p class="card-subtitle">Predictive lead qualification</p>
+                        </div>
+                        <p>Implement machine learning algorithms that analyze multiple data points to predict lead quality and likelihood to convert, automatically prioritizing sales efforts.</p>
+                        <ul style="margin: 1rem 0; margin-left: 1.5rem; color: var(--text-secondary);">
+                            <li>• Multi-factor scoring algorithms</li>
+                            <li>• Predictive conversion modeling</li>
+                            <li>• Automated lead prioritization</li>
+                            <li>• Continuous model improvement</li>
+                        </ul>
+                        <button class="btn-primary" onclick="deployTemplate('ai-scoring')">Deploy Template</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Workflow Management Functions
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize workflow data
+            initializeWorkflowData();
+            
+            // Add interaction tracking
+            trackPageInteraction();
+        });
+
+        function initializeWorkflowData() {
+            const workflowData = {
+                activeWorkflows: 127,
+                successRate: 94.7,
+                timeSaved: 45,
+                actionsProcessed: 2400000,
+                templates: [
+                    { id: 'hubspot-sync', name: 'HubSpot Lead Sync', deployed: false },
+                    { id: 'ghl-orchestration', name: 'GoHighLevel Campaign Orchestration', deployed: true },
+                    { id: 'airtable-dashboard', name: 'Airtable Dashboard Integration', deployed: true },
+                    { id: 'ai-scoring', name: 'AI-Powered Lead Scoring', deployed: false }
+                ]
+            };
+            
+            localStorage.setItem('workflowData', JSON.stringify(workflowData));
+        }
+
+        function showWorkflowDetails(workflowType) {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = 'Loading...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                const details = {
+                    qualification: {
+                        title: 'Lead Qualification Pipeline Details',
+                        metrics: 'Processed 2,847 leads this month with 89% accuracy',
+                        nextAction: 'Review AI scoring parameters'
+                    },
+                    nurturing: {
+                        title: 'Multi-Channel Nurturing Details',
+                        metrics: 'Sent 15,423 personalized messages with 34% engagement rate',
+                        nextAction: 'Optimize send timing algorithm'
+                    }
+                };
+                
+                const detail = details[workflowType];
+                if (detail) {
+                    alert(`${detail.title}\n\n${detail.metrics}\n\nNext Action: ${detail.nextAction}`);
+                }
+                
+                button.textContent = originalText;
+                button.disabled = false;
+                
+                // Store interaction
+                const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+                interactions.push({
+                    type: 'workflow_details_view',
+                    workflow: workflowType,
+                    timestamp: new Date().toISOString(),
+                    page: 'workflows'
+                });
+                localStorage.setItem('userInteractions', JSON.stringify(interactions));
+            }, 1000);
+        }
+
+        function resumeWorkflow(workflowType) {
+            const button = event.target;
+            button.textContent = 'Resuming...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Resume Workflow';
+                button.disabled = false;
+                
+                // Update status indicator
+                const statusElement = button.closest('.workflow-card').querySelector('.workflow-status');
+                statusElement.textContent = 'Active';
+                statusElement.className = 'workflow-status status-active';
+                
+                // Change button to view details
+                button.textContent = 'View Details';
+                button.className = 'btn-success';
+                button.onclick = () => showWorkflowDetails(workflowType);
+                
+                // Show success feedback
+                showNotification('Workflow resumed successfully!', 'success');
+            }, 1500);
+        }
+
+        function startWorkflowBuilder() {
+            const builder = document.getElementById('workflowBuilder');
+            const canvas = document.getElementById('workflowCanvas');
+            
+            builder.classList.add('active');
+            
+            canvas.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                    <div class="workflow-node" draggable="true">
+                        📥 Lead Capture<br><small>HubSpot Form</small>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-node" draggable="true">
+                        🤖 AI Analysis<br><small>GPT-4 Scoring</small>
+                    </div>
+                    <div class="workflow-connector"></div>
+                    <div class="workflow-node" draggable="true">
+                        📧 Email Sequence<br><small>GoHighLevel</small>
+                    </div>
+                </div>
+                <div style="margin-top: 2rem; text-align: center;">
+                    <button class="btn-primary" onclick="saveWorkflow()">Save Workflow</button>
+                    <button class="btn-secondary" onclick="clearWorkflow()">Clear Canvas</button>
+                </div>
+            `;
+            
+            // Make nodes draggable
+            const nodes = canvas.querySelectorAll('.workflow-node');
+            nodes.forEach(node => {
+                node.addEventListener('dragstart', handleDragStart);
+                node.addEventListener('dragover', handleDragOver);
+                node.addEventListener('drop', handleDrop);
+            });
+            
+            showNotification('Workflow builder activated! Drag nodes to rearrange.', 'info');
+        }
+
+        function deployTemplate(templateId) {
+            const button = event.target;
+            button.textContent = 'Deploying...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                const templates = {
+                    'hubspot-sync': 'HubSpot Lead Sync template deployed successfully!',
+                    'ghl-orchestration': 'GoHighLevel Campaign Orchestration template deployed!',
+                    'airtable-dashboard': 'Airtable Dashboard Integration template deployed!',
+                    'ai-scoring': 'AI-Powered Lead Scoring template deployed!'
+                };
+                
+                button.textContent = 'Deployed ✓';
+                button.className = 'btn-success';
+                
+                showNotification(templates[templateId], 'success');
+                
+                // Update workflow data
+                const workflowData = JSON.parse(localStorage.getItem('workflowData') || '{}');
+                const template = workflowData.templates?.find(t => t.id === templateId);
+                if (template) {
+                    template.deployed = true;
+                    localStorage.setItem('workflowData', JSON.stringify(workflowData));
+                }
+            }, 2000);
+        }
+
+        function saveWorkflow() {
+            showNotification('Workflow saved successfully! Ready for deployment.', 'success');
+        }
+
+        function clearWorkflow() {
+            const canvas = document.getElementById('workflowCanvas');
+            canvas.innerHTML = `
+                <div style="color: var(--text-secondary); text-align: center;">
+                    <h3>Drag & Drop Workflow Designer</h3>
+                    <p>Click "Start Building" to create custom automation workflows with our visual designer</p>
+                    <button class="btn-primary" style="margin-top: 1rem;" onclick="startWorkflowBuilder()">Start Building Workflow</button>
+                </div>
+            `;
+            document.getElementById('workflowBuilder').classList.remove('active');
+        }
+
+        // Drag and Drop Functions
+        let draggedElement = null;
+
+        function handleDragStart(e) {
+            draggedElement = this;
+            this.style.opacity = '0.5';
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            if (this !== draggedElement) {
+                const draggedContent = draggedElement.innerHTML;
+                const thisContent = this.innerHTML;
+                
+                draggedElement.innerHTML = thisContent;
+                this.innerHTML = draggedContent;
+            }
+            draggedElement.style.opacity = '1';
+            draggedElement = null;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+            `;
+            
+            const colors = {
+                success: 'var(--success-color)',
+                error: 'var(--error-color)',
+                info: 'var(--primary-color)',
+                warning: 'var(--warning-color)'
+            };
+            
+            notification.style.backgroundColor = colors[type] || colors.info;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => notification.style.transform = 'translateX(400px)', 4000);
+            setTimeout(() => notification.remove(), 4500);
+        }
+
+        function trackPageInteraction() {
+            const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+            interactions.push({
+                type: 'page_view',
+                page: 'workflows',
+                timestamp: new Date().toISOString()
+            });
+            localStorage.setItem('userInteractions', JSON.stringify(interactions));
+        }
+
+        // Add button click tracking
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('button')) {
+                const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+                interactions.push({
+                    type: 'button_click',
+                    element: e.target.textContent,
+                    timestamp: new Date().toISOString(),
+                    page: 'workflows'
+                });
+                localStorage.setItem('userInteractions', JSON.stringify(interactions));
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Management - AI Sales Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary-color: #10b981;
+            --secondary-hover: #059669;
+            --accent-color: #f59e0b;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-size-xs: 0.75rem;
+            --font-size-sm: 0.875rem;
+            --font-size-base: 1rem;
+            --font-size-lg: 1.125rem;
+            --font-size-xl: 1.25rem;
+            --font-size-2xl: 1.5rem;
+            --font-size-3xl: 1.875rem;
+            --font-size-4xl: 2.25rem;
+            --font-weight-normal: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--spacing-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 4rem;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-weight: var(--font-weight-bold);
+            font-size: var(--font-size-xl);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-lg);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-weight-medium);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background-color: rgb(37 99 235 / 0.1);
+        }
+
+        /* Page Container */
+        .page-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-md);
+            max-width: 1200px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Page Header */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-3xl);
+        }
+
+        .page-title h1 {
+            font-size: var(--font-size-4xl);
+            font-weight: var(--font-weight-bold);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .page-subtitle {
+            font-size: var(--font-size-lg);
+            color: var(--text-secondary);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--primary-color);
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-left: var(--spacing-sm);
+        }
+
+        .btn-success {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: var(--font-weight-medium);
+            font-size: var(--font-size-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            margin-bottom: var(--spacing-md);
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .card-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .card-subtitle {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+            margin: 0.25rem 0 0 0;
+        }
+
+        /* Campaign Stats */
+        .campaign-stats {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-xl);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: var(--font-size-3xl);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-label {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .stat-change {
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            margin-top: var(--spacing-xs);
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--error-color);
+        }
+
+        /* Campaign Cards */
+        .campaign-card {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .campaign-status {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: var(--font-size-xs);
+            font-weight: var(--font-weight-medium);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-active {
+            background-color: rgb(220 252 231);
+            color: rgb(22 101 52);
+        }
+
+        .status-paused {
+            background-color: rgb(254 243 199);
+            color: rgb(146 64 14);
+        }
+
+        .status-draft {
+            background-color: rgb(219 234 254);
+            color: rgb(30 64 175);
+        }
+
+        .status-completed {
+            background-color: rgb(229 231 235);
+            color: rgb(75 85 99);
+        }
+
+        /* Campaign Metrics */
+        .campaign-metrics {
+            display: flex;
+            justify-content: space-between;
+            margin: var(--spacing-md) 0;
+            padding: var(--spacing-md);
+            background-color: var(--background-color);
+            border-radius: 0.5rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-bold);
+            color: var(--primary-color);
+        }
+
+        .metric-label {
+            font-size: var(--font-size-xs);
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Channel Icons */
+        .channel-icons {
+            display: flex;
+            gap: var(--spacing-sm);
+            margin: var(--spacing-md) 0;
+        }
+
+        .channel-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-sm);
+        }
+
+        /* Progress Bars */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: var(--spacing-sm) 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            transition: width 0.5s ease;
+        }
+
+        /* Multi-Channel Section */
+        .multi-channel {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 0.75rem;
+            padding: var(--spacing-2xl);
+            margin: var(--spacing-2xl) 0;
+            text-align: center;
+        }
+
+        .multi-channel h2 {
+            font-size: var(--font-size-3xl);
+            margin-bottom: var(--spacing-md);
+            color: white;
+        }
+
+        .multi-channel p {
+            font-size: var(--font-size-lg);
+            opacity: 0.9;
+            margin-bottom: var(--spacing-xl);
+        }
+
+        .channel-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-lg);
+            margin-top: var(--spacing-xl);
+        }
+
+        .channel-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .channel-card h4 {
+            margin-bottom: var(--spacing-sm);
+            color: white;
+        }
+
+        .channel-card p {
+            font-size: var(--font-size-sm);
+            opacity: 0.8;
+        }
+
+        /* AI Content Generation */
+        .ai-content {
+            background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid var(--primary-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            margin: var(--spacing-xl) 0;
+        }
+
+        .ai-content-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .ai-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--font-size-lg);
+        }
+
+        .ai-content-title {
+            font-size: var(--font-size-xl);
+            font-weight: var(--font-weight-semibold);
+            color: var(--primary-color);
+        }
+
+        /* Campaign Builder */
+        .campaign-builder {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-xl);
+            margin: var(--spacing-2xl) 0;
+            border: 2px dashed var(--border-color);
+        }
+
+        .campaign-builder.active {
+            border-color: var(--primary-color);
+            background-color: rgb(37 99 235 / 0.05);
+        }
+
+        .builder-step {
+            display: flex;
+            align-items: center;
+            padding: var(--spacing-md);
+            margin: var(--spacing-sm) 0;
+            background-color: var(--background-color);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: var(--font-weight-bold);
+            margin-right: var(--spacing-md);
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-title {
+            font-weight: var(--font-weight-medium);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .step-description {
+            font-size: var(--font-size-sm);
+            color: var(--text-secondary);
+        }
+
+        .step-action {
+            margin-left: var(--spacing-md);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            background-color: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .chart-title {
+            font-size: var(--font-size-lg);
+            font-weight: var(--font-weight-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .chart-canvas {
+            width: 100%;
+            height: 300px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-4, .grid-3, .grid-2 {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: start;
+                gap: var(--spacing-md);
+            }
+            
+            .campaign-stats {
+                flex-direction: column;
+                gap: var(--spacing-lg);
+            }
+            
+            .campaign-metrics {
+                flex-direction: column;
+                gap: var(--spacing-sm);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>AI Sales Pro</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="lead-scoring.html" class="nav-link">AI Lead Scoring</a></li>
+                    <li><a href="workflows.html" class="nav-link">Automation</a></li>
+                    <li><a href="campaigns.html" class="nav-link active">Campaigns</a></li>
+                    <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <header class="page-header">
+                <div class="page-title">
+                    <h1>Campaign Management</h1>
+                    <p class="page-subtitle">Orchestrate multi-channel nurturing campaigns with AI-powered personalization and behavioral triggers</p>
+                </div>
+                <div>
+                    <button class="btn-primary" onclick="createCampaign()">+ Create Campaign</button>
+                    <button class="btn-secondary" onclick="viewTemplates()">Browse Templates</button>
+                </div>
+            </header>
+
+            <!-- Campaign Performance Stats -->
+            <section class="campaign-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="activeCampaigns">24</div>
+                    <div class="stat-label">Active Campaigns</div>
+                    <div class="stat-change positive">+3 this month</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="totalReach">15.2K</div>
+                    <div class="stat-label">Total Reach</div>
+                    <div class="stat-change positive">+18.7% this month</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="engagementRate">34.2%</div>
+                    <div class="stat-label">Engagement Rate</div>
+                    <div class="stat-change positive">+5.1% this month</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="conversionRate">12.8%</div>
+                    <div class="stat-label">Conversion Rate</div>
+                    <div class="stat-change positive">+2.3% this month</div>
+                </div>
+            </section>
+
+            <!-- Multi-Channel Overview -->
+            <section class="multi-channel">
+                <h2>🎯 Multi-Channel Campaign Orchestration</h2>
+                <p>Coordinate email, SMS, social media, and direct mail campaigns with intelligent timing and AI-generated personalized content based on prospect behavior and preferences.</p>
+                
+                <div class="channel-grid">
+                    <div class="channel-card">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📧</div>
+                        <h4>Email Automation</h4>
+                        <p>Personalized email sequences with dynamic content generation and optimal send time prediction</p>
+                    </div>
+                    <div class="channel-card">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📱</div>
+                        <h4>SMS Campaigns</h4>
+                        <p>Behavior-triggered SMS with personalized messaging and compliance management</p>
+                    </div>
+                    <div class="channel-card">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💬</div>
+                        <h4>Social DMs</h4>
+                        <p>Automated social media direct messaging across LinkedIn, Twitter, and Facebook</p>
+                    </div>
+                    <div class="channel-card">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📮</div>
+                        <h4>Direct Mail</h4>
+                        <p>Physical mail integration with digital campaign tracking and attribution</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Active Campaigns -->
+            <section>
+                <h2 style="margin-bottom: 2rem; font-size: 1.875rem; font-weight: 700;">Active Campaigns</h2>
+                <div class="grid grid-3">
+                    <div class="card campaign-card">
+                        <div class="campaign-status status-active">Active</div>
+                        <div class="card-header">
+                            <h3 class="card-title">Q1 Enterprise Outreach</h3>
+                            <p class="card-subtitle">Multi-touch enterprise lead nurturing</p>
+                        </div>
+                        
+                        <div class="channel-icons">
+                            <div class="channel-icon" title="Email">📧</div>
+                            <div class="channel-icon" title="LinkedIn">💼</div>
+                            <div class="channel-icon" title="Direct Mail">📮</div>
+                        </div>
+                        
+                        <div class="campaign-metrics">
+                            <div class="metric">
+                                <div class="metric-value">1,247</div>
+                                <div class="metric-label">Contacts</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">89</div>
+                                <div class="metric-label">Conversions</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">285%</div>
+                                <div class="metric-label">ROI</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 1rem 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Campaign Progress</span>
+                                <span style="font-size: 0.875rem; font-weight: 600;">68%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 68%"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <button class="btn-success" onclick="viewCampaign('enterprise')">View Details</button>
+                            <button class="btn-warning" onclick="pauseCampaign('enterprise')">Pause</button>
+                        </div>
+                    </div>
+
+                    <div class="card campaign-card">
+                        <div class="campaign-status status-active">Active</div>
+                        <div class="card-header">
+                            <h3 class="card-title">AI Product Launch</h3>
+                            <p class="card-subtitle">Product announcement and education series</p>
+                        </div>
+                        
+                        <div class="channel-icons">
+                            <div class="channel-icon" title="Email">📧</div>
+                            <div class="channel-icon" title="SMS">📱</div>
+                            <div class="channel-icon" title="Social">📱</div>
+                            <div class="channel-icon" title="Webinar">🎥</div>
+                        </div>
+                        
+                        <div class="campaign-metrics">
+                            <div class="metric">
+                                <div class="metric-value">892</div>
+                                <div class="metric-label">Contacts</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">156</div>
+                                <div class="metric-label">Conversions</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">412%</div>
+                                <div class="metric-label">ROI</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 1rem 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Campaign Progress</span>
+                                <span style="font-size: 0.875rem; font-weight: 600;">82%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 82%"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <button class="btn-success" onclick="viewCampaign('product-launch')">View Details</button>
+                            <button class="btn-warning" onclick="pauseCampaign('product-launch')">Pause</button>
+                        </div>
+                    </div>
+
+                    <div class="card campaign-card">
+                        <div class="campaign-status status-paused">Paused</div>
+                        <div class="card-header">
+                            <h3 class="card-title">SMB Nurture Sequence</h3>
+                            <p class="card-subtitle">Small business lead nurturing workflow</p>
+                        </div>
+                        
+                        <div class="channel-icons">
+                            <div class="channel-icon" title="Email">📧</div>
+                            <div class="channel-icon" title="SMS">📱</div>
+                        </div>
+                        
+                        <div class="campaign-metrics">
+                            <div class="metric">
+                                <div class="metric-value">2,156</div>
+                                <div class="metric-label">Contacts</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">234</div>
+                                <div class="metric-label">Conversions</div>
+                            </div>
+                            <div class="metric">
+                                <div class="metric-value">178%</div>
+                                <div class="metric-label">ROI</div>
+                            </div>
+                        </div>
+                        
+                        <div style="margin: 1rem 0;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <span style="font-size: 0.875rem; color: var(--text-secondary);">Campaign Progress</span>
+                                <span style="font-size: 0.875rem; font-weight: 600;">45%</span>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: 45%"></div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
+                            <button class="btn-primary" onclick="resumeCampaign('smb-nurture')">Resume</button>
+                            <button class="btn-secondary" onclick="editCampaign('smb-nurture')">Edit</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Content Generation */
+            <section class="ai-content">
+                <div class="ai-content-header">
+                    <div class="ai-icon">🤖</div>
+                    <div class="ai-content-title">AI-Powered Content Generation</div>
+                </div>
+                <p style="margin-bottom: 1.5rem;">Our GPT-4 integration automatically generates personalized email subject lines, message content, and SMS text based on lead behavior, industry, and engagement history. Content is dynamically optimized for maximum engagement and conversion.</p>
+                
+                <div class="grid grid-2">
+                    <div style="background-color: var(--surface-color); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-color);">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--primary-color);">📧 Email Personalization</h4>
+                        <ul style="margin-left: 1.5rem; color: var(--text-secondary); font-size: 0.875rem;">
+                            <li>• Dynamic subject line generation</li>
+                            <li>• Industry-specific messaging</li>
+                            <li>• Behavioral trigger content</li>
+                            <li>• A/B testing automation</li>
+                        </ul>
+                    </div>
+                    <div style="background-color: var(--surface-color); padding: 1rem; border-radius: 0.5rem; border: 1px solid var(--border-color);">
+                        <h4 style="margin-bottom: 0.5rem; color: var(--primary-color);">📱 SMS Optimization</h4>
+                        <ul style="margin-left: 1.5rem; color: var(--text-secondary); font-size: 0.875rem;">
+                            <li>• Character count optimization</li>
+                            <li>• Urgency and timing analysis</li>
+                            <li>• Compliance checking</li>
+                            <li>• Response rate prediction</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <button class="btn-primary" style="margin-top: 1.5rem;" onclick="demoAIContent()">Demo AI Content Generation</button>
+            </section>
+
+            <!-- Campaign Performance Charts -->
+            <section class="grid grid-2">
+                <div class="chart-container">
+                    <h3 class="chart-title">Campaign Performance Trends</h3>
+                    <canvas id="performanceChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="chart-container">
+                    <h3 class="chart-title">Channel Effectiveness</h3>
+                    <canvas id="channelChart" class="chart-canvas"></canvas>
+                </div>
+            </section>
+
+            <!-- Campaign Builder -->
+            <section>
+                <h2 style="margin-bottom: 2rem; font-size: 1.875rem; font-weight: 700;">Quick Campaign Builder</h2>
+                <div class="campaign-builder" id="campaignBuilder">
+                    <h3 style="margin-bottom: 1.5rem; text-align: center; color: var(--primary-color);">Create Multi-Channel Campaign</h3>
+                    
+                    <div class="builder-step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">Define Target Audience</div>
+                            <div class="step-description">Select lead segments, demographics, and behavioral criteria</div>
+                        </div>
+                        <div class="step-action">
+                            <button class="btn-secondary" onclick="configureAudience()">Configure</button>
+                        </div>
+                    </div>
+                    
+                    <div class="builder-step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Choose Channels</div>
+                            <div class="step-description">Select email, SMS, social DM, and direct mail touchpoints</div>
+                        </div>
+                        <div class="step-action">
+                            <button class="btn-secondary" onclick="selectChannels()">Select</button>
+                        </div>
+                    </div>
+                    
+                    <div class="builder-step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">AI Content Generation</div>
+                            <div class="step-description">Generate personalized content using GPT-4 algorithms</div>
+                        </div>
+                        <div class="step-action">
+                            <button class="btn-secondary" onclick="generateContent()">Generate</button>
+                        </div>
+                    </div>
+                    
+                    <div class="builder-step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Schedule & Launch</div>
+                            <div class="step-description">Set timing, triggers, and campaign duration</div>
+                        </div>
+                        <div class="step-action">
+                            <button class="btn-primary" onclick="launchCampaign()">Launch</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Campaign Management Functions
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCampaignData();
+            initializeCharts();
+            trackPageInteraction();
+        });
+
+        function initializeCampaignData() {
+            const campaignData = {
+                activeCampaigns: 24,
+                totalReach: 15200,
+                engagementRate: 34.2,
+                conversionRate: 12.8,
+                campaigns: [
+                    {
+                        id: 'enterprise',
+                        name: 'Q1 Enterprise Outreach',
+                        status: 'active',
+                        contacts: 1247,
+                        conversions: 89,
+                        roi: 285,
+                        progress: 68
+                    },
+                    {
+                        id: 'product-launch',
+                        name: 'AI Product Launch',
+                        status: 'active',
+                        contacts: 892,
+                        conversions: 156,
+                        roi: 412,
+                        progress: 82
+                    },
+                    {
+                        id: 'smb-nurture',
+                        name: 'SMB Nurture Sequence',
+                        status: 'paused',
+                        contacts: 2156,
+                        conversions: 234,
+                        roi: 178,
+                        progress: 45
+                    }
+                ]
+            };
+            
+            localStorage.setItem('campaignData', JSON.stringify(campaignData));
+        }
+
+        function createCampaign() {
+            showNotification('Campaign creation wizard launched!', 'info');
+            
+            // Scroll to campaign builder
+            document.getElementById('campaignBuilder').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+            document.getElementById('campaignBuilder').classList.add('active');
+        }
+
+        function viewTemplates() {
+            const templates = [
+                'Enterprise Lead Nurturing',
+                'Product Launch Sequence',
+                'SMB Onboarding Campaign',
+                'Re-engagement Series',
+                'Customer Retention Campaign'
+            ];
+            
+            const templateList = templates.map((template, index) => `${index + 1}. ${template}`).join('\n');
+            alert(`Available Campaign Templates:\n\n${templateList}\n\nSelect a template to customize for your needs.`);
+        }
+
+        function viewCampaign(campaignId) {
+            const button = event.target;
+            button.textContent = 'Loading...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                const campaigns = {
+                    enterprise: {
+                        name: 'Q1 Enterprise Outreach',
+                        details: 'Multi-touch enterprise campaign with 8 touchpoints across email, LinkedIn, and direct mail',
+                        nextAction: 'Review personalization rules for next batch'
+                    },
+                    'product-launch': {
+                        name: 'AI Product Launch',
+                        details: 'Product announcement campaign with demo scheduling and trial sign-ups',
+                        nextAction: 'Optimize email send times based on engagement data'
+                    }
+                };
+                
+                const campaign = campaigns[campaignId];
+                if (campaign) {
+                    alert(`${campaign.name}\n\n${campaign.details}\n\nNext Action: ${campaign.nextAction}`);
+                }
+                
+                button.textContent = 'View Details';
+                button.disabled = false;
+                
+                trackInteraction('campaign_view', campaignId);
+            }, 1000);
+        }
+
+        function pauseCampaign(campaignId) {
+            const button = event.target;
+            button.textContent = 'Pausing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Resume';
+                button.onclick = () => resumeCampaign(campaignId);
+                
+                // Update status indicator
+                const statusElement = button.closest('.campaign-card').querySelector('.campaign-status');
+                statusElement.textContent = 'Paused';
+                statusElement.className = 'campaign-status status-paused';
+                
+                showNotification('Campaign paused successfully', 'warning');
+                trackInteraction('campaign_pause', campaignId);
+            }, 1000);
+        }
+
+        function resumeCampaign(campaignId) {
+            const button = event.target;
+            button.textContent = 'Resuming...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Pause';
+                button.onclick = () => pauseCampaign(campaignId);
+                button.className = 'btn-warning';
+                
+                // Update status indicator
+                const statusElement = button.closest('.campaign-card').querySelector('.campaign-status');
+                statusElement.textContent = 'Active';
+                statusElement.className = 'campaign-status status-active';
+                
+                showNotification('Campaign resumed successfully', 'success');
+                trackInteraction('campaign_resume', campaignId);
+            }, 1500);
+        }
+
+        function editCampaign(campaignId) {
+            showNotification('Campaign editor opened in new window', 'info');
+            trackInteraction('campaign_edit', campaignId);
+        }
+
+        function demoAIContent() {
+            const button = event.target;
+            button.textContent = '🤖 Generating...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                const examples = [
+                    'Email Subject: "Transform your sales process with AI-powered automation, [Company Name]"',
+                    'SMS: "Hi [Name], your demo request caught our attention. Quick 15-min call to show you our ROI calculator? Reply Y/N"',
+                    'LinkedIn DM: "Noticed you\'re working on sales optimization at [Company]. Our recent client in [Industry] saw 300% lead conversion increase..."'
+                ];
+                
+                alert('AI-Generated Content Examples:\n\n' + examples.join('\n\n'));
+                
+                button.textContent = 'Demo AI Content Generation';
+                button.disabled = false;
+                
+                trackInteraction('ai_content_demo', 'content_generation');
+            }, 2000);
+        }
+
+        // Campaign Builder Functions
+        function configureAudience() {
+            showNotification('Audience configuration panel opened', 'info');
+            event.target.textContent = 'Configured ✓';
+            event.target.className = 'btn-success';
+        }
+
+        function selectChannels() {
+            showNotification('Channel selection panel opened', 'info');
+            event.target.textContent = 'Selected ✓';
+            event.target.className = 'btn-success';
+        }
+
+        function generateContent() {
+            const button = event.target;
+            button.textContent = 'Generating...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Generated ✓';
+                button.className = 'btn-success';
+                button.disabled = false;
+                showNotification('AI content generated for all channels', 'success');
+            }, 2000);
+        }
+
+        function launchCampaign() {
+            const button = event.target;
+            button.textContent = 'Launching...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Launched ✓';
+                button.className = 'btn-success';
+                button.disabled = false;
+                showNotification('Campaign launched successfully!', 'success');
+                
+                // Update campaign count
+                const activeElement = document.getElementById('activeCampaigns');
+                const currentCount = parseInt(activeElement.textContent);
+                activeElement.textContent = currentCount + 1;
+            }, 3000);
+        }
+
+        function initializeCharts() {
+            // Campaign Performance Chart
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                    datasets: [{
+                        label: 'Open Rate',
+                        data: [28, 32, 35, 38, 41, 43],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Click Rate',
+                        data: [12, 15, 18, 22, 25, 28],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4
+                    }, {
+                        label: 'Conversion Rate',
+                        data: [8, 10, 12, 15, 17, 19],
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 50
+                        }
+                    }
+                }
+            });
+
+            // Channel Effectiveness Chart
+            const channelCtx = document.getElementById('channelChart').getContext('2d');
+            new Chart(channelCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['Email', 'SMS', 'LinkedIn', 'Direct Mail', 'Social DM', 'Phone'],
+                    datasets: [{
+                        label: 'Engagement Rate',
+                        data: [85, 72, 68, 45, 58, 62],
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)',
+                        pointBackgroundColor: '#2563eb',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#2563eb'
+                    }, {
+                        label: 'Conversion Rate',
+                        data: [32, 28, 35, 18, 22, 25],
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        pointBackgroundColor: '#10b981',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#10b981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: {
+                        line: {
+                            borderWidth: 3
+                        }
+                    },
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: false
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 1rem 1.5rem;
+                border-radius: 0.5rem;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                transform: translateX(400px);
+                transition: transform 0.3s ease;
+            `;
+            
+            const colors = {
+                success: 'var(--success-color)',
+                error: 'var(--error-color)',
+                info: 'var(--primary-color)',
+                warning: 'var(--warning-color)'
+            };
+            
+            notification.style.backgroundColor = colors[type] || colors.info;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.style.transform = 'translateX(0)', 100);
+            setTimeout(() => notification.style.transform = 'translateX(400px)', 4000);
+            setTimeout(() => notification.remove(), 4500);
+        }
+
+        function trackInteraction(type, detail) {
+            const interactions = JSON.parse(localStorage.getItem('userInteractions') || '[]');
+            interactions.push({
+                type: type,
+                detail: detail,
+                timestamp: new Date().toISOString(),
+                page: 'campaigns'
+            });
+            localStorage.setItem('userInteractions', JSON.stringify(interactions));
+        }
+
+        function trackPageInteraction() {
+            trackInteraction('page_view', 'campaigns');
+        }
+
+        // Add button click tracking
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('button')) {
+                trackInteraction('button_click', e.target.textContent);
+            }
+        });
+    </script>
+</body>
+</html>
