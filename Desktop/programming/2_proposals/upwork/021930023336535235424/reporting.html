@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Automated Reporting - AWS Pipeline Reports</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #FF9900;
+            --secondary-color: #232F3E;
+            --accent-color: #146EB4;
+            --success-color: #1B660F;
+            --warning-color: #D13212;
+            --background-color: #FFFFFF;
+            --surface-color: #F2F3F3;
+            --text-primary: #16191F;
+            --text-secondary: #545B64;
+            --border-color: #D5DBDB;
+            
+            --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", monospace;
+            
+            --text-xs: 12px;
+            --text-sm: 14px;
+            --text-base: 16px;
+            --text-lg: 18px;
+            --text-xl: 20px;
+            --text-2xl: 24px;
+            --text-3xl: 30px;
+            --text-4xl: 36px;
+            
+            --font-light: 300;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: var(--text-base);
+            color: var(--text-primary);
+            background-color: var(--surface-color);
+            line-height: 1.6;
+        }
+
+        /* Container and Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .aws-header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: var(--space-md) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .aws-logo {
+            width: 40px;
+            height: 24px;
+            fill: var(--primary-color);
+        }
+
+        .site-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: white;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color 0.2s ease;
+            padding: var(--space-sm) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* Main Content */
+        .reporting-container {
+            padding: var(--space-xl) 0;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .page-title {
+            margin: 0;
+        }
+
+        .page-title h1 {
+            font-size: var(--text-2xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-sm);
+        }
+
+        .page-title p {
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+        }
+
+        .page-actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--text-base);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #e88a00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--surface-color);
+            border-color: var(--secondary-color);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #14520c;
+        }
+
+        /* Report Overview Cards */
+        .report-overview {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .overview-card {
+            background-color: white;
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .overview-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .overview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+
+        .overview-title {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+        }
+
+        .overview-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-lg);
+        }
+
+        .overview-icon.reports {
+            background-color: #e8f0fe;
+            color: var(--accent-color);
+        }
+
+        .overview-icon.automated {
+            background-color: #e6f4ea;
+            color: var(--success-color);
+        }
+
+        .overview-icon.scheduled {
+            background-color: #fef3e6;
+            color: var(--primary-color);
+        }
+
+        .overview-icon.delivered {
+            background-color: #f3e8ff;
+            color: #7c3aed;
+        }
+
+        .overview-value {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .overview-change {
+            font-size: var(--text-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .overview-change.positive {
+            color: var(--success-color);
+        }
+
+        /* Main Layout Grid */
+        .reporting-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--space-lg);
+        }
+
+        /* Sidebar */
+        .report-sidebar {
+            background-color: white;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            padding: var(--space-lg);
+            height: fit-content;
+        }
+
+        .sidebar-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-md);
+            color: var(--secondary-color);
+        }
+
+        .report-list {
+            list-style: none;
+        }
+
+        .report-item {
+            padding: var(--space-md);
+            margin-bottom: var(--space-sm);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid transparent;
+        }
+
+        .report-item:hover {
+            background-color: var(--surface-color);
+        }
+
+        .report-item.active {
+            background-color: #fef3e6;
+            border-color: var(--primary-color);
+        }
+
+        .report-name {
+            font-weight: var(--font-medium);
+            margin-bottom: var(--space-xs);
+        }
+
+        .report-meta {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .report-frequency {
+            background-color: var(--surface-color);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-xs);
+        }
+
+        .report-status {
+            font-size: var(--text-xs);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-full);
+        }
+
+        .report-status.active {
+            background-color: #e6f4ea;
+            color: var(--success-color);
+        }
+
+        .report-status.paused {
+            background-color: var(--surface-color);
+            color: var(--text-secondary);
+        }
+
+        /* Main Report Area */
+        .report-main {
+            background-color: white;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            padding: var(--space-xl);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            padding-bottom: var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .report-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--secondary-color);
+        }
+
+        .report-actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        /* Report Configuration */
+        .report-config {
+            margin-bottom: var(--space-xl);
+        }
+
+        .config-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .config-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-md);
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-md);
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: var(--font-medium);
+            margin-bottom: var(--space-sm);
+            color: var(--text-primary);
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: var(--space-sm) var(--space-md);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-base);
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .form-help {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-top: var(--space-xs);
+        }
+
+        /* Report Preview */
+        .report-preview {
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-top: var(--space-lg);
+        }
+
+        .preview-header {
+            background-color: var(--surface-color);
+            padding: var(--space-md) var(--space-lg);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .preview-title {
+            font-weight: var(--font-semibold);
+        }
+
+        .preview-date {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .preview-content {
+            padding: var(--space-xl);
+        }
+
+        .preview-content h2 {
+            margin-bottom: var(--space-lg);
+            color: var(--secondary-color);
+        }
+
+        .preview-content h3 {
+            margin: var(--space-lg) 0 var(--space-md);
+            color: var(--secondary-color);
+        }
+
+        .preview-content p {
+            margin-bottom: var(--space-md);
+            line-height: 1.6;
+        }
+
+        /* Charts in Report */
+        .report-chart {
+            margin: var(--space-lg) 0;
+            background-color: var(--surface-color);
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+        }
+
+        .chart-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-md);
+            color: var(--secondary-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Data Table in Report */
+        .report-table {
+            margin: var(--space-lg) 0;
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+        }
+
+        .data-table th {
+            background-color: var(--surface-color);
+            text-align: left;
+            padding: var(--space-md);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--border-color);
+            font-size: var(--text-sm);
+        }
+
+        .data-table td {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table tr:hover {
+            background-color: var(--surface-color);
+        }
+
+        /* Email Recipients */
+        .recipients-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            margin-top: var(--space-sm);
+        }
+
+        .recipient-tag {
+            background-color: var(--surface-color);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .recipient-remove {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: var(--text-sm);
+        }
+
+        /* Schedule Settings */
+        .schedule-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .schedule-option {
+            padding: var(--space-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .schedule-option:hover {
+            border-color: var(--primary-color);
+        }
+
+        .schedule-option.selected {
+            border-color: var(--primary-color);
+            background-color: #fef3e6;
+        }
+
+        .schedule-option .icon {
+            font-size: var(--text-2xl);
+            margin-bottom: var(--space-sm);
+        }
+
+        .schedule-option .title {
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-xs);
+        }
+
+        .schedule-option .description {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Status Messages */
+        .status-message {
+            padding: var(--space-md);
+            border-radius: var(--radius-sm);
+            margin-bottom: var(--space-lg);
+            display: none;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .status-message.success {
+            background-color: #e6f4ea;
+            color: var(--success-color);
+            border: 1px solid #b7e1cd;
+        }
+
+        .status-message.info {
+            background-color: #e8f0fe;
+            color: var(--accent-color);
+            border: 1px solid #aecbfa;
+        }
+
+        .status-message.show {
+            display: flex;
+        }
+
+        /* Footer */
+        .aws-footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: var(--space-2xl) 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+        }
+
+        .footer-section h4 {
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-md);
+            color: var(--primary-color);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: var(--space-sm);
+            opacity: 0.8;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--surface-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header class="aws-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo-section">
+                        <svg class="aws-logo" viewBox="0 0 40 24">
+                            <path d="M14.4 9.7c0 .5 0 .9-.1 1.2-.1.3-.2.6-.4.9-.1.1-.2.2-.3.2-.1 0-.2-.1-.2-.2-.5-.6-.6-1.4-.6-2.5 0-1.9.7-2.7 1.4-2.7h.1c.1.1.1.4.1 1.1zm4.3 4.5c-.1.1-.2.1-.4.1-.3 0-.5-.1-.7-.3-.2-.2-.3-.5-.4-.8-.6.7-1.5 1.1-2.5 1.1-1.4 0-2.5-.8-2.5-2.3 0-1.2.7-2 1.6-2.5.9-.4 2.1-.5 2.9-.5v-.3c0-1-.1-2.2-1.5-2.2-.6 0-1.3.2-1.7.5-.1.1-.2.1-.3.1-.2 0-.4-.2-.4-.4 0-.2.1-.3.2-.4.6-.4 1.4-.6 2.2-.6 1 0 1.8.3 2.2.8.5.6.5 1.4.5 2.2v2.9c0 .8.3 1.2.6 1.2.1 0 .2 0 .3-.1.1 0 .2 0 .3.1.1.1.1.2.1.3 0 .2-.1.3-.2.4-.2.2-.5.3-.8.3zm8.8-4.5c0 .5 0 .9-.1 1.2-.1.3-.2.6-.4.9-.1.1-.2.2-.3.2-.1 0-.2-.1-.2-.2-.5-.6-.6-1.4-.6-2.5 0-1.9.7-2.7 1.4-2.7h.1c.1.1.1.4.1 1.1zm4.3 4.5c-.1.1-.2.1-.4.1-.3 0-.5-.1-.7-.3-.2-.2-.3-.5-.4-.8-.6.7-1.5 1.1-2.5 1.1-1.4 0-2.5-.8-2.5-2.3 0-1.2.7-2 1.6-2.5.9-.4 2.1-.5 2.9-.5v-.3c0-1-.1-2.2-1.5-2.2-.6 0-1.3.2-1.7.5-.1.1-.2.1-.3.1-.2 0-.4-.2-.4-.4 0-.2.1-.3.2-.4.6-.4 1.4-.6 2.2-.6 1 0 1.8.3 2.2.8.5.6.5 1.4.5 2.2v2.9c0 .8.3 1.2.6 1.2.1 0 .2 0 .3-.1.1 0 .2 0 .3.1.1.1.1.2.1.3 0 .2-.1.3-.2.4-.2.2-.5.3-.8.3z"/>
+                        </svg>
+                        <h1 class="site-title">AWS Pipeline Automation</h1>
+                    </div>
+                    <nav class="main-nav">
+                        <a href="index.html" class="nav-link">Overview</a>
+                        <a href="pipeline-dashboard.html" class="nav-link">Pipeline Dashboard</a>
+                        <a href="data-transformation.html" class="nav-link">Data Transformation</a>
+                        <a href="reporting.html" class="nav-link active">Reporting</a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="reporting-container">
+            <div class="container">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="page-title">
+                        <h1>Automated Reporting</h1>
+                        <p>Configure and manage automated reports with custom schedules and email distribution</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-secondary" onclick="previewReport()">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                            </svg>
+                            Preview
+                        </button>
+                        <button class="btn btn-primary" onclick="createNewReport()">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                            </svg>
+                            New Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Report Overview Cards -->
+                <div class="report-overview">
+                    <div class="overview-card">
+                        <div class="overview-header">
+                            <span class="overview-title">Active Reports</span>
+                            <div class="overview-icon reports">📊</div>
+                        </div>
+                        <div class="overview-value">12</div>
+                        <div class="overview-change positive">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>+2 this month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="overview-header">
+                            <span class="overview-title">Automated Sends</span>
+                            <div class="overview-icon automated">🚀</div>
+                        </div>
+                        <div class="overview-value">347</div>
+                        <div class="overview-change positive">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>This month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="overview-header">
+                            <span class="overview-title">Scheduled Today</span>
+                            <div class="overview-icon scheduled">📅</div>
+                        </div>
+                        <div class="overview-value">8</div>
+                        <div class="overview-change">
+                            <span style="color: var(--text-secondary);">Next at 2:00 PM</span>
+                        </div>
+                    </div>
+                    
+                    <div class="overview-card">
+                        <div class="overview-header">
+                            <span class="overview-title">Delivery Rate</span>
+                            <div class="overview-icon delivered">✉️</div>
+                        </div>
+                        <div class="overview-value">99.2%</div>
+                        <div class="overview-change positive">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>Excellent</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Layout Grid -->
+                <div class="reporting-grid">
+                    <!-- Sidebar -->
+                    <aside class="report-sidebar">
+                        <h2 class="sidebar-title">Reports</h2>
+                        <ul class="report-list">
+                            <li class="report-item active" onclick="selectReport(this, 'weekly-sales')">
+                                <div class="report-name">Weekly Sales Summary</div>
+                                <div class="report-meta">
+                                    <span class="report-frequency">Weekly</span>
+                                    <span class="report-status active">Active</span>
+                                </div>
+                            </li>
+                            <li class="report-item" onclick="selectReport(this, 'monthly-inventory')">
+                                <div class="report-name">Monthly Inventory Report</div>
+                                <div class="report-meta">
+                                    <span class="report-frequency">Monthly</span>
+                                    <span class="report-status active">Active</span>
+                                </div>
+                            </li>
+                            <li class="report-item" onclick="selectReport(this, 'daily-operations')">
+                                <div class="report-name">Daily Operations Dashboard</div>
+                                <div class="report-meta">
+                                    <span class="report-frequency">Daily</span>
+                                    <span class="report-status active">Active</span>
+                                </div>
+                            </li>
+                            <li class="report-item" onclick="selectReport(this, 'quarterly-analysis')">
+                                <div class="report-name">Quarterly Analysis</div>
+                                <div class="report-meta">
+                                    <span class="report-frequency">Quarterly</span>
+                                    <span class="report-status paused">Paused</span>
+                                </div>
+                            </li>
+                            <li class="report-item" onclick="selectReport(this, 'member-insights')">
+                                <div class="report-name">Member Insights Report</div>
+                                <div class="report-meta">
+                                    <span class="report-frequency">Bi-weekly</span>
+                                    <span class="report-status active">Active</span>
+                                </div>
+                            </li>
+                        </ul>
+                    </aside>
+
+                    <!-- Main Report Area -->
+                    <div class="report-main">
+                        <div class="report-header">
+                            <h2 class="report-title" id="reportTitle">Weekly Sales Summary</h2>
+                            <div class="report-actions">
+                                <button class="btn btn-secondary" onclick="sendTestReport()">
+                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                        <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                                    </svg>
+                                    Send Test
+                                </button>
+                                <button class="btn btn-success" onclick="saveReport()">
+                                    <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                                        <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 1 1 0 000 2H6a2 2 0 00-2 2v6a2 2 0 002 2h2a1 1 0 000-2H6V7h8v6h-2a1 1 0 100 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a1 1 0 100-2h2a2 2 0 012 2v10a2 2 0 01-2 2H6a2 2 0 01-2-2V5z" clip-rule="evenodd"/>
+                                    </svg>
+                                    Save
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Status Message -->
+                        <div id="statusMessage" class="status-message">
+                            <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <span id="statusText">Report configuration saved successfully</span>
+                        </div>
+
+                        <!-- Report Configuration -->
+                        <div class="report-config">
+                            <!-- Basic Settings -->
+                            <div class="config-section">
+                                <h3 class="config-title">Basic Settings</h3>
+                                <div class="config-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Report Name</label>
+                                        <input type="text" class="form-input" id="reportName" value="Weekly Sales Summary">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Report Type</label>
+                                        <select class="form-select">
+                                            <option>Sales Analysis</option>
+                                            <option>Inventory Report</option>
+                                            <option>Operations Dashboard</option>
+                                            <option>Financial Summary</option>
+                                            <option>Custom Report</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label class="form-label">Description</label>
+                                        <input type="text" class="form-input" value="Automated weekly summary of sales performance, trends, and key metrics">
+                                        <span class="form-help">Brief description of what this report contains</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Schedule Configuration -->
+                            <div class="config-section">
+                                <h3 class="config-title">Schedule</h3>
+                                <div class="schedule-grid">
+                                    <div class="schedule-option selected" onclick="selectSchedule(this, 'weekly')">
+                                        <div class="icon">📅</div>
+                                        <div class="title">Weekly</div>
+                                        <div class="description">Every Monday at 8:00 AM</div>
+                                    </div>
+                                    <div class="schedule-option" onclick="selectSchedule(this, 'monthly')">
+                                        <div class="icon">🗓️</div>
+                                        <div class="title">Monthly</div>
+                                        <div class="description">1st of each month</div>
+                                    </div>
+                                    <div class="schedule-option" onclick="selectSchedule(this, 'daily')">
+                                        <div class="icon">⏰</div>
+                                        <div class="title">Daily</div>
+                                        <div class="description">Every day at 6:00 AM</div>
+                                    </div>
+                                </div>
+                                <div class="config-grid" style="margin-top: var(--space-lg);">
+                                    <div class="form-group">
+                                        <label class="form-label">Time Zone</label>
+                                        <select class="form-select">
+                                            <option>UTC-8 (Pacific Time)</option>
+                                            <option>UTC-5 (Eastern Time)</option>
+                                            <option>UTC+0 (GMT)</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Next Run</label>
+                                        <input type="text" class="form-input" value="Monday, Jan 27, 2025 at 8:00 AM" readonly>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email Configuration -->
+                            <div class="config-section">
+                                <h3 class="config-title">Email Distribution</h3>
+                                <div class="config-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">From Email</label>
+                                        <input type="email" class="form-input" value="reports@company.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Subject Line</label>
+                                        <input type="text" class="form-input" value="Weekly Sales Summary - {{date}}">
+                                        <span class="form-help">Use {{date}} for dynamic date insertion</span>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label class="form-label">Recipients</label>
+                                        <input type="email" class="form-input" placeholder="Add email address..." onkeypress="addRecipient(event)">
+                                        <div class="recipients-list">
+                                            <div class="recipient-tag">
+                                                sales@company.com
+                                                <button class="recipient-remove" onclick="removeRecipient(this)">&times;</button>
+                                            </div>
+                                            <div class="recipient-tag">
+                                                manager@company.com
+                                                <button class="recipient-remove" onclick="removeRecipient(this)">&times;</button>
+                                            </div>
+                                            <div class="recipient-tag">
+                                                finance@company.com
+                                                <button class="recipient-remove" onclick="removeRecipient(this)">&times;</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Data Source Configuration -->
+                            <div class="config-section">
+                                <h3 class="config-title">Data Sources</h3>
+                                <div class="config-grid">
+                                    <div class="form-group">
+                                        <label class="form-label">Primary Data Source</label>
+                                        <select class="form-select">
+                                            <option>Processed Sales Data (S3)</option>
+                                            <option>Customer Database (RDS)</option>
+                                            <option>Inventory System (DynamoDB)</option>
+                                            <option>Analytics Data Lake</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Date Range</label>
+                                        <select class="form-select">
+                                            <option>Last 7 days</option>
+                                            <option>Last 30 days</option>
+                                            <option>Current month</option>
+                                            <option>Last month</option>
+                                            <option>Custom range</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group full-width">
+                                        <label class="form-label">Filters & Conditions</label>
+                                        <input type="text" class="form-input" placeholder="e.g., region='West Coast' AND amount > 1000">
+                                        <span class="form-help">SQL-like conditions to filter your data</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Report Preview -->
+                        <div class="report-preview">
+                            <div class="preview-header">
+                                <span class="preview-title">Report Preview</span>
+                                <span class="preview-date">Generated: January 25, 2025</span>
+                            </div>
+                            <div class="preview-content">
+                                <h2>Weekly Sales Summary</h2>
+                                <p><strong>Report Period:</strong> January 18 - January 24, 2025</p>
+                                <p>This report provides a comprehensive overview of sales performance during the specified period, including key metrics, trends, and actionable insights.</p>
+
+                                <h3>Executive Summary</h3>
+                                <ul style="margin-left: var(--space-lg); margin-bottom: var(--space-lg);">
+                                    <li>Total Sales: $2,847,592 (+12.5% vs. previous week)</li>
+                                    <li>Number of Transactions: 1,247 (+8.3% vs. previous week)</li>
+                                    <li>Average Order Value: $2,284 (+3.8% vs. previous week)</li>
+                                    <li>Top Performing Region: West Coast (34% of total sales)</li>
+                                </ul>
+
+                                <div class="report-chart">
+                                    <h4 class="chart-title">Sales Trend (Last 7 Days)</h4>
+                                    <div class="chart-container">
+                                        <canvas id="salesTrendChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <h3>Top Performing Products</h3>
+                                <div class="report-table">
+                                    <table class="data-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Product ID</th>
+                                                <th>Product Name</th>
+                                                <th>Units Sold</th>
+                                                <th>Revenue</th>
+                                                <th>% of Total</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>P001</td>
+                                                <td>Premium Widget Pro</td>
+                                                <td>234</td>
+                                                <td>$587,500</td>
+                                                <td>20.6%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P024</td>
+                                                <td>Standard Widget Plus</td>
+                                                <td>189</td>
+                                                <td>$378,000</td>
+                                                <td>13.3%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P045</td>
+                                                <td>Deluxe Widget Suite</td>
+                                                <td>156</td>
+                                                <td>$468,000</td>
+                                                <td>16.4%</td>
+                                            </tr>
+                                            <tr>
+                                                <td>P067</td>
+                                                <td>Basic Widget</td>
+                                                <td>298</td>
+                                                <td>$149,000</td>
+                                                <td>5.2%</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div class="report-chart">
+                                    <h4 class="chart-title">Sales by Region</h4>
+                                    <div class="chart-container">
+                                        <canvas id="regionChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <h3>Key Insights & Recommendations</h3>
+                                <ul style="margin-left: var(--space-lg); margin-bottom: var(--space-lg);">
+                                    <li><strong>Growth Momentum:</strong> 12.5% week-over-week growth indicates strong market demand</li>
+                                    <li><strong>Product Mix:</strong> Premium products (P001, P045) driving higher margins</li>
+                                    <li><strong>Regional Performance:</strong> West Coast continues to outperform other regions</li>
+                                    <li><strong>Opportunity:</strong> Consider expanding premium product line based on current trends</li>
+                                </ul>
+
+                                <p style="margin-top: var(--space-xl); padding-top: var(--space-lg); border-top: 1px solid var(--border-color); color: var(--text-secondary);">
+                                    <em>This report was automatically generated by AWS Pipeline Automation on {{date}} using data from our integrated sales system.</em>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="aws-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h4>AWS Pipeline Demo</h4>
+                        <p>Automated data pipeline solution built on AWS</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Key Features</h4>
+                        <ul>
+                            <li>Email Attachment Processing</li>
+                            <li>S3 Storage Management</li>
+                            <li>AWS Glue Transformations</li>
+                            <li>Automated Reporting</li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Technologies</h4>
+                        <ul>
+                            <li>AWS S3</li>
+                            <li>AWS Glue</li>
+                            <li>AWS Lambda</li>
+                            <li>AWS RDS</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize Charts
+        let salesTrendChart, regionChart;
+
+        function initializeCharts() {
+            // Sales Trend Chart
+            const salesCtx = document.getElementById('salesTrendChart').getContext('2d');
+            salesTrendChart = new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Daily Sales ($)',
+                        data: [385000, 420000, 395000, 470000, 445000, 380000, 352000],
+                        borderColor: '#FF9900',
+                        backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function(value) {
+                                    return '$' + (value / 1000) + 'k';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Region Chart
+            const regionCtx = document.getElementById('regionChart').getContext('2d');
+            regionChart = new Chart(regionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['West Coast', 'East Coast', 'Midwest', 'South', 'International'],
+                    datasets: [{
+                        data: [34, 28, 18, 15, 5],
+                        backgroundColor: [
+                            '#FF9900',
+                            '#146EB4',
+                            '#569A31',
+                            '#945DBB',
+                            '#D13212'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Report Selection
+        function selectReport(element, reportId) {
+            // Remove active class from all items
+            document.querySelectorAll('.report-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to selected item
+            element.classList.add('active');
+            
+            // Update report title
+            const reportName = element.querySelector('.report-name').textContent;
+            document.getElementById('reportTitle').textContent = reportName;
+            document.getElementById('reportName').value = reportName;
+            
+            // Show status message
+            showStatus('Loading report configuration...', 'info');
+            
+            // Simulate loading different configurations
+            setTimeout(() => {
+                updateReportConfiguration(reportId);
+                hideStatus();
+            }, 500);
+        }
+
+        // Update report configuration based on selection
+        function updateReportConfiguration(reportId) {
+            const configs = {
+                'weekly-sales': {
+                    type: 'Sales Analysis',
+                    description: 'Automated weekly summary of sales performance, trends, and key metrics',
+                    schedule: 'weekly'
+                },
+                'monthly-inventory': {
+                    type: 'Inventory Report',
+                    description: 'Monthly inventory levels, turnover rates, and stock optimization recommendations',
+                    schedule: 'monthly'
+                },
+                'daily-operations': {
+                    type: 'Operations Dashboard',
+                    description: 'Daily operational metrics including processing times and system health',
+                    schedule: 'daily'
+                }
+            };
+            
+            // Update form fields based on selected report
+        }
+
+        // Schedule Selection
+        function selectSchedule(element, scheduleType) {
+            // Remove selected class from all options
+            document.querySelectorAll('.schedule-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            element.classList.add('selected');
+            
+            // Update next run time based on schedule
+            const nextRunField = document.querySelector('input[value*="Monday"]');
+            const scheduleTexts = {
+                'daily': 'Tomorrow at 6:00 AM',
+                'weekly': 'Monday, Jan 27, 2025 at 8:00 AM',
+                'monthly': 'February 1, 2025 at 8:00 AM'
+            };
+            
+            if (nextRunField) {
+                nextRunField.value = scheduleTexts[scheduleType] || 'Not scheduled';
+            }
+        }
+
+        // Add Recipient
+        function addRecipient(event) {
+            if (event.key === 'Enter') {
+                const email = event.target.value.trim();
+                if (email && validateEmail(email)) {
+                    const recipientsList = document.querySelector('.recipients-list');
+                    const recipientTag = document.createElement('div');
+                    recipientTag.className = 'recipient-tag';
+                    recipientTag.innerHTML = `
+                        ${email}
+                        <button class="recipient-remove" onclick="removeRecipient(this)">&times;</button>
+                    `;
+                    recipientsList.appendChild(recipientTag);
+                    event.target.value = '';
+                } else {
+                    showStatus('Please enter a valid email address', 'info');
+                }
+            }
+        }
+
+        // Remove Recipient
+        function removeRecipient(button) {
+            button.parentElement.remove();
+        }
+
+        // Email Validation
+        function validateEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        // Save Report
+        function saveReport() {
+            showStatus('Saving report configuration...', 'info');
+            
+            setTimeout(() => {
+                showStatus('Report configuration saved successfully!', 'success');
+            }, 1000);
+        }
+
+        // Send Test Report
+        function sendTestReport() {
+            showStatus('Sending test report...', 'info');
+            
+            setTimeout(() => {
+                showStatus('Test report sent successfully! Check your email.', 'success');
+            }, 2000);
+        }
+
+        // Preview Report
+        function previewReport() {
+            showStatus('Generating report preview...', 'info');
+            
+            setTimeout(() => {
+                // Scroll to preview section
+                document.querySelector('.report-preview').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+                hideStatus();
+            }, 1000);
+        }
+
+        // Create New Report
+        function createNewReport() {
+            const reportName = prompt('Enter new report name:');
+            if (reportName) {
+                showStatus(`Creating new report: ${reportName}...`, 'info');
+                
+                setTimeout(() => {
+                    // Add new report to list
+                    const reportList = document.querySelector('.report-list');
+                    const newReport = document.createElement('li');
+                    newReport.className = 'report-item';
+                    newReport.innerHTML = `
+                        <div class="report-name">${reportName}</div>
+                        <div class="report-meta">
+                            <span class="report-frequency">Weekly</span>
+                            <span class="report-status paused">New</span>
+                        </div>
+                    `;
+                    newReport.onclick = function() { selectReport(this, 'new-report'); };
+                    reportList.appendChild(newReport);
+                    
+                    // Select the new report
+                    newReport.click();
+                    
+                    showStatus('New report created successfully!', 'success');
+                }, 1000);
+            }
+        }
+
+        // Status Message Management
+        function showStatus(message, type) {
+            const statusMessage = document.getElementById('statusMessage');
+            const statusText = document.getElementById('statusText');
+            
+            statusMessage.className = `status-message ${type} show`;
+            statusText.textContent = message;
+            
+            // Auto-hide success messages
+            if (type === 'success') {
+                setTimeout(hideStatus, 3000);
+            }
+        }
+
+        function hideStatus() {
+            document.getElementById('statusMessage').classList.remove('show');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initializeCharts();
+        });
+
+        // Simulate real-time updates for overview cards
+        setInterval(() => {
+            const automatedSends = document.querySelector('.overview-card:nth-child(2) .overview-value');
+            if (automatedSends) {
+                const current = parseInt(automatedSends.textContent);
+                if (Math.random() > 0.8) {
+                    automatedSends.textContent = current + 1;
+                }
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

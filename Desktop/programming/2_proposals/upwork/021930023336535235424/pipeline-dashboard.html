@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>Pipeline Dashboard - AWS Data Pipeline Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #FF9900;
+            --secondary-color: #232F3E;
+            --accent-color: #146EB4;
+            --success-color: #1B660F;
+            --warning-color: #D13212;
+            --background-color: #FFFFFF;
+            --surface-color: #F2F3F3;
+            --text-primary: #16191F;
+            --text-secondary: #545B64;
+            --border-color: #D5DBDB;
+            
+            --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", monospace;
+            
+            --text-xs: 12px;
+            --text-sm: 14px;
+            --text-base: 16px;
+            --text-lg: 18px;
+            --text-xl: 20px;
+            --text-2xl: 24px;
+            --text-3xl: 30px;
+            --text-4xl: 36px;
+            
+            --font-light: 300;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: var(--text-base);
+            color: var(--text-primary);
+            background-color: var(--surface-color);
+            line-height: 1.6;
+        }
+
+        /* Container and Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .aws-header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: var(--space-md) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .aws-logo {
+            width: 40px;
+            height: 24px;
+            fill: var(--primary-color);
+        }
+
+        .site-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: white;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color 0.2s ease;
+            padding: var(--space-sm) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            padding: var(--space-xl) 0;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .dashboard-title h1 {
+            font-size: var(--text-2xl);
+            color: var(--secondary-color);
+            margin-bottom: var(--space-xs);
+        }
+
+        .dashboard-title p {
+            color: var(--text-secondary);
+        }
+
+        .dashboard-actions {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--text-base);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #e88a00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: white;
+            color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--surface-color);
+            border-color: var(--secondary-color);
+        }
+
+        /* Status Cards Grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .status-card {
+            background-color: white;
+            padding: var(--space-lg);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .status-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .status-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-md);
+        }
+
+        .status-card-title {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+        }
+
+        .status-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-icon.success {
+            background-color: #e6f4ea;
+            color: var(--success-color);
+        }
+
+        .status-icon.warning {
+            background-color: #fef3e6;
+            color: var(--primary-color);
+        }
+
+        .status-icon.error {
+            background-color: #fce8e6;
+            color: var(--warning-color);
+        }
+
+        .status-icon.info {
+            background-color: #e8f0fe;
+            color: var(--accent-color);
+        }
+
+        .status-value {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-sm);
+        }
+
+        .status-change {
+            font-size: var(--text-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+        }
+
+        .status-change.positive {
+            color: var(--success-color);
+        }
+
+        .status-change.negative {
+            color: var(--warning-color);
+        }
+
+        /* Main Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        /* Pipeline Flow Visualization */
+        .pipeline-flow-card {
+            background-color: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .card-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--secondary-color);
+        }
+
+        .pipeline-stages {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            padding: var(--space-xl) 0;
+        }
+
+        .pipeline-stage {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stage-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto var(--space-md);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-2xl);
+            transition: all 0.3s ease;
+        }
+
+        .stage-icon.active {
+            background-color: var(--primary-color);
+            color: white;
+            animation: pulse 2s infinite;
+        }
+
+        .stage-icon.completed {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .stage-icon.pending {
+            background-color: var(--surface-color);
+            color: var(--text-secondary);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 153, 0, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 153, 0, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 153, 0, 0); }
+        }
+
+        .stage-name {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            margin-bottom: var(--space-xs);
+        }
+
+        .stage-count {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+        }
+
+        .pipeline-connector {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+
+        .pipeline-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background-color: var(--primary-color);
+            transition: width 1s ease;
+        }
+
+        /* Activity Feed */
+        .activity-feed-card {
+            background-color: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: var(--space-md);
+            padding: var(--space-md) 0;
+            border-bottom: 1px solid var(--surface-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: var(--text-sm);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            margin-bottom: var(--space-xs);
+        }
+
+        .activity-time {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+        }
+
+        /* Charts Section */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-lg);
+            margin-bottom: var(--space-xl);
+        }
+
+        .chart-card {
+            background-color: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        /* Recent Files Table */
+        .table-card {
+            background-color: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: var(--space-md);
+            font-weight: var(--font-semibold);
+            color: var(--text-secondary);
+            border-bottom: 2px solid var(--surface-color);
+            font-size: var(--text-sm);
+        }
+
+        .data-table td {
+            padding: var(--space-md);
+            border-bottom: 1px solid var(--surface-color);
+        }
+
+        .data-table tr:hover {
+            background-color: var(--surface-color);
+        }
+
+        .file-status {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+        }
+
+        .file-status.processed {
+            background-color: #e6f4ea;
+            color: var(--success-color);
+        }
+
+        .file-status.processing {
+            background-color: #fef3e6;
+            color: var(--primary-color);
+        }
+
+        .file-status.error {
+            background-color: #fce8e6;
+            color: var(--warning-color);
+        }
+
+        /* Footer */
+        .aws-footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: var(--space-2xl) 0;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+        }
+
+        .footer-section h4 {
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-md);
+            color: var(--primary-color);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: var(--space-sm);
+            opacity: 0.8;
+        }
+
+        /* Real-time Indicator */
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-xs) var(--space-md);
+            background-color: var(--success-color);
+            color: white;
+            border-radius: var(--radius-full);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background-color: white;
+            border-radius: 50%;
+            animation: livePulse 2s infinite;
+        }
+
+        @keyframes livePulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .loading-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .loading-content {
+            background-color: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .loading-spinner {
+            width: 48px;
+            height: 48px;
+            border: 4px solid var(--surface-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--space-md);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header class="aws-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo-section">
+                        <svg class="aws-logo" viewBox="0 0 40 24">
+                            <path d="M14.4 9.7c0 .5 0 .9-.1 1.2-.1.3-.2.6-.4.9-.1.1-.2.2-.3.2-.1 0-.2-.1-.2-.2-.5-.6-.6-1.4-.6-2.5 0-1.9.7-2.7 1.4-2.7h.1c.1.1.1.4.1 1.1zm4.3 4.5c-.1.1-.2.1-.4.1-.3 0-.5-.1-.7-.3-.2-.2-.3-.5-.4-.8-.6.7-1.5 1.1-2.5 1.1-1.4 0-2.5-.8-2.5-2.3 0-1.2.7-2 1.6-2.5.9-.4 2.1-.5 2.9-.5v-.3c0-1-.1-2.2-1.5-2.2-.6 0-1.3.2-1.7.5-.1.1-.2.1-.3.1-.2 0-.4-.2-.4-.4 0-.2.1-.3.2-.4.6-.4 1.4-.6 2.2-.6 1 0 1.8.3 2.2.8.5.6.5 1.4.5 2.2v2.9c0 .8.3 1.2.6 1.2.1 0 .2 0 .3-.1.1 0 .2 0 .3.1.1.1.1.2.1.3 0 .2-.1.3-.2.4-.2.2-.5.3-.8.3zm8.8-4.5c0 .5 0 .9-.1 1.2-.1.3-.2.6-.4.9-.1.1-.2.2-.3.2-.1 0-.2-.1-.2-.2-.5-.6-.6-1.4-.6-2.5 0-1.9.7-2.7 1.4-2.7h.1c.1.1.1.4.1 1.1zm4.3 4.5c-.1.1-.2.1-.4.1-.3 0-.5-.1-.7-.3-.2-.2-.3-.5-.4-.8-.6.7-1.5 1.1-2.5 1.1-1.4 0-2.5-.8-2.5-2.3 0-1.2.7-2 1.6-2.5.9-.4 2.1-.5 2.9-.5v-.3c0-1-.1-2.2-1.5-2.2-.6 0-1.3.2-1.7.5-.1.1-.2.1-.3.1-.2 0-.4-.2-.4-.4 0-.2.1-.3.2-.4.6-.4 1.4-.6 2.2-.6 1 0 1.8.3 2.2.8.5.6.5 1.4.5 2.2v2.9c0 .8.3 1.2.6 1.2.1 0 .2 0 .3-.1.1 0 .2 0 .3.1.1.1.1.2.1.3 0 .2-.1.3-.2.4-.2.2-.5.3-.8.3z"/>
+                        </svg>
+                        <h1 class="site-title">AWS Pipeline Automation</h1>
+                    </div>
+                    <nav class="main-nav">
+                        <a href="index.html" class="nav-link">Overview</a>
+                        <a href="pipeline-dashboard.html" class="nav-link active">Pipeline Dashboard</a>
+                        <a href="data-transformation.html" class="nav-link">Data Transformation</a>
+                        <a href="reporting.html" class="nav-link">Reporting</a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Dashboard Container -->
+        <main class="dashboard-container">
+            <div class="container">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <div class="dashboard-title">
+                        <h1>Pipeline Dashboard</h1>
+                        <p>Real-time monitoring of your AWS data pipeline</p>
+                    </div>
+                    <div class="dashboard-actions">
+                        <span class="live-indicator">
+                            <span class="live-dot"></span>
+                            Live
+                        </span>
+                        <button class="btn btn-secondary" onclick="refreshDashboard()">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                            </svg>
+                            Refresh
+                        </button>
+                        <button class="btn btn-primary" onclick="simulateNewEmail()">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"/>
+                            </svg>
+                            Simulate Email
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Status Cards -->
+                <div class="status-grid">
+                    <div class="status-card">
+                        <div class="status-card-header">
+                            <span class="status-card-title">Files Processed Today</span>
+                            <div class="status-icon success">📊</div>
+                        </div>
+                        <div class="status-value" id="filesProcessed">847</div>
+                        <div class="status-change positive">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>+12% from yesterday</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <div class="status-card-header">
+                            <span class="status-card-title">Active Pipelines</span>
+                            <div class="status-icon warning">⚡</div>
+                        </div>
+                        <div class="status-value" id="activePipelines">5</div>
+                        <div class="status-change">
+                            <span style="color: var(--text-secondary);">3 running, 2 scheduled</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <div class="status-card-header">
+                            <span class="status-card-title">Error Rate</span>
+                            <div class="status-icon error">⚠️</div>
+                        </div>
+                        <div class="status-value" id="errorRate">0.2%</div>
+                        <div class="status-change positive">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>-0.1% improvement</span>
+                        </div>
+                    </div>
+                    
+                    <div class="status-card">
+                        <div class="status-card-header">
+                            <span class="status-card-title">Avg Processing Time</span>
+                            <div class="status-icon info">⏱️</div>
+                        </div>
+                        <div class="status-value" id="avgTime">2.4s</div>
+                        <div class="status-change positive">
+                            <svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M12 13a1 1 0 100 2h5a1 1 0 001-1V9a1 1 0 10-2 0v2.586l-4.293-4.293a1 1 0 00-1.414 0L8 9.586 3.707 5.293a1 1 0 00-1.414 1.414l5 5a1 1 0 001.414 0L11 9.414 14.586 13H12z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>200ms faster</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Pipeline Flow Visualization -->
+                    <div class="pipeline-flow-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Pipeline Flow Status</h2>
+                            <span style="color: var(--text-secondary); font-size: var(--text-sm);">Real-time processing</span>
+                        </div>
+                        <div class="pipeline-stages">
+                            <div class="pipeline-connector">
+                                <div class="pipeline-progress" id="pipelineProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="pipeline-stage">
+                                <div class="stage-icon completed" id="stage1">📧</div>
+                                <div class="stage-name">Email Ingestion</div>
+                                <div class="stage-count" id="stage1Count">324 emails</div>
+                            </div>
+                            <div class="pipeline-stage">
+                                <div class="stage-icon completed" id="stage2">☁️</div>
+                                <div class="stage-name">S3 Upload</div>
+                                <div class="stage-count" id="stage2Count">847 files</div>
+                            </div>
+                            <div class="pipeline-stage">
+                                <div class="stage-icon active" id="stage3">⚙️</div>
+                                <div class="stage-name">Glue Transform</div>
+                                <div class="stage-count" id="stage3Count">Processing...</div>
+                            </div>
+                            <div class="pipeline-stage">
+                                <div class="stage-icon pending" id="stage4">🗄️</div>
+                                <div class="stage-name">Data Lake</div>
+                                <div class="stage-count" id="stage4Count">Waiting</div>
+                            </div>
+                            <div class="pipeline-stage">
+                                <div class="stage-icon pending" id="stage5">📊</div>
+                                <div class="stage-name">Reports</div>
+                                <div class="stage-count" id="stage5Count">Scheduled</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Activity Feed -->
+                    <div class="activity-feed-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Recent Activity</h2>
+                        </div>
+                        <div class="activity-list" id="activityList">
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background-color: #e6f4ea; color: var(--success-color);">✓</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Batch processing completed</div>
+                                    <div class="activity-time">2 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background-color: #e8f0fe; color: var(--accent-color);">📥</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">15 new emails received</div>
+                                    <div class="activity-time">5 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background-color: #fef3e6; color: var(--primary-color);">⚡</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Glue job started: Transform_Daily_Reports</div>
+                                    <div class="activity-time">8 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background-color: #e6f4ea; color: var(--success-color);">✓</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">S3 bucket sync completed</div>
+                                    <div class="activity-time">12 minutes ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon" style="background-color: #fce8e6; color: var(--warning-color);">⚠️</div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Validation error: Missing required field in row 456</div>
+                                    <div class="activity-time">15 minutes ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h2 class="card-title">Processing Volume (24 Hours)</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="volumeChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="card-header">
+                            <h2 class="card-title">File Types Distribution</h2>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="fileTypesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Files Table -->
+                <div class="table-card">
+                    <div class="card-header">
+                        <h2 class="card-title">Recent Files</h2>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>File Name</th>
+                                <th>Source Email</th>
+                                <th>Size</th>
+                                <th>Received</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="filesTable">
+                            <tr>
+                                <td>monthly_sales_report_jan2025.xlsx</td>
+                                <td>finance@member-org.com</td>
+                                <td>2.4 MB</td>
+                                <td>2 minutes ago</td>
+                                <td><span class="file-status processed">Processed</span></td>
+                            </tr>
+                            <tr>
+                                <td>inventory_update_012525.csv</td>
+                                <td>warehouse@member-org.com</td>
+                                <td>856 KB</td>
+                                <td>5 minutes ago</td>
+                                <td><span class="file-status processing">Processing</span></td>
+                            </tr>
+                            <tr>
+                                <td>customer_data_batch_47.xlsx</td>
+                                <td>sales@member-org.com</td>
+                                <td>1.2 MB</td>
+                                <td>8 minutes ago</td>
+                                <td><span class="file-status processed">Processed</span></td>
+                            </tr>
+                            <tr>
+                                <td>regional_metrics_q1.xlsx</td>
+                                <td>analytics@member-org.com</td>
+                                <td>3.7 MB</td>
+                                <td>12 minutes ago</td>
+                                <td><span class="file-status error">Error</span></td>
+                            </tr>
+                            <tr>
+                                <td>product_catalog_update.csv</td>
+                                <td>catalog@member-org.com</td>
+                                <td>543 KB</td>
+                                <td>15 minutes ago</td>
+                                <td><span class="file-status processed">Processed</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="aws-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h4>AWS Pipeline Demo</h4>
+                        <p>Automated data pipeline solution built on AWS</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Key Features</h4>
+                        <ul>
+                            <li>Email Attachment Processing</li>
+                            <li>S3 Storage Management</li>
+                            <li>AWS Glue Transformations</li>
+                            <li>Automated Reporting</li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Technologies</h4>
+                        <ul>
+                            <li>AWS S3</li>
+                            <li>AWS Glue</li>
+                            <li>AWS Lambda</li>
+                            <li>AWS RDS</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <p>Processing pipeline...</p>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Charts
+        let volumeChart, fileTypesChart;
+
+        function initializeCharts() {
+            // Volume Chart
+            const volumeCtx = document.getElementById('volumeChart').getContext('2d');
+            volumeChart = new Chart(volumeCtx, {
+                type: 'line',
+                data: {
+                    labels: generateTimeLabels(),
+                    datasets: [{
+                        label: 'Files Processed',
+                        data: generateVolumeData(),
+                        borderColor: '#FF9900',
+                        backgroundColor: 'rgba(255, 153, 0, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: '#F2F3F3'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+
+            // File Types Chart
+            const fileTypesCtx = document.getElementById('fileTypesChart').getContext('2d');
+            fileTypesChart = new Chart(fileTypesCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excel (.xlsx)', 'CSV', 'JSON', 'XML', 'Other'],
+                    datasets: [{
+                        data: [45, 30, 15, 8, 2],
+                        backgroundColor: [
+                            '#FF9900',
+                            '#146EB4',
+                            '#569A31',
+                            '#945DBB',
+                            '#545B64'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right'
+                        }
+                    }
+                }
+            });
+        }
+
+        function generateTimeLabels() {
+            const labels = [];
+            for (let i = 23; i >= 0; i--) {
+                labels.push(`${i}:00`);
+            }
+            return labels.reverse();
+        }
+
+        function generateVolumeData() {
+            return Array.from({length: 24}, () => Math.floor(Math.random() * 50) + 20);
+        }
+
+        // Pipeline Animation
+        let currentStage = 3;
+        function animatePipeline() {
+            const progress = (currentStage - 1) * 25;
+            document.getElementById('pipelineProgress').style.width = `${progress}%`;
+            
+            // Update stage states
+            for (let i = 1; i <= 5; i++) {
+                const stage = document.getElementById(`stage${i}`);
+                if (i < currentStage) {
+                    stage.className = 'stage-icon completed';
+                } else if (i === currentStage) {
+                    stage.className = 'stage-icon active';
+                } else {
+                    stage.className = 'stage-icon pending';
+                }
+            }
+        }
+
+        // Simulate real-time updates
+        function updateMetrics() {
+            // Update files processed
+            const filesProcessed = document.getElementById('filesProcessed');
+            const currentFiles = parseInt(filesProcessed.textContent);
+            filesProcessed.textContent = currentFiles + Math.floor(Math.random() * 3);
+
+            // Update average time
+            const avgTime = document.getElementById('avgTime');
+            const baseTime = 2.4;
+            const variation = (Math.random() - 0.5) * 0.2;
+            avgTime.textContent = `${(baseTime + variation).toFixed(1)}s`;
+
+            // Update stage counts
+            document.getElementById('stage1Count').textContent = `${324 + Math.floor(Math.random() * 10)} emails`;
+            document.getElementById('stage2Count').textContent = `${parseInt(filesProcessed.textContent)} files`;
+        }
+
+        // Refresh Dashboard
+        function refreshDashboard() {
+            showLoading();
+            
+            setTimeout(() => {
+                updateMetrics();
+                updateCharts();
+                addActivityItem('Dashboard refreshed', '📊', '#e8f0fe', '#146EB4');
+                hideLoading();
+            }, 1000);
+        }
+
+        // Update Charts
+        function updateCharts() {
+            if (volumeChart) {
+                volumeChart.data.datasets[0].data = generateVolumeData();
+                volumeChart.update();
+            }
+        }
+
+        // Simulate New Email
+        function simulateNewEmail() {
+            showLoading();
+            
+            // Reset pipeline to stage 1
+            currentStage = 1;
+            animatePipeline();
+            
+            // Add activity
+            addActivityItem('New email received: data_batch_' + Math.floor(Math.random() * 1000) + '.xlsx', '📧', '#e8f0fe', '#146EB4');
+            
+            // Animate through pipeline stages
+            const stageInterval = setInterval(() => {
+                currentStage++;
+                animatePipeline();
+                
+                if (currentStage === 2) {
+                    addActivityItem('File uploaded to S3', '☁️', '#e6f4ea', '#569A31');
+                } else if (currentStage === 3) {
+                    addActivityItem('Glue transformation started', '⚙️', '#fef3e6', '#FF9900');
+                } else if (currentStage === 4) {
+                    addActivityItem('Data written to lake', '🗄️', '#e6f4ea', '#569A31');
+                } else if (currentStage === 5) {
+                    addActivityItem('Report generation scheduled', '📊', '#e6f4ea', '#569A31');
+                    clearInterval(stageInterval);
+                    hideLoading();
+                    
+                    // Add new file to table
+                    addFileToTable();
+                }
+            }, 1500);
+        }
+
+        // Add Activity Item
+        function addActivityItem(title, icon, bgColor, color) {
+            const activityList = document.getElementById('activityList');
+            const newItem = document.createElement('div');
+            newItem.className = 'activity-item';
+            newItem.innerHTML = `
+                <div class="activity-icon" style="background-color: ${bgColor}; color: ${color};">${icon}</div>
+                <div class="activity-content">
+                    <div class="activity-title">${title}</div>
+                    <div class="activity-time">Just now</div>
+                </div>
+            `;
+            
+            activityList.insertBefore(newItem, activityList.firstChild);
+            
+            // Remove oldest item if too many
+            if (activityList.children.length > 10) {
+                activityList.removeChild(activityList.lastChild);
+            }
+        }
+
+        // Add File to Table
+        function addFileToTable() {
+            const filesTable = document.getElementById('filesTable');
+            const fileNames = ['sales_report', 'inventory_data', 'customer_batch', 'product_catalog'];
+            const sources = ['finance@member-org.com', 'warehouse@member-org.com', 'sales@member-org.com'];
+            
+            const newRow = filesTable.insertRow(0);
+            newRow.innerHTML = `
+                <td>${fileNames[Math.floor(Math.random() * fileNames.length)]}_${Math.floor(Math.random() * 1000)}.xlsx</td>
+                <td>${sources[Math.floor(Math.random() * sources.length)]}</td>
+                <td>${(Math.random() * 3 + 0.5).toFixed(1)} MB</td>
+                <td>Just now</td>
+                <td><span class="file-status processing">Processing</span></td>
+            `;
+            
+            // Update to processed after delay
+            setTimeout(() => {
+                newRow.querySelector('.file-status').className = 'file-status processed';
+                newRow.querySelector('.file-status').textContent = 'Processed';
+            }, 3000);
+            
+            // Remove last row if too many
+            if (filesTable.rows.length > 10) {
+                filesTable.deleteRow(-1);
+            }
+        }
+
+        // Loading Functions
+        function showLoading() {
+            document.getElementById('loadingOverlay').classList.add('show');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initializeCharts();
+            animatePipeline();
+            
+            // Start real-time updates
+            setInterval(updateMetrics, 5000);
+            
+            // Simulate pipeline progression
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    currentStage = Math.floor(Math.random() * 5) + 1;
+                    animatePipeline();
+                }
+            }, 10000);
+        });
+
+        // Update activity times
+        setInterval(() => {
+            const activities = document.querySelectorAll('.activity-time');
+            activities.forEach((activity, index) => {
+                if (activity.textContent === 'Just now' && index > 0) {
+                    activity.textContent = '1 minute ago';
+                } else if (activity.textContent.includes('minute')) {
+                    const minutes = parseInt(activity.textContent) + 1;
+                    activity.textContent = `${minutes} minutes ago`;
+                }
+            });
+        }, 60000);
+    </script>
+</body>
+</html>

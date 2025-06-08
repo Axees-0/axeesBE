@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=1280, initial-scale=1.0">
+    <title>AWS Pipeline Automation - Transform Your Data Workflow</title>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #FF9900;
+            --secondary-color: #232F3E;
+            --accent-color: #146EB4;
+            --success-color: #1B660F;
+            --warning-color: #D13212;
+            --background-color: #FFFFFF;
+            --surface-color: #F2F3F3;
+            --text-primary: #16191F;
+            --text-secondary: #545B64;
+            --border-color: #D5DBDB;
+            
+            --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            --font-mono: "Monaco", "Menlo", "Ubuntu Mono", "Consolas", monospace;
+            
+            --text-xs: 12px;
+            --text-sm: 14px;
+            --text-base: 16px;
+            --text-lg: 18px;
+            --text-xl: 20px;
+            --text-2xl: 24px;
+            --text-3xl: 30px;
+            --text-4xl: 36px;
+            
+            --font-light: 300;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            --space-xs: 4px;
+            --space-sm: 8px;
+            --space-md: 16px;
+            --space-lg: 24px;
+            --space-xl: 32px;
+            --space-2xl: 48px;
+            --space-3xl: 64px;
+            
+            --radius-sm: 4px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            font-size: var(--text-base);
+            color: var(--text-primary);
+            background-color: var(--background-color);
+            line-height: 1.6;
+        }
+
+        /* Container and Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+        }
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Styles */
+        .aws-header {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: var(--space-md) 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+        }
+
+        .aws-logo {
+            width: 40px;
+            height: 24px;
+            fill: var(--primary-color);
+        }
+
+        .site-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: white;
+        }
+
+        .main-nav {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            transition: color 0.2s ease;
+            padding: var(--space-sm) 0;
+            border-bottom: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--secondary-color) 0%, #374151 100%);
+            color: white;
+            padding: var(--space-3xl) 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-3xl);
+            align-items: center;
+        }
+
+        .hero-text h1 {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-lg);
+            line-height: 1.2;
+        }
+
+        .hero-text .highlight {
+            color: var(--primary-color);
+        }
+
+        .hero-text p {
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-xl);
+            opacity: 0.9;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: var(--space-sm) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: var(--text-base);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #e88a00;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn-secondary:hover {
+            background-color: white;
+            color: var(--secondary-color);
+        }
+
+        /* Hero Visual */
+        .hero-visual {
+            position: relative;
+            height: 400px;
+        }
+
+        .pipeline-animation {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Problem Section */
+        .problem-section {
+            padding: var(--space-3xl) 0;
+            background-color: var(--surface-color);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .section-header h2 {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-md);
+            color: var(--secondary-color);
+        }
+
+        .section-header p {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .problem-card {
+            background-color: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid var(--border-color);
+        }
+
+        .problem-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+
+        .problem-icon {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto var(--space-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #fee2cc;
+            border-radius: var(--radius-full);
+        }
+
+        .problem-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: var(--primary-color);
+        }
+
+        .problem-card h3 {
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-md);
+            color: var(--secondary-color);
+        }
+
+        /* Solution Section */
+        .solution-section {
+            padding: var(--space-3xl) 0;
+        }
+
+        .solution-flow {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: var(--space-2xl);
+            position: relative;
+        }
+
+        .flow-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .flow-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--space-md);
+            background-color: var(--primary-color);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: var(--text-2xl);
+            transition: transform 0.3s ease;
+        }
+
+        .flow-step:hover .flow-icon {
+            transform: scale(1.1);
+        }
+
+        .flow-arrow {
+            position: absolute;
+            top: 40px;
+            width: 100%;
+            height: 2px;
+            background-color: var(--border-color);
+            z-index: 1;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: var(--space-3xl) 0;
+            background-color: var(--surface-color);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-xl);
+            margin-top: var(--space-2xl);
+        }
+
+        .feature-card {
+            background-color: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: var(--space-lg);
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 4px 16px rgba(255, 153, 0, 0.1);
+        }
+
+        .feature-icon {
+            flex-shrink: 0;
+            width: 60px;
+            height: 60px;
+            background-color: var(--surface-color);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-content h3 {
+            font-size: var(--text-xl);
+            margin-bottom: var(--space-sm);
+            color: var(--secondary-color);
+        }
+
+        .feature-content p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Metrics Section */
+        .metrics-section {
+            padding: var(--space-3xl) 0;
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-xl);
+            margin-top: var(--space-2xl);
+        }
+
+        .metric-card {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+            margin-bottom: var(--space-sm);
+        }
+
+        .metric-label {
+            font-size: var(--text-base);
+            opacity: 0.9;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: var(--space-3xl) 0;
+            background: linear-gradient(135deg, var(--primary-color) 0%, #e88a00 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-content h2 {
+            font-size: var(--text-3xl);
+            margin-bottom: var(--space-lg);
+        }
+
+        .cta-content p {
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-xl);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        .aws-footer {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: var(--space-2xl) 0;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+        }
+
+        .footer-section h4 {
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-md);
+            color: var(--primary-color);
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: var(--space-sm);
+            opacity: 0.8;
+        }
+
+        /* Loading Animation */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        .loading-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary-color);
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: var(--space-lg);
+            background-color: white;
+            border-radius: var(--radius-md);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            padding: var(--space-md);
+            display: none;
+            align-items: center;
+            gap: var(--space-md);
+            min-width: 300px;
+            z-index: 1000;
+        }
+
+        .notification.show {
+            display: flex;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .notification-icon {
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+        }
+
+        .notification-success .notification-icon {
+            fill: var(--success-color);
+        }
+
+        .notification-close {
+            margin-left: auto;
+            background: none;
+            border: none;
+            font-size: var(--text-xl);
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Header -->
+        <header class="aws-header">
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo-section">
+                        <svg class="aws-logo" viewBox="0 0 40 24">
+                            <path d="M14.4 9.7c0 .5 0 .9-.1 1.2-.1.3-.2.6-.4.9-.1.1-.2.2-.3.2-.1 0-.2-.1-.2-.2-.5-.6-.6-1.4-.6-2.5 0-1.9.7-2.7 1.4-2.7h.1c.1.1.1.4.1 1.1zm4.3 4.5c-.1.1-.2.1-.4.1-.3 0-.5-.1-.7-.3-.2-.2-.3-.5-.4-.8-.6.7-1.5 1.1-2.5 1.1-1.4 0-2.5-.8-2.5-2.3 0-1.2.7-2 1.6-2.5.9-.4 2.1-.5 2.9-.5v-.3c0-1-.1-2.2-1.5-2.2-.6 0-1.3.2-1.7.5-.1.1-.2.1-.3.1-.2 0-.4-.2-.4-.4 0-.2.1-.3.2-.4.6-.4 1.4-.6 2.2-.6 1 0 1.8.3 2.2.8.5.6.5 1.4.5 2.2v2.9c0 .8.3 1.2.6 1.2.1 0 .2 0 .3-.1.1 0 .2 0 .3.1.1.1.1.2.1.3 0 .2-.1.3-.2.4-.2.2-.5.3-.8.3zm8.8-4.5c0 .5 0 .9-.1 1.2-.1.3-.2.6-.4.9-.1.1-.2.2-.3.2-.1 0-.2-.1-.2-.2-.5-.6-.6-1.4-.6-2.5 0-1.9.7-2.7 1.4-2.7h.1c.1.1.1.4.1 1.1zm4.3 4.5c-.1.1-.2.1-.4.1-.3 0-.5-.1-.7-.3-.2-.2-.3-.5-.4-.8-.6.7-1.5 1.1-2.5 1.1-1.4 0-2.5-.8-2.5-2.3 0-1.2.7-2 1.6-2.5.9-.4 2.1-.5 2.9-.5v-.3c0-1-.1-2.2-1.5-2.2-.6 0-1.3.2-1.7.5-.1.1-.2.1-.3.1-.2 0-.4-.2-.4-.4 0-.2.1-.3.2-.4.6-.4 1.4-.6 2.2-.6 1 0 1.8.3 2.2.8.5.6.5 1.4.5 2.2v2.9c0 .8.3 1.2.6 1.2.1 0 .2 0 .3-.1.1 0 .2 0 .3.1.1.1.1.2.1.3 0 .2-.1.3-.2.4-.2.2-.5.3-.8.3z"/>
+                        </svg>
+                        <h1 class="site-title">AWS Pipeline Automation</h1>
+                    </div>
+                    <nav class="main-nav">
+                        <a href="index.html" class="nav-link active">Overview</a>
+                        <a href="pipeline-dashboard.html" class="nav-link">Pipeline Dashboard</a>
+                        <a href="data-transformation.html" class="nav-link">Data Transformation</a>
+                        <a href="reporting.html" class="nav-link">Reporting</a>
+                    </nav>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <div class="container">
+                <div class="hero-content">
+                    <div class="hero-text">
+                        <h1>Transform Your <span class="highlight">15-Year Manual Process</span> Into an Automated AWS Pipeline</h1>
+                        <p>Stop wasting analyst hours on repetitive tasks. Automate email attachment processing, data transformation, and reporting with a modern AWS-powered solution.</p>
+                        <div class="hero-buttons">
+                            <a href="pipeline-dashboard.html" class="btn btn-primary">
+                                View Live Dashboard
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"/>
+                                </svg>
+                            </a>
+                            <button class="btn btn-secondary" onclick="showDemo()">
+                                Watch Demo
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="hero-visual">
+                        <div class="pipeline-animation" id="pipelineVisual">
+                            <!-- Animated SVG Pipeline -->
+                            <svg width="500" height="400" viewBox="0 0 500 400">
+                                <!-- Email Icon -->
+                                <g id="emailIcon" transform="translate(50, 150)">
+                                    <rect width="60" height="45" rx="5" fill="#FF9900" opacity="0.8"/>
+                                    <path d="M5 5 L30 25 L55 5" stroke="white" stroke-width="2" fill="none"/>
+                                </g>
+                                
+                                <!-- Arrow 1 -->
+                                <path id="arrow1" d="M110 172.5 L180 172.5" stroke="#FF9900" stroke-width="3" marker-end="url(#arrowhead)" opacity="0"/>
+                                
+                                <!-- S3 Bucket -->
+                                <g id="s3Icon" transform="translate(180, 150)" opacity="0">
+                                    <circle cx="30" cy="22.5" r="25" fill="#569A31"/>
+                                    <text x="30" y="27.5" text-anchor="middle" fill="white" font-weight="bold">S3</text>
+                                </g>
+                                
+                                <!-- Arrow 2 -->
+                                <path id="arrow2" d="M235 172.5 L305 172.5" stroke="#FF9900" stroke-width="3" marker-end="url(#arrowhead)" opacity="0"/>
+                                
+                                <!-- Glue Icon -->
+                                <g id="glueIcon" transform="translate(305, 150)" opacity="0">
+                                    <rect width="60" height="45" rx="5" fill="#945DBB"/>
+                                    <text x="30" y="27.5" text-anchor="middle" fill="white" font-weight="bold">Glue</text>
+                                </g>
+                                
+                                <!-- Arrow 3 -->
+                                <path id="arrow3" d="M365 172.5 L435 172.5" stroke="#FF9900" stroke-width="3" marker-end="url(#arrowhead)" opacity="0"/>
+                                
+                                <!-- Database Icon -->
+                                <g id="dbIcon" transform="translate(435, 150)" opacity="0">
+                                    <ellipse cx="30" cy="10" rx="25" ry="8" fill="#146EB4"/>
+                                    <rect x="5" y="10" width="50" height="25" fill="#146EB4"/>
+                                    <ellipse cx="30" cy="35" rx="25" ry="8" fill="#146EB4"/>
+                                    <text x="30" y="25" text-anchor="middle" fill="white" font-size="12">DB</text>
+                                </g>
+                                
+                                <!-- Arrow Marker -->
+                                <defs>
+                                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                                        <polygon points="0 0, 10 3.5, 0 7" fill="#FF9900"/>
+                                    </marker>
+                                </defs>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Problem Section -->
+        <section class="problem-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Your Current Challenges</h2>
+                    <p>We understand the pain of manual data processing</p>
+                </div>
+                <div class="problem-grid">
+                    <div class="problem-card">
+                        <div class="problem-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <h3>Manual Email Processing</h3>
+                        <p>Analysts spending hours downloading and organizing email attachments from members</p>
+                    </div>
+                    <div class="problem-card">
+                        <div class="problem-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                            </svg>
+                        </div>
+                        <h3>Legacy Access Databases</h3>
+                        <p>15-year-old on-premise Access databases limiting scalability and accessibility</p>
+                    </div>
+                    <div class="problem-card">
+                        <div class="problem-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M11 9h2V7h-2m1 13c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8m0-18A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2m-1 15h2v-6h-2v6z"/>
+                            </svg>
+                        </div>
+                        <h3>Repetitive Labor</h3>
+                        <p>Valuable analyst time wasted on routine data upload and transformation tasks</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Solution Section -->
+        <section class="solution-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Our AWS-Powered Solution</h2>
+                    <p>End-to-end automation that transforms your workflow</p>
+                </div>
+                <div class="solution-flow">
+                    <div class="flow-arrow"></div>
+                    <div class="flow-step">
+                        <div class="flow-icon">📧</div>
+                        <h3>Email Ingestion</h3>
+                        <p>Automated retrieval of email attachments using AWS SES</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon">☁️</div>
+                        <h3>S3 Storage</h3>
+                        <p>Secure, scalable storage with automatic organization</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon">⚙️</div>
+                        <h3>AWS Glue ETL</h3>
+                        <p>Intelligent data transformation with business logic</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon">🗄️</div>
+                        <h3>Data Lake</h3>
+                        <p>Modern, queryable data warehouse on AWS</p>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-icon">📊</div>
+                        <h3>Auto Reports</h3>
+                        <p>Scheduled reports and Power BI dashboards</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Section -->
+        <section class="features-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2>Key Capabilities</h2>
+                    <p>Everything you need for modern data pipeline automation</p>
+                </div>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="#FF9900">
+                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                            </svg>
+                        </div>
+                        <div class="feature-content">
+                            <h3>4-Week Delivery</h3>
+                            <p>Rapid implementation with demonstrable progress milestones. Daily standups ensure tight feedback loops and quick iterations.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="#146EB4">
+                                <path d="M9 11H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2zm2-7h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V9h14v11z"/>
+                            </svg>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Collaborative Development</h3>
+                            <p>Work directly with your team. You'll have access to the codebase and can contribute alongside our implementation.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="#569A31">
+                                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                            </svg>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Business Logic Preservation</h3>
+                            <p>Your existing business rules and data transformations seamlessly migrated to AWS Glue jobs with full validation.</p>
+                        </div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <svg width="30" height="30" viewBox="0 0 24 24" fill="#945DBB">
+                                <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/>
+                            </svg>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Real-time Monitoring</h3>
+                            <p>CloudWatch dashboards provide instant visibility into pipeline health, data flow metrics, and processing status.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Metrics Section -->
+        <section class="metrics-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 style="color: white;">Expected Results</h2>
+                    <p style="color: rgba(255,255,255,0.8);">Based on similar AWS pipeline implementations</p>
+                </div>
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value">95%</div>
+                        <div class="metric-label">Reduction in Manual Work</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">24/7</div>
+                        <div class="metric-label">Automated Processing</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">&lt;5min</div>
+                        <div class="metric-label">Email to Database Time</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value">100%</div>
+                        <div class="metric-label">Data Accuracy</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <div class="container">
+                <div class="cta-content">
+                    <h2>Ready to Modernize Your Data Pipeline?</h2>
+                    <p>Let's discuss how we can transform your manual processes into an efficient AWS-powered solution within 4 weeks.</p>
+                    <div class="hero-buttons">
+                        <a href="pipeline-dashboard.html" class="btn btn-secondary">
+                            Explore Dashboard Demo
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="aws-footer">
+            <div class="container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h4>AWS Pipeline Demo</h4>
+                        <p>Automated data pipeline solution built on AWS</p>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Key Features</h4>
+                        <ul>
+                            <li>Email Attachment Processing</li>
+                            <li>S3 Storage Management</li>
+                            <li>AWS Glue Transformations</li>
+                            <li>Automated Reporting</li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h4>Technologies</h4>
+                        <ul>
+                            <li>AWS S3</li>
+                            <li>AWS Glue</li>
+                            <li>AWS Lambda</li>
+                            <li>AWS RDS</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification notification-success">
+        <svg class="notification-icon" viewBox="0 0 24 24">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+        </svg>
+        <div class="notification-content">
+            <h4 class="notification-title">Success</h4>
+            <p class="notification-message">Demo loading...</p>
+        </div>
+        <button class="notification-close" onclick="hideNotification()">&times;</button>
+    </div>
+
+    <script>
+        // Pipeline Animation
+        function animatePipeline() {
+            const timeline = [
+                { element: 'arrow1', delay: 500, type: 'fade' },
+                { element: 's3Icon', delay: 800, type: 'fade' },
+                { element: 'arrow2', delay: 1100, type: 'fade' },
+                { element: 'glueIcon', delay: 1400, type: 'fade' },
+                { element: 'arrow3', delay: 1700, type: 'fade' },
+                { element: 'dbIcon', delay: 2000, type: 'fade' }
+            ];
+
+            timeline.forEach(item => {
+                setTimeout(() => {
+                    const element = document.getElementById(item.element);
+                    if (element) {
+                        element.style.opacity = '1';
+                        element.style.transition = 'opacity 0.5s ease';
+                    }
+                }, item.delay);
+            });
+
+            // Repeat animation
+            setTimeout(() => {
+                timeline.forEach(item => {
+                    const element = document.getElementById(item.element);
+                    if (element && item.element !== 'emailIcon') {
+                        element.style.opacity = '0';
+                    }
+                });
+                setTimeout(animatePipeline, 1000);
+            }, 5000);
+        }
+
+        // Start animation when page loads
+        window.addEventListener('load', () => {
+            setTimeout(animatePipeline, 500);
+        });
+
+        // Demo functionality
+        function showDemo() {
+            showNotification('Loading interactive demo...', 'success');
+            setTimeout(() => {
+                window.location.href = 'pipeline-dashboard.html';
+            }, 1500);
+        }
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const messageEl = notification.querySelector('.notification-message');
+            
+            messageEl.textContent = message;
+            notification.className = `notification notification-${type} show`;
+        }
+
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.remove('show');
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add interactive hover effects
+        document.querySelectorAll('.feature-card, .problem-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Simulate real-time metrics
+        function animateMetrics() {
+            const metrics = document.querySelectorAll('.metric-value');
+            metrics.forEach(metric => {
+                const originalValue = metric.textContent;
+                metric.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.1)';
+                    this.style.transition = 'transform 0.3s ease';
+                });
+                
+                metric.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        }
+
+        animateMetrics();
+    </script>
+</body>
+</html>

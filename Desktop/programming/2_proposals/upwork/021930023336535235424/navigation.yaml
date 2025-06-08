@@ -1,0 +1,207 @@
+name: "AWS Data Pipeline Automation Demo - Workflow"
+description: "Automated testing workflow for AWS data pipeline automation demo showcasing email processing, S3 storage, Glue transformations, and reporting capabilities"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 15000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Navigate to demo homepage
+  - type: navigate
+    description: "Navigate to AWS Pipeline Demo homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021930023336535235424/index.html"
+    screenshot: true
+    
+  # Wait for main content to load
+  - type: wait-for-selector
+    description: "Wait for main hero content to load"
+    selector: ".hero-section"
+    
+  # Verify main heading and value proposition
+  - type: assertText
+    description: "Verify main value proposition heading"
+    selector: ".hero-text h1"
+    expected: "Transform Your 15-Year Manual Process Into an Automated AWS Pipeline"
+    
+  # Test pipeline animation
+  - type: wait-for-selector
+    description: "Wait for pipeline animation to load"
+    selector: "#pipelineVisual"
+    
+  # Test navigation to dashboard
+  - type: click
+    description: "Navigate to Pipeline Dashboard"
+    selector: "a[href='pipeline-dashboard.html']"
+    screenshot: true
+    
+  # Wait for dashboard to load
+  - type: wait-for-selector
+    description: "Wait for dashboard container to load"
+    selector: ".dashboard-container"
+    
+  # Verify dashboard title
+  - type: assertText
+    description: "Verify dashboard page title"
+    selector: ".dashboard-title h1"
+    expected: "Pipeline Dashboard"
+    
+  # Test live indicator
+  - type: wait-for-selector
+    description: "Wait for live indicator to appear"
+    selector: ".live-indicator"
+    
+  # Test pipeline simulation
+  - type: click
+    description: "Test simulate email functionality"
+    selector: "button[onclick='simulateNewEmail()']"
+    screenshot: true
+    
+  # Wait for loading overlay
+  - type: wait-for-selector
+    description: "Wait for loading overlay to appear"
+    selector: ".loading-overlay.show"
+    
+  # Wait for simulation to complete
+  - type: evaluate
+    description: "Wait for email simulation to complete"
+    script: |
+      return new Promise((resolve) => {
+        const checkCompleted = () => {
+          const overlay = document.querySelector('.loading-overlay');
+          if (!overlay.classList.contains('show')) {
+            resolve(true);
+          } else {
+            setTimeout(checkCompleted, 1000);
+          }
+        };
+        checkCompleted();
+      });
+    
+  # Navigate to data transformation page
+  - type: click
+    description: "Navigate to Data Transformation page"
+    selector: "a[href='data-transformation.html']"
+    screenshot: true
+    
+  # Wait for transformation page to load
+  - type: wait-for-selector
+    description: "Wait for transformation container to load"
+    selector: ".transformation-container"
+    
+  # Verify transformation page title
+  - type: assertText
+    description: "Verify transformation page title"
+    selector: ".page-header h1"
+    expected: "AWS Glue Data Transformation"
+    
+  # Test job selection
+  - type: click
+    description: "Test Glue job selection"
+    selector: ".job-item:nth-child(2)"
+    
+  # Test tab switching to script view
+  - type: click
+    description: "Switch to script tab"
+    selector: ".tab:nth-child(2)"
+    
+  # Verify script content loads
+  - type: wait-for-selector
+    description: "Wait for code editor to load"
+    selector: ".code-editor"
+    
+  # Test transformation preview
+  - type: click
+    description: "Test transformation run"
+    selector: "button[onclick='testTransformation()']"
+    
+  # Navigate to reporting page
+  - type: click
+    description: "Navigate to Reporting page"
+    selector: "a[href='reporting.html']"
+    screenshot: true
+    
+  # Wait for reporting page to load
+  - type: wait-for-selector
+    description: "Wait for reporting container to load"
+    selector: ".reporting-container"
+    
+  # Verify reporting page title
+  - type: assertText
+    description: "Verify reporting page title"
+    selector: ".page-title h1"
+    expected: "Automated Reporting"
+    
+  # Test report selection
+  - type: click
+    description: "Test report selection"
+    selector: ".report-item:nth-child(2)"
+    
+  # Test schedule selection
+  - type: click
+    description: "Test schedule option selection"
+    selector: ".schedule-option:nth-child(2)"
+    
+  # Test send test report
+  - type: click
+    description: "Test send test report functionality"
+    selector: "button[onclick='sendTestReport()']"
+    
+  # Wait for test report status
+  - type: wait-for-selector
+    description: "Wait for test report status message"
+    selector: ".status-message.show"
+    
+  # Test report preview
+  - type: click
+    description: "Test report preview functionality"
+    selector: "button[onclick='previewReport()']"
+    
+  # Verify charts load in preview
+  - type: wait-for-selector
+    description: "Wait for charts to load in preview"
+    selector: "#salesTrendChart"
+    
+  # Navigate back to homepage
+  - type: click
+    description: "Navigate back to homepage"
+    selector: "a[href='index.html']"
+    screenshot: true
+    
+  # Test problem section visibility
+  - type: wait-for-selector
+    description: "Wait for problem section to load"
+    selector: ".problem-section"
+    
+  # Test solution section visibility
+  - type: wait-for-selector
+    description: "Wait for solution section to load"
+    selector: ".solution-section"
+    
+  # Test metrics section
+  - type: wait-for-selector
+    description: "Wait for metrics section to load"
+    selector: ".metrics-section"
+    
+  # Verify key metrics are displayed
+  - type: assertText
+    description: "Verify reduction in manual work metric"
+    selector: ".metric-card:nth-child(1) .metric-value"
+    expected: "95%"
+    
+  # Test CTA section
+  - type: wait-for-selector
+    description: "Wait for CTA section to load"
+    selector: ".cta-section"
+    
+  # Final screenshot of completed demo
+  - type: screenshot
+    description: "Final screenshot of demo completion"
+    
+  # Verify footer loads
+  - type: wait-for-selector
+    description: "Wait for footer to load"
+    selector: ".aws-footer"
