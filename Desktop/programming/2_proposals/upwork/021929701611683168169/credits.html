@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credits & Referrals - ConvertIQ AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Primary Brand Colors */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #059669;
+            --secondary-dark: #047857;
+            --secondary-light: #d1fae5;
+            
+            /* Alert Colors */
+            --warning-color: #dc2626;
+            --warning-light: #fee2e2;
+            --info-color: #0891b2;
+            --info-light: #cffafe;
+            --amber-color: #f59e0b;
+            --amber-light: #fef3c7;
+            --purple-color: #7c3aed;
+            --purple-light: #ede9fe;
+            
+            /* Neutral Colors */
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --background: #ffffff;
+            --background-secondary: #f9fafb;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            
+            /* Spacing System */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            --font-light: 300;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            background: var(--background-secondary);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .site-header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-md) 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            color: var(--primary-color);
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+        }
+
+        .main-nav {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            transition: color 0.2s ease;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: var(--primary-light);
+        }
+
+        /* Main Content */
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            padding-top: calc(var(--space-3xl) + 60px);
+            padding-bottom: var(--space-3xl);
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-3xl);
+        }
+
+        .page-title {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-lg);
+            background: linear-gradient(135deg, var(--primary-color), var(--purple-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .page-subtitle {
+            font-size: var(--text-xl);
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Credits Dashboard */
+        .credits-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-3xl);
+        }
+
+        .credits-card {
+            background: var(--background);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+
+        .credits-card.balance {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .credits-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto var(--space-lg) auto;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-3xl);
+        }
+
+        .credits-number {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .credits-label {
+            font-size: var(--text-lg);
+            opacity: 0.9;
+            margin-bottom: var(--space-lg);
+        }
+
+        .credits-action {
+            margin-top: var(--space-lg);
+        }
+
+        /* Referral System */
+        .referral-section {
+            background: var(--background);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-3xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: var(--space-2xl);
+        }
+
+        .section-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-md);
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+        }
+
+        .referral-steps {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .step-card {
+            text-align: center;
+            padding: var(--space-xl);
+            background: var(--background-secondary);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .step-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto var(--space-lg) auto;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+        }
+
+        .step-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+        }
+
+        /* Referral Link */
+        .referral-link-section {
+            background: var(--purple-light);
+            border: 2px solid var(--purple-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .referral-link-header {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-md);
+            color: var(--purple-color);
+        }
+
+        .link-input-group {
+            display: flex;
+            gap: var(--space-md);
+        }
+
+        .link-input {
+            flex: 1;
+            padding: var(--space-md);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            font-size: var(--text-base);
+            background: var(--background);
+            color: var(--text-secondary);
+            font-family: monospace;
+        }
+
+        .copy-button {
+            background-color: var(--purple-color);
+            color: white;
+            padding: var(--space-md) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .copy-button:hover {
+            background-color: #6d28d9;
+            transform: translateY(-1px);
+        }
+
+        .copy-button.copied {
+            background-color: var(--secondary-color);
+        }
+
+        /* Social Sharing */
+        .social-sharing {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+
+        .social-button {
+            padding: var(--space-md);
+            border: none;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+        }
+
+        .social-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .social-button.twitter { background: #1da1f2; }
+        .social-button.facebook { background: #1877f2; }
+        .social-button.linkedin { background: #0077b5; }
+        .social-button.email { background: var(--text-secondary); }
+
+        /* Pricing Plans */
+        .pricing-section {
+            background: var(--background);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--space-3xl);
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-xl);
+            margin-top: var(--space-xl);
+        }
+
+        .pricing-card {
+            background: var(--background-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .pricing-card.popular {
+            border-color: var(--primary-color);
+            background: var(--background);
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary-color);
+            color: white;
+            padding: var(--space-xs) var(--space-lg);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .plan-name {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-md);
+        }
+
+        .plan-price {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .plan-period {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: var(--space-xl);
+        }
+
+        .plan-features li {
+            margin-bottom: var(--space-sm);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .feature-check {
+            color: var(--secondary-color);
+            font-weight: bold;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-sm) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: var(--space-sm) var(--space-lg);
+            border: 2px solid var(--primary-color);
+            border-radius: var(--radius-md);
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            width: 100%;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        /* Progress Tracking */
+        .progress-section {
+            background: var(--background);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .progress-header {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+        }
+
+        .progress-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-lg);
+        }
+
+        .progress-stat {
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--background-secondary);
+            border-radius: var(--radius-lg);
+        }
+
+        .progress-number {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-xs);
+        }
+
+        .progress-label {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .credits-dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .referral-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-sharing {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .progress-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>ConvertIQ AI</h1>
+            </div>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="dashboard.html" class="nav-link">Dashboard</a>
+                <a href="credits.html" class="nav-link active">Credits</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-container">
+        <div class="content-wrapper">
+            <!-- Page Header -->
+            <section class="page-header">
+                <h1 class="page-title">Credits & Referrals</h1>
+                <p class="page-subtitle">
+                    Earn free analysis credits by referring others and unlock premium features 
+                    to supercharge your conversion optimization.
+                </p>
+            </section>
+
+            <!-- Credits Dashboard -->
+            <section class="credits-dashboard">
+                <div class="credits-card balance">
+                    <div class="credits-icon">💎</div>
+                    <div class="credits-number" id="credits-balance">3</div>
+                    <div class="credits-label">Available Credits</div>
+                    <div class="credits-action">
+                        <button class="btn-secondary" style="color: white; border-color: rgba(255,255,255,0.3);" onclick="window.location.href='index.html'">
+                            Use Credits
+                        </button>
+                    </div>
+                </div>
+
+                <div class="credits-card">
+                    <div class="credits-icon" style="background: var(--secondary-light); color: var(--secondary-color);">🎯</div>
+                    <div class="credits-number" id="referrals-count">7</div>
+                    <div class="credits-label" style="color: var(--text-primary);">Successful Referrals</div>
+                    <div class="credits-action">
+                        <button class="btn-primary" onclick="scrollToReferrals()">
+                            Refer More Friends
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Referral System -->
+            <section class="referral-section" id="referrals">
+                <div class="section-header">
+                    <h2 class="section-title">Earn Credits Through Referrals</h2>
+                    <p class="section-description">
+                        Share ConvertIQ AI with friends and earn 2 free credits for every person who signs up!
+                    </p>
+                </div>
+
+                <div class="referral-steps">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Share Your Link</h3>
+                        <p class="step-description">Copy your unique referral link and share it with friends, colleagues, or on social media.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Friend Signs Up</h3>
+                        <p class="step-description">When someone clicks your link and creates an account, they get 1 free credit to try ConvertIQ AI.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">You Earn Credits</h3>
+                        <p class="step-description">You receive 2 credits for each successful referral - that's 2 free page analyses!</p>
+                    </div>
+                </div>
+
+                <!-- Referral Link -->
+                <div class="referral-link-section">
+                    <h3 class="referral-link-header">Your Personal Referral Link</h3>
+                    <div class="link-input-group">
+                        <input 
+                            type="text" 
+                            class="link-input" 
+                            id="referral-link" 
+                            value="https://convertiq.ai/ref/mike-optimizer-2024" 
+                            readonly
+                        >
+                        <button class="copy-button" id="copy-button" onclick="copyReferralLink()">
+                            Copy Link
+                        </button>
+                    </div>
+
+                    <!-- Social Sharing -->
+                    <div class="social-sharing">
+                        <a href="#" class="social-button twitter" onclick="shareOnTwitter()">
+                            🐦 Twitter
+                        </a>
+                        <a href="#" class="social-button facebook" onclick="shareOnFacebook()">
+                            📘 Facebook
+                        </a>
+                        <a href="#" class="social-button linkedin" onclick="shareOnLinkedIn()">
+                            💼 LinkedIn
+                        </a>
+                        <a href="#" class="social-button email" onclick="shareViaEmail()">
+                            ✉️ Email
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Pricing Plans -->
+            <section class="pricing-section">
+                <div class="section-header">
+                    <h2 class="section-title">Upgrade for Unlimited Access</h2>
+                    <p class="section-description">
+                        Get unlimited analysis credits and unlock advanced features to maximize your conversion rates.
+                    </p>
+                </div>
+
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <h3 class="plan-name">Starter</h3>
+                        <div class="plan-price">$19</div>
+                        <div class="plan-period">per month</div>
+                        <ul class="plan-features">
+                            <li><span class="feature-check">✓</span> 25 page analyses/month</li>
+                            <li><span class="feature-check">✓</span> Basic recommendations</li>
+                            <li><span class="feature-check">✓</span> PDF export</li>
+                            <li><span class="feature-check">✓</span> Email support</li>
+                        </ul>
+                        <button class="btn-secondary">Choose Starter</button>
+                    </div>
+
+                    <div class="pricing-card popular">
+                        <div class="popular-badge">Most Popular</div>
+                        <h3 class="plan-name">Professional</h3>
+                        <div class="plan-price">$49</div>
+                        <div class="plan-period">per month</div>
+                        <ul class="plan-features">
+                            <li><span class="feature-check">✓</span> Unlimited analyses</li>
+                            <li><span class="feature-check">✓</span> Advanced AI insights</li>
+                            <li><span class="feature-check">✓</span> A/B test suggestions</li>
+                            <li><span class="feature-check">✓</span> Priority support</li>
+                            <li><span class="feature-check">✓</span> Team collaboration</li>
+                        </ul>
+                        <button class="btn-primary">Choose Professional</button>
+                    </div>
+
+                    <div class="pricing-card">
+                        <h3 class="plan-name">Enterprise</h3>
+                        <div class="plan-price">$149</div>
+                        <div class="plan-period">per month</div>
+                        <ul class="plan-features">
+                            <li><span class="feature-check">✓</span> Everything in Professional</li>
+                            <li><span class="feature-check">✓</span> Custom integrations</li>
+                            <li><span class="feature-check">✓</span> Dedicated account manager</li>
+                            <li><span class="feature-check">✓</span> White-label reports</li>
+                            <li><span class="feature-check">✓</span> API access</li>
+                        </ul>
+                        <button class="btn-secondary">Contact Sales</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Progress Tracking -->
+            <section class="progress-section">
+                <div class="progress-header">
+                    <h2 class="section-title">Your Referral Progress</h2>
+                    <p class="section-description">
+                        Track your referral success and see how close you are to earning more credits.
+                    </p>
+                </div>
+
+                <div class="progress-stats">
+                    <div class="progress-stat">
+                        <div class="progress-number" style="color: var(--secondary-color);">7</div>
+                        <div class="progress-label">Total Referrals</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="progress-number" style="color: var(--primary-color);">14</div>
+                        <div class="progress-label">Credits Earned</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="progress-number" style="color: var(--amber-color);">23</div>
+                        <div class="progress-label">Link Clicks</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="progress-number" style="color: var(--purple-color);">3</div>
+                        <div class="progress-label">Credits Remaining</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Initialize credits from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCreditsDisplay();
+        });
+
+        function updateCreditsDisplay() {
+            const credits = localStorage.getItem('userCredits') || '3';
+            document.getElementById('credits-balance').textContent = credits;
+        }
+
+        function copyReferralLink() {
+            const linkInput = document.getElementById('referral-link');
+            const copyButton = document.getElementById('copy-button');
+            
+            linkInput.select();
+            document.execCommand('copy');
+            
+            copyButton.textContent = 'Copied!';
+            copyButton.classList.add('copied');
+            
+            setTimeout(() => {
+                copyButton.textContent = 'Copy Link';
+                copyButton.classList.remove('copied');
+            }, 2000);
+            
+            // Show success message
+            showNotification('Referral link copied to clipboard!', 'success');
+        }
+
+        function shareOnTwitter() {
+            const text = "I'm using ConvertIQ AI to optimize my landing pages and boost conversions! Get your free analysis here:";
+            const url = document.getElementById('referral-link').value;
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+            window.open(twitterUrl, '_blank', 'width=600,height=400');
+        }
+
+        function shareOnFacebook() {
+            const url = document.getElementById('referral-link').value;
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            window.open(facebookUrl, '_blank', 'width=600,height=400');
+        }
+
+        function shareOnLinkedIn() {
+            const title = "ConvertIQ AI - Boost Your Landing Page Conversions";
+            const summary = "AI-powered conversion optimization tool that analyzes landing pages and provides actionable recommendations.";
+            const url = document.getElementById('referral-link').value;
+            const linkedinUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(summary)}`;
+            window.open(linkedinUrl, '_blank', 'width=600,height=400');
+        }
+
+        function shareViaEmail() {
+            const subject = "Check out ConvertIQ AI - Boost Your Conversions!";
+            const body = `Hi there!\n\nI've been using ConvertIQ AI to optimize my landing pages and the results have been amazing. It uses AI to analyze conversion elements and provides actionable recommendations to boost performance.\n\nYou can try it free here: ${document.getElementById('referral-link').value}\n\nBest regards!`;
+            const emailUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            window.location.href = emailUrl;
+        }
+
+        function scrollToReferrals() {
+            document.getElementById('referrals').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'center' 
+            });
+        }
+
+        function showNotification(message, type = 'info') {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--secondary-color)' : 'var(--primary-color)'};
+                color: white;
+                padding: var(--space-md) var(--space-lg);
+                border-radius: var(--radius-md);
+                box-shadow: var(--shadow-lg);
+                z-index: 10000;
+                font-weight: var(--font-medium);
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            // Animate in
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            // Animate out and remove
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Add interactive animations
+        document.querySelectorAll('.step-card').forEach((card, index) => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-8px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+        });
+
+        // Animate progress stats on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const progressNumbers = entry.target.querySelectorAll('.progress-number');
+                    progressNumbers.forEach((number, index) => {
+                        setTimeout(() => {
+                            number.style.opacity = '0';
+                            number.style.transform = 'translateY(20px)';
+                            setTimeout(() => {
+                                number.style.transition = 'all 0.6s ease';
+                                number.style.opacity = '1';
+                                number.style.transform = 'translateY(0)';
+                            }, 100);
+                        }, index * 200);
+                    });
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        observer.observe(document.querySelector('.progress-section'));
+
+        // Add pricing card interactions
+        document.querySelectorAll('.pricing-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('popular')) {
+                    this.style.borderColor = 'var(--primary-color)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('popular')) {
+                    this.style.borderColor = 'var(--border-color)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

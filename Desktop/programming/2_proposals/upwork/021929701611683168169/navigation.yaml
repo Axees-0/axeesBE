@@ -1,0 +1,222 @@
+name: "ConvertIQ AI - Demo Workflow"
+description: "Automated testing workflow for AI-powered conversion optimization tool demo"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 15000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  - type: navigate
+    description: "Navigate to demo homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929701611683168169/index.html"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for main content to load"
+    selector: ".hero-section"
+    
+  - type: assertText
+    description: "Verify main page title"
+    selector: ".hero-title"
+    expected: "AI-Powered Conversion Optimization"
+    
+  - type: assertText
+    description: "Verify hero subtitle contains key messaging"
+    selector: ".hero-subtitle"
+    contains: "Analyze any landing page"
+    
+  - type: wait-for-selector
+    description: "Wait for URL input form"
+    selector: "#analysis-form"
+    
+  - type: click
+    description: "Focus on URL input field"
+    selector: "#url-input"
+    
+  - type: type
+    description: "Enter sample URL for analysis"
+    selector: "#url-input"
+    text: "https://example-landing-page.com"
+    
+  - type: click
+    description: "Submit analysis form"
+    selector: "#analyze-btn"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for loading state"
+    selector: ".loading-spinner"
+    timeout: 1000
+    
+  - type: wait-for-selector
+    description: "Wait for quick results to appear"
+    selector: ".quick-results.show"
+    timeout: 4000
+    
+  - type: assertText
+    description: "Verify quick analysis results loaded"
+    selector: ".quick-results h3"
+    expected: "Quick Analysis Preview"
+    
+  - type: screenshot
+    description: "Capture quick results display"
+    
+  - type: scroll
+    description: "Scroll to features section"
+    selector: ".features-grid"
+    
+  - type: assertText
+    description: "Verify features section loaded"
+    selector: ".features-grid .feature-title"
+    expected: "Deep Page Analysis"
+    
+  - type: click
+    description: "Navigate to full dashboard report"
+    selector: ".quick-results .btn-primary"
+    screenshot: true
+    
+  - type: wait-for-selector
+    description: "Wait for dashboard page to load"
+    selector: ".dashboard-header"
+    
+  - type: assertText
+    description: "Verify dashboard title"
+    selector: ".dashboard-header h1"
+    expected: "Conversion Analysis Report"
+    
+  - type: assertText
+    description: "Verify analyzed URL display"
+    selector: "#analyzed-url"
+    contains: "example-landing-page.com"
+    
+  - type: wait-for-selector
+    description: "Wait for overall score to display"
+    selector: ".overall-score .score-number"
+    
+  - type: assertText
+    description: "Verify conversion score"
+    selector: ".overall-score .score-number"
+    expected: "72"
+    
+  - type: scroll
+    description: "Scroll to urgent fixes section"
+    selector: ".alerts-section"
+    
+  - type: assertText
+    description: "Verify urgent fixes section"
+    selector: ".alert-group .alert-title"
+    expected: "Urgent Fixes (3)"
+    
+  - type: click
+    description: "Test alert item interaction"
+    selector: ".alert-item.urgent:first-child"
+    
+  - type: scroll
+    description: "Scroll to detailed analysis"
+    selector: ".analysis-details"
+    
+  - type: wait-for-selector
+    description: "Wait for chart to load"
+    selector: "#scoreChart"
+    timeout: 3000
+    
+  - type: screenshot
+    description: "Capture dashboard analysis view"
+    
+  - type: click
+    description: "Navigate to credits page"
+    selector: 'a[href="credits.html"]'
+    
+  - type: wait-for-selector
+    description: "Wait for credits page to load"
+    selector: ".credits-dashboard"
+    
+  - type: assertText
+    description: "Verify credits page title"
+    selector: ".page-title"
+    expected: "Credits & Referrals"
+    
+  - type: assertText
+    description: "Verify credits balance display"
+    selector: "#credits-balance"
+    expected: "3"
+    
+  - type: scroll
+    description: "Scroll to referral section"
+    selector: ".referral-section"
+    
+  - type: click
+    description: "Test referral link copy functionality"
+    selector: "#copy-button"
+    
+  - type: wait
+    description: "Wait for copy confirmation"
+    duration: 1000
+    
+  - type: assertText
+    description: "Verify copy button feedback"
+    selector: "#copy-button"
+    expected: "Copied!"
+    
+  - type: scroll
+    description: "Scroll to pricing section"
+    selector: ".pricing-section"
+    
+  - type: assertText
+    description: "Verify pricing plans loaded"
+    selector: ".pricing-card.popular .plan-name"
+    expected: "Professional"
+    
+  - type: screenshot
+    description: "Capture credits and referral interface"
+    
+  - type: scroll
+    description: "Scroll to progress tracking"
+    selector: ".progress-section"
+    
+  - type: wait-for-selector
+    description: "Wait for progress stats animation"
+    selector: ".progress-number"
+    timeout: 2000
+    
+  - type: click
+    description: "Test navigation back to home"
+    selector: 'a[href="index.html"]'
+    
+  - type: wait-for-selector
+    description: "Wait for homepage to reload"
+    selector: ".hero-section"
+    
+  - type: assertText
+    description: "Verify successful navigation back to home"
+    selector: ".nav-link.active"
+    expected: "Home"
+    
+  - type: scroll
+    description: "Scroll to stats section"
+    selector: ".stats-section"
+    
+  - type: assertText
+    description: "Verify conversion statistics"
+    selector: ".stat-number"
+    expected: "47%"
+    
+  - type: scroll
+    description: "Scroll to call-to-action"
+    selector: ".cta-section"
+    
+  - type: click
+    description: "Test CTA button functionality"
+    selector: ".cta-section .btn-primary"
+    
+  - type: evaluate
+    description: "Verify URL input field received focus"
+    script: "document.activeElement === document.getElementById('url-input')"
+    expected: true
+    
+  - type: screenshot
+    description: "Final screenshot of completed user journey"

@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis Dashboard - ConvertIQ AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Primary Brand Colors */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #059669;
+            --secondary-dark: #047857;
+            --secondary-light: #d1fae5;
+            
+            /* Alert Colors */
+            --warning-color: #dc2626;
+            --warning-light: #fee2e2;
+            --info-color: #0891b2;
+            --info-light: #cffafe;
+            --amber-color: #f59e0b;
+            --amber-light: #fef3c7;
+            
+            /* Neutral Colors */
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --background: #ffffff;
+            --background-secondary: #f9fafb;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            
+            /* Spacing System */
+            --space-xs: 0.25rem;
+            --space-sm: 0.5rem;
+            --space-md: 1rem;
+            --space-lg: 1.5rem;
+            --space-xl: 2rem;
+            --space-2xl: 3rem;
+            --space-3xl: 4rem;
+            
+            /* Border Radius */
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            --font-light: 300;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            background: var(--background-secondary);
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .site-header {
+            background: var(--background);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--space-md) 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo h1 {
+            color: var(--primary-color);
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+        }
+
+        .main-nav {
+            display: flex;
+            gap: var(--space-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            transition: color 0.2s ease;
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: var(--primary-light);
+        }
+
+        /* Main Content */
+        .page-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-lg);
+            min-height: 100vh;
+        }
+
+        .content-wrapper {
+            padding-top: calc(var(--space-3xl) + 60px);
+            padding-bottom: var(--space-3xl);
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            background: var(--background);
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-xl);
+            box-shadow: var(--shadow-md);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--space-xl);
+        }
+
+        .header-info h1 {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .analyzed-url {
+            color: var(--primary-color);
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-md);
+            word-break: break-all;
+        }
+
+        .analysis-meta {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+        }
+
+        .overall-score {
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: var(--space-xl);
+            border-radius: var(--radius-lg);
+            min-width: 200px;
+        }
+
+        .score-number {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .score-label {
+            font-size: var(--text-sm);
+            opacity: 0.9;
+        }
+
+        /* Alert Sections */
+        .alerts-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .alert-group {
+            background: var(--background);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-md);
+        }
+
+        .alert-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .alert-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: var(--text-lg);
+        }
+
+        .alert-icon.urgent { background: var(--warning-color); }
+        .alert-icon.improvement { background: var(--amber-color); }
+
+        .alert-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+        }
+
+        .alert-item {
+            background: var(--background-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-md);
+            border-left: 4px solid;
+        }
+
+        .alert-item.urgent { border-left-color: var(--warning-color); }
+        .alert-item.improvement { border-left-color: var(--amber-color); }
+
+        .alert-item h4 {
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .alert-item p {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+        }
+
+        .recommendation {
+            background: var(--background);
+            padding: var(--space-md);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .recommendation h5 {
+            font-weight: var(--font-medium);
+            margin-bottom: var(--space-xs);
+            color: var(--secondary-color);
+        }
+
+        /* Analysis Details */
+        .analysis-details {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-xl);
+        }
+
+        .details-card {
+            background: var(--background);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-md);
+        }
+
+        .details-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .details-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+        }
+
+        .element-analysis {
+            margin-bottom: var(--space-lg);
+        }
+
+        .element-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-md);
+        }
+
+        .element-name {
+            font-weight: var(--font-medium);
+        }
+
+        .element-score {
+            padding: var(--space-xs) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .score-excellent { background: var(--secondary-light); color: var(--secondary-dark); }
+        .score-good { background: var(--primary-light); color: var(--primary-dark); }
+        .score-needs-work { background: var(--amber-light); color: #92400e; }
+        .score-poor { background: var(--warning-light); color: var(--warning-color); }
+
+        .element-details {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: var(--space-lg);
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-sm) var(--space-lg);
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            padding: var(--space-sm) var(--space-lg);
+            border: 2px solid var(--primary-color);
+            border-radius: var(--radius-md);
+            font-weight: var(--font-medium);
+            font-size: var(--text-base);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-sm {
+            padding: var(--space-xs) var(--space-md);
+            font-size: var(--text-sm);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+
+        /* Competitive Analysis */
+        .competitive-analysis {
+            background: var(--background);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-md);
+            margin-bottom: var(--space-xl);
+        }
+
+        .competitive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-top: var(--space-lg);
+        }
+
+        .competitive-item {
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--background-secondary);
+            border-radius: var(--radius-md);
+        }
+
+        .competitive-score {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-sm);
+        }
+
+        .competitive-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .alerts-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .analysis-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .competitive-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <div class="nav-container">
+            <div class="logo">
+                <h1>ConvertIQ AI</h1>
+            </div>
+            <nav class="main-nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="credits.html" class="nav-link">Credits</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="page-container">
+        <div class="content-wrapper">
+            <!-- Dashboard Header -->
+            <section class="dashboard-header">
+                <div class="header-content">
+                    <div class="header-info">
+                        <h1>Conversion Analysis Report</h1>
+                        <div class="analyzed-url" id="analyzed-url">https://example-landing-page.com</div>
+                        <div class="analysis-meta">
+                            Analyzed on <span id="analysis-date">January 15, 2024 at 3:42 PM</span> • 
+                            Analysis time: 2.3 seconds
+                        </div>
+                    </div>
+                    <div class="overall-score">
+                        <div class="score-number">72</div>
+                        <div class="score-label">Conversion Score</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Alert Sections -->
+            <section class="alerts-section">
+                <!-- Urgent Fixes -->
+                <div class="alert-group">
+                    <div class="alert-header">
+                        <div class="alert-icon urgent">!</div>
+                        <h2 class="alert-title">Urgent Fixes (3)</h2>
+                    </div>
+                    
+                    <div class="alert-item urgent">
+                        <h4>Missing Primary CTA Above the Fold</h4>
+                        <p>Your main call-to-action is not visible without scrolling, which could reduce conversions by up to 35%.</p>
+                        <div class="recommendation">
+                            <h5>Recommendation:</h5>
+                            <p>Add a prominent "Get Started" or "Try Free" button in your hero section, positioned within the first 600px of page height.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-item urgent">
+                        <h4>No Social Proof Visible</h4>
+                        <p>Missing testimonials, reviews, or trust signals that could increase visitor confidence by 23%.</p>
+                        <div class="recommendation">
+                            <h5>Recommendation:</h5>
+                            <p>Add customer testimonials with photos and specific results. Include company logos or review platform ratings near your CTA.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-item urgent">
+                        <h4>Unclear Value Proposition</h4>
+                        <p>Your headline doesn't clearly communicate the main benefit or unique value proposition.</p>
+                        <div class="recommendation">
+                            <h5>Recommendation:</h5>
+                            <p>Rewrite your headline to focus on the specific outcome or benefit users will get. Use the formula: "Get [desired outcome] in [timeframe] without [common objection]".</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- High-Impact Improvements -->
+                <div class="alert-group">
+                    <div class="alert-header">
+                        <div class="alert-icon improvement">⚡</div>
+                        <h2 class="alert-title">High-Impact Tests (4)</h2>
+                    </div>
+                    
+                    <div class="alert-item improvement">
+                        <h4>Add Urgency Elements</h4>
+                        <p>Including time-sensitive offers or limited availability can increase conversions by 15-25%.</p>
+                        <div class="recommendation">
+                            <h5>A/B Test:</h5>
+                            <p>Test adding "Limited time: 50% off expires in 24 hours" or "Only 3 spots remaining" to create urgency.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-item improvement">
+                        <h4>Optimize Button Text</h4>
+                        <p>Your current CTA text could be more action-oriented and benefit-focused.</p>
+                        <div class="recommendation">
+                            <h5>A/B Test:</h5>
+                            <p>Test "Start My Free Trial" vs "Get Instant Access" vs "Claim Your Discount" to see which drives more clicks.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-item improvement">
+                        <h4>Enhance Mobile Experience</h4>
+                        <p>Mobile users show 18% lower engagement - optimize for mobile-first design.</p>
+                        <div class="recommendation">
+                            <h5>A/B Test:</h5>
+                            <p>Test a simpler mobile layout with larger buttons and reduced form fields for mobile users.</p>
+                        </div>
+                    </div>
+
+                    <div class="alert-item improvement">
+                        <h4>Risk Reversal Strategy</h4>
+                        <p>Adding guarantees or risk-free trials can improve conversion rates by 20-30%.</p>
+                        <div class="recommendation">
+                            <h5>A/B Test:</h5>
+                            <p>Test adding "30-day money-back guarantee" or "Cancel anytime" near your primary CTA.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analysis Details -->
+            <section class="analysis-details">
+                <!-- Detailed Element Analysis -->
+                <div class="details-card">
+                    <div class="details-header">
+                        <h3 class="details-title">Element-by-Element Analysis</h3>
+                    </div>
+
+                    <div class="element-analysis">
+                        <div class="element-header">
+                            <span class="element-name">Headline & Value Proposition</span>
+                            <span class="element-score score-needs-work">Needs Work</span>
+                        </div>
+                        <div class="element-details">
+                            Current headline lacks specificity and doesn't clearly communicate unique benefits. Consider using numbers, specific outcomes, or addressing pain points directly.
+                        </div>
+                    </div>
+
+                    <div class="element-analysis">
+                        <div class="element-header">
+                            <span class="element-name">Call-to-Action Placement</span>
+                            <span class="element-score score-poor">Poor</span>
+                        </div>
+                        <div class="element-details">
+                            Primary CTA is below the fold and lacks prominence. Best practice is to have a strong CTA visible within the first screen view.
+                        </div>
+                    </div>
+
+                    <div class="element-analysis">
+                        <div class="element-header">
+                            <span class="element-name">Social Proof & Trust Signals</span>
+                            <span class="element-score score-poor">Poor</span>
+                        </div>
+                        <div class="element-details">
+                            No visible testimonials, reviews, or trust badges. Adding social proof elements can significantly impact visitor confidence and conversion rates.
+                        </div>
+                    </div>
+
+                    <div class="element-analysis">
+                        <div class="element-header">
+                            <span class="element-name">Page Loading Speed</span>
+                            <span class="element-score score-good">Good</span>
+                        </div>
+                        <div class="element-details">
+                            Page loads in 2.1 seconds, which is acceptable. Consider optimizing images and scripts to get under 2 seconds for optimal performance.
+                        </div>
+                    </div>
+
+                    <div class="element-analysis">
+                        <div class="element-header">
+                            <span class="element-name">Mobile Responsiveness</span>
+                            <span class="element-score score-good">Good</span>
+                        </div>
+                        <div class="element-details">
+                            Page is mobile-responsive with minor issues. CTA buttons could be larger on mobile devices for better usability.
+                        </div>
+                    </div>
+
+                    <div class="element-analysis">
+                        <div class="element-header">
+                            <span class="element-name">Content Clarity & Structure</span>
+                            <span class="element-score score-excellent">Excellent</span>
+                        </div>
+                        <div class="element-details">
+                            Content is well-structured with clear hierarchy. Good use of headers, bullet points, and whitespace makes it easy to scan.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Conversion Score Breakdown -->
+                <div class="details-card">
+                    <div class="details-header">
+                        <h3 class="details-title">Score Breakdown</h3>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="scoreChart"></canvas>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="credits.html" class="btn-primary">Unlock Full Report</a>
+                        <button class="btn-secondary btn-sm" onclick="window.print()">Export PDF</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Competitive Analysis -->
+            <section class="competitive-analysis">
+                <h3 class="details-title">Industry Benchmark Comparison</h3>
+                <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
+                    See how your page performs compared to high-converting pages in your industry.
+                </p>
+                
+                <div class="competitive-grid">
+                    <div class="competitive-item">
+                        <div class="competitive-score" style="color: var(--warning-color);">72</div>
+                        <div class="competitive-label">Your Score</div>
+                    </div>
+                    <div class="competitive-item">
+                        <div class="competitive-score" style="color: var(--secondary-color);">89</div>
+                        <div class="competitive-label">Industry Average</div>
+                    </div>
+                    <div class="competitive-item">
+                        <div class="competitive-score" style="color: var(--primary-color);">94</div>
+                        <div class="competitive-label">Top 10% Pages</div>
+                    </div>
+                    <div class="competitive-item">
+                        <div class="competitive-score" style="color: var(--amber-color);">+22</div>
+                        <div class="competitive-label">Potential Uplift</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <script>
+        // Load analyzed URL from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const analyzedUrl = localStorage.getItem('analyzedUrl');
+            const analysisTimestamp = localStorage.getItem('analysisTimestamp');
+            
+            if (analyzedUrl) {
+                document.getElementById('analyzed-url').textContent = analyzedUrl;
+            }
+            
+            if (analysisTimestamp) {
+                const date = new Date(analysisTimestamp);
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit'
+                });
+                document.getElementById('analysis-date').textContent = formattedDate;
+            }
+            
+            // Initialize Chart
+            initializeScoreChart();
+        });
+
+        function initializeScoreChart() {
+            const ctx = document.getElementById('scoreChart').getContext('2d');
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Strong Areas', 'Needs Improvement', 'Critical Issues'],
+                    datasets: [{
+                        data: [45, 35, 20],
+                        backgroundColor: [
+                            '#059669', // Green for strong
+                            '#f59e0b', // Amber for needs improvement  
+                            '#dc2626'  // Red for critical
+                        ],
+                        borderWidth: 0,
+                        cutout: '70%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.label + ': ' + context.parsed + '%';
+                                }
+                            }
+                        }
+                    },
+                    elements: {
+                        arc: {
+                            borderWidth: 0
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'centerText',
+                    beforeDraw: function(chart) {
+                        const width = chart.width,
+                              height = chart.height,
+                              ctx = chart.ctx;
+                        
+                        ctx.restore();
+                        const fontSize = (height / 180).toFixed(2);
+                        ctx.font = `bold ${fontSize}em Inter, sans-serif`;
+                        ctx.textBaseline = "middle";
+                        ctx.fillStyle = '#111827';
+                        
+                        const text = "72";
+                        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                        const textY = height / 2 - 10;
+                        
+                        ctx.fillText(text, textX, textY);
+                        
+                        ctx.font = `${fontSize * 0.4}em Inter, sans-serif`;
+                        ctx.fillStyle = '#6b7280';
+                        const subText = "Overall Score";
+                        const subTextX = Math.round((width - ctx.measureText(subText).width) / 2);
+                        const subTextY = textY + 25;
+                        
+                        ctx.fillText(subText, subTextX, subTextY);
+                        ctx.save();
+                    }
+                }]
+            });
+        }
+
+        // Add interactive elements
+        document.querySelectorAll('.alert-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 150);
+            });
+        });
+
+        // Add smooth animations for score elements
+        function animateScores() {
+            const scoreElements = document.querySelectorAll('.competitive-score');
+            scoreElements.forEach((el, index) => {
+                setTimeout(() => {
+                    el.style.opacity = '0';
+                    el.style.transform = 'translateY(20px)';
+                    setTimeout(() => {
+                        el.style.transition = 'all 0.6s ease';
+                        el.style.opacity = '1';
+                        el.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+        }
+
+        // Trigger animations when the competitive section comes into view
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateScores();
+                    observer.unobserve(entry.target);
+                }
+            });
+        });
+
+        observer.observe(document.querySelector('.competitive-analysis'));
+    </script>
+</body>
+</html>
