@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - LoyaltyMax Platform</title>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #f59e0b;
+            --secondary-hover: #d97706;
+            --secondary-light: #fef3c7;
+            
+            /* Neutral Colors */
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            /* Status Colors */
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #06b6d4;
+            
+            /* Border & Shadow */
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-20: 5rem;
+            --space-24: 6rem;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            height: 70px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo-text {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            font-size: var(--text-sm);
+            padding: var(--space-2) var(--space-3);
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-light);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+            padding: var(--space-2) var(--space-4);
+            border: none;
+            border-radius: 0.375rem;
+            font-size: var(--text-xs);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+            padding: var(--space-2) var(--space-4);
+            border: none;
+            border-radius: 0.375rem;
+            font-size: var(--text-xs);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 70px;
+            min-height: calc(100vh - 140px);
+            padding: var(--space-8) 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: var(--space-8);
+            padding-bottom: var(--space-6);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+        }
+
+        /* Admin Grid Layout */
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--space-8);
+            margin-bottom: var(--space-8);
+        }
+
+        /* Sidebar */
+        .admin-sidebar {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: var(--space-6);
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+
+        .sidebar-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-4);
+            color: var(--text-primary);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            margin-bottom: var(--space-2);
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: var(--space-3);
+            color: var(--text-secondary);
+            text-decoration: none;
+            border-radius: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-link:hover,
+        .sidebar-link.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        /* Main Admin Content */
+        .admin-main {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+
+        .admin-section {
+            display: none;
+            padding: var(--space-8);
+        }
+
+        .admin-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-6);
+            color: var(--text-primary);
+        }
+
+        /* Form Styles */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .form-group {
+            margin-bottom: var(--space-4);
+        }
+
+        .form-label {
+            display: block;
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            background-color: var(--surface-color);
+            transition: all 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            background-color: var(--surface-color);
+            transition: all 0.2s ease;
+        }
+
+        /* Table Styles */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: var(--space-6);
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: var(--space-3) var(--space-4);
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background-color: var(--background-color);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .data-table td {
+            color: var(--text-secondary);
+        }
+
+        .data-table tr:hover td {
+            background-color: var(--background-color);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: var(--space-1) var(--space-3);
+            border-radius: 1rem;
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+        }
+
+        .status-active {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .status-pending {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .status-inactive {
+            background-color: var(--text-muted);
+            color: white;
+        }
+
+        /* Cards Grid */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            margin-bottom: var(--space-4);
+            padding-bottom: var(--space-4);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .card-icon {
+            font-size: var(--text-2xl);
+        }
+
+        .card-content {
+            color: var(--text-secondary);
+        }
+
+        .metric {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+            margin-bottom: var(--space-2);
+        }
+
+        /* Configuration Panel */
+        .config-panel {
+            background-color: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            margin-bottom: var(--space-6);
+        }
+
+        .config-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-4);
+            color: var(--text-primary);
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--text-muted);
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--primary-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--text-primary);
+            color: var(--surface-color);
+            padding: var(--space-12) 0 var(--space-8);
+            margin-top: var(--space-16);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-8);
+        }
+
+        .footer-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-4);
+            color: var(--primary-color);
+        }
+
+        .footer-subtitle {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-3);
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            margin-bottom: var(--space-4);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: var(--space-2);
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .admin-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .admin-sidebar {
+                position: static;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo">🏆</div>
+                <span class="logo-text">LoyaltyMax</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Dashboard</a></li>
+                <li class="nav-item"><a href="loyalty.html" class="nav-link">Loyalty Program</a></li>
+                <li class="nav-item"><a href="admin.html" class="nav-link active">Admin Panel</a></li>
+                <li class="nav-item"><a href="analytics.html" class="nav-link">Analytics</a></li>
+                <li class="nav-item"><a href="pos.html" class="nav-link">POS Integration</a></li>
+                <li class="nav-item"><a href="profiles.html" class="nav-link">User Profiles</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-secondary" onclick="showSettings()">Settings</button>
+                <a href="loyalty.html" class="btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Admin Panel</h1>
+                <p class="page-subtitle">Manage business rules, configure loyalty programs, and monitor system performance</p>
+            </div>
+
+            <!-- Admin Layout -->
+            <div class="admin-grid">
+                <!-- Sidebar Navigation -->
+                <aside class="admin-sidebar">
+                    <h3 class="sidebar-title">Administration</h3>
+                    <ul class="sidebar-menu">
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link active" onclick="showSection('overview')">📊 Overview</a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="showSection('loyalty-rules')">🎯 Loyalty Rules</a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="showSection('brand-management')">🏪 Brand Management</a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="showSection('campaigns')">📢 Campaigns</a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="showSection('integrations')">🔗 Integrations</a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="showSection('security')">🛡️ Security</a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="#" class="sidebar-link" onclick="showSection('reporting')">📈 Reporting</a>
+                        </li>
+                    </ul>
+                </aside>
+
+                <!-- Main Admin Content -->
+                <main class="admin-main">
+                    <!-- Overview Section -->
+                    <section id="overview" class="admin-section active">
+                        <h2 class="section-title">System Overview</h2>
+                        
+                        <div class="cards-grid">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Active Rules</h3>
+                                    <span class="card-icon">⚙️</span>
+                                </div>
+                                <div class="card-content">
+                                    <div class="metric">47</div>
+                                    <p>Business rules currently active across all brands</p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Integration Status</h3>
+                                    <span class="card-icon">🔗</span>
+                                </div>
+                                <div class="card-content">
+                                    <div class="metric">11/11</div>
+                                    <p>Brands successfully integrated with POS systems</p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Security Alerts</h3>
+                                    <span class="card-icon">🛡️</span>
+                                </div>
+                                <div class="card-content">
+                                    <div class="metric">0</div>
+                                    <p>No security threats detected in the last 24 hours</p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">System Health</h3>
+                                    <span class="card-icon">💚</span>
+                                </div>
+                                <div class="card-content">
+                                    <div class="metric">99.1%</div>
+                                    <p>Overall system uptime this month</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="config-panel">
+                            <h3 class="config-title">Quick Actions</h3>
+                            <div style="display: flex; gap: var(--space-4); flex-wrap: wrap;">
+                                <button class="btn-primary" onclick="createNewRule()">Create New Rule</button>
+                                <button class="btn-secondary" onclick="viewSystemLogs()">View System Logs</button>
+                                <button class="btn-secondary" onclick="exportData()">Export Data</button>
+                                <button class="btn-warning" onclick="syncAllBrands()">Sync All Brands</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Loyalty Rules Section -->
+                    <section id="loyalty-rules" class="admin-section">
+                        <h2 class="section-title">Loyalty Program Rules</h2>
+                        
+                        <div class="config-panel">
+                            <h3 class="config-title">Points Configuration</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="points-per-dollar">Points per Dollar</label>
+                                    <input type="number" id="points-per-dollar" class="form-input" value="10" min="1" max="100">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="bonus-multiplier">Bonus Multiplier</label>
+                                    <select id="bonus-multiplier" class="form-select">
+                                        <option value="1">1x (Standard)</option>
+                                        <option value="2">2x (Double Points)</option>
+                                        <option value="3">3x (Triple Points)</option>
+                                        <option value="5">5x (Special Events)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="minimum-purchase">Minimum Purchase ($)</label>
+                                    <input type="number" id="minimum-purchase" class="form-input" value="5.00" min="0" step="0.01">
+                                </div>
+                            </div>
+                            <button class="btn-primary" onclick="savePointsConfig()">Save Configuration</button>
+                        </div>
+
+                        <div class="config-panel">
+                            <h3 class="config-title">Tier Levels</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Tier Name</th>
+                                        <th>Required Points</th>
+                                        <th>Discount %</th>
+                                        <th>Special Benefits</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Bronze</td>
+                                        <td>0 - 999</td>
+                                        <td>5%</td>
+                                        <td>Welcome bonus</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td><button class="btn-secondary" onclick="editTier('bronze')">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Silver</td>
+                                        <td>1,000 - 4,999</td>
+                                        <td>10%</td>
+                                        <td>Free delivery</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td><button class="btn-secondary" onclick="editTier('silver')">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Gold</td>
+                                        <td>5,000 - 14,999</td>
+                                        <td>15%</td>
+                                        <td>Priority support, Early access</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td><button class="btn-secondary" onclick="editTier('gold')">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Platinum</td>
+                                        <td>15,000+</td>
+                                        <td>20%</td>
+                                        <td>VIP events, Personal manager</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td><button class="btn-secondary" onclick="editTier('platinum')">Edit</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Brand Management Section -->
+                    <section id="brand-management" class="admin-section">
+                        <h2 class="section-title">Brand Management</h2>
+                        
+                        <div class="cards-grid">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Pizza Palace</h3>
+                                    <span class="status-badge status-active">Active</span>
+                                </div>
+                                <div class="card-content">
+                                    <p><strong>Locations:</strong> 45</p>
+                                    <p><strong>Monthly Revenue:</strong> $892K</p>
+                                    <p><strong>Loyalty Members:</strong> 12,847</p>
+                                    <button class="btn-secondary" onclick="manageBrand('pizza-palace')">Manage</button>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Coffee Corner</h3>
+                                    <span class="status-badge status-active">Active</span>
+                                </div>
+                                <div class="card-content">
+                                    <p><strong>Locations:</strong> 28</p>
+                                    <p><strong>Monthly Revenue:</strong> $567K</p>
+                                    <p><strong>Loyalty Members:</strong> 8,932</p>
+                                    <button class="btn-secondary" onclick="manageBrand('coffee-corner')">Manage</button>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">QuickMart</h3>
+                                    <span class="status-badge status-active">Active</span>
+                                </div>
+                                <div class="card-content">
+                                    <p><strong>Locations:</strong> 67</p>
+                                    <p><strong>Monthly Revenue:</strong> $1.2M</p>
+                                    <p><strong>Loyalty Members:</strong> 18,456</p>
+                                    <button class="btn-secondary" onclick="manageBrand('quickmart')">Manage</button>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Burger Barn</h3>
+                                    <span class="status-badge status-pending">Integrating</span>
+                                </div>
+                                <div class="card-content">
+                                    <p><strong>Locations:</strong> 23</p>
+                                    <p><strong>Monthly Revenue:</strong> $445K</p>
+                                    <p><strong>Loyalty Members:</strong> 6,721</p>
+                                    <button class="btn-warning" onclick="manageBrand('burger-barn')">Complete Setup</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Campaigns Section -->
+                    <section id="campaigns" class="admin-section">
+                        <h2 class="section-title">Marketing Campaigns</h2>
+                        
+                        <div class="config-panel">
+                            <h3 class="config-title">Create New Campaign</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="campaign-name">Campaign Name</label>
+                                    <input type="text" id="campaign-name" class="form-input" placeholder="Enter campaign name">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="campaign-type">Campaign Type</label>
+                                    <select id="campaign-type" class="form-select">
+                                        <option>Points Bonus</option>
+                                        <option>Discount Promotion</option>
+                                        <option>Cross-Brand Challenge</option>
+                                        <option>Tier Upgrade</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="target-segment">Target Segment</label>
+                                    <select id="target-segment" class="form-select">
+                                        <option>All Members</option>
+                                        <option>Bronze Tier</option>
+                                        <option>Silver Tier</option>
+                                        <option>Gold Tier</option>
+                                        <option>Platinum Tier</option>
+                                        <option>Inactive Members</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="campaign-duration">Duration (Days)</label>
+                                    <input type="number" id="campaign-duration" class="form-input" value="7" min="1" max="365">
+                                </div>
+                            </div>
+                            <button class="btn-primary" onclick="createCampaign()">Create Campaign</button>
+                        </div>
+
+                        <h3 class="config-title">Active Campaigns</h3>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Campaign Name</th>
+                                    <th>Type</th>
+                                    <th>Target</th>
+                                    <th>Participants</th>
+                                    <th>End Date</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Summer Double Points</td>
+                                    <td>Points Bonus</td>
+                                    <td>All Members</td>
+                                    <td>23,847</td>
+                                    <td>Aug 31, 2024</td>
+                                    <td><span class="status-badge status-active">Running</span></td>
+                                    <td>
+                                        <button class="btn-secondary" onclick="editCampaign('summer-double')">Edit</button>
+                                        <button class="btn-warning" onclick="pauseCampaign('summer-double')">Pause</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Cross-Brand Challenge</td>
+                                    <td>Challenge</td>
+                                    <td>Gold+ Tier</td>
+                                    <td>4,521</td>
+                                    <td>Jul 15, 2024</td>
+                                    <td><span class="status-badge status-active">Running</span></td>
+                                    <td>
+                                        <button class="btn-secondary" onclick="editCampaign('cross-brand')">Edit</button>
+                                        <button class="btn-warning" onclick="pauseCampaign('cross-brand')">Pause</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- Integrations Section -->
+                    <section id="integrations" class="admin-section">
+                        <h2 class="section-title">System Integrations</h2>
+                        
+                        <div class="config-panel">
+                            <h3 class="config-title">POS System Status</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Brand</th>
+                                        <th>POS System</th>
+                                        <th>Connection</th>
+                                        <th>Last Sync</th>
+                                        <th>Transactions Today</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Pizza Palace</td>
+                                        <td>Aloha POS</td>
+                                        <td><span class="status-badge status-active">Connected</span></td>
+                                        <td>2 minutes ago</td>
+                                        <td>1,247</td>
+                                        <td><button class="btn-success" onclick="syncPOS('pizza-palace')">Sync Now</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Coffee Corner</td>
+                                        <td>NCR POS</td>
+                                        <td><span class="status-badge status-active">Connected</span></td>
+                                        <td>1 minute ago</td>
+                                        <td>892</td>
+                                        <td><button class="btn-success" onclick="syncPOS('coffee-corner')">Sync Now</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>QuickMart</td>
+                                        <td>Aloha POS</td>
+                                        <td><span class="status-badge status-active">Connected</span></td>
+                                        <td>30 seconds ago</td>
+                                        <td>2,156</td>
+                                        <td><button class="btn-success" onclick="syncPOS('quickmart')">Sync Now</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Burger Barn</td>
+                                        <td>NCR POS</td>
+                                        <td><span class="status-badge status-pending">Configuring</span></td>
+                                        <td>-</td>
+                                        <td>0</td>
+                                        <td><button class="btn-warning" onclick="configurePOS('burger-barn')">Configure</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="config-panel">
+                            <h3 class="config-title">API Endpoints</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Mobile App API</label>
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span>https://api.loyaltymax.com/mobile/v1</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Website Integration</label>
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span>https://api.loyaltymax.com/web/v1</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">POS Integration</label>
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span>https://api.loyaltymax.com/pos/v1</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Security Section -->
+                    <section id="security" class="admin-section">
+                        <h2 class="section-title">Security & Compliance</h2>
+                        
+                        <div class="cards-grid">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Fraud Detection</h3>
+                                    <span class="card-icon">🚨</span>
+                                </div>
+                                <div class="card-content">
+                                    <div class="metric">3</div>
+                                    <p>Suspicious activities detected and blocked today</p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Compliance Score</h3>
+                                    <span class="card-icon">✅</span>
+                                </div>
+                                <div class="card-content">
+                                    <div class="metric">98.7%</div>
+                                    <p>Overall compliance with data protection regulations</p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Security Audit</h3>
+                                    <span class="card-icon">🔍</span>
+                                </div>
+                                <div class="card-content">
+                                    <div class="metric">Passed</div>
+                                    <p>Last ISO 27001 audit completed successfully</p>
+                                </div>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3 class="card-title">Access Control</h3>
+                                    <span class="card-icon">🔐</span>
+                                </div>
+                                <div class="card-content">
+                                    <div class="metric">47</div>
+                                    <p>Active admin users with role-based permissions</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="config-panel">
+                            <h3 class="config-title">Security Settings</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label">Two-Factor Authentication</label>
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span>Required for all admin accounts</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Fraud Detection AI</label>
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked>
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span>Automated suspicious activity detection</span>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Data Encryption</label>
+                                    <div style="display: flex; align-items: center; gap: var(--space-3);">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked disabled>
+                                            <span class="slider"></span>
+                                        </label>
+                                        <span>AES-256 encryption (always enabled)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Reporting Section -->
+                    <section id="reporting" class="admin-section">
+                        <h2 class="section-title">Business Intelligence & Reporting</h2>
+                        
+                        <div class="config-panel">
+                            <h3 class="config-title">Generate Reports</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label class="form-label" for="report-type">Report Type</label>
+                                    <select id="report-type" class="form-select">
+                                        <option>Loyalty Program Performance</option>
+                                        <option>Cross-Brand Analysis</option>
+                                        <option>Member Engagement</option>
+                                        <option>Revenue Impact</option>
+                                        <option>Campaign Effectiveness</option>
+                                        <option>Fraud Detection Summary</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="report-period">Time Period</label>
+                                    <select id="report-period" class="form-select">
+                                        <option>Last 7 days</option>
+                                        <option>Last 30 days</option>
+                                        <option>Last 3 months</option>
+                                        <option>Last 6 months</option>
+                                        <option>Year to date</option>
+                                        <option>Custom range</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label" for="report-format">Export Format</label>
+                                    <select id="report-format" class="form-select">
+                                        <option>PDF</option>
+                                        <option>Excel (XLSX)</option>
+                                        <option>CSV</option>
+                                        <option>JSON</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button class="btn-primary" onclick="generateReport()">Generate Report</button>
+                        </div>
+
+                        <div class="config-panel">
+                            <h3 class="config-title">Automated Reports</h3>
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Report Name</th>
+                                        <th>Frequency</th>
+                                        <th>Recipients</th>
+                                        <th>Last Sent</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Weekly Performance Summary</td>
+                                        <td>Weekly</td>
+                                        <td>executives@company.com</td>
+                                        <td>3 days ago</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td><button class="btn-secondary" onclick="editAutomatedReport('weekly')">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Monthly Brand Analysis</td>
+                                        <td>Monthly</td>
+                                        <td>managers@company.com</td>
+                                        <td>1 week ago</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td><button class="btn-secondary" onclick="editAutomatedReport('monthly')">Edit</button></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Daily Fraud Summary</td>
+                                        <td>Daily</td>
+                                        <td>security@company.com</td>
+                                        <td>Yesterday</td>
+                                        <td><span class="status-badge status-active">Active</span></td>
+                                        <td><button class="btn-secondary" onclick="editAutomatedReport('daily-fraud')">Edit</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </main>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3 class="footer-title">LoyaltyMax</h3>
+                <p class="footer-text">Enterprise-grade omnichannel loyalty platform with comprehensive admin controls.</p>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-subtitle">Administration</h4>
+                <ul class="footer-links">
+                    <li><a href="#overview">System Overview</a></li>
+                    <li><a href="#loyalty-rules">Loyalty Rules</a></li>
+                    <li><a href="#brand-management">Brand Management</a></li>
+                    <li><a href="#security">Security</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-subtitle">Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#admin-docs">Admin Documentation</a></li>
+                    <li><a href="#system-status">System Status</a></li>
+                    <li><a href="#technical-support">Technical Support</a></li>
+                    <li><a href="#training">Admin Training</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-subtitle">Compliance</h4>
+                <ul class="footer-links">
+                    <li><a href="#iso-27001">ISO 27001</a></li>
+                    <li><a href="#soc2">SOC 2 Type II</a></li>
+                    <li><a href="#gdpr">GDPR Compliance</a></li>
+                    <li><a href="#honduras-data">Honduras Data Protection</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Admin section management
+        function showSection(sectionId) {
+            // Hide all sections
+            const sections = document.querySelectorAll('.admin-section');
+            sections.forEach(section => section.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update sidebar navigation
+            const sidebarLinks = document.querySelectorAll('.sidebar-link');
+            sidebarLinks.forEach(link => link.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Store current section
+            localStorage.setItem('currentAdminSection', sectionId);
+        }
+
+        // Navigation active state management
+        function setActiveNavLink() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Settings modal simulation
+        function showSettings() {
+            alert('Settings panel would open here. Features include:\n\n• User account management\n• Notification preferences\n• Security settings\n• Integration configuration\n• System preferences');
+        }
+
+        // Admin action functions
+        function createNewRule() {
+            alert('Create New Rule wizard would open here.\n\nConfigure:\n• Rule conditions\n• Target audience\n• Rewards/actions\n• Validity period\n• Cross-brand applicability');
+        }
+
+        function viewSystemLogs() {
+            alert('System logs interface would display:\n\n• Real-time activity logs\n• Error tracking\n• Performance metrics\n• User actions audit\n• Integration status logs');
+        }
+
+        function exportData() {
+            alert('Data export options:\n\n• Member data (anonymized)\n• Transaction history\n• Loyalty program metrics\n• Campaign performance\n• Compliance reports');
+        }
+
+        function syncAllBrands() {
+            alert('Synchronizing all brand data...\n\n• POS transaction sync\n• Member profile updates\n• Inventory updates\n• Campaign status sync\n• Analytics refresh');
+        }
+
+        function savePointsConfig() {
+            alert('Points configuration saved successfully!\n\n• Updated across all brands\n• Members notified of changes\n• Historical data preserved');
+        }
+
+        function editTier(tierName) {
+            alert(`Edit ${tierName.toUpperCase()} tier settings:\n\n• Modify point requirements\n• Update benefits\n• Change discount percentages\n• Set special perks\n• Configure tier progression rules`);
+        }
+
+        function manageBrand(brandId) {
+            alert(`Brand management panel for ${brandId}:\n\n• Configure brand-specific rules\n• View performance metrics\n• Manage locations\n• Update POS integration\n• Customize loyalty offerings`);
+        }
+
+        function createCampaign() {
+            const name = document.getElementById('campaign-name').value;
+            const type = document.getElementById('campaign-type').value;
+            const segment = document.getElementById('target-segment').value;
+            
+            if (name.trim() === '') {
+                alert('Please enter a campaign name.');
+                return;
+            }
+            
+            alert(`Campaign "${name}" created successfully!\n\nType: ${type}\nTarget: ${segment}\nStatus: Scheduled for review\n\nThe campaign will be activated after approval.`);
+            
+            // Clear form
+            document.getElementById('campaign-name').value = '';
+        }
+
+        function editCampaign(campaignId) {
+            alert(`Edit campaign ${campaignId}:\n\n• Modify targeting rules\n• Update rewards/discounts\n• Change duration\n• Pause/resume campaign\n• View real-time performance`);
+        }
+
+        function pauseCampaign(campaignId) {
+            alert(`Campaign ${campaignId} has been paused.\n\n• Participants notified\n• Current progress preserved\n• Can be resumed at any time\n• Analytics continue tracking`);
+        }
+
+        function syncPOS(brandId) {
+            alert(`Syncing POS data for ${brandId}...\n\n• Pulling latest transactions\n• Updating member point balances\n• Syncing inventory data\n• Refreshing loyalty status\n\nSync completed successfully!`);
+        }
+
+        function configurePOS(brandId) {
+            alert(`POS configuration for ${brandId}:\n\n• API endpoint setup\n• Authentication configuration\n• Data mapping rules\n• Test connection\n• Schedule sync intervals`);
+        }
+
+        function generateReport() {
+            const type = document.getElementById('report-type').value;
+            const period = document.getElementById('report-period').value;
+            const format = document.getElementById('report-format').value;
+            
+            alert(`Generating report...\n\nType: ${type}\nPeriod: ${period}\nFormat: ${format}\n\nReport will be ready for download in 2-3 minutes.\nYou'll receive an email notification when complete.`);
+        }
+
+        function editAutomatedReport(reportId) {
+            alert(`Edit automated report ${reportId}:\n\n• Modify schedule\n• Update recipients\n• Change report content\n• Configure delivery options\n• Set data filters`);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveNavLink();
+            
+            // Restore last viewed section
+            const lastSection = localStorage.getItem('currentAdminSection') || 'overview';
+            if (lastSection !== 'overview') {
+                showSection(lastSection);
+            }
+            
+            // Simulate real-time updates for system metrics
+            setInterval(() => {
+                const systemHealthMetric = document.querySelector('#overview .metric');
+                if (systemHealthMetric && systemHealthMetric.textContent.includes('%')) {
+                    const currentValue = parseFloat(systemHealthMetric.textContent);
+                    const variation = (Math.random() - 0.5) * 0.1;
+                    const newValue = Math.max(98, Math.min(100, currentValue + variation));
+                    systemHealthMetric.textContent = newValue.toFixed(1) + '%';
+                }
+            }, 30000);
+        });
+
+        // Store current page in localStorage
+        localStorage.setItem('currentPage', 'admin');
+        localStorage.setItem('lastVisit', new Date().toISOString());
+    </script>
+</body>
+</html>

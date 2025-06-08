@@ -1,0 +1,24 @@
+{
+  "completed_at": "2025-06-08T07:21:45.101Z",
+  "project_dir": "/Users/Mike/Desktop/programming/2_proposals/upwork/021929684825916104222",
+  "screenshot_dir": "/Users/Mike/Desktop/programming/2_proposals/upwork/021929684825916104222/screenshots/2025-06-08T07-18-41",
+  "navigation_file": "/Users/Mike/Desktop/programming/2_proposals/upwork/021929684825916104222/navigation.yaml",
+  "status": "partial",
+  "execution_method": "schema_validated",
+  "workflow_name": "LoyaltyMax Omnichannel Platform - Demo Workflow",
+  "validation": {
+    "originally_valid": false,
+    "corrections_applied": 45,
+    "final_valid": true
+  },
+  "execution": {
+    "steps_total": 53,
+    "steps_passed": 7,
+    "steps_failed": 1,
+    "steps_skipped": 45,
+    "duration_ms": 183364,
+    "screenshots_generated": 2,
+    "status": "partial"
+  },
+  "execution_report": "# Test Execution Report\n\n## Workflow: LoyaltyMax Omnichannel Platform - Demo Workflow\n**Status**: ⚠️ Partial\n**Duration**: 3m 3s\n**Executed**: 6/8/2025, 12:18:41 AM\n\n## Summary\n\n- **Total Steps**: 53\n- **Passed**: 7 ✅\n- **Failed**: 1 ❌\n- **Skipped**: 45 ⏭️\n- **Success Rate**: 13%\n\n\n\n## Timeline\n1. ✅ Navigate to LoyaltyMax demo homepage (2214ms)\n2. ✅ Wait for main dashboard content to load (12ms)\n3. ✅ Verify main platform title is displayed \n4. ✅ Verify hero stats are showing 11 integrated brands (1ms)\n5. ✅ Wait for dashboard metrics to load (4ms)\n6. ✅ Verify member engagement metric is displayed \n7. ✅ Capture dashboard overview with key metrics (383ms)\n8. ❌ Navigate to Loyalty Program page (243ms)\n   - Error: Protocol error (Input.dispatchMouseEvent): Target closed\n\n## Network Activity\n\n**Total Requests**: 2\n**Successful**: 0\n**Failed**: 0\n\n## Screenshots\n1. [2025-06-08T07-18-44-372Z_step_0_navigate.png](/Users/Mike/Desktop/programming/2_proposals/upwork/021929684825916104222/screenshots/2025-06-08T07-18-41/2025-06-08T07-18-44-372Z_step_0_navigate.png)\n2. [2025-06-08T07-18-44-797Z_step_6_screenshot.png](/Users/Mike/Desktop/programming/2_proposals/upwork/021929684825916104222/screenshots/2025-06-08T07-18-41/2025-06-08T07-18-44-797Z_step_6_screenshot.png)\n\n## Performance Summary\n- **Total Duration**: 3m 3s\n- **Average Step Duration**: 357ms\n- **Slowest Step**: Navigate to LoyaltyMax demo homepage (2214ms)\n\n## Detailed Step Results\n\n### Step 1: Navigate to LoyaltyMax demo homepage\n- **Type**: navigate\n- **Status**: ✅ Success\n- **Duration**: 2214ms\n- **Result Data**: ```json\n{\n  \"url\": \"file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929684825916104222/index.html\",\n  \"title\": \"Dashboard - LoyaltyMax Omnichannel Platform\"\n}\n```\n\n### Step 2: Wait for main dashboard content to load\n- **Type**: waitForSelector\n- **Selector**: `.main-content`\n- **Status**: ✅ Success\n- **Duration**: 12ms\n- **Result Data**: ```json\n{\n  \"found\": \".main-content\"\n}\n```\n\n### Step 3: Verify main platform title is displayed\n- **Type**: evaluate\n- **Status**: ✅ Success\n- **Result Data**: ```json\n{\n  \"evaluated\": true\n}\n```\n\n### Step 4: Verify hero stats are showing 11 integrated brands\n- **Type**: evaluate\n- **Status**: ✅ Success\n- **Duration**: 1ms\n- **Result Data**: ```json\n{\n  \"evaluated\": true\n}\n```\n\n### Step 5: Wait for dashboard metrics to load\n- **Type**: waitForSelector\n- **Selector**: `.dashboard-grid`\n- **Status**: ✅ Success\n- **Duration**: 4ms\n- **Result Data**: ```json\n{\n  \"found\": \".dashboard-grid\"\n}\n```\n\n### Step 6: Verify member engagement metric is displayed\n- **Type**: evaluate\n- **Status**: ✅ Success\n- **Result Data**: ```json\n{\n  \"evaluated\": true\n}\n```\n\n### Step 7: Capture dashboard overview with key metrics\n- **Type**: screenshot\n- **Status**: ✅ Success\n- **Duration**: 383ms\n- **Result Data**: ```json\n{\n  \"screenshot\": \"captured\"\n}\n```\n\n### Step 8: Navigate to Loyalty Program page\n- **Type**: click\n- **Selector**: `a[href='loyalty.html']`\n- **Status**: ❌ Failed\n- **Duration**: 243ms\n- **Error**: Protocol error (Input.dispatchMouseEvent): Target closed"
+}

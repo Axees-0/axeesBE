@@ -1,0 +1,1341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profiles - LoyaltyMax Platform</title>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #f59e0b;
+            --secondary-hover: #d97706;
+            --secondary-light: #fef3c7;
+            
+            /* Neutral Colors */
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            
+            /* Status Colors */
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --info-color: #06b6d4;
+            
+            /* Border & Shadow */
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --text-xs: 0.75rem;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --font-normal: 400;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-20: 5rem;
+            --space-24: 6rem;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* Navigation Styles */
+        .navbar {
+            background-color: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            height: 70px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            width: 32px;
+            height: 32px;
+        }
+
+        .logo-text {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: var(--font-medium);
+            font-size: var(--text-sm);
+            padding: var(--space-2) var(--space-3);
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .nav-link.active {
+            color: var(--primary-color);
+            background-color: var(--primary-light);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        /* Button Styles */
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+            padding: var(--space-3) var(--space-6);
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background-color: var(--surface-color);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: var(--space-3) var(--space-6);
+            border-radius: 0.5rem;
+            font-weight: var(--font-medium);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-light);
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+            color: white;
+            padding: var(--space-2) var(--space-4);
+            border: none;
+            border-radius: 0.375rem;
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: white;
+            padding: var(--space-2) var(--space-4);
+            border: none;
+            border-radius: 0.375rem;
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 70px;
+            min-height: calc(100vh - 140px);
+            padding: var(--space-8) 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: var(--space-8);
+            padding-bottom: var(--space-6);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-title {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+        }
+
+        /* Search and Filters */
+        .search-filters {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: var(--space-6);
+        }
+
+        .search-section {
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+            flex: 1;
+        }
+
+        .search-input {
+            flex: 1;
+            max-width: 400px;
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            background-color: var(--surface-color);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+
+        .filter-select {
+            padding: var(--space-3) var(--space-4);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            background-color: var(--surface-color);
+            min-width: 150px;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        /* Profile Stats Overview */
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-12);
+        }
+
+        .stat-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xl);
+            margin: 0 auto var(--space-4);
+        }
+
+        .stat-icon.members {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .stat-icon.active {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .stat-icon.engagement {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .stat-icon.segments {
+            background-color: var(--info-color);
+            color: white;
+        }
+
+        .stat-value {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+        }
+
+        /* Customer Profiles Grid */
+        .profiles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-12);
+        }
+
+        .profile-card {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .profile-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-4px);
+        }
+
+        .profile-header {
+            padding: var(--space-6);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-3);
+            background-color: rgba(255, 255, 255, 0.2);
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+        }
+
+        .profile-name {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-1);
+        }
+
+        .profile-tier {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: var(--space-1) var(--space-3);
+            border-radius: 1rem;
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .profile-content {
+            padding: var(--space-6);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .profile-stat {
+            text-align: center;
+        }
+
+        .profile-stat-value {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            color: var(--primary-color);
+        }
+
+        .profile-stat-label {
+            color: var(--text-secondary);
+            font-size: var(--text-xs);
+        }
+
+        .profile-details {
+            margin-bottom: var(--space-6);
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: var(--space-2);
+            font-size: var(--text-sm);
+        }
+
+        .detail-label {
+            color: var(--text-secondary);
+        }
+
+        .detail-value {
+            color: var(--text-primary);
+            font-weight: var(--font-medium);
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: var(--space-3);
+            justify-content: center;
+        }
+
+        /* Segmentation Sidebar */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: var(--space-8);
+        }
+
+        .segments-sidebar {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: var(--space-6);
+            height: fit-content;
+            position: sticky;
+            top: 90px;
+        }
+
+        .sidebar-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-4);
+        }
+
+        .segment-list {
+            list-style: none;
+        }
+
+        .segment-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3);
+            margin-bottom: var(--space-2);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .segment-item:hover {
+            background-color: var(--background-color);
+        }
+
+        .segment-item.active {
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .segment-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .segment-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        .segment-name {
+            font-weight: var(--font-medium);
+            font-size: var(--text-sm);
+        }
+
+        .segment-count {
+            font-size: var(--text-xs);
+            background-color: var(--text-muted);
+            color: white;
+            padding: var(--space-1) var(--space-2);
+            border-radius: 1rem;
+        }
+
+        /* Profile Insights */
+        .insights-section {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: var(--space-8);
+            margin-bottom: var(--space-12);
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .insight-card {
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: var(--space-6);
+            background-color: var(--background-color);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .insight-icon {
+            font-size: var(--text-xl);
+        }
+
+        .insight-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+        }
+
+        .insight-value {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+            margin-bottom: var(--space-2);
+        }
+
+        .insight-description {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--text-primary);
+            color: var(--surface-color);
+            padding: var(--space-12) 0 var(--space-8);
+            margin-top: var(--space-16);
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-8);
+        }
+
+        .footer-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            margin-bottom: var(--space-4);
+            color: var(--primary-color);
+        }
+
+        .footer-subtitle {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-3);
+        }
+
+        .footer-text {
+            color: var(--text-muted);
+            margin-bottom: var(--space-4);
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: var(--space-2);
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .segments-sidebar {
+                position: static;
+            }
+            
+            .search-filters {
+                flex-direction: column;
+                gap: var(--space-4);
+                align-items: stretch;
+            }
+            
+            .search-section {
+                flex-direction: column;
+            }
+            
+            .profiles-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-overview {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <div class="logo">🏆</div>
+                <span class="logo-text">LoyaltyMax</span>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="index.html" class="nav-link">Dashboard</a></li>
+                <li class="nav-item"><a href="loyalty.html" class="nav-link">Loyalty Program</a></li>
+                <li class="nav-item"><a href="admin.html" class="nav-link">Admin Panel</a></li>
+                <li class="nav-item"><a href="analytics.html" class="nav-link">Analytics</a></li>
+                <li class="nav-item"><a href="pos.html" class="nav-link">POS Integration</a></li>
+                <li class="nav-item"><a href="profiles.html" class="nav-link active">User Profiles</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn-secondary" onclick="showSettings()">Settings</button>
+                <a href="loyalty.html" class="btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Customer Profiles & Segmentation</h1>
+                <p class="page-subtitle">AI-powered customer insights and dynamic segmentation for personalized experiences</p>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="search-filters">
+                <div class="search-section">
+                    <input type="text" class="search-input" placeholder="Search customers by name, email, or member ID..." onkeyup="searchProfiles(this.value)">
+                    <select class="filter-select" onchange="filterByTier(this.value)">
+                        <option value="">All Tiers</option>
+                        <option value="bronze">Bronze</option>
+                        <option value="silver">Silver</option>
+                        <option value="gold">Gold</option>
+                        <option value="platinum">Platinum</option>
+                    </select>
+                    <select class="filter-select" onchange="filterBySegment(this.value)">
+                        <option value="">All Segments</option>
+                        <option value="loyal">Loyal Champions</option>
+                        <option value="price-sensitive">Price Sensitive</option>
+                        <option value="convenience">Convenience Seekers</option>
+                        <option value="at-risk">At-Risk</option>
+                    </select>
+                </div>
+                <div class="filter-actions">
+                    <button class="btn-secondary" onclick="exportProfiles()">Export Data</button>
+                    <button class="btn-primary" onclick="createSegment()">Create Segment</button>
+                </div>
+            </div>
+
+            <!-- Statistics Overview -->
+            <section class="stats-overview">
+                <div class="stat-card">
+                    <div class="stat-icon members">👥</div>
+                    <div class="stat-value">47,256</div>
+                    <div class="stat-label">Total Members</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon active">🟢</div>
+                    <div class="stat-value">42,183</div>
+                    <div class="stat-label">Active Members (30 days)</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon engagement">📊</div>
+                    <div class="stat-value">89.4%</div>
+                    <div class="stat-label">Engagement Rate</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon segments">🎯</div>
+                    <div class="stat-value">12</div>
+                    <div class="stat-label">AI Segments</div>
+                </div>
+            </section>
+
+            <!-- Main Layout -->
+            <div class="main-layout">
+                <!-- Segments Sidebar -->
+                <aside class="segments-sidebar">
+                    <h3 class="sidebar-title">Customer Segments</h3>
+                    <ul class="segment-list">
+                        <li class="segment-item active" onclick="selectSegment('all', this)">
+                            <div class="segment-info">
+                                <div class="segment-color" style="background-color: #64748b;"></div>
+                                <span class="segment-name">All Customers</span>
+                            </div>
+                            <span class="segment-count">47.2K</span>
+                        </li>
+                        <li class="segment-item" onclick="selectSegment('loyal', this)">
+                            <div class="segment-info">
+                                <div class="segment-color" style="background-color: #2563eb;"></div>
+                                <span class="segment-name">Loyal Champions</span>
+                            </div>
+                            <span class="segment-count">16.1K</span>
+                        </li>
+                        <li class="segment-item" onclick="selectSegment('price-sensitive', this)">
+                            <div class="segment-info">
+                                <div class="segment-color" style="background-color: #f59e0b;"></div>
+                                <span class="segment-name">Price Sensitive</span>
+                            </div>
+                            <span class="segment-count">13.5K</span>
+                        </li>
+                        <li class="segment-item" onclick="selectSegment('convenience', this)">
+                            <div class="segment-info">
+                                <div class="segment-color" style="background-color: #10b981;"></div>
+                                <span class="segment-name">Convenience Seekers</span>
+                            </div>
+                            <span class="segment-count">10.4K</span>
+                        </li>
+                        <li class="segment-item" onclick="selectSegment('at-risk', this)">
+                            <div class="segment-info">
+                                <div class="segment-color" style="background-color: #ef4444;"></div>
+                                <span class="segment-name">At-Risk</span>
+                            </div>
+                            <span class="segment-count">7.1K</span>
+                        </li>
+                        <li class="segment-item" onclick="selectSegment('new-members', this)">
+                            <div class="segment-info">
+                                <div class="segment-color" style="background-color: #06b6d4;"></div>
+                                <span class="segment-name">New Members</span>
+                            </div>
+                            <span class="segment-count">2.8K</span>
+                        </li>
+                        <li class="segment-item" onclick="selectSegment('high-value', this)">
+                            <div class="segment-info">
+                                <div class="segment-color" style="background-color: #8b5cf6;"></div>
+                                <span class="segment-name">High Value</span>
+                            </div>
+                            <span class="segment-count">1.9K</span>
+                        </li>
+                    </ul>
+                </aside>
+
+                <!-- Main Content Area -->
+                <div class="main-area">
+                    <!-- Customer Profiles Grid -->
+                    <section class="profiles-grid" id="profilesGrid">
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">CM</div>
+                                <div class="profile-name">Carlos Martinez</div>
+                                <div class="profile-tier">Gold Member</div>
+                            </div>
+                            <div class="profile-content">
+                                <div class="profile-stats">
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">8,347</div>
+                                        <div class="profile-stat-label">Points</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">$2,847</div>
+                                        <div class="profile-stat-label">Lifetime Value</div>
+                                    </div>
+                                </div>
+                                <div class="profile-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Member Since:</span>
+                                        <span class="detail-value">March 2022</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Favorite Brand:</span>
+                                        <span class="detail-value">Coffee Corner</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Visit Frequency:</span>
+                                        <span class="detail-value">12x/month</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Segment:</span>
+                                        <span class="detail-value">Loyal Champion</span>
+                                    </div>
+                                </div>
+                                <div class="profile-actions">
+                                    <button class="btn-secondary" onclick="viewProfile('LM-4751')">View Details</button>
+                                    <button class="btn-success" onclick="sendOffer('LM-4751')">Send Offer</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">ML</div>
+                                <div class="profile-name">Maria Lopez</div>
+                                <div class="profile-tier">Silver Member</div>
+                            </div>
+                            <div class="profile-content">
+                                <div class="profile-stats">
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">3,142</div>
+                                        <div class="profile-stat-label">Points</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">$1,523</div>
+                                        <div class="profile-stat-label">Lifetime Value</div>
+                                    </div>
+                                </div>
+                                <div class="profile-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Member Since:</span>
+                                        <span class="detail-value">July 2022</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Favorite Brand:</span>
+                                        <span class="detail-value">QuickMart</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Visit Frequency:</span>
+                                        <span class="detail-value">8x/month</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Segment:</span>
+                                        <span class="detail-value">Price Sensitive</span>
+                                    </div>
+                                </div>
+                                <div class="profile-actions">
+                                    <button class="btn-secondary" onclick="viewProfile('LM-8923')">View Details</button>
+                                    <button class="btn-success" onclick="sendOffer('LM-8923')">Send Offer</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">JG</div>
+                                <div class="profile-name">Juan Garcia</div>
+                                <div class="profile-tier">Platinum Member</div>
+                            </div>
+                            <div class="profile-content">
+                                <div class="profile-stats">
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">18,742</div>
+                                        <div class="profile-stat-label">Points</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">$6,247</div>
+                                        <div class="profile-stat-label">Lifetime Value</div>
+                                    </div>
+                                </div>
+                                <div class="profile-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Member Since:</span>
+                                        <span class="detail-value">January 2021</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Favorite Brand:</span>
+                                        <span class="detail-value">Pizza Palace</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Visit Frequency:</span>
+                                        <span class="detail-value">23x/month</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Segment:</span>
+                                        <span class="detail-value">High Value</span>
+                                    </div>
+                                </div>
+                                <div class="profile-actions">
+                                    <button class="btn-secondary" onclick="viewProfile('LM-2847')">View Details</button>
+                                    <button class="btn-success" onclick="sendOffer('LM-2847')">Send Offer</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">AS</div>
+                                <div class="profile-name">Ana Silva</div>
+                                <div class="profile-tier">Bronze Member</div>
+                            </div>
+                            <div class="profile-content">
+                                <div class="profile-stats">
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">542</div>
+                                        <div class="profile-stat-label">Points</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">$347</div>
+                                        <div class="profile-stat-label">Lifetime Value</div>
+                                    </div>
+                                </div>
+                                <div class="profile-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Member Since:</span>
+                                        <span class="detail-value">February 2024</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Favorite Brand:</span>
+                                        <span class="detail-value">Burger Barn</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Visit Frequency:</span>
+                                        <span class="detail-value">3x/month</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Segment:</span>
+                                        <span class="detail-value">New Member</span>
+                                    </div>
+                                </div>
+                                <div class="profile-actions">
+                                    <button class="btn-secondary" onclick="viewProfile('LM-9456')">View Details</button>
+                                    <button class="btn-warning" onclick="sendOffer('LM-9456')">Welcome Offer</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">RH</div>
+                                <div class="profile-name">Roberto Hernandez</div>
+                                <div class="profile-tier">Gold Member</div>
+                            </div>
+                            <div class="profile-content">
+                                <div class="profile-stats">
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">11,847</div>
+                                        <div class="profile-stat-label">Points</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">$4,128</div>
+                                        <div class="profile-stat-label">Lifetime Value</div>
+                                    </div>
+                                </div>
+                                <div class="profile-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Member Since:</span>
+                                        <span class="detail-value">September 2021</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Favorite Brand:</span>
+                                        <span class="detail-value">QuickMart</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Visit Frequency:</span>
+                                        <span class="detail-value">18x/month</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Segment:</span>
+                                        <span class="detail-value">Convenience Seeker</span>
+                                    </div>
+                                </div>
+                                <div class="profile-actions">
+                                    <button class="btn-secondary" onclick="viewProfile('LM-5647')">View Details</button>
+                                    <button class="btn-success" onclick="sendOffer('LM-5647')">Send Offer</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="profile-card">
+                            <div class="profile-header">
+                                <div class="profile-avatar">LP</div>
+                                <div class="profile-name">Laura Perez</div>
+                                <div class="profile-tier">Silver Member</div>
+                            </div>
+                            <div class="profile-content">
+                                <div class="profile-stats">
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">2,156</div>
+                                        <div class="profile-stat-label">Points</div>
+                                    </div>
+                                    <div class="profile-stat">
+                                        <div class="profile-stat-value">$892</div>
+                                        <div class="profile-stat-label">Lifetime Value</div>
+                                    </div>
+                                </div>
+                                <div class="profile-details">
+                                    <div class="detail-row">
+                                        <span class="detail-label">Member Since:</span>
+                                        <span class="detail-value">December 2023</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Favorite Brand:</span>
+                                        <span class="detail-value">Coffee Corner</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Visit Frequency:</span>
+                                        <span class="detail-value">2x/month</span>
+                                    </div>
+                                    <div class="detail-row">
+                                        <span class="detail-label">Segment:</span>
+                                        <span class="detail-value">At-Risk</span>
+                                    </div>
+                                </div>
+                                <div class="profile-actions">
+                                    <button class="btn-secondary" onclick="viewProfile('LM-7823')">View Details</button>
+                                    <button class="btn-warning" onclick="sendOffer('LM-7823')">Re-engage</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- AI Insights Section -->
+            <section class="insights-section">
+                <h2 class="sidebar-title">Customer Insights</h2>
+                <div class="insights-grid">
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <span class="insight-icon">📈</span>
+                            <h3 class="insight-title">Average Customer Value</h3>
+                        </div>
+                        <div class="insight-value">$2,347</div>
+                        <div class="insight-description">18% increase from last quarter driven by cross-brand engagement</div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <span class="insight-icon">🔄</span>
+                            <h3 class="insight-title">Retention Rate</h3>
+                        </div>
+                        <div class="insight-value">92.7%</div>
+                        <div class="insight-description">Above industry average, loyalty programs showing strong impact</div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <span class="insight-icon">🎯</span>
+                            <h3 class="insight-title">Cross-Brand Usage</h3>
+                        </div>
+                        <div class="insight-value">67.8%</div>
+                        <div class="insight-description">Members using 3+ brands show 156% higher lifetime value</div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-header">
+                            <span class="insight-icon">⚠️</span>
+                            <h3 class="insight-title">Churn Risk</h3>
+                        </div>
+                        <div class="insight-value">1,247</div>
+                        <div class="insight-description">Members at risk of churning in next 30 days - action required</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3 class="footer-title">LoyaltyMax</h3>
+                <p class="footer-text">Advanced customer profiling and segmentation powered by AI for maximum engagement and retention.</p>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-subtitle">Customer Management</h4>
+                <ul class="footer-links">
+                    <li><a href="#profiles">Customer Profiles</a></li>
+                    <li><a href="#segmentation">AI Segmentation</a></li>
+                    <li><a href="#insights">Customer Insights</a></li>
+                    <li><a href="#personalization">Personalization</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-subtitle">Analytics</h4>
+                <ul class="footer-links">
+                    <li><a href="#behavior">Behavior Analysis</a></li>
+                    <li><a href="#lifetime-value">Lifetime Value</a></li>
+                    <li><a href="#churn">Churn Prediction</a></li>
+                    <li><a href="#engagement">Engagement Metrics</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4 class="footer-subtitle">Tools</h4>
+                <ul class="footer-links">
+                    <li><a href="#campaigns">Targeted Campaigns</a></li>
+                    <li><a href="#automation">Marketing Automation</a></li>
+                    <li><a href="#export">Data Export</a></li>
+                    <li><a href="#integration">CRM Integration</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        let currentSegment = 'all';
+        let allProfiles = []; // Would be populated from API
+
+        // Navigation active state management
+        function setActiveNavLink() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === currentPage) {
+                    link.classList.add('active');
+                }
+            });
+        }
+
+        // Settings modal simulation
+        function showSettings() {
+            alert('Profile Settings:\n\n• Segmentation rules\n• AI model configuration\n• Data privacy settings\n• Export preferences\n• Integration settings');
+        }
+
+        // Segment selection
+        function selectSegment(segmentId, element) {
+            // Update active segment
+            document.querySelectorAll('.segment-item').forEach(item => item.classList.remove('active'));
+            element.classList.add('active');
+            currentSegment = segmentId;
+            
+            // Filter profiles based on segment
+            filterProfilesBySegment(segmentId);
+        }
+
+        function filterProfilesBySegment(segmentId) {
+            const profiles = document.querySelectorAll('.profile-card');
+            
+            profiles.forEach(profile => {
+                const segment = profile.querySelector('.detail-value:last-child').textContent.toLowerCase();
+                
+                if (segmentId === 'all' || 
+                    (segmentId === 'loyal' && segment.includes('loyal')) ||
+                    (segmentId === 'price-sensitive' && segment.includes('price')) ||
+                    (segmentId === 'convenience' && segment.includes('convenience')) ||
+                    (segmentId === 'at-risk' && segment.includes('at-risk')) ||
+                    (segmentId === 'new-members' && segment.includes('new')) ||
+                    (segmentId === 'high-value' && segment.includes('high'))) {
+                    profile.style.display = 'block';
+                } else {
+                    profile.style.display = 'none';
+                }
+            });
+        }
+
+        // Search functionality
+        function searchProfiles(searchTerm) {
+            const profiles = document.querySelectorAll('.profile-card');
+            
+            profiles.forEach(profile => {
+                const name = profile.querySelector('.profile-name').textContent.toLowerCase();
+                const memberData = profile.textContent.toLowerCase();
+                
+                if (searchTerm === '' || name.includes(searchTerm.toLowerCase()) || memberData.includes(searchTerm.toLowerCase())) {
+                    profile.style.display = 'block';
+                } else {
+                    profile.style.display = 'none';
+                }
+            });
+        }
+
+        // Filter by tier
+        function filterByTier(tier) {
+            const profiles = document.querySelectorAll('.profile-card');
+            
+            profiles.forEach(profile => {
+                const profileTier = profile.querySelector('.profile-tier').textContent.toLowerCase();
+                
+                if (tier === '' || profileTier.includes(tier)) {
+                    profile.style.display = 'block';
+                } else {
+                    profile.style.display = 'none';
+                }
+            });
+        }
+
+        // Filter by segment
+        function filterBySegment(segment) {
+            if (segment === '') {
+                selectSegment('all', document.querySelector('.segment-item'));
+            } else {
+                const segmentMapping = {
+                    'loyal': 'loyal',
+                    'price-sensitive': 'price-sensitive',
+                    'convenience': 'convenience',
+                    'at-risk': 'at-risk'
+                };
+                
+                if (segmentMapping[segment]) {
+                    selectSegment(segmentMapping[segment], document.querySelector(`[onclick*="${segmentMapping[segment]}"]`));
+                }
+            }
+        }
+
+        // Profile actions
+        function viewProfile(memberId) {
+            alert(`Viewing detailed profile for ${memberId}:\n\n• Complete transaction history\n• Behavior analytics\n• Engagement timeline\n• Preference analysis\n• Recommended actions\n• Communication history`);
+        }
+
+        function sendOffer(memberId) {
+            alert(`Creating personalized offer for ${memberId}:\n\n• AI-generated offer recommendations\n• Personalized discount calculation\n• Preferred channel selection\n• Optimal timing analysis\n• A/B testing options\n\nOffer will be sent within 24 hours.`);
+        }
+
+        // Management functions
+        function exportProfiles() {
+            alert('Export Options:\n\n• Customer profiles (CSV/Excel)\n• Segmentation data\n• Engagement metrics\n• Lifetime value analysis\n• Behavioral insights\n• GDPR-compliant export\n\nExport will be generated and emailed.');
+        }
+
+        function createSegment() {
+            alert('Create New Segment:\n\n• Define segment criteria\n• Set behavioral rules\n• Configure AI parameters\n• Name and describe segment\n• Set auto-update rules\n• Schedule analysis refresh');
+        }
+
+        // Simulate real-time profile updates
+        function simulateProfileUpdates() {
+            setInterval(() => {
+                // Randomly update one of the profile stats
+                const profileCards = document.querySelectorAll('.profile-card');
+                if (profileCards.length > 0) {
+                    const randomProfile = profileCards[Math.floor(Math.random() * profileCards.length)];
+                    const pointsElement = randomProfile.querySelector('.profile-stat-value');
+                    
+                    if (pointsElement && Math.random() < 0.1) { // 10% chance every 10 seconds
+                        const currentPoints = parseInt(pointsElement.textContent.replace(',', ''));
+                        const newPoints = currentPoints + Math.floor(Math.random() * 50) + 10;
+                        pointsElement.textContent = newPoints.toLocaleString();
+                        
+                        // Add visual feedback
+                        pointsElement.style.color = '#10b981';
+                        pointsElement.style.transform = 'scale(1.1)';
+                        setTimeout(() => {
+                            pointsElement.style.color = '';
+                            pointsElement.style.transform = 'scale(1)';
+                        }, 1000);
+                    }
+                }
+            }, 10000);
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            setActiveNavLink();
+            simulateProfileUpdates();
+            
+            // Add smooth scrolling for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Add hover effects to cards
+            const cards = document.querySelectorAll('.profile-card, .stat-card, .insight-card');
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    if (this.classList.contains('profile-card')) {
+                        this.style.transform = 'translateY(-6px) scale(1.02)';
+                    } else {
+                        this.style.transform = 'translateY(-4px) scale(1.02)';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+        });
+
+        // Store current page in localStorage
+        localStorage.setItem('currentPage', 'profiles');
+        localStorage.setItem('lastVisit', new Date().toISOString());
+    </script>
+</body>
+</html>

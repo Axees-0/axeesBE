@@ -1,0 +1,126 @@
+name: "LoyaltyMax Omnichannel Platform - 9 Screenshot Demo"
+description: "Captures 9 strategic screenshots of the complete loyalty platform demonstrating enterprise capabilities for $12K/month contract"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 30000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Screenshot 1: Homepage/Dashboard
+  - type: navigate
+    description: "Navigate to LoyaltyMax dashboard homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929684825916104222/index.html"
+    waitUntil: "networkidle2"
+  - type: wait
+    description: "Wait for dashboard metrics to load"
+    value: 3000
+  - type: screenshot
+    description: "Homepage - Executive Dashboard Overview"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 2: Loyalty Program Customer Experience  
+  - type: click
+    description: "Navigate to Loyalty Program page"
+    selector: "a[href='loyalty.html']"
+  - type: wait
+    description: "Wait for loyalty page to load"
+    value: 3000
+  - type: screenshot
+    description: "Loyalty Program - Customer Experience"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 3: Admin Panel Business Management
+  - type: click
+    description: "Navigate to Admin Panel"
+    selector: "a[href='admin.html']"
+  - type: wait
+    description: "Wait for admin panel to load"
+    value: 3000
+  - type: screenshot
+    description: "Admin Panel - Business Rules Management"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 4: AI Analytics Dashboard
+  - type: click
+    description: "Navigate to Analytics dashboard"
+    selector: "a[href='analytics.html']"
+  - type: wait
+    description: "Wait for analytics and charts to load"
+    value: 5000
+  - type: screenshot
+    description: "AI Analytics - Predictive Insights"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 5: POS Integration Real-time
+  - type: click
+    description: "Navigate to POS Integration page"
+    selector: "a[href='pos.html']"
+  - type: wait
+    description: "Wait for POS systems to load"
+    value: 3000
+  - type: screenshot
+    description: "POS Integration - Real-time Transaction Processing"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 6: Customer Profiles & Segmentation
+  - type: click
+    description: "Navigate to Customer Profiles page"
+    selector: "a[href='profiles.html']"
+  - type: wait
+    description: "Wait for customer profiles to load"
+    value: 3000
+  - type: screenshot
+    description: "Customer Profiles - AI Segmentation"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 7: Admin Panel - Loyalty Rules Configuration
+  - type: click
+    description: "Return to Admin Panel for rules demo"
+    selector: "a[href='admin.html']"
+  - type: wait
+    description: "Wait for admin panel"
+    value: 2000
+  - type: click
+    description: "Click on Loyalty Rules section"
+    selector: ".sidebar-link[onclick*='loyalty-rules']"
+  - type: wait
+    description: "Wait for loyalty rules section"
+    value: 2000
+  - type: screenshot
+    description: "Admin Panel - Loyalty Rules Configuration"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 8: Analytics - AI Insights Section
+  - type: click
+    description: "Return to Analytics for AI insights"
+    selector: "a[href='analytics.html']"
+  - type: wait
+    description: "Wait for analytics page to fully load"
+    value: 4000
+  - type: screenshot
+    description: "Analytics - AI Insights & Recommendations"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 9: Return to Dashboard - Complete Platform Overview
+  - type: click
+    description: "Return to main dashboard for final overview"
+    selector: "a[href='index.html']"
+  - type: wait
+    description: "Wait for dashboard to reload completely"
+    value: 3000
+  - type: screenshot
+    description: "Platform Overview - Complete Feature Showcase"
+    screenshot:
+      fullPage: true
