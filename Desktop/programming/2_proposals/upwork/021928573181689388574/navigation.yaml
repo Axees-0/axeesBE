@@ -1,0 +1,265 @@
+name: "AI Optimizer Pro - Demo Workflow"
+description: "Automated testing workflow for AI-powered conversion optimization platform demo"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 30000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Screenshot 1: Homepage/Dashboard
+  - type: navigate
+    description: "Navigate to AI Optimizer Pro homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021928573181689388574/index.html"
+    waitUntil: "networkidle2"
+    
+  - type: wait
+    description: "Wait for charts and dynamic content to load"
+    value: 3000
+    
+  - type: waitForSelector
+    description: "Wait for main dashboard content"
+    selector: ".main-content, .page-title"
+    timeout: 10000
+    
+  - type: assertText
+    description: "Verify dashboard page title"
+    selector: "h1"
+    expected: "Dashboard"
+    
+  - type: screenshot
+    description: "Capture dashboard overview"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 2: Analytics Page
+  - type: click
+    description: "Navigate to analytics page"
+    selector: "a[href='analytics.html']"
+    
+  - type: wait
+    description: "Wait for analytics page to load"
+    value: 3000
+    
+  - type: waitForSelector
+    description: "Wait for analytics charts to render"
+    selector: "#funnelChart, #journeyChart"
+    timeout: 10000
+    
+  - type: assertText
+    description: "Verify analytics page title"
+    selector: "h1"
+    expected: "Analytics"
+    
+  - type: screenshot
+    description: "Capture analytics dashboard"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 3: AI Optimizer Page
+  - type: click
+    description: "Navigate to AI optimizer page"
+    selector: "a[href='optimizer.html']"
+    
+  - type: wait
+    description: "Wait for optimizer page to load"
+    value: 3000
+    
+  - type: waitForSelector
+    description: "Wait for AI recommendations to appear"
+    selector: ".recommendation-card, .ai-insights"
+    timeout: 10000
+    
+  - type: assertText
+    description: "Verify optimizer page title"
+    selector: "h1"
+    expected: "AI Conversion Optimizer"
+    
+  - type: screenshot
+    description: "Capture AI optimizer interface"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 4: A/B Testing Page
+  - type: click
+    description: "Navigate to A/B testing page"
+    selector: "a[href='testing.html']"
+    
+  - type: wait
+    description: "Wait for testing page to load"
+    value: 3000
+    
+  - type: waitForSelector
+    description: "Wait for test cards and charts"
+    selector: ".test-card, #performanceChart"
+    timeout: 10000
+    
+  - type: assertText
+    description: "Verify A/B testing page title"
+    selector: "h1"
+    expected: "A/B Testing"
+    
+  - type: screenshot
+    description: "Capture A/B testing interface"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 5: Reports Page
+  - type: click
+    description: "Navigate to reports page"
+    selector: "a[href='reports.html']"
+    
+  - type: wait
+    description: "Wait for reports page to load"
+    value: 3000
+    
+  - type: waitForSelector
+    description: "Wait for report templates and charts"
+    selector: ".report-template, #usageChart"
+    timeout: 10000
+    
+  - type: assertText
+    description: "Verify reports page title"
+    selector: "h1"
+    expected: "Reports & Insights"
+    
+  - type: screenshot
+    description: "Capture reports and insights page"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 6: Dashboard Interaction - Apply Recommendation
+  - type: navigate
+    description: "Return to dashboard for interaction testing"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021928573181689388574/index.html"
+    waitUntil: "networkidle2"
+    
+  - type: wait
+    description: "Wait for dashboard to load"
+    value: 3000
+    
+  - type: click
+    description: "Click on Apply Fix button for checkout optimization"
+    selector: "button[onclick=\"applyRecommendation('checkout')\"]"
+    
+  - type: wait
+    description: "Wait for recommendation application"
+    value: 2500
+    
+  - type: screenshot
+    description: "Capture recommendation application result"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 7: Analytics Date Filter Interaction
+  - type: navigate
+    description: "Return to analytics for filter testing"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021928573181689388574/analytics.html"
+    waitUntil: "networkidle2"
+    
+  - type: wait
+    description: "Wait for analytics page"
+    value: 3000
+    
+  - type: click
+    description: "Change date filter to 90 days"
+    selector: "#dateRange"
+    
+  - type: evaluate
+    description: "Set date range to 90 days"
+    script: |
+      document.getElementById('dateRange').value = '90';
+      document.getElementById('dateRange').dispatchEvent(new Event('change'));
+    
+  - type: wait
+    description: "Wait for filter update"
+    value: 1000
+    
+  - type: screenshot
+    description: "Capture analytics with date filter applied"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 8: A/B Testing Create Test Modal
+  - type: navigate
+    description: "Return to A/B testing for modal testing"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021928573181689388574/testing.html"
+    waitUntil: "networkidle2"
+    
+  - type: wait
+    description: "Wait for testing page"
+    value: 3000
+    
+  - type: click
+    description: "Open create new test modal"
+    selector: "button[onclick='openCreateTestModal()']"
+    
+  - type: wait
+    description: "Wait for modal to appear"
+    value: 1000
+    
+  - type: waitForSelector
+    description: "Wait for modal content"
+    selector: "#createTestModal.active"
+    timeout: 5000
+    
+  - type: screenshot
+    description: "Capture create test modal interface"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 9: Reports Export Interface
+  - type: navigate
+    description: "Navigate to reports for export interface"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021928573181689388574/reports.html"
+    waitUntil: "networkidle2"
+    
+  - type: wait
+    description: "Wait for reports page"
+    value: 3000
+    
+  - type: evaluate
+    description: "Scroll to export section"
+    script: |
+      document.querySelector('.card:last-child').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+  - type: wait
+    description: "Wait for scroll animation"
+    value: 1000
+    
+  - type: click
+    description: "Select Excel export format"
+    selector: ".format-option[onclick=\"selectFormat('excel')\"]"
+    
+  - type: wait
+    description: "Wait for format selection"
+    value: 500
+    
+  - type: screenshot
+    description: "Capture export interface with format selection"
+    screenshot:
+      fullPage: true
+
+  # Final verification
+  - type: evaluate
+    description: "Verify demo functionality"
+    script: |
+      ({
+        title: document.title,
+        currentUrl: window.location.href,
+        hasCharts: !!document.querySelector('canvas'),
+        hasInteractivity: !!document.querySelector('button[onclick]'),
+        hasNavigation: !!document.querySelector('.nav-menu'),
+        localStorage: Object.keys(localStorage).length > 0
+      })
+    
+  - type: assertVisible
+    description: "Verify navigation menu is visible"
+    selector: ".nav-menu"
+    
+  - type: assertVisible
+    description: "Verify main content area is visible"
+    selector: ".main-content"

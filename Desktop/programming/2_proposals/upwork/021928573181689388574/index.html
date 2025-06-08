@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Optimizer Pro - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #5855eb;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .page-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-nav {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-lg);
+            height: 4rem;
+        }
+
+        .nav-brand a {
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .nav-brand h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .page-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .metric-card {
+            background: var(--surface-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+
+        .metric-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .metric-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+            display: inline-block;
+        }
+
+        .metric-change.positive {
+            color: var(--secondary-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .metric-change.negative {
+            color: var(--danger-color);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .card {
+            background: var(--surface-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-light);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: var(--spacing-md);
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: var(--spacing-md);
+            background: var(--surface-color);
+        }
+
+        .recommendation-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .recommendation-icon.high {
+            background: var(--danger-color);
+        }
+
+        .recommendation-icon.medium {
+            background: var(--accent-color);
+        }
+
+        .recommendation-icon.low {
+            background: var(--secondary-color);
+        }
+
+        .recommendation-content {
+            flex: 1;
+        }
+
+        .recommendation-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .recommendation-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .recommendation-impact {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--secondary-color);
+            margin-top: var(--spacing-xs);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 0.5rem;
+            background: var(--border-light);
+            border-radius: 0.25rem;
+            overflow: hidden;
+            margin-top: var(--spacing-sm);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <a href="index.html">
+                        <h2>AI Optimizer Pro</h2>
+                    </a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link active">Dashboard</a></li>
+                    <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                    <li><a href="optimizer.html" class="nav-link">Optimizer</a></li>
+                    <li><a href="testing.html" class="nav-link">A/B Testing</a></li>
+                    <li><a href="reports.html" class="nav-link">Reports</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">AI-powered insights to optimize your conversion rates</p>
+            </div>
+
+            <div class="grid grid-4" style="margin-bottom: var(--spacing-2xl);">
+                <div class="metric-card">
+                    <div class="metric-value">$47,234</div>
+                    <div class="metric-label">Total Revenue</div>
+                    <span class="metric-change positive">+18.2%</span>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">3.24%</div>
+                    <div class="metric-label">Conversion Rate</div>
+                    <span class="metric-change positive">+0.8%</span>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">12,847</div>
+                    <div class="metric-label">Total Visitors</div>
+                    <span class="metric-change positive">+12.5%</span>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">$68.40</div>
+                    <div class="metric-label">Avg Order Value</div>
+                    <span class="metric-change negative">-2.1%</span>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Conversion Trends</h3>
+                        <a href="analytics.html" class="btn-secondary">View Details</a>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="conversionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Revenue Analysis</h3>
+                        <a href="analytics.html" class="btn-secondary">View Details</a>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="revenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: var(--spacing-2xl);">
+                <div class="card-header">
+                    <h3 class="card-title">AI Optimization Recommendations</h3>
+                    <a href="optimizer.html" class="btn-primary">Start Optimization</a>
+                </div>
+                
+                <div class="recommendation-item">
+                    <div class="recommendation-icon high">!</div>
+                    <div class="recommendation-content">
+                        <div class="recommendation-title">Optimize Checkout Flow</div>
+                        <div class="recommendation-description">AI detected 34% cart abandonment at payment step. Simplify checkout form and add trust signals.</div>
+                        <div class="recommendation-impact">Potential +15% conversion increase</div>
+                    </div>
+                    <button class="btn-primary" onclick="applyRecommendation('checkout')">Apply Fix</button>
+                </div>
+
+                <div class="recommendation-item">
+                    <div class="recommendation-icon medium">↗</div>
+                    <div class="recommendation-content">
+                        <div class="recommendation-title">Improve Product Page Headlines</div>
+                        <div class="recommendation-description">A/B test shows benefit-focused headlines perform 23% better than feature-focused ones.</div>
+                        <div class="recommendation-impact">Potential +8% conversion increase</div>
+                    </div>
+                    <button class="btn-primary" onclick="applyRecommendation('headlines')">Apply Fix</button>
+                </div>
+
+                <div class="recommendation-item">
+                    <div class="recommendation-icon low">⚡</div>
+                    <div class="recommendation-content">
+                        <div class="recommendation-title">Add Social Proof Elements</div>
+                        <div class="recommendation-description">Pages with customer reviews and testimonials show 12% higher conversion rates.</div>
+                        <div class="recommendation-impact">Potential +5% conversion increase</div>
+                    </div>
+                    <button class="btn-primary" onclick="applyRecommendation('social')">Apply Fix</button>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: var(--spacing-2xl);">
+                <div class="card-header">
+                    <h3 class="card-title">Active A/B Tests</h3>
+                    <a href="testing.html" class="btn-primary">Manage Tests</a>
+                </div>
+                
+                <div style="margin-bottom: var(--spacing-lg);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm);">
+                        <strong>Homepage Hero Section Test</strong>
+                        <span style="color: var(--secondary-color); font-weight: 600;">Winner: Variant B (+12% CTR)</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 89%;"></div>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: var(--spacing-xs);">
+                        89% statistical confidence • 2,847 visitors tested
+                    </div>
+                </div>
+
+                <div style="margin-bottom: var(--spacing-lg);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm);">
+                        <strong>Product Pricing Display Test</strong>
+                        <span style="color: var(--accent-color); font-weight: 600;">Running • No significant difference yet</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 42%;"></div>
+                    </div>
+                    <div style="font-size: 0.875rem; color: var(--text-secondary); margin-top: var(--spacing-xs);">
+                        42% statistical confidence • 1,234 visitors tested
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Chart.js Configuration
+        const chartDefaults = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    grid: {
+                        color: '#f3f4f6'
+                    }
+                }
+            }
+        };
+
+        // Conversion Chart
+        const conversionCtx = document.getElementById('conversionChart').getContext('2d');
+        new Chart(conversionCtx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    data: [2.1, 2.3, 2.8, 3.1, 2.9, 3.2, 3.4],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: chartDefaults
+        });
+
+        // Revenue Chart
+        const revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        new Chart(revenueCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                datasets: [{
+                    data: [28000, 31000, 35000, 42000, 38000, 45000, 47000],
+                    backgroundColor: '#10b981',
+                    borderRadius: 4
+                }]
+            },
+            options: chartDefaults
+        });
+
+        // Recommendation Application
+        function applyRecommendation(type) {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = 'Applying...';
+            button.style.opacity = '0.6';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Applied ✓';
+                button.style.background = '#10b981';
+                
+                // Save to localStorage
+                const applied = JSON.parse(localStorage.getItem('appliedRecommendations') || '[]');
+                if (!applied.includes(type)) {
+                    applied.push(type);
+                    localStorage.setItem('appliedRecommendations', JSON.stringify(applied));
+                }
+                
+                // Update metrics simulation
+                updateMetrics();
+            }, 2000);
+        }
+
+        function updateMetrics() {
+            // Simulate metric improvements when recommendations are applied
+            const appliedRecommendations = JSON.parse(localStorage.getItem('appliedRecommendations') || '[]');
+            
+            if (appliedRecommendations.length > 0) {
+                const conversionElement = document.querySelector('.metric-card:nth-child(2) .metric-value');
+                const revenueElement = document.querySelector('.metric-card:nth-child(1) .metric-value');
+                
+                // Simulate improvements based on applied recommendations
+                let conversionBoost = appliedRecommendations.length * 0.1;
+                let revenueBoost = appliedRecommendations.length * 2000;
+                
+                conversionElement.textContent = (3.24 + conversionBoost).toFixed(2) + '%';
+                revenueElement.textContent = '$' + (47234 + revenueBoost).toLocaleString();
+            }
+        }
+
+        // Load applied recommendations on page load
+        window.addEventListener('load', () => {
+            const appliedRecommendations = JSON.parse(localStorage.getItem('appliedRecommendations') || '[]');
+            
+            appliedRecommendations.forEach(type => {
+                const button = document.querySelector(`button[onclick="applyRecommendation('${type}')"]`);
+                if (button) {
+                    button.textContent = 'Applied ✓';
+                    button.style.background = '#10b981';
+                    button.disabled = true;
+                }
+            });
+            
+            updateMetrics();
+        });
+
+        // Navigation active state management
+        function setActiveNavigation() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        setActiveNavigation();
+    </script>
+</body>
+</html>

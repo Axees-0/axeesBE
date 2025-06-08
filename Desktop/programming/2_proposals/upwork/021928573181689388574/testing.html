@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Optimizer Pro - A/B Testing</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #5855eb;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .page-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-nav {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-lg);
+            height: 4rem;
+        }
+
+        .nav-brand a {
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .nav-brand h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-danger {
+            background: var(--danger-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .test-grid {
+            display: grid;
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .test-card {
+            border-left: 4px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+
+        .test-card.running {
+            border-left-color: var(--primary-color);
+        }
+
+        .test-card.winner {
+            border-left-color: var(--secondary-color);
+        }
+
+        .test-card.concluded {
+            border-left-color: var(--text-muted);
+        }
+
+        .test-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .test-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .test-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .test-status {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .test-status.running {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+        }
+
+        .test-status.winner {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .test-status.concluded {
+            background: rgba(107, 114, 128, 0.1);
+            color: var(--text-muted);
+        }
+
+        .test-metrics {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-lg);
+            margin: var(--spacing-lg) 0;
+            padding: var(--spacing-md);
+            background: var(--border-light);
+            border-radius: 0.5rem;
+        }
+
+        .metric {
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: var(--spacing-xs);
+        }
+
+        .test-variants {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+            margin: var(--spacing-lg) 0;
+        }
+
+        .variant {
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            text-align: center;
+        }
+
+        .variant.winner {
+            border-color: var(--secondary-color);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .variant-name {
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .variant-metric {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .variant.winner .variant-metric {
+            color: var(--secondary-color);
+        }
+
+        .variant-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .variant-change.positive {
+            color: var(--secondary-color);
+        }
+
+        .variant-change.negative {
+            color: var(--danger-color);
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 0.5rem;
+            background: var(--border-light);
+            border-radius: 0.25rem;
+            overflow: hidden;
+            margin: var(--spacing-md) 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            transition: width 0.5s ease;
+        }
+
+        .test-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-lg);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--surface-color);
+            padding: var(--spacing-2xl);
+            border-radius: 0.75rem;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: var(--spacing-md);
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-lg);
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: var(--spacing-lg);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <a href="index.html">
+                        <h2>AI Optimizer Pro</h2>
+                    </a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                    <li><a href="optimizer.html" class="nav-link">Optimizer</a></li>
+                    <li><a href="testing.html" class="nav-link active">A/B Testing</a></li>
+                    <li><a href="reports.html" class="nav-link">Reports</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">A/B Testing</h1>
+                    <p class="page-subtitle">Create, manage, and analyze conversion experiments</p>
+                </div>
+                <button class="btn-primary" onclick="openCreateTestModal()">Create New Test</button>
+            </div>
+
+            <div class="stats-overview">
+                <div class="card stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">Active Tests</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-number">23</div>
+                    <div class="stat-label">Completed Tests</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-number">+18.2%</div>
+                    <div class="stat-label">Average Lift</div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-bottom: var(--spacing-2xl);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Test Performance Overview</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Statistical Significance Tracking</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="significanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="test-grid">
+                <div class="card test-card winner">
+                    <div class="test-header">
+                        <div>
+                            <div class="test-title">Homepage Hero Section Test</div>
+                            <div class="test-description">Testing benefit-focused headline vs. feature-focused headline</div>
+                        </div>
+                        <div class="test-status winner">Winner: Variant B</div>
+                    </div>
+                    
+                    <div class="test-metrics">
+                        <div class="metric">
+                            <div class="metric-value">2,847</div>
+                            <div class="metric-label">Visitors</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">89%</div>
+                            <div class="metric-label">Confidence</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">+12%</div>
+                            <div class="metric-label">CTR Lift</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">14 days</div>
+                            <div class="metric-label">Duration</div>
+                        </div>
+                    </div>
+
+                    <div class="test-variants">
+                        <div class="variant">
+                            <div class="variant-name">Control (A)</div>
+                            <div class="variant-metric">4.2%</div>
+                            <div class="variant-change">Click-through Rate</div>
+                        </div>
+                        <div class="variant winner">
+                            <div class="variant-name">Winner (B)</div>
+                            <div class="variant-metric">4.7%</div>
+                            <div class="variant-change positive">+11.9% improvement</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 89%;"></div>
+                    </div>
+
+                    <div class="test-actions">
+                        <button class="btn-success" onclick="deployWinner('hero-test')">Deploy Winner</button>
+                        <button class="btn-secondary" onclick="viewDetails('hero-test')">View Details</button>
+                        <button class="btn-secondary" onclick="downloadReport('hero-test')">Download Report</button>
+                    </div>
+                </div>
+
+                <div class="card test-card running">
+                    <div class="test-header">
+                        <div>
+                            <div class="test-title">Product Pricing Display Test</div>
+                            <div class="test-description">Testing crossed-out original price vs. simple current price</div>
+                        </div>
+                        <div class="test-status running">Running</div>
+                    </div>
+                    
+                    <div class="test-metrics">
+                        <div class="metric">
+                            <div class="metric-value">1,234</div>
+                            <div class="metric-label">Visitors</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">42%</div>
+                            <div class="metric-label">Confidence</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">+2.3%</div>
+                            <div class="metric-label">CVR Difference</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">7 days</div>
+                            <div class="metric-label">Running</div>
+                        </div>
+                    </div>
+
+                    <div class="test-variants">
+                        <div class="variant">
+                            <div class="variant-name">Control (A)</div>
+                            <div class="variant-metric">3.1%</div>
+                            <div class="variant-change">Conversion Rate</div>
+                        </div>
+                        <div class="variant">
+                            <div class="variant-name">Variant (B)</div>
+                            <div class="variant-metric">3.2%</div>
+                            <div class="variant-change positive">+2.3% difference</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 42%;"></div>
+                    </div>
+
+                    <div class="test-actions">
+                        <button class="btn-secondary" onclick="viewLiveResults('pricing-test')">Live Results</button>
+                        <button class="btn-secondary" onclick="pauseTest('pricing-test')">Pause Test</button>
+                        <button class="btn-danger" onclick="stopTest('pricing-test')">Stop Test</button>
+                    </div>
+                </div>
+
+                <div class="card test-card running">
+                    <div class="test-header">
+                        <div>
+                            <div class="test-title">Checkout Button Color Test</div>
+                            <div class="test-description">Testing green vs. orange call-to-action button</div>
+                        </div>
+                        <div class="test-status running">Running</div>
+                    </div>
+                    
+                    <div class="test-metrics">
+                        <div class="metric">
+                            <div class="metric-value">892</div>
+                            <div class="metric-label">Visitors</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">28%</div>
+                            <div class="metric-label">Confidence</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">-1.1%</div>
+                            <div class="metric-label">CVR Difference</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">4 days</div>
+                            <div class="metric-label">Running</div>
+                        </div>
+                    </div>
+
+                    <div class="test-variants">
+                        <div class="variant">
+                            <div class="variant-name">Control (Green)</div>
+                            <div class="variant-metric">5.7%</div>
+                            <div class="variant-change">Conversion Rate</div>
+                        </div>
+                        <div class="variant">
+                            <div class="variant-name">Variant (Orange)</div>
+                            <div class="variant-metric">5.6%</div>
+                            <div class="variant-change negative">-1.1% difference</div>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 28%;"></div>
+                    </div>
+
+                    <div class="test-actions">
+                        <button class="btn-secondary" onclick="viewLiveResults('button-test')">Live Results</button>
+                        <button class="btn-secondary" onclick="pauseTest('button-test')">Pause Test</button>
+                        <button class="btn-danger" onclick="stopTest('button-test')">Stop Test</button>
+                    </div>
+                </div>
+
+                <div class="card test-card concluded">
+                    <div class="test-header">
+                        <div>
+                            <div class="test-title">Email Signup Form Position</div>
+                            <div class="test-description">Testing popup vs. inline newsletter signup form</div>
+                        </div>
+                        <div class="test-status concluded">Concluded</div>
+                    </div>
+                    
+                    <div class="test-metrics">
+                        <div class="metric">
+                            <div class="metric-value">3,456</div>
+                            <div class="metric-label">Visitors</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">94%</div>
+                            <div class="metric-label">Confidence</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">+24%</div>
+                            <div class="metric-label">Signup Lift</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">21 days</div>
+                            <div class="metric-label">Duration</div>
+                        </div>
+                    </div>
+
+                    <div class="test-variants">
+                        <div class="variant">
+                            <div class="variant-name">Control (Popup)</div>
+                            <div class="variant-metric">8.3%</div>
+                            <div class="variant-change">Signup Rate</div>
+                        </div>
+                        <div class="variant winner">
+                            <div class="variant-name">Winner (Inline)</div>
+                            <div class="variant-metric">10.3%</div>
+                            <div class="variant-change positive">+24.1% improvement</div>
+                        </div>
+                    </div>
+
+                    <div class="test-actions">
+                        <button class="btn-secondary" onclick="viewDetails('signup-test')">View Archive</button>
+                        <button class="btn-secondary" onclick="downloadReport('signup-test')">Download Report</button>
+                        <button class="btn-secondary" onclick="duplicateTest('signup-test')">Duplicate Test</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Test Modal -->
+    <div id="createTestModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Create New A/B Test</h3>
+                <button class="close-btn" onclick="closeCreateTestModal()">&times;</button>
+            </div>
+            
+            <form onsubmit="createTest(event)">
+                <div class="form-group">
+                    <label class="form-label" for="testName">Test Name</label>
+                    <input type="text" id="testName" class="form-input" placeholder="e.g., Header CTA Button Test" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="testDescription">Description</label>
+                    <textarea id="testDescription" class="form-input form-textarea" placeholder="Describe what you're testing and why..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="testType">Test Type</label>
+                    <select id="testType" class="form-input form-select" required>
+                        <option value="">Select test type</option>
+                        <option value="button-color">Button Color</option>
+                        <option value="headline">Headlines</option>
+                        <option value="layout">Page Layout</option>
+                        <option value="pricing">Pricing Display</option>
+                        <option value="form">Form Design</option>
+                        <option value="images">Images/Graphics</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="testGoal">Primary Goal</label>
+                    <select id="testGoal" class="form-input form-select" required>
+                        <option value="">Select primary goal</option>
+                        <option value="conversions">Increase Conversions</option>
+                        <option value="clicks">Increase Click-through Rate</option>
+                        <option value="signups">Increase Sign-ups</option>
+                        <option value="engagement">Increase Engagement</option>
+                        <option value="revenue">Increase Revenue</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="trafficSplit">Traffic Split (%)</label>
+                    <input type="number" id="trafficSplit" class="form-input" value="50" min="10" max="90" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="testDuration">Estimated Duration (days)</label>
+                    <input type="number" id="testDuration" class="form-input" value="14" min="7" max="90" required>
+                </div>
+
+                <div class="test-actions">
+                    <button type="submit" class="btn-primary">Create Test</button>
+                    <button type="button" class="btn-secondary" onclick="closeCreateTestModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Chart.js Configuration
+        const chartDefaults = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    grid: {
+                        color: '#f3f4f6'
+                    }
+                }
+            }
+        };
+
+        // Performance Chart
+        const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+        new Chart(performanceCtx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                datasets: [{
+                    label: 'Average Lift %',
+                    data: [8.2, 12.1, 15.6, 18.3, 17.9, 18.2],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Tests Completed',
+                    data: [2, 3, 5, 7, 8, 9],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: false,
+                    tension: 0.4
+                }]
+            },
+            options: chartDefaults
+        });
+
+        // Significance Chart
+        const significanceCtx = document.getElementById('significanceChart').getContext('2d');
+        new Chart(significanceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Significant Results', 'Inconclusive', 'Negative Results'],
+                datasets: [{
+                    data: [67, 23, 10],
+                    backgroundColor: ['#10b981', '#f59e0b', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // Modal Management
+        function openCreateTestModal() {
+            document.getElementById('createTestModal').classList.add('active');
+        }
+
+        function closeCreateTestModal() {
+            document.getElementById('createTestModal').classList.remove('active');
+        }
+
+        // Test Management Functions
+        function createTest(event) {
+            event.preventDefault();
+            
+            const testName = document.getElementById('testName').value;
+            const testDescription = document.getElementById('testDescription').value;
+            const testType = document.getElementById('testType').value;
+            const testGoal = document.getElementById('testGoal').value;
+            const trafficSplit = document.getElementById('trafficSplit').value;
+            const testDuration = document.getElementById('testDuration').value;
+            
+            // Simulate test creation
+            const button = event.target.querySelector('button[type="submit"]');
+            const originalText = button.textContent;
+            
+            button.textContent = 'Creating...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                alert(`Test "${testName}" has been created successfully!\n\nConfiguration:\n- Type: ${testType}\n- Goal: ${testGoal}\n- Traffic Split: ${trafficSplit}%\n- Duration: ${testDuration} days\n\nThe test will begin collecting data immediately.`);
+                
+                // Reset form
+                event.target.reset();
+                closeCreateTestModal();
+                
+                button.textContent = originalText;
+                button.disabled = false;
+            }, 2000);
+        }
+
+        function deployWinner(testId) {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = 'Deploying...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Deployed ✓';
+                button.style.background = '#10b981';
+                
+                // Save to localStorage
+                const deployed = JSON.parse(localStorage.getItem('deployedTests') || '[]');
+                if (!deployed.includes(testId)) {
+                    deployed.push(testId);
+                    localStorage.setItem('deployedTests', JSON.stringify(deployed));
+                }
+            }, 2000);
+        }
+
+        function viewDetails(testId) {
+            alert(`Detailed test results for ${testId} would open in a new window with:\n\n- Complete statistical analysis\n- Visitor segment breakdown\n- Time-based performance\n- Conversion funnel impact\n- Revenue attribution`);
+        }
+
+        function viewLiveResults(testId) {
+            alert(`Live results dashboard for ${testId} showing:\n\n- Real-time visitor allocation\n- Current conversion rates\n- Statistical significance progress\n- Confidence interval updates\n- Expected time to conclusion`);
+        }
+
+        function pauseTest(testId) {
+            const button = event.target;
+            if (button.textContent === 'Pause Test') {
+                button.textContent = 'Resume Test';
+                button.style.background = '#f59e0b';
+            } else {
+                button.textContent = 'Pause Test';
+                button.style.background = '';
+            }
+        }
+
+        function stopTest(testId) {
+            if (confirm('Are you sure you want to stop this test? This action cannot be undone.')) {
+                const button = event.target;
+                button.textContent = 'Stopped';
+                button.disabled = true;
+                button.style.background = '#6b7280';
+            }
+        }
+
+        function downloadReport(testId) {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = 'Generating...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Downloaded ✓';
+                button.style.background = '#10b981';
+                button.style.color = 'white';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    button.style.background = '';
+                    button.style.color = '';
+                }, 2000);
+            }, 1500);
+        }
+
+        function duplicateTest(testId) {
+            alert('Test configuration has been copied. You can now create a new test with the same settings.');
+            openCreateTestModal();
+        }
+
+        // Navigation active state management
+        function setActiveNavigation() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Load deployed tests on page load
+        window.addEventListener('load', () => {
+            const deployed = JSON.parse(localStorage.getItem('deployedTests') || '[]');
+            
+            deployed.forEach(testId => {
+                const button = document.querySelector(`button[onclick="deployWinner('${testId}')"]`);
+                if (button) {
+                    button.textContent = 'Deployed ✓';
+                    button.style.background = '#10b981';
+                    button.disabled = true;
+                }
+            });
+            
+            setActiveNavigation();
+        });
+
+        // Close modal on outside click
+        document.getElementById('createTestModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeCreateTestModal();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Optimizer Pro - Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #5855eb;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .page-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-nav {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-lg);
+            height: 4rem;
+        }
+
+        .nav-brand a {
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .nav-brand h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .date-filter {
+            display: flex;
+            gap: var(--spacing-md);
+            align-items: center;
+        }
+
+        .filter-select {
+            padding: 0.5rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--surface-color);
+            color: var(--text-primary);
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .card {
+            background: var(--surface-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-light);
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: var(--spacing-md);
+        }
+
+        .large-chart {
+            height: 400px;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .metric-row:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .metric-value {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .metric-number {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .metric-change {
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.375rem;
+        }
+
+        .metric-change.positive {
+            color: var(--secondary-color);
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .metric-change.negative {
+            color: var(--danger-color);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .funnel-stage {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--surface-color);
+        }
+
+        .funnel-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .funnel-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .funnel-details h4 {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .funnel-details p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .funnel-stats {
+            text-align: right;
+        }
+
+        .funnel-conversion {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .funnel-drop {
+            font-size: 0.875rem;
+            color: var(--danger-color);
+            margin-top: var(--spacing-xs);
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .traffic-source {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-md) 0;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .traffic-source:last-child {
+            border-bottom: none;
+        }
+
+        .source-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .source-dot {
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+        }
+
+        .source-name {
+            font-weight: 500;
+        }
+
+        .source-stats {
+            display: flex;
+            gap: var(--spacing-lg);
+            font-size: 0.875rem;
+        }
+
+        .source-stat {
+            text-align: center;
+        }
+
+        .source-stat-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .source-stat-label {
+            color: var(--text-secondary);
+            margin-top: var(--spacing-xs);
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <a href="index.html">
+                        <h2>AI Optimizer Pro</h2>
+                    </a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="analytics.html" class="nav-link active">Analytics</a></li>
+                    <li><a href="optimizer.html" class="nav-link">Optimizer</a></li>
+                    <li><a href="testing.html" class="nav-link">A/B Testing</a></li>
+                    <li><a href="reports.html" class="nav-link">Reports</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Analytics</h1>
+                    <p class="page-subtitle">Deep insights into your conversion performance</p>
+                </div>
+                <div class="date-filter">
+                    <label for="dateRange">Time Period:</label>
+                    <select id="dateRange" class="filter-select" onchange="updateAnalytics()">
+                        <option value="7">Last 7 days</option>
+                        <option value="30" selected>Last 30 days</option>
+                        <option value="90">Last 90 days</option>
+                        <option value="365">Last year</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grid grid-3" style="margin-bottom: var(--spacing-2xl);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Key Metrics</h3>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Conversion Rate</span>
+                        <div class="metric-value">
+                            <span class="metric-number">3.24%</span>
+                            <span class="metric-change positive">+12.5%</span>
+                        </div>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Average Session</span>
+                        <div class="metric-value">
+                            <span class="metric-number">2m 34s</span>
+                            <span class="metric-change positive">+8.2%</span>
+                        </div>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Bounce Rate</span>
+                        <div class="metric-value">
+                            <span class="metric-number">42.1%</span>
+                            <span class="metric-change negative">-5.3%</span>
+                        </div>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Pages per Session</span>
+                        <div class="metric-value">
+                            <span class="metric-number">3.8</span>
+                            <span class="metric-change positive">+15.7%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Revenue Metrics</h3>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Total Revenue</span>
+                        <div class="metric-value">
+                            <span class="metric-number">$47,234</span>
+                            <span class="metric-change positive">+18.2%</span>
+                        </div>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Avg Order Value</span>
+                        <div class="metric-value">
+                            <span class="metric-number">$68.40</span>
+                            <span class="metric-change negative">-2.1%</span>
+                        </div>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Revenue per Visitor</span>
+                        <div class="metric-value">
+                            <span class="metric-number">$3.68</span>
+                            <span class="metric-change positive">+22.4%</span>
+                        </div>
+                    </div>
+                    <div class="metric-row">
+                        <span class="metric-label">Total Orders</span>
+                        <div class="metric-value">
+                            <span class="metric-number">690</span>
+                            <span class="metric-change positive">+28.3%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Traffic Sources</h3>
+                    </div>
+                    <div class="traffic-source">
+                        <div class="source-info">
+                            <div class="source-dot" style="background: #6366f1;"></div>
+                            <span class="source-name">Organic Search</span>
+                        </div>
+                        <div class="source-stats">
+                            <div class="source-stat">
+                                <div class="source-stat-value">42.3%</div>
+                                <div class="source-stat-label">Share</div>
+                            </div>
+                            <div class="source-stat">
+                                <div class="source-stat-value">3.8%</div>
+                                <div class="source-stat-label">CVR</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="traffic-source">
+                        <div class="source-info">
+                            <div class="source-dot" style="background: #10b981;"></div>
+                            <span class="source-name">Paid Search</span>
+                        </div>
+                        <div class="source-stats">
+                            <div class="source-stat">
+                                <div class="source-stat-value">28.7%</div>
+                                <div class="source-stat-label">Share</div>
+                            </div>
+                            <div class="source-stat">
+                                <div class="source-stat-value">4.2%</div>
+                                <div class="source-stat-label">CVR</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="traffic-source">
+                        <div class="source-info">
+                            <div class="source-dot" style="background: #f59e0b;"></div>
+                            <span class="source-name">Social Media</span>
+                        </div>
+                        <div class="source-stats">
+                            <div class="source-stat">
+                                <div class="source-stat-value">18.9%</div>
+                                <div class="source-stat-label">Share</div>
+                            </div>
+                            <div class="source-stat">
+                                <div class="source-stat-value">2.1%</div>
+                                <div class="source-stat-label">CVR</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="traffic-source">
+                        <div class="source-info">
+                            <div class="source-dot" style="background: #ef4444;"></div>
+                            <span class="source-name">Direct</span>
+                        </div>
+                        <div class="source-stats">
+                            <div class="source-stat">
+                                <div class="source-stat-value">10.1%</div>
+                                <div class="source-stat-label">Share</div>
+                            </div>
+                            <div class="source-stat">
+                                <div class="source-stat-value">5.7%</div>
+                                <div class="source-stat-label">CVR</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-2" style="margin-bottom: var(--spacing-2xl);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Conversion Funnel Analysis</h3>
+                        <button class="btn-secondary" onclick="exportFunnelData()">Export Data</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="funnelChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">User Journey Flow</h3>
+                        <button class="btn-secondary" onclick="viewDetailedFlow()">View Details</button>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="journeyChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: var(--spacing-2xl);">
+                <div class="card-header">
+                    <h3 class="card-title">Conversion Funnel Breakdown</h3>
+                    <button class="btn-primary" onclick="optimizeFunnel()">Optimize Funnel</button>
+                </div>
+                
+                <div class="funnel-stage">
+                    <div class="funnel-info">
+                        <div class="funnel-icon">1</div>
+                        <div class="funnel-details">
+                            <h4>Landing Page Views</h4>
+                            <p>Users who visited your landing page</p>
+                        </div>
+                    </div>
+                    <div class="funnel-stats">
+                        <div class="funnel-conversion">12,847</div>
+                    </div>
+                </div>
+
+                <div class="funnel-stage">
+                    <div class="funnel-info">
+                        <div class="funnel-icon">2</div>
+                        <div class="funnel-details">
+                            <h4>Product Page Views</h4>
+                            <p>Users who viewed product details</p>
+                        </div>
+                    </div>
+                    <div class="funnel-stats">
+                        <div class="funnel-conversion">8,923</div>
+                        <div class="funnel-drop">-30.5% drop</div>
+                    </div>
+                </div>
+
+                <div class="funnel-stage">
+                    <div class="funnel-info">
+                        <div class="funnel-icon">3</div>
+                        <div class="funnel-details">
+                            <h4>Add to Cart</h4>
+                            <p>Users who added items to cart</p>
+                        </div>
+                    </div>
+                    <div class="funnel-stats">
+                        <div class="funnel-conversion">3,456</div>
+                        <div class="funnel-drop">-61.3% drop</div>
+                    </div>
+                </div>
+
+                <div class="funnel-stage">
+                    <div class="funnel-info">
+                        <div class="funnel-icon">4</div>
+                        <div class="funnel-details">
+                            <h4>Checkout Started</h4>
+                            <p>Users who began checkout process</p>
+                        </div>
+                    </div>
+                    <div class="funnel-stats">
+                        <div class="funnel-conversion">1,234</div>
+                        <div class="funnel-drop">-64.3% drop</div>
+                    </div>
+                </div>
+
+                <div class="funnel-stage">
+                    <div class="funnel-info">
+                        <div class="funnel-icon">5</div>
+                        <div class="funnel-details">
+                            <h4>Purchase Completed</h4>
+                            <p>Users who completed their purchase</p>
+                        </div>
+                    </div>
+                    <div class="funnel-stats">
+                        <div class="funnel-conversion" style="color: var(--secondary-color);">690</div>
+                        <div class="funnel-drop">-44.1% drop</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Performance Trends</h3>
+                    <button class="btn-secondary" onclick="customizeChart()">Customize</button>
+                </div>
+                <div class="chart-container large-chart">
+                    <canvas id="trendsChart"></canvas>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Chart.js Configuration
+        const chartDefaults = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    grid: {
+                        color: '#f3f4f6'
+                    }
+                }
+            }
+        };
+
+        // Funnel Chart
+        const funnelCtx = document.getElementById('funnelChart').getContext('2d');
+        new Chart(funnelCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Landing', 'Product', 'Cart', 'Checkout', 'Purchase'],
+                datasets: [{
+                    label: 'Users',
+                    data: [12847, 8923, 3456, 1234, 690],
+                    backgroundColor: ['#6366f1', '#8b5cf6', '#f59e0b', '#ef4444', '#10b981'],
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                ...chartDefaults,
+                plugins: {
+                    ...chartDefaults.plugins,
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Journey Chart
+        const journeyCtx = document.getElementById('journeyChart').getContext('2d');
+        new Chart(journeyCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Homepage', 'Product Pages', 'Category Pages', 'Search Results', 'Cart', 'Checkout'],
+                datasets: [{
+                    data: [35, 28, 15, 12, 6, 4],
+                    backgroundColor: ['#6366f1', '#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#6b7280']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 10,
+                            font: {
+                                size: 11
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Trends Chart
+        const trendsCtx = document.getElementById('trendsChart').getContext('2d');
+        new Chart(trendsCtx, {
+            type: 'line',
+            data: {
+                labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8'],
+                datasets: [{
+                    label: 'Conversion Rate (%)',
+                    data: [2.1, 2.3, 2.8, 3.1, 2.9, 3.2, 3.4, 3.6],
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y'
+                }, {
+                    label: 'Revenue ($)',
+                    data: [28000, 31000, 35000, 42000, 38000, 45000, 47000, 52000],
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    yAxisID: 'y1'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        type: 'linear',
+                        display: true,
+                        position: 'left',
+                        grid: {
+                            color: '#f3f4f6'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Conversion Rate (%)'
+                        }
+                    },
+                    y1: {
+                        type: 'linear',
+                        display: true,
+                        position: 'right',
+                        grid: {
+                            drawOnChartArea: false,
+                        },
+                        title: {
+                            display: true,
+                            text: 'Revenue ($)'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Interactive Functions
+        function updateAnalytics() {
+            const dateRange = document.getElementById('dateRange').value;
+            // Simulate data update based on date range
+            console.log(`Updating analytics for ${dateRange} days`);
+            
+            // Update metrics with simulated data
+            const multiplier = dateRange === '7' ? 0.8 : dateRange === '90' ? 1.3 : dateRange === '365' ? 2.1 : 1;
+            
+            // Store selection in localStorage
+            localStorage.setItem('selectedDateRange', dateRange);
+            
+            // Show loading state
+            document.body.style.opacity = '0.8';
+            setTimeout(() => {
+                document.body.style.opacity = '1';
+            }, 500);
+        }
+
+        function exportFunnelData() {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = 'Exporting...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Downloaded ✓';
+                button.style.background = '#10b981';
+                button.style.color = 'white';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    button.style.background = '';
+                    button.style.color = '';
+                }, 2000);
+            }, 1500);
+        }
+
+        function viewDetailedFlow() {
+            const button = event.target;
+            button.textContent = 'Loading...';
+            
+            setTimeout(() => {
+                button.textContent = 'View Details';
+                // Simulate opening detailed view
+                alert('Detailed user journey flow would open in a new window');
+            }, 1000);
+        }
+
+        function optimizeFunnel() {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = 'Analyzing...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'View Recommendations';
+                button.onclick = () => window.location.href = 'optimizer.html';
+                button.disabled = false;
+            }, 2000);
+        }
+
+        function customizeChart() {
+            alert('Chart customization panel would open here');
+        }
+
+        // Navigation active state management
+        function setActiveNavigation() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Load saved preferences
+        window.addEventListener('load', () => {
+            const savedRange = localStorage.getItem('selectedDateRange');
+            if (savedRange) {
+                document.getElementById('dateRange').value = savedRange;
+            }
+            setActiveNavigation();
+        });
+    </script>
+</body>
+</html>

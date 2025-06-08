@@ -1,0 +1,1082 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Optimizer Pro - Reports</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #6366f1;
+            --primary-hover: #5855eb;
+            --secondary-color: #10b981;
+            --accent-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --border-light: #f3f4f6;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-2xl: 3rem;
+            --spacing-3xl: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        .page-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-nav {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 var(--spacing-lg);
+            height: 4rem;
+        }
+
+        .nav-brand a {
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .nav-brand h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: var(--spacing-xl);
+        }
+
+        .nav-link {
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-weight: 500;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 0.375rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: var(--spacing-xl) var(--spacing-lg);
+        }
+
+        .page-header {
+            margin-bottom: var(--spacing-2xl);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            margin: 0;
+        }
+
+        .report-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .card {
+            background: var(--surface-color);
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: var(--spacing-lg);
+            border: 1px solid var(--border-light);
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--spacing-md);
+            margin-bottom: var(--spacing-lg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 0.875rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+        }
+
+        .grid {
+            display: grid;
+            gap: var(--spacing-lg);
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .report-template {
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .report-template:hover {
+            border-color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.02);
+        }
+
+        .report-template.selected {
+            border-color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .template-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+        }
+
+        .template-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .template-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .template-badge.popular {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .template-badge.new {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+        }
+
+        .template-description {
+            color: var(--text-secondary);
+            margin-bottom: var(--spacing-md);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .template-features {
+            list-style: none;
+        }
+
+        .template-features li {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-xs);
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .template-features li::before {
+            content: "✓";
+            color: var(--secondary-color);
+            font-weight: 700;
+        }
+
+        .chart-container {
+            height: 300px;
+            margin-top: var(--spacing-md);
+        }
+
+        .large-chart {
+            height: 400px;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: var(--spacing-lg);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .report-history {
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--spacing-md);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: var(--spacing-sm);
+            background: var(--surface-color);
+        }
+
+        .history-info {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+        }
+
+        .history-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.875rem;
+        }
+
+        .history-details h4 {
+            font-weight: 600;
+            margin-bottom: var(--spacing-xs);
+        }
+
+        .history-details p {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+
+        .form-group {
+            margin-bottom: var(--spacing-lg);
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: var(--spacing-sm);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+        }
+
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--spacing-md);
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .export-format {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .format-option {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-md);
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .format-option:hover, .format-option.selected {
+            border-color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .format-icon {
+            width: 2rem;
+            height: 2rem;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 0.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+        }
+
+        .ai-insights-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 0.75rem;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-2xl);
+        }
+
+        .ai-insights-header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .ai-avatar {
+            width: 2.5rem;
+            height: 2.5rem;
+            background: linear-gradient(135deg, var(--primary-color), #8b5cf6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .ai-insights-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+
+        .insights-list {
+            list-style: none;
+        }
+
+        .insights-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .insights-list li::before {
+            content: "💡";
+            margin-top: 0.125rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-container">
+        <nav class="main-nav">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <a href="index.html">
+                        <h2>AI Optimizer Pro</h2>
+                    </a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Dashboard</a></li>
+                    <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                    <li><a href="optimizer.html" class="nav-link">Optimizer</a></li>
+                    <li><a href="testing.html" class="nav-link">A/B Testing</a></li>
+                    <li><a href="reports.html" class="nav-link active">Reports</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <main class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">Reports & Insights</h1>
+                    <p class="page-subtitle">Generate comprehensive reports and export your optimization data</p>
+                </div>
+                <div class="report-actions">
+                    <button class="btn-secondary" onclick="scheduleReport()">Schedule Report</button>
+                    <button class="btn-primary" onclick="generateCustomReport()">Generate Report</button>
+                </div>
+            </div>
+
+            <div class="ai-insights-box">
+                <div class="ai-insights-header">
+                    <div class="ai-avatar">AI</div>
+                    <div class="ai-insights-title">AI-Generated Report Insights</div>
+                </div>
+                <ul class="insights-list">
+                    <li>Your conversion rate improved by 18.2% this month, primarily driven by checkout optimizations</li>
+                    <li>Mobile traffic shows 23% lower conversion rates - consider mobile-specific A/B tests</li>
+                    <li>Organic search visitors have the highest lifetime value at $127 per customer</li>
+                    <li>Tuesday afternoons show peak conversion performance - schedule campaigns accordingly</li>
+                    <li>Product pages with video content convert 34% better than those without</li>
+                </ul>
+            </div>
+
+            <div class="summary-stats">
+                <div class="card stat-card">
+                    <div class="stat-number">47</div>
+                    <div class="stat-label">Reports Generated</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Scheduled Reports</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-number">89%</div>
+                    <div class="stat-label">Data Accuracy</div>
+                </div>
+                <div class="card stat-card">
+                    <div class="stat-number">2.3s</div>
+                    <div class="stat-label">Avg Generation Time</div>
+                </div>
+            </div>
+
+            <div class="grid grid-2" style="margin-bottom: var(--spacing-2xl);">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Report Usage Analytics</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="usageChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Export Format Preferences</h3>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="formatChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: var(--spacing-2xl);">
+                <div class="card-header">
+                    <h3 class="card-title">Report Templates</h3>
+                    <span style="font-size: 0.875rem; color: var(--text-secondary);">Choose a template or create a custom report</span>
+                </div>
+                
+                <div class="grid grid-3">
+                    <div class="report-template" onclick="selectTemplate('executive')">
+                        <div class="template-header">
+                            <div class="template-title">Executive Summary</div>
+                            <div class="template-badge popular">Popular</div>
+                        </div>
+                        <div class="template-description">
+                            High-level overview perfect for stakeholders and leadership teams. Focuses on key metrics, revenue impact, and strategic recommendations.
+                        </div>
+                        <ul class="template-features">
+                            <li>Key performance indicators</li>
+                            <li>Revenue and conversion trends</li>
+                            <li>ROI analysis</li>
+                            <li>Strategic recommendations</li>
+                        </ul>
+                    </div>
+
+                    <div class="report-template" onclick="selectTemplate('technical')">
+                        <div class="template-header">
+                            <div class="template-title">Technical Analysis</div>
+                            <div class="template-badge new">New</div>
+                        </div>
+                        <div class="template-description">
+                            Detailed technical insights for development and marketing teams. Includes funnel analysis, user behavior patterns, and optimization opportunities.
+                        </div>
+                        <ul class="template-features">
+                            <li>Detailed funnel breakdown</li>
+                            <li>User journey analysis</li>
+                            <li>A/B test statistical results</li>
+                            <li>Technical recommendations</li>
+                        </ul>
+                    </div>
+
+                    <div class="report-template" onclick="selectTemplate('performance')">
+                        <div class="template-header">
+                            <div class="template-title">Performance Benchmark</div>
+                        </div>
+                        <div class="template-description">
+                            Compare your performance against industry benchmarks and historical data. Ideal for tracking progress and identifying improvement areas.
+                        </div>
+                        <ul class="template-features">
+                            <li>Industry comparisons</li>
+                            <li>Historical performance trends</li>
+                            <li>Benchmark analysis</li>
+                            <li>Goal tracking</li>
+                        </ul>
+                    </div>
+
+                    <div class="report-template" onclick="selectTemplate('campaign')">
+                        <div class="template-header">
+                            <div class="template-title">Campaign Impact</div>
+                        </div>
+                        <div class="template-description">
+                            Analyze the effectiveness of specific marketing campaigns and optimization initiatives. Track attribution and measure true impact.
+                        </div>
+                        <ul class="template-features">
+                            <li>Campaign attribution</li>
+                            <li>Traffic source analysis</li>
+                            <li>Conversion path tracking</li>
+                            <li>ROI by channel</li>
+                        </ul>
+                    </div>
+
+                    <div class="report-template" onclick="selectTemplate('custom')">
+                        <div class="template-header">
+                            <div class="template-title">Custom Report</div>
+                        </div>
+                        <div class="template-description">
+                            Build your own report with specific metrics, date ranges, and visualizations. Perfect for unique business requirements and presentations.
+                        </div>
+                        <ul class="template-features">
+                            <li>Custom metrics selection</li>
+                            <li>Flexible date ranges</li>
+                            <li>Multiple export formats</li>
+                            <li>Branding options</li>
+                        </ul>
+                    </div>
+
+                    <div class="report-template" onclick="selectTemplate('scheduled')">
+                        <div class="template-header">
+                            <div class="template-title">Automated Insights</div>
+                        </div>
+                        <div class="template-description">
+                            AI-powered automated reports delivered on your schedule. Includes anomaly detection, trend analysis, and proactive recommendations.
+                        </div>
+                        <ul class="template-features">
+                            <li>Automated generation</li>
+                            <li>Anomaly detection</li>
+                            <li>Trend predictions</li>
+                            <li>Email delivery</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-history">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Reports</h3>
+                        <button class="btn-secondary" onclick="viewAllReports()">View All</button>
+                    </div>
+                    
+                    <div class="history-item">
+                        <div class="history-info">
+                            <div class="history-icon">PDF</div>
+                            <div class="history-details">
+                                <h4>Monthly Executive Summary - November 2024</h4>
+                                <p>Generated on Nov 30, 2024 • 2.3 MB • 23 pages</p>
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-secondary" onclick="downloadReport('nov-2024-executive')">Download</button>
+                            <button class="btn-secondary" onclick="shareReport('nov-2024-executive')">Share</button>
+                        </div>
+                    </div>
+
+                    <div class="history-item">
+                        <div class="history-info">
+                            <div class="history-icon">CSV</div>
+                            <div class="history-details">
+                                <h4>A/B Test Results Export</h4>
+                                <p>Generated on Nov 28, 2024 • 847 KB • Raw data</p>
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-secondary" onclick="downloadReport('ab-test-export')">Download</button>
+                            <button class="btn-secondary" onclick="shareReport('ab-test-export')">Share</button>
+                        </div>
+                    </div>
+
+                    <div class="history-item">
+                        <div class="history-info">
+                            <div class="history-icon">PPT</div>
+                            <div class="history-details">
+                                <h4>Q4 Performance Review Presentation</h4>
+                                <p>Generated on Nov 25, 2024 • 5.7 MB • 31 slides</p>
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-secondary" onclick="downloadReport('q4-presentation')">Download</button>
+                            <button class="btn-secondary" onclick="shareReport('q4-presentation')">Share</button>
+                        </div>
+                    </div>
+
+                    <div class="history-item">
+                        <div class="history-info">
+                            <div class="history-icon">XLS</div>
+                            <div class="history-details">
+                                <h4>Conversion Funnel Analysis</h4>
+                                <p>Generated on Nov 22, 2024 • 1.2 MB • Multiple sheets</p>
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn-secondary" onclick="downloadReport('funnel-analysis')">Download</button>
+                            <button class="btn-secondary" onclick="shareReport('funnel-analysis')">Share</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Quick Export</h3>
+                    <span style="font-size: 0.875rem; color: var(--text-secondary);">Export current data in multiple formats</span>
+                </div>
+                
+                <div class="grid grid-2">
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label" for="dateRange">Date Range</label>
+                            <select id="dateRange" class="form-input form-select">
+                                <option value="7">Last 7 days</option>
+                                <option value="30" selected>Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                                <option value="custom">Custom range</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Data to Include</label>
+                            <div class="checkbox-group">
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="conversions" checked>
+                                    <label for="conversions">Conversion Data</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="revenue" checked>
+                                    <label for="revenue">Revenue Metrics</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="traffic" checked>
+                                    <label for="traffic">Traffic Sources</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="tests">
+                                    <label for="tests">A/B Test Results</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="funnel">
+                                    <label for="funnel">Funnel Analysis</label>
+                                </div>
+                                <div class="checkbox-item">
+                                    <input type="checkbox" id="segments">
+                                    <label for="segments">User Segments</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="form-group">
+                            <label class="form-label">Export Format</label>
+                            <div class="export-format">
+                                <div class="format-option selected" onclick="selectFormat('pdf')">
+                                    <div class="format-icon">PDF</div>
+                                    <div>
+                                        <div style="font-weight: 600;">PDF Report</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Professional format</div>
+                                    </div>
+                                </div>
+                                <div class="format-option" onclick="selectFormat('csv')">
+                                    <div class="format-icon">CSV</div>
+                                    <div>
+                                        <div style="font-weight: 600;">CSV Data</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Raw data export</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="export-format">
+                                <div class="format-option" onclick="selectFormat('excel')">
+                                    <div class="format-icon">XLS</div>
+                                    <div>
+                                        <div style="font-weight: 600;">Excel Workbook</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Multiple sheets</div>
+                                    </div>
+                                </div>
+                                <div class="format-option" onclick="selectFormat('ppt')">
+                                    <div class="format-icon">PPT</div>
+                                    <div>
+                                        <div style="font-weight: 600;">PowerPoint</div>
+                                        <div style="font-size: 0.75rem; color: var(--text-secondary);">Presentation ready</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="margin-top: var(--spacing-lg);">
+                            <button class="btn-primary" onclick="exportData()" style="width: 100%; margin-bottom: var(--spacing-md);">Export Data</button>
+                            <button class="btn-secondary" onclick="previewReport()" style="width: 100%;">Preview Report</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Chart.js Configuration
+        const chartDefaults = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        display: false
+                    }
+                },
+                y: {
+                    grid: {
+                        color: '#f3f4f6'
+                    }
+                }
+            }
+        };
+
+        // Usage Chart
+        const usageCtx = document.getElementById('usageChart').getContext('2d');
+        new Chart(usageCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Executive', 'Technical', 'Performance', 'Campaign', 'Custom', 'Automated'],
+                datasets: [{
+                    label: 'Reports Generated',
+                    data: [12, 8, 6, 9, 7, 5],
+                    backgroundColor: '#6366f1',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                ...chartDefaults,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Format Chart
+        const formatCtx = document.getElementById('formatChart').getContext('2d');
+        new Chart(formatCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['PDF', 'Excel', 'CSV', 'PowerPoint'],
+                datasets: [{
+                    data: [45, 25, 20, 10],
+                    backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ef4444']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20
+                        }
+                    }
+                }
+            }
+        });
+
+        // Template Selection
+        let selectedTemplate = null;
+        let selectedFormat = 'pdf';
+
+        function selectTemplate(templateType) {
+            // Remove previous selection
+            document.querySelectorAll('.report-template').forEach(template => {
+                template.classList.remove('selected');
+            });
+            
+            // Add selection to clicked template
+            event.currentTarget.classList.add('selected');
+            selectedTemplate = templateType;
+            
+            console.log(`Selected template: ${templateType}`);
+        }
+
+        function selectFormat(format) {
+            // Remove previous selection
+            document.querySelectorAll('.format-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selection to clicked format
+            event.currentTarget.classList.add('selected');
+            selectedFormat = format;
+            
+            console.log(`Selected format: ${format}`);
+        }
+
+        // Report Generation Functions
+        function generateCustomReport() {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = 'Generating...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Generated ✓';
+                button.style.background = '#10b981';
+                
+                // Simulate file download
+                setTimeout(() => {
+                    alert(`Custom report generated successfully!\n\nFormat: ${selectedFormat.toUpperCase()}\nTemplate: ${selectedTemplate || 'Executive Summary'}\nSize: 2.4 MB\n\nThe report has been added to your downloads.`);
+                    
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    button.style.background = '';
+                }, 1000);
+            }, 3000);
+        }
+
+        function scheduleReport() {
+            alert('Schedule Report:\n\n• Weekly Executive Summary every Monday\n• Monthly Performance Review on the 1st\n• Automated insights on data changes\n• Custom schedules available\n\nScheduling interface would open here.');
+        }
+
+        function exportData() {
+            const dateRange = document.getElementById('dateRange').value;
+            const checkboxes = document.querySelectorAll('.checkbox-group input[type="checkbox"]:checked');
+            const selectedData = Array.from(checkboxes).map(cb => cb.id);
+            
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = 'Exporting...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Downloaded ✓';
+                button.style.background = '#10b981';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    button.style.background = '';
+                }, 2000);
+                
+                console.log(`Exported data: ${selectedData.join(', ')} for ${dateRange} days in ${selectedFormat} format`);
+            }, 2500);
+        }
+
+        function previewReport() {
+            alert('Report preview would open in a new window showing:\n\n• Live data visualization\n• Chart previews\n• Page layout\n• Export formatting\n• Data accuracy validation');
+        }
+
+        function downloadReport(reportId) {
+            const button = event.target;
+            const originalText = button.textContent;
+            
+            button.textContent = 'Downloading...';
+            button.disabled = true;
+            
+            setTimeout(() => {
+                button.textContent = 'Downloaded ✓';
+                button.style.background = '#10b981';
+                button.style.color = 'white';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.disabled = false;
+                    button.style.background = '';
+                    button.style.color = '';
+                }, 2000);
+            }, 1000);
+        }
+
+        function shareReport(reportId) {
+            alert(`Share Report:\n\n• Generate shareable link\n• Email to team members\n• Export to cloud storage\n• Embed in presentations\n• Schedule automatic delivery\n\nSharing options for ${reportId} would open here.`);
+        }
+
+        function viewAllReports() {
+            alert('Complete report history would open showing:\n\n• All generated reports by date\n• Filter by type and format\n• Search functionality\n• Bulk download options\n• Storage usage analytics');
+        }
+
+        // Navigation active state management
+        function setActiveNavigation() {
+            const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+            document.querySelectorAll('.nav-link').forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === currentPage) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        // Initialize page
+        window.addEventListener('load', () => {
+            setActiveNavigation();
+            
+            // Auto-select first format option
+            document.querySelector('.format-option').classList.add('selected');
+        });
+    </script>
+</body>
+</html>
