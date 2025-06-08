@@ -1,0 +1,25 @@
+{
+  "generated_at": "2025-06-08T00:00:54.528731",
+  "job_id": "021929721942233831631",
+  "job_url": "https://www.upwork.com/jobs/~021929721942233831631?link=new_job",
+  "job_title": "AI developer needed to turn our mobile App into an AI-powered app. - Mobile Development",
+  "questions_count": 4,
+  "answers": {
+    "question_1": {
+      "question": "Include a link to your GitHub profile and/or website",
+      "answer": "Certainly! You can explore my work and projects on my GitHub profile at [https://github.com/michael-abdo](https://github.com/michael-abdo) and my personal website at [michaelabdo.com](http://michaelabdo.com). My experience as a Mobile App Developer at Bio::Neos, where I developed iOS and Android interfaces, aligns well with your need for cross-platform development. Additionally, my role at Xenodex Sciences involved integrating AI/ML systems, which will be instrumental in enhancing your app with AI-powered features. I am excited about the opportunity to contribute to your platform's evolution into a smarter, more intuitive experience for users."
+    },
+    "question_2": {
+      "question": "Describe your approach to testing and improving QA",
+      "answer": "To test and improve QA, I leverage my extensive experience in developing automated systems, such as the scalable inference pipeline at Xenodex Sciences, which significantly reduced costs and improved efficiency. My approach involves implementing robust testing frameworks that incorporate data augmentation and transfer learning techniques to maximize accuracy and reliability. I prioritize continuous integration and deployment practices, ensuring that any updates to the AI/ML systems are thoroughly tested in realistic environments before release. By maintaining a focus on data-driven decision-making, as demonstrated in my role at Amazon PDX5, I ensure that QA processes are not only efficient but also aligned with the project's goals of enhancing user experience and operational excellence."
+    },
+    "question_3": {
+      "question": "Describe your recent experience with similar projects",
+      "answer": "In my role as Co-Founder & Lead Developer at Xenodex Sciences, I've been deeply involved in integrating AI/ML systems, specifically training a binary classification transformer for behavioral video data, which aligns well with the AI integration required for your project. My experience in building scalable inference pipelines and applying data augmentation techniques will be invaluable for developing your AI-powered booking and event discovery platform. Additionally, my background in mobile app development at Bio::Neos, where I built iOS/Android interfaces, provides a solid foundation for enhancing your app's UI/UX and integrating AI features. I'm excited about the opportunity to apply these skills to create a smarter, more intuitive platform for live music."
+    },
+    "question_4": {
+      "question": "What frameworks have you worked with?",
+      "answer": "I've developed a cost-effective framework for automating behavioral phenotype classification at Xenodex Sciences, which involved training binary classification transformers and implementing data augmentation and transfer learning techniques. Additionally, my experience as a Mobile App Developer at Bio::Neos involved building iOS and Android interfaces, providing a strong foundation in mobile development frameworks. While the job description emphasizes React Native or Flutter, my background in mobile app development and AI/ML integration aligns well with the project's goals of enhancing app functionality through AI-powered features."
+    }
+  }
+}

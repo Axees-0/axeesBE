@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Booking - MusicAI Platform</title>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #ec4899;
+            --accent-color: #06b6d4;
+            --background-color: #0f172a;
+            --surface-color: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --border-color: #334155;
+            --hover-bg: #334155;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            background: var(--background-color);
+            line-height: 1.6;
+        }
+
+        /* Page Layout */
+        .page-wrapper {
+            min-height: 100vh;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+        }
+
+        .btn-ai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Grid Systems */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            color: var(--text-secondary);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--surface-color);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* AI Chat Interface */
+        .ai-chat {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-indicator {
+            background: var(--success-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            max-height: 350px;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.user .message-content {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.ai .message-content {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .message-content {
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            max-width: 70%;
+            font-size: 0.875rem;
+            line-height: 1.4;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            flex-shrink: 0;
+        }
+
+        .ai-avatar {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+        }
+
+        .user-avatar {
+            background: var(--primary-color);
+        }
+
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 16px;
+            background: var(--background-color);
+            border: 2px solid var(--border-color);
+            border-radius: 20px;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Booking Form */
+        .booking-form {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Suggestions Panel */
+        .suggestions-panel {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .suggestion-item {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-item:hover {
+            border-color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        .suggestion-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .suggestion-score {
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            float: right;
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Typing Animation */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 0.75rem 1rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>🎵 MusicAI</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="booking.html" class="nav-link active">AI Booking</a></li>
+                    <li><a href="discovery.html" class="nav-link">Event Discovery</a></li>
+                    <li><a href="admin.html" class="nav-link">Admin</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <section class="section">
+                <div class="section-header">
+                    <h1>🤖 AI-Powered Talent Booking</h1>
+                    <p>Let our AI assistant help you find the perfect artist-venue match with intelligent recommendations</p>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Booking Form -->
+                    <div class="booking-form">
+                        <h3>Booking Requirements</h3>
+                        <form id="bookingForm">
+                            <div class="form-group">
+                                <label class="form-label">Event Type</label>
+                                <select class="form-select" id="eventType" required>
+                                    <option value="">Select event type</option>
+                                    <option value="concert">Concert</option>
+                                    <option value="festival">Festival</option>
+                                    <option value="private">Private Event</option>
+                                    <option value="corporate">Corporate Event</option>
+                                    <option value="wedding">Wedding</option>
+                                </select>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Venue Capacity</label>
+                                    <select class="form-select" id="venueCapacity" required>
+                                        <option value="">Select capacity</option>
+                                        <option value="intimate">Intimate (50-200)</option>
+                                        <option value="small">Small (200-500)</option>
+                                        <option value="medium">Medium (500-1500)</option>
+                                        <option value="large">Large (1500-5000)</option>
+                                        <option value="arena">Arena (5000+)</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Budget Range</label>
+                                    <select class="form-select" id="budget" required>
+                                        <option value="">Select budget</option>
+                                        <option value="startup">$1K - $5K</option>
+                                        <option value="small">$5K - $15K</option>
+                                        <option value="medium">$15K - $50K</option>
+                                        <option value="large">$50K - $150K</option>
+                                        <option value="premium">$150K+</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Event Date</label>
+                                    <input type="date" class="form-input" id="eventDate" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Location</label>
+                                    <input type="text" class="form-input" id="location" placeholder="City, State" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Music Genre Preferences</label>
+                                <input type="text" class="form-input" id="genres" placeholder="Rock, Jazz, Electronic, Pop..." required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Special Requirements</label>
+                                <textarea class="form-textarea" id="requirements" placeholder="Sound equipment, staging, accessibility, etc."></textarea>
+                            </div>
+
+                            <button type="submit" class="btn-ai" style="width: 100%;">
+                                🔍 Find AI Matches
+                            </button>
+                        </form>
+
+                        <div id="suggestionsPanel" class="suggestions-panel hidden">
+                            <h3>🎯 AI Recommendations</h3>
+                            <div id="suggestions"></div>
+                        </div>
+                    </div>
+
+                    <!-- AI Chat Assistant -->
+                    <div class="ai-chat">
+                        <div class="chat-header">
+                            <h3>🤖 AI Booking Assistant</h3>
+                            <span class="status-indicator">Online</span>
+                        </div>
+                        <div class="chat-messages" id="chatMessages">
+                            <div class="message ai">
+                                <div class="message-avatar ai-avatar">🤖</div>
+                                <div class="message-content">
+                                    Hi! I'm your AI booking assistant. I can help you find the perfect artist-venue match based on your requirements. Fill out the form and I'll provide intelligent recommendations with match scores and availability!
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" id="chatInput" placeholder="Ask about bookings, artists, venues...">
+                            <button class="btn-ai" id="sendBtn">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // AI Chat System
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const bookingForm = document.getElementById('bookingForm');
+        const suggestionsPanel = document.getElementById('suggestionsPanel');
+        const suggestions = document.getElementById('suggestions');
+
+        // Sample AI responses
+        const aiResponses = {
+            greeting: "Hello! I'm here to help with your booking needs. What can I assist you with today?",
+            booking: "I can help you find the perfect artist-venue match. Please fill out the booking form and I'll analyze the requirements.",
+            artists: "Based on current data, I have access to over 10,000+ verified artists across all genres. What type of music are you looking for?",
+            venues: "I can recommend venues based on capacity, location, acoustics, and availability. What's your preferred location?",
+            pricing: "Pricing varies by artist tier, venue size, and date. I can provide accurate estimates once you specify your requirements.",
+            availability: "I have real-time availability data for most artists and venues. Let me check specific dates for you.",
+            contract: "I can help generate contract templates and negotiate terms automatically based on industry standards and past successful bookings.",
+            default: "That's a great question! I'm constantly learning about the music industry. Could you provide more details about your booking needs?"
+        };
+
+        // Sample artist/venue data
+        const sampleMatches = [
+            {
+                name: "Electric Horizon",
+                type: "Electronic/Dance",
+                score: 97,
+                fee: "$25K - $35K",
+                availability: "Available",
+                description: "Grammy-nominated electronic duo, perfect for festivals and large venues"
+            },
+            {
+                name: "The Midnight Sessions",
+                type: "Indie Rock",
+                score: 94,
+                fee: "$15K - $22K", 
+                availability: "Available",
+                description: "Rising indie rock band with strong social media following"
+            },
+            {
+                name: "Jazz Collective NYC",
+                type: "Jazz/Blues",
+                score: 91,
+                fee: "$8K - $12K",
+                availability: "Available",
+                description: "Veteran jazz ensemble, excellent for intimate venues and corporate events"
+            }
+        ];
+
+        // Initialize chat
+        function initializeChat() {
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            sendBtn.addEventListener('click', sendMessage);
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            chatInput.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Generate AI response
+            setTimeout(() => {
+                hideTypingIndicator();
+                const response = generateAIResponse(message);
+                addMessage(response, 'ai');
+            }, 1500 + Math.random() * 1000);
+        }
+
+        function addMessage(content, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${type}-avatar`;
+            avatar.textContent = type === 'ai' ? '🤖' : '👤';
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.textContent = content;
+
+            if (type === 'user') {
+                messageDiv.appendChild(messageContent);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(messageContent);
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Track interaction
+            trackInteraction('chat_message', { type, content });
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai';
+            typingDiv.id = 'typingIndicator';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar ai-avatar';
+            avatar.textContent = '🤖';
+
+            const typingContent = document.createElement('div');
+            typingContent.className = 'typing-indicator';
+            typingContent.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+            typingDiv.appendChild(avatar);
+            typingDiv.appendChild(typingContent);
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function generateAIResponse(message) {
+            const lowerMessage = message.toLowerCase();
+            
+            if (lowerMessage.includes('artist') || lowerMessage.includes('musician')) {
+                return aiResponses.artists;
+            } else if (lowerMessage.includes('venue') || lowerMessage.includes('location')) {
+                return aiResponses.venues;
+            } else if (lowerMessage.includes('price') || lowerMessage.includes('cost') || lowerMessage.includes('budget')) {
+                return aiResponses.pricing;
+            } else if (lowerMessage.includes('available') || lowerMessage.includes('date')) {
+                return aiResponses.availability;
+            } else if (lowerMessage.includes('contract') || lowerMessage.includes('negotiate')) {
+                return aiResponses.contract;
+            } else if (lowerMessage.includes('booking') || lowerMessage.includes('book')) {
+                return aiResponses.booking;
+            } else if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                return aiResponses.greeting;
+            } else {
+                return aiResponses.default;
+            }
+        }
+
+        // Booking Form Handling
+        function initializeBookingForm() {
+            bookingForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                processBookingRequest();
+            });
+
+            // Set minimum date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('eventDate').min = today;
+        }
+
+        function processBookingRequest() {
+            const formData = new FormData(bookingForm);
+            const data = Object.fromEntries(formData);
+
+            // Show loading state
+            const submitBtn = bookingForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '🔍 AI Analyzing... <span class="loading-spinner"></span>';
+            submitBtn.disabled = true;
+
+            // Simulate AI processing
+            setTimeout(() => {
+                displayAIRecommendations(data);
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+
+                // Add AI chat message
+                addMessage(`I've analyzed your requirements and found ${sampleMatches.length} excellent matches! Check the recommendations below. The top match has a 97% compatibility score based on genre, budget, and venue requirements.`, 'ai');
+            }, 3000);
+
+            // Track form submission
+            trackInteraction('booking_form_submit', data);
+        }
+
+        function displayAIRecommendations(formData) {
+            suggestionsPanel.classList.remove('hidden');
+            suggestions.innerHTML = '';
+
+            sampleMatches.forEach((match, index) => {
+                const suggestionDiv = document.createElement('div');
+                suggestionDiv.className = 'suggestion-item';
+                suggestionDiv.onclick = () => selectArtist(match);
+
+                suggestionDiv.innerHTML = `
+                    <span class="suggestion-score">${match.score}% Match</span>
+                    <h4>${match.name}</h4>
+                    <p><strong>Genre:</strong> ${match.type}</p>
+                    <p><strong>Fee Range:</strong> ${match.fee}</p>
+                    <p><strong>Status:</strong> <span style="color: var(--success-color);">${match.availability}</span></p>
+                    <p>${match.description}</p>
+                    <button class="btn-success" style="margin-top: 0.5rem;">Select Artist</button>
+                `;
+
+                suggestions.appendChild(suggestionDiv);
+            });
+        }
+
+        function selectArtist(artist) {
+            // Simulate booking selection
+            alert(`🎉 Great choice! Initiating booking process for ${artist.name}.\n\nNext steps:\n• Contract generation\n• Availability confirmation\n• Payment processing\n\nOur AI will handle the negotiation automatically!`);
+            
+            addMessage(`Excellent choice! I'm now initiating the booking process for ${artist.name}. I'll handle contract generation, availability confirmation, and initial negotiations. You should receive a booking confirmation within 24 hours.`, 'ai');
+
+            trackInteraction('artist_selected', artist);
+        }
+
+        // Data tracking
+        function trackInteraction(action, details) {
+            const interactions = JSON.parse(localStorage.getItem('musicai_interactions') || '[]');
+            interactions.push({
+                timestamp: new Date().toISOString(),
+                action: action,
+                details: details,
+                page: 'booking'
+            });
+            localStorage.setItem('musicai_interactions', JSON.stringify(interactions));
+        }
+
+        // Navigation loading effect
+        document.querySelectorAll('.nav-link:not(.active)').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const originalText = this.textContent;
+                this.innerHTML = originalText + ' <span class="loading-spinner"></span>';
+                
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 500);
+            });
+        });
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChat();
+            initializeBookingForm();
+            console.log('🤖 AI Booking System Loaded - Ready for intelligent talent matching!');
+        });
+    </script>
+</body>
+</html>

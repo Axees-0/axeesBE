@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - MusicAI Platform</title>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #ec4899;
+            --accent-color: #06b6d4;
+            --background-color: #0f172a;
+            --surface-color: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --border-color: #334155;
+            --hover-bg: #334155;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            background: var(--background-color);
+            line-height: 1.6;
+        }
+
+        /* Page Layout */
+        .page-wrapper {
+            min-height: 100vh;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        h4 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-success {
+            background: var(--success-color);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-warning {
+            background: var(--warning-color);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.875rem;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 0.75rem;
+        }
+
+        /* Dashboard Layout */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .dashboard-header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stat-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-change {
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .stat-change.positive {
+            color: var(--success-color);
+        }
+
+        .stat-change.negative {
+            color: var(--error-color);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Charts */
+        .chart-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(99, 102, 241, 0.05);
+            border-radius: 8px;
+            margin: 1rem 0;
+            position: relative;
+        }
+
+        .chart-placeholder {
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        /* Tables */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table th {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .table td {
+            color: var(--text-secondary);
+        }
+
+        .table tr:hover {
+            background: var(--hover-bg);
+        }
+
+        /* Status badges */
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success-color);
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--warning-color);
+        }
+
+        .status-badge.cancelled {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error-color);
+        }
+
+        /* Lists */
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 0.875rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-description {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .quick-action {
+            background: var(--hover-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: var(--text-secondary);
+        }
+
+        .quick-action:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .quick-action-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* AI Insights */
+        .ai-insights {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(236, 72, 153, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .insight-content {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .insight-recommendations {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+        }
+
+        .recommendation {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>🎵 MusicAI</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="booking.html" class="nav-link">AI Booking</a></li>
+                    <li><a href="discovery.html" class="nav-link">Event Discovery</a></li>
+                    <li><a href="admin.html" class="nav-link active">Admin</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="dashboard-container">
+                <!-- Dashboard Header -->
+                <div class="dashboard-header">
+                    <div>
+                        <h1>📊 Admin Dashboard</h1>
+                        <p>Manage venues, artists, bookings, and platform analytics</p>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-avatar">AM</div>
+                        <div>
+                            <div style="color: var(--text-primary); font-weight: 500;">Admin User</div>
+                            <div style="font-size: 0.875rem; color: var(--text-muted);">Platform Administrator</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Insights -->
+                <div class="ai-insights">
+                    <div class="insight-header">
+                        <span style="font-size: 1.5rem;">🤖</span>
+                        <h3>AI Platform Insights</h3>
+                    </div>
+                    <div class="insight-content">
+                        <p><strong>Performance Summary:</strong> AI booking automation has increased platform efficiency by 240% this month. The recommendation engine is achieving 94% user satisfaction with event matching.</p>
+                        
+                        <div class="insight-recommendations">
+                            <div class="recommendation">
+                                <span style="color: var(--success-color);">✅</span>
+                                <span>Peak booking times: Friday evenings (7-9 PM) show highest conversion rates</span>
+                            </div>
+                            <div class="recommendation">
+                                <span style="color: var(--warning-color);">⚠️</span>
+                                <span>Consider expanding electronic/dance venue partnerships - 35% demand increase</span>
+                            </div>
+                            <div class="recommendation">
+                                <span style="color: var(--primary-color);">💡</span>
+                                <span>AI suggests implementing dynamic pricing for premium time slots</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-icon">🎫</span>
+                        <span class="stat-number" id="totalBookings">1,247</span>
+                        <span class="stat-label">Total Bookings</span>
+                        <div class="stat-change positive">+23% this month</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">🎤</span>
+                        <span class="stat-number" id="activeArtists">342</span>
+                        <span class="stat-label">Active Artists</span>
+                        <div class="stat-change positive">+15 new</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">🏛️</span>
+                        <span class="stat-number" id="activeVenues">89</span>
+                        <span class="stat-label">Partner Venues</span>
+                        <div class="stat-change positive">+7 this week</div>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-icon">💰</span>
+                        <span class="stat-number" id="revenue">$2.4M</span>
+                        <span class="stat-label">Revenue (YTD)</span>
+                        <div class="stat-change positive">+34% vs. last year</div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Main Charts Area -->
+                    <div>
+                        <!-- Booking Analytics -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>📈 Booking Analytics</h3>
+                                <button class="btn-primary btn-sm" onclick="refreshAnalytics()">Refresh Data</button>
+                            </div>
+                            <div class="chart-container">
+                                <div class="chart-placeholder">
+                                    <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                                    <div><strong>Interactive Chart Placeholder</strong></div>
+                                    <div style="margin-top: 0.5rem; font-size: 0.875rem;">
+                                        Bookings by Month: Jan(89) → Feb(124) → Mar(156) → Apr(198) → May(245) → Jun(287)
+                                    </div>
+                                    <div style="margin-top: 0.5rem; font-size: 0.875rem; color: var(--success-color);">
+                                        ↗️ Consistent 25% month-over-month growth
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Bookings Table -->
+                        <div class="card" style="margin-top: 2rem;">
+                            <div class="card-header">
+                                <h3>🎪 Recent Bookings</h3>
+                                <button class="btn-primary btn-sm" onclick="exportBookings()">Export CSV</button>
+                            </div>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Event</th>
+                                        <th>Artist</th>
+                                        <th>Venue</th>
+                                        <th>Date</th>
+                                        <th>Status</th>
+                                        <th>Revenue</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bookingsTable">
+                                    <tr>
+                                        <td>Summer Beats Festival</td>
+                                        <td>Electric Horizon</td>
+                                        <td>Sunset Amphitheater</td>
+                                        <td>Jul 15, 2024</td>
+                                        <td><span class="status-badge active">Confirmed</span></td>
+                                        <td>$45,000</td>
+                                        <td>
+                                            <button class="btn-success btn-sm" onclick="viewBookingDetails(1)">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jazz Under Stars</td>
+                                        <td>Midnight Sessions</td>
+                                        <td>Blue Note Jazz Club</td>
+                                        <td>Jul 12, 2024</td>
+                                        <td><span class="status-badge active">Confirmed</span></td>
+                                        <td>$18,500</td>
+                                        <td>
+                                            <button class="btn-success btn-sm" onclick="viewBookingDetails(2)">View</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Indie Rock Showcase</td>
+                                        <td>Various Artists</td>
+                                        <td>The Underground</td>
+                                        <td>Jul 18, 2024</td>
+                                        <td><span class="status-badge pending">Pending</span></td>
+                                        <td>$12,800</td>
+                                        <td>
+                                            <button class="btn-warning btn-sm" onclick="viewBookingDetails(3)">Review</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>Classical & Wine</td>
+                                        <td>City Symphony</td>
+                                        <td>Grand Concert Hall</td>
+                                        <td>Jul 16, 2024</td>
+                                        <td><span class="status-badge active">Confirmed</span></td>
+                                        <td>$32,400</td>
+                                        <td>
+                                            <button class="btn-success btn-sm" onclick="viewBookingDetails(4)">View</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar -->
+                    <div>
+                        <!-- Quick Actions -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>⚡ Quick Actions</h3>
+                            </div>
+                            <div class="quick-actions">
+                                <a href="#" class="quick-action" onclick="openModal('addArtist')">
+                                    <span class="quick-action-icon">🎤</span>
+                                    <span>Add Artist</span>
+                                </a>
+                                <a href="#" class="quick-action" onclick="openModal('addVenue')">
+                                    <span class="quick-action-icon">🏛️</span>
+                                    <span>Add Venue</span>
+                                </a>
+                                <a href="#" class="quick-action" onclick="generateReport()">
+                                    <span class="quick-action-icon">📊</span>
+                                    <span>Generate Report</span>
+                                </a>
+                                <a href="#" class="quick-action" onclick="manageUsers()">
+                                    <span class="quick-action-icon">👥</span>
+                                    <span>Manage Users</span>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="card" style="margin-top: 1.5rem;">
+                            <div class="card-header">
+                                <h3>🕒 Recent Activity</h3>
+                            </div>
+                            <div class="activity-list">
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background: var(--success-color);">🎤</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">New Artist Registration</div>
+                                        <div class="activity-description">Luna Martinez joined as acoustic performer</div>
+                                    </div>
+                                    <div class="activity-time">2h ago</div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background: var(--primary-color);">🎫</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Booking Confirmed</div>
+                                        <div class="activity-description">Electric Horizon - Summer Festival</div>
+                                    </div>
+                                    <div class="activity-time">4h ago</div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background: var(--warning-color);">🏛️</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Venue Capacity Update</div>
+                                        <div class="activity-description">Sunset Amphitheater increased to 5,000</div>
+                                    </div>
+                                    <div class="activity-time">6h ago</div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background: var(--accent-color);">💰</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">Payment Processed</div>
+                                        <div class="activity-description">$18,500 - Jazz Under Stars</div>
+                                    </div>
+                                    <div class="activity-time">1d ago</div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon" style="background: var(--secondary-color);">🤖</div>
+                                    <div class="activity-content">
+                                        <div class="activity-title">AI Model Updated</div>
+                                        <div class="activity-description">Recommendation accuracy improved to 94%</div>
+                                    </div>
+                                    <div class="activity-time">2d ago</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Performance Metrics -->
+                        <div class="card" style="margin-top: 1.5rem;">
+                            <div class="card-header">
+                                <h3>🤖 AI Performance</h3>
+                            </div>
+                            <div style="padding: 1rem 0;">
+                                <div style="margin-bottom: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span>Match Accuracy</span>
+                                        <span style="color: var(--success-color); font-weight: 600;">94%</span>
+                                    </div>
+                                    <div style="background: var(--border-color); height: 8px; border-radius: 4px;">
+                                        <div style="background: var(--success-color); height: 100%; width: 94%; border-radius: 4px;"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span>Response Time</span>
+                                        <span style="color: var(--success-color); font-weight: 600;">0.8s</span>
+                                    </div>
+                                    <div style="background: var(--border-color); height: 8px; border-radius: 4px;">
+                                        <div style="background: var(--success-color); height: 100%; width: 85%; border-radius: 4px;"></div>
+                                    </div>
+                                </div>
+                                <div style="margin-bottom: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                                        <span>User Satisfaction</span>
+                                        <span style="color: var(--success-color); font-weight: 600;">97%</span>
+                                    </div>
+                                    <div style="background: var(--border-color); height: 8px; border-radius: 4px;">
+                                        <div style="background: var(--success-color); height: 100%; width: 97%; border-radius: 4px;"></div>
+                                    </div>
+                                </div>
+                                <button class="btn-primary" style="width: 100%; margin-top: 1rem;" onclick="optimizeAI()">
+                                    Optimize AI Models
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Dashboard functionality
+        let dashboardData = {
+            totalBookings: 1247,
+            activeArtists: 342,
+            activeVenues: 89,
+            revenue: 2400000
+        };
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            updateCounters();
+            loadBookings();
+            
+            // Simulate real-time updates
+            setInterval(updateCounters, 30000);
+        }
+
+        function updateCounters() {
+            // Simulate gradual increases
+            dashboardData.totalBookings += Math.floor(Math.random() * 3);
+            dashboardData.activeArtists += Math.floor(Math.random() * 2);
+            dashboardData.revenue += Math.floor(Math.random() * 5000);
+
+            document.getElementById('totalBookings').textContent = dashboardData.totalBookings.toLocaleString();
+            document.getElementById('activeArtists').textContent = dashboardData.activeArtists.toLocaleString();
+            document.getElementById('activeVenues').textContent = dashboardData.activeVenues.toLocaleString();
+            document.getElementById('revenue').textContent = `$${(dashboardData.revenue / 1000000).toFixed(1)}M`;
+        }
+
+        function loadBookings() {
+            // Bookings are already loaded in HTML, this would connect to real API
+            console.log('📊 Bookings data loaded from API simulation');
+        }
+
+        // Quick Actions
+        function openModal(type) {
+            switch(type) {
+                case 'addArtist':
+                    alert('🎤 Add Artist Modal\n\nWould open form with:\n• Artist name & contact info\n• Genre & style preferences\n• Performance requirements\n• Portfolio/demo uploads\n• Availability calendar\n• AI matching preferences');
+                    break;
+                case 'addVenue':
+                    alert('🏛️ Add Venue Modal\n\nWould open form with:\n• Venue details & capacity\n• Location & amenities\n• Technical specifications\n• Booking policies\n• Pricing structure\n• Photos & virtual tour');
+                    break;
+                default:
+                    alert(`Opening ${type} modal...`);
+            }
+            trackInteraction('modal_opened', { type });
+        }
+
+        function generateReport() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.innerHTML = 'Generating... <span class="loading-spinner"></span>';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert('📊 Analytics Report Generated!\n\n✅ Booking trends analysis\n✅ Revenue breakdown by genre\n✅ Venue performance metrics\n✅ Artist popularity rankings\n✅ AI recommendation effectiveness\n✅ User engagement statistics\n\n📧 Report emailed to admin@musicai.com');
+                btn.textContent = originalText;
+                btn.disabled = false;
+                trackInteraction('report_generated', { type: 'full_analytics' });
+            }, 3000);
+        }
+
+        function manageUsers() {
+            alert('👥 User Management\n\nWould open interface for:\n• View all platform users\n• Artist & venue approval\n• User role management\n• Subscription status\n• Platform permissions\n• Support ticket handling');
+            trackInteraction('user_management_accessed');
+        }
+
+        function refreshAnalytics() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.innerHTML = 'Refreshing... <span class="loading-spinner"></span>';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                // Simulate data refresh
+                updateCounters();
+                btn.textContent = originalText;
+                btn.disabled = false;
+                
+                // Show update notification
+                showNotification('📈 Analytics data refreshed successfully!', 'success');
+                trackInteraction('analytics_refreshed');
+            }, 2000);
+        }
+
+        function exportBookings() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.innerHTML = 'Exporting... <span class="loading-spinner"></span>';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert('📄 Export Complete!\n\nBookings data exported to CSV:\n• All booking records (1,247 entries)\n• Artist & venue details\n• Financial data\n• Status & timestamps\n\n💾 File: musicai_bookings_' + new Date().toISOString().split('T')[0] + '.csv');
+                btn.textContent = originalText;
+                btn.disabled = false;
+                trackInteraction('bookings_exported');
+            }, 2500);
+        }
+
+        function viewBookingDetails(bookingId) {
+            const bookingDetails = {
+                1: {
+                    event: 'Summer Beats Festival',
+                    artist: 'Electric Horizon',
+                    venue: 'Sunset Amphitheater',
+                    date: 'July 15, 2024',
+                    status: 'Confirmed',
+                    revenue: '$45,000',
+                    details: 'Grammy-nominated electronic duo, 5,000 capacity venue, premium sound system'
+                },
+                2: {
+                    event: 'Jazz Under Stars',
+                    artist: 'Midnight Sessions',
+                    venue: 'Blue Note Jazz Club',
+                    date: 'July 12, 2024',
+                    status: 'Confirmed',
+                    revenue: '$18,500',
+                    details: 'Intimate jazz performance, 200 capacity, premium acoustics'
+                }
+            };
+
+            const booking = bookingDetails[bookingId] || bookingDetails[1];
+            alert(`🎪 Booking Details\n\n📅 Event: ${booking.event}\n🎤 Artist: ${booking.artist}\n🏛️ Venue: ${booking.venue}\n📍 Date: ${booking.date}\n✅ Status: ${booking.status}\n💰 Revenue: ${booking.revenue}\n\n📝 ${booking.details}\n\n🔧 Available Actions:\n• Modify booking\n• Contact artist/venue\n• Generate contract\n• Process payment\n• Send notifications`);
+            
+            trackInteraction('booking_viewed', { bookingId, event: booking.event });
+        }
+
+        function optimizeAI() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.innerHTML = 'Optimizing... <span class="loading-spinner"></span>';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                alert('🤖 AI Optimization Complete!\n\n✅ Recommendation algorithm updated\n✅ Matching accuracy improved: 94% → 96%\n✅ Response time optimized: 0.8s → 0.6s\n✅ New genre preferences integrated\n✅ Historical data reprocessed\n\n🚀 Platform performance enhanced!');
+                btn.textContent = originalText;
+                btn.disabled = false;
+                showNotification('🤖 AI models optimized successfully!', 'success');
+                trackInteraction('ai_optimized');
+            }, 4000);
+        }
+
+        function showNotification(message, type = 'info') {
+            // Simple notification system
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 100px;
+                right: 20px;
+                background: var(--success-color);
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 8px;
+                box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+                z-index: 10000;
+                font-weight: 500;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Data tracking
+        function trackInteraction(action, details = {}) {
+            const interactions = JSON.parse(localStorage.getItem('musicai_interactions') || '[]');
+            interactions.push({
+                timestamp: new Date().toISOString(),
+                action: action,
+                details: details,
+                page: 'admin'
+            });
+            localStorage.setItem('musicai_interactions', JSON.stringify(interactions));
+        }
+
+        // Navigation loading effect
+        document.querySelectorAll('.nav-link:not(.active)').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const originalText = this.textContent;
+                this.innerHTML = originalText + ' <span class="loading-spinner"></span>';
+                
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 500);
+            });
+        });
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDashboard();
+            console.log('📊 Admin Dashboard Loaded - AI-powered music platform management ready!');
+        });
+    </script>
+</body>
+</html>

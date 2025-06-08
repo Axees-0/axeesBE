@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Discovery - MusicAI Platform</title>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #ec4899;
+            --accent-color: #06b6d4;
+            --background-color: #0f172a;
+            --surface-color: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --border-color: #334155;
+            --hover-bg: #334155;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            background: var(--background-color);
+            line-height: 1.6;
+        }
+
+        /* Page Layout */
+        .page-wrapper {
+            min-height: 100vh;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+        }
+
+        .btn-ai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
+        }
+
+        /* AI Chat Interface - Full Width */
+        .discovery-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .ai-discovery-chat {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .chat-header h2 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        .chat-subheader {
+            margin-top: 0.5rem;
+            opacity: 0.9;
+            font-size: 0.875rem;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            max-height: 450px;
+        }
+
+        .message {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+        }
+
+        .message.user .message-content {
+            background: var(--primary-color);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.ai .message-content {
+            background: var(--hover-bg);
+            color: var(--text-primary);
+        }
+
+        .message-content {
+            padding: 1rem 1.25rem;
+            border-radius: 16px;
+            max-width: 75%;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .message-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .ai-avatar {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+        }
+
+        .user-avatar {
+            background: var(--primary-color);
+        }
+
+        .chat-input-container {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 14px 20px;
+            background: var(--background-color);
+            border: 2px solid var(--border-color);
+            border-radius: 25px;
+            color: var(--text-primary);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        /* Event Cards */
+        .events-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .event-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+            border-color: var(--primary-color);
+        }
+
+        .event-image {
+            height: 150px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .event-content {
+            padding: 1.5rem;
+        }
+
+        .event-title {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-details {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.25rem;
+        }
+
+        .event-description {
+            margin-top: 0.75rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .event-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .event-tag {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--primary-color);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .event-price {
+            color: var(--success-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Quick Suggestions */
+        .quick-suggestions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin: 1rem 0;
+        }
+
+        .suggestion-chip {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .suggestion-chip:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Search Results */
+        .search-results {
+            margin-top: 2rem;
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .results-count {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        .filter-tags {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-tag {
+            background: var(--success-color);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        /* Typing Animation */
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 1rem 1.25rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--text-muted);
+            animation: typing 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes typing {
+            0%, 80%, 100% { opacity: 0.3; }
+            40% { opacity: 1; }
+        }
+
+        /* Section Styles */
+        .section-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .discovery-container {
+                padding: 1rem;
+            }
+            
+            .ai-discovery-chat {
+                height: 500px;
+            }
+            
+            .message-content {
+                max-width: 85%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>🎵 MusicAI</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link">Home</a></li>
+                    <li><a href="booking.html" class="nav-link">AI Booking</a></li>
+                    <li><a href="discovery.html" class="nav-link active">Event Discovery</a></li>
+                    <li><a href="admin.html" class="nav-link">Admin</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="discovery-container">
+                <div class="section-header">
+                    <h1>💬 Conversational Event Discovery</h1>
+                    <p>Find events naturally with AI - just ask what you're looking for</p>
+                </div>
+
+                <!-- AI Discovery Chat -->
+                <div class="ai-discovery-chat">
+                    <div class="chat-header">
+                        <h2>🎪 Event Discovery AI</h2>
+                        <div class="chat-subheader">Ask me anything: "Jazz concerts this weekend", "Rock festivals near Austin", "Indie shows under $50"</div>
+                    </div>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message ai">
+                            <div class="message-avatar ai-avatar">🎪</div>
+                            <div class="message-content">
+                                Welcome to AI Event Discovery! I can help you find the perfect live music experiences. Just tell me what you're looking for in natural language - location, genre, date, budget, venue type, or anything else. Try asking something like "What jazz concerts are happening this weekend in Chicago?" or "Find me affordable indie rock shows next month".
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chatInput" placeholder="Ask about events: 'Rock concerts this weekend in LA under $100'">
+                        <button class="btn-ai" id="sendBtn">🔍 Search</button>
+                    </div>
+                </div>
+
+                <!-- Quick Suggestions -->
+                <div class="quick-suggestions">
+                    <div class="suggestion-chip" onclick="quickSearch('jazz concerts this weekend')">Jazz concerts this weekend</div>
+                    <div class="suggestion-chip" onclick="quickSearch('rock festivals summer 2024')">Rock festivals summer 2024</div>
+                    <div class="suggestion-chip" onclick="quickSearch('electronic music events under $50')">Electronic shows under $50</div>
+                    <div class="suggestion-chip" onclick="quickSearch('indie concerts small venues')">Indie concerts in small venues</div>
+                    <div class="suggestion-chip" onclick="quickSearch('acoustic performances coffee shops')">Acoustic performances</div>
+                </div>
+
+                <!-- Search Results -->
+                <div id="searchResults" class="search-results hidden">
+                    <div class="results-header">
+                        <h3 id="resultsTitle">Search Results</h3>
+                        <div class="results-count" id="resultsCount">Loading...</div>
+                    </div>
+                    <div class="filter-tags" id="filterTags"></div>
+                    <div class="events-grid" id="eventsGrid"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // AI Chat System for Event Discovery
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const searchResults = document.getElementById('searchResults');
+        const eventsGrid = document.getElementById('eventsGrid');
+        const resultsTitle = document.getElementById('resultsTitle');
+        const resultsCount = document.getElementById('resultsCount');
+        const filterTags = document.getElementById('filterTags');
+
+        // Sample event data
+        const sampleEvents = [
+            {
+                id: 1,
+                title: "Electric Horizon - Summer Beats Festival",
+                artist: "Electric Horizon",
+                genre: "Electronic/Dance",
+                date: "2024-07-15",
+                time: "8:00 PM",
+                venue: "Sunset Amphitheater",
+                location: "Los Angeles, CA",
+                price: "$45 - $75",
+                description: "Grammy-nominated electronic duo brings their latest album to life with stunning visuals and immersive sound.",
+                image: "🎧",
+                tags: ["Electronic", "Dance", "Festival", "Outdoor"]
+            },
+            {
+                id: 2,
+                title: "Jazz Under the Stars",
+                artist: "The Midnight Sessions",
+                genre: "Jazz",
+                date: "2024-07-12",
+                time: "7:30 PM",
+                venue: "Blue Note Jazz Club",
+                location: "New York, NY",
+                price: "$35 - $55",
+                description: "Intimate jazz evening featuring classic standards and modern interpretations in an authentic club setting.",
+                image: "🎷",
+                tags: ["Jazz", "Intimate", "Club", "Classic"]
+            },
+            {
+                id: 3,
+                title: "Indie Rock Showcase",
+                artist: "Various Artists",
+                genre: "Indie Rock",
+                date: "2024-07-18",
+                time: "6:00 PM",
+                venue: "The Underground",
+                location: "Austin, TX",
+                price: "$25 - $40",
+                description: "Discover the next big indie rock bands in Austin's premier underground venue. 4 bands, one incredible night.",
+                image: "🎸",
+                tags: ["Indie", "Rock", "Underground", "Multi-artist"]
+            },
+            {
+                id: 4,
+                title: "Acoustic Sessions & Coffee",
+                artist: "Luna Martinez",
+                genre: "Folk/Acoustic",
+                date: "2024-07-14",
+                time: "3:00 PM",
+                venue: "Moonbeam Coffee House",
+                location: "Portland, OR",
+                price: "$15 - $20",
+                description: "Enjoy afternoon acoustic melodies with artisan coffee in Portland's coziest venue.",
+                image: "☕",
+                tags: ["Acoustic", "Folk", "Coffee", "Afternoon"]
+            },
+            {
+                id: 5,
+                title: "Synthwave Night",
+                artist: "Neon Dreams",
+                genre: "Synthwave",
+                date: "2024-07-20",
+                time: "9:00 PM",
+                venue: "Retro Arcade Bar",
+                location: "Miami, FL",
+                price: "$30 - $45",
+                description: "Step into the 80s with neon-soaked synthwave beats, retro visuals, and classic arcade games.",
+                image: "🌃",
+                tags: ["Synthwave", "80s", "Neon", "Arcade"]
+            },
+            {
+                id: 6,
+                title: "Classical & Wine Evening",
+                artist: "City Symphony Orchestra",
+                genre: "Classical",
+                date: "2024-07-16",
+                time: "7:00 PM",
+                venue: "Grand Concert Hall",
+                location: "San Francisco, CA",
+                price: "$60 - $120",
+                description: "Elegant evening of classical music paired with premium wine tastings in a stunning concert hall.",
+                image: "🎻",
+                tags: ["Classical", "Orchestra", "Wine", "Elegant"]
+            }
+        ];
+
+        // AI Response patterns for event discovery
+        const discoveryResponses = {
+            greeting: "Hi! I'm your event discovery assistant. Tell me what kind of music events you're looking for and I'll find the perfect matches!",
+            search: "Let me search for events matching your criteria...",
+            location: "I can find events in any city! Just tell me where you're looking and what type of music you prefer.",
+            genre: "Great taste! I have events across all genres. What location and timeframe are you thinking?",
+            budget: "I can help you find events within your budget range. What's your preferred price range and location?",
+            date: "Perfect! I can search by specific dates or date ranges. What type of music are you interested in?",
+            venue: "I know all the best venues! Small intimate clubs, large arenas, outdoor festivals - what's your preference?",
+            noResults: "I couldn't find exact matches for that search, but here are some similar events you might enjoy:",
+            moreInfo: "Would you like more details about any of these events? I can help you with tickets, venue info, or similar recommendations.",
+            default: "I can help you discover amazing live music events! Try asking about specific genres, locations, dates, or venues you're interested in."
+        };
+
+        // Initialize chat system
+        function initializeChat() {
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+
+            sendBtn.addEventListener('click', sendMessage);
+        }
+
+        function sendMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+            chatInput.value = '';
+
+            // Show typing indicator
+            showTypingIndicator();
+
+            // Process search and generate response
+            setTimeout(() => {
+                hideTypingIndicator();
+                processEventSearch(message);
+            }, 1500 + Math.random() * 1000);
+        }
+
+        function quickSearch(query) {
+            chatInput.value = query;
+            sendMessage();
+        }
+
+        function addMessage(content, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            
+            const avatar = document.createElement('div');
+            avatar.className = `message-avatar ${type}-avatar`;
+            avatar.textContent = type === 'ai' ? '🎪' : '👤';
+
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.textContent = content;
+
+            if (type === 'user') {
+                messageDiv.appendChild(messageContent);
+                messageDiv.appendChild(avatar);
+            } else {
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(messageContent);
+            }
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Track interaction
+            trackInteraction('discovery_chat', { type, content });
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message ai';
+            typingDiv.id = 'typingIndicator';
+
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar ai-avatar';
+            avatar.textContent = '🎪';
+
+            const typingContent = document.createElement('div');
+            typingContent.className = 'typing-indicator';
+            typingContent.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+
+            typingDiv.appendChild(avatar);
+            typingDiv.appendChild(typingContent);
+            chatMessages.appendChild(typingDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function hideTypingIndicator() {
+            const typingIndicator = document.getElementById('typingIndicator');
+            if (typingIndicator) {
+                typingIndicator.remove();
+            }
+        }
+
+        function processEventSearch(query) {
+            // Simple keyword matching for demo
+            const lowerQuery = query.toLowerCase();
+            let matches = sampleEvents;
+            let responseText = "";
+            let filters = [];
+
+            // Filter by genre
+            if (lowerQuery.includes('jazz')) {
+                matches = matches.filter(event => event.genre.toLowerCase().includes('jazz'));
+                filters.push('Jazz');
+                responseText = `Found ${matches.length} jazz events for you! `;
+            } else if (lowerQuery.includes('rock') || lowerQuery.includes('indie')) {
+                matches = matches.filter(event => event.genre.toLowerCase().includes('rock') || event.genre.toLowerCase().includes('indie'));
+                filters.push('Rock/Indie');
+                responseText = `Found ${matches.length} rock and indie events! `;
+            } else if (lowerQuery.includes('electronic') || lowerQuery.includes('dance')) {
+                matches = matches.filter(event => event.genre.toLowerCase().includes('electronic') || event.genre.toLowerCase().includes('dance'));
+                filters.push('Electronic/Dance');
+                responseText = `Found ${matches.length} electronic and dance events! `;
+            } else if (lowerQuery.includes('classical')) {
+                matches = matches.filter(event => event.genre.toLowerCase().includes('classical'));
+                filters.push('Classical');
+                responseText = `Found ${matches.length} classical events! `;
+            } else if (lowerQuery.includes('acoustic') || lowerQuery.includes('folk')) {
+                matches = matches.filter(event => event.genre.toLowerCase().includes('acoustic') || event.genre.toLowerCase().includes('folk'));
+                filters.push('Acoustic/Folk');
+                responseText = `Found ${matches.length} acoustic and folk events! `;
+            }
+
+            // Filter by location
+            if (lowerQuery.includes('los angeles') || lowerQuery.includes('la')) {
+                matches = matches.filter(event => event.location.toLowerCase().includes('los angeles'));
+                filters.push('Los Angeles');
+            } else if (lowerQuery.includes('new york') || lowerQuery.includes('nyc')) {
+                matches = matches.filter(event => event.location.toLowerCase().includes('new york'));
+                filters.push('New York');
+            } else if (lowerQuery.includes('austin')) {
+                matches = matches.filter(event => event.location.toLowerCase().includes('austin'));
+                filters.push('Austin');
+            }
+
+            // Filter by price
+            if (lowerQuery.includes('under $50') || lowerQuery.includes('cheap') || lowerQuery.includes('affordable')) {
+                matches = matches.filter(event => {
+                    const price = event.price.match(/\$(\d+)/);
+                    return price && parseInt(price[1]) < 50;
+                });
+                filters.push('Under $50');
+            }
+
+            // Filter by venue type
+            if (lowerQuery.includes('small') || lowerQuery.includes('intimate') || lowerQuery.includes('club')) {
+                matches = matches.filter(event => 
+                    event.venue.toLowerCase().includes('club') || 
+                    event.venue.toLowerCase().includes('coffee') ||
+                    event.venue.toLowerCase().includes('underground')
+                );
+                filters.push('Intimate Venues');
+            }
+
+            // Default response if no specific matches
+            if (!responseText) {
+                responseText = `I found ${matches.length} events that might interest you! `;
+            }
+
+            // Add contextual response
+            if (matches.length === 0) {
+                responseText = discoveryResponses.noResults;
+                matches = sampleEvents.slice(0, 3); // Show some sample events
+            } else {
+                responseText += "Here are the best matches based on your search criteria:";
+            }
+
+            addMessage(responseText, 'ai');
+            displayEventResults(matches, filters, query);
+        }
+
+        function displayEventResults(events, filters, query) {
+            searchResults.classList.remove('hidden');
+            resultsTitle.textContent = `Event Search Results`;
+            resultsCount.textContent = `${events.length} events found`;
+
+            // Display filter tags
+            filterTags.innerHTML = '';
+            filters.forEach(filter => {
+                const tag = document.createElement('div');
+                tag.className = 'filter-tag';
+                tag.textContent = filter;
+                filterTags.appendChild(tag);
+            });
+
+            // Display events
+            eventsGrid.innerHTML = '';
+            events.forEach(event => {
+                const eventCard = createEventCard(event);
+                eventsGrid.appendChild(eventCard);
+            });
+
+            // Scroll to results
+            searchResults.scrollIntoView({ behavior: 'smooth' });
+
+            // Track search
+            trackInteraction('event_search', { query, resultsCount: events.length, filters });
+        }
+
+        function createEventCard(event) {
+            const card = document.createElement('div');
+            card.className = 'event-card';
+            card.onclick = () => selectEvent(event);
+
+            card.innerHTML = `
+                <div class="event-image">${event.image}</div>
+                <div class="event-content">
+                    <div class="event-title">${event.title}</div>
+                    <div class="event-details">📅 ${formatDate(event.date)} at ${event.time}</div>
+                    <div class="event-details">📍 ${event.venue}, ${event.location}</div>
+                    <div class="event-description">${event.description}</div>
+                    <div class="event-tags">
+                        ${event.tags.map(tag => `<span class="event-tag">${tag}</span>`).join('')}
+                    </div>
+                    <div class="event-price">💰 ${event.price}</div>
+                    <button class="btn-primary" style="width: 100%;">View Details & Book</button>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function selectEvent(event) {
+            alert(`🎉 Event Selected: ${event.title}\n\n📅 ${formatDate(event.date)} at ${event.time}\n📍 ${event.venue}, ${event.location}\n💰 ${event.price}\n\n🎫 Booking integration would connect to ticketing platform here!`);
+            
+            addMessage(`Great choice! "${event.title}" looks amazing. I can help you with ticket booking, venue directions, or finding similar events. What would you like to know more about?`, 'ai');
+
+            trackInteraction('event_selected', event);
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+        }
+
+        // Data tracking
+        function trackInteraction(action, details) {
+            const interactions = JSON.parse(localStorage.getItem('musicai_interactions') || '[]');
+            interactions.push({
+                timestamp: new Date().toISOString(),
+                action: action,
+                details: details,
+                page: 'discovery'
+            });
+            localStorage.setItem('musicai_interactions', JSON.stringify(interactions));
+        }
+
+        // Navigation loading effect
+        document.querySelectorAll('.nav-link:not(.active)').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const originalText = this.textContent;
+                this.innerHTML = originalText + ' <span class="loading-spinner"></span>';
+                
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 500);
+            });
+        });
+
+        // Initialize everything
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeChat();
+            console.log('🎪 Event Discovery AI Loaded - Ready for natural language search!');
+        });
+    </script>
+</body>
+</html>

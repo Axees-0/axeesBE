@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicAI - AI-Powered Music Booking Platform</title>
+    <style>
+        /* CSS Variables from Design System */
+        :root {
+            --primary-color: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary-color: #ec4899;
+            --accent-color: #06b6d4;
+            --background-color: #0f172a;
+            --surface-color: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #64748b;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --border-color: #334155;
+            --hover-bg: #334155;
+        }
+
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            background: var(--background-color);
+            line-height: 1.6;
+        }
+
+        /* Page Layout */
+        .page-wrapper {
+            min-height: 100vh;
+            background: var(--background-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .main-content {
+            flex: 1;
+            padding-top: 80px;
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-color);
+            z-index: 1000;
+            padding: 1rem 0;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo h2 {
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--primary-color);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        /* Typography */
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        h2 {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-ai {
+            background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1rem;
+        }
+
+        .btn-ai:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.3);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: linear-gradient(135deg, var(--background-color), var(--surface-color));
+            padding: 6rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23334155" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)" opacity="0.3"/></svg>');
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+        }
+
+        /* Grid Systems */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        @media (max-width: 1024px) {
+            .grid-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sections */
+        .section {
+            padding: 4rem 2rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Feature Icons */
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--surface-color);
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 2rem 1rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .footer-section h4 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .footer-section h5 {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 0.25rem;
+            color: var(--text-muted);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        /* Loading Animation */
+        .loading-spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-logo">
+                    <h2>🎵 MusicAI</h2>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html" class="nav-link active">Home</a></li>
+                    <li><a href="booking.html" class="nav-link">AI Booking</a></li>
+                    <li><a href="discovery.html" class="nav-link">Event Discovery</a></li>
+                    <li><a href="admin.html" class="nav-link">Admin</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="hero-content">
+                    <h1>AI-Powered Music Booking Platform</h1>
+                    <p class="hero-subtitle">
+                        Revolutionize live music with intelligent talent booking, conversational event discovery, 
+                        and automated venue management powered by advanced AI.
+                    </p>
+                    <div class="hero-buttons">
+                        <a href="booking.html" class="btn-primary">Start AI Booking</a>
+                        <a href="discovery.html" class="btn-ai">Discover Events</a>
+                        <button class="btn-secondary" onclick="showDemo()">Watch Demo</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Section -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Intelligent Music Platform Features</h2>
+                    <p>Experience the future of live music with AI-driven automation and smart discovery</p>
+                </div>
+                <div class="grid-3">
+                    <div class="card">
+                        <span class="feature-icon">🤖</span>
+                        <h3>AI Booking Automation</h3>
+                        <p>Smart contract negotiation, automatic scheduling, and intelligent artist-venue matching based on preferences, availability, and performance history.</p>
+                        <a href="booking.html" class="btn-primary" style="margin-top: 1rem;">Try AI Booking</a>
+                    </div>
+                    <div class="card">
+                        <span class="feature-icon">💬</span>
+                        <h3>Conversational Event Discovery</h3>
+                        <p>Natural language event search with personalized recommendations. Ask "Find jazz concerts near me this weekend" and get instant, relevant results.</p>
+                        <a href="discovery.html" class="btn-primary" style="margin-top: 1rem;">Discover Events</a>
+                    </div>
+                    <div class="card">
+                        <span class="feature-icon">📊</span>
+                        <h3>Smart Analytics Dashboard</h3>
+                        <p>Real-time performance metrics, audience insights, and predictive analytics to optimize bookings and maximize venue profitability.</p>
+                        <a href="admin.html" class="btn-primary" style="margin-top: 1rem;">View Dashboard</a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Stats Section -->
+            <section class="stats-section">
+                <div class="section-header">
+                    <h2>Platform Performance</h2>
+                    <p>Delivering results for artists, venues, and music fans</p>
+                </div>
+                <div class="stats-grid">
+                    <div>
+                        <span class="stat-number">95%</span>
+                        <span class="stat-label">Booking Success Rate</span>
+                    </div>
+                    <div>
+                        <span class="stat-number">2.3x</span>
+                        <span class="stat-label">Faster Negotiations</span>
+                    </div>
+                    <div>
+                        <span class="stat-number">$1.2M</span>
+                        <span class="stat-label">Revenue Generated</span>
+                    </div>
+                    <div>
+                        <span class="stat-number">500+</span>
+                        <span class="stat-label">Active Venues</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Technology Showcase -->
+            <section class="section">
+                <div class="section-header">
+                    <h2>Powered by Advanced AI</h2>
+                    <p>Built with cutting-edge technology stack for maximum performance</p>
+                </div>
+                <div class="grid-3">
+                    <div class="glass-card">
+                        <h3>🧠 Machine Learning</h3>
+                        <p>Advanced recommendation algorithms analyze user preferences, booking patterns, and market trends to suggest optimal matches.</p>
+                        <ul style="margin-top: 1rem; padding-left: 1rem;">
+                            <li>Collaborative filtering</li>
+                            <li>Predictive analytics</li>
+                            <li>Natural language processing</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card">
+                        <h3>🔄 Real-time Processing</h3>
+                        <p>Instant availability checks, live pricing updates, and real-time notifications ensure seamless booking experiences.</p>
+                        <ul style="margin-top: 1rem; padding-left: 1rem;">
+                            <li>WebSocket connections</li>
+                            <li>Event-driven architecture</li>
+                            <li>Distributed caching</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card">
+                        <h3>📱 Cross-platform Integration</h3>
+                        <p>Seamless API integration with existing systems, mobile apps, and third-party platforms for comprehensive coverage.</p>
+                        <ul style="margin-top: 1rem; padding-left: 1rem;">
+                            <li>RESTful APIs</li>
+                            <li>GraphQL endpoints</li>
+                            <li>React Native compatibility</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-container">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h4>🎵 MusicAI</h4>
+                        <p>AI-powered talent booking and event discovery platform revolutionizing the live music industry.</p>
+                    </div>
+                    <div class="footer-section">
+                        <h5>Core Features</h5>
+                        <ul>
+                            <li>AI Booking Automation</li>
+                            <li>Event Discovery Chat</li>
+                            <li>Venue Management</li>
+                            <li>Analytics Dashboard</li>
+                        </ul>
+                    </div>
+                    <div class="footer-section">
+                        <h5>Technology</h5>
+                        <ul>
+                            <li>Machine Learning</li>
+                            <li>Natural Language Processing</li>
+                            <li>Real-time APIs</li>
+                            <li>Cross-platform Integration</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <p>&copy; 2024 MusicAI Platform. Transforming live music with AI technology.</p>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Demo functionality
+        function showDemo() {
+            const btn = event.target;
+            const originalText = btn.textContent;
+            
+            btn.innerHTML = 'Loading Demo <span class="loading-spinner"></span>';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert('🎬 Demo Features:\n\n✅ AI Booking: Smart artist-venue matching\n✅ Event Discovery: Natural language search\n✅ Admin Dashboard: Real-time analytics\n✅ Cross-platform APIs: React Native ready\n\nClick on navigation links to explore each feature!');
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }, 2000);
+        }
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add loading animation to navigation links
+        document.querySelectorAll('.nav-link:not(.active)').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const originalText = this.textContent;
+                this.innerHTML = originalText + ' <span class="loading-spinner"></span>';
+                
+                setTimeout(() => {
+                    window.location.href = this.href;
+                }, 500);
+            });
+        });
+
+        // Add counter animation for stats
+        function animateCounters() {
+            const counters = document.querySelectorAll('.stat-number');
+            const targets = ['95%', '2.3x', '$1.2M', '500+'];
+            
+            counters.forEach((counter, index) => {
+                counter.style.opacity = '0';
+                
+                setTimeout(() => {
+                    counter.style.opacity = '1';
+                    counter.style.transform = 'scale(1.1)';
+                    setTimeout(() => {
+                        counter.style.transform = 'scale(1)';
+                    }, 200);
+                }, index * 200);
+            });
+        }
+
+        // Trigger animations on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.target.classList.contains('stats-section')) {
+                    animateCounters();
+                }
+            });
+        });
+
+        document.querySelector('.stats-section') && observer.observe(document.querySelector('.stats-section'));
+
+        // Save user interaction data to localStorage
+        function trackInteraction(action, details) {
+            const interactions = JSON.parse(localStorage.getItem('musicai_interactions') || '[]');
+            interactions.push({
+                timestamp: new Date().toISOString(),
+                action: action,
+                details: details,
+                page: 'home'
+            });
+            localStorage.setItem('musicai_interactions', JSON.stringify(interactions));
+        }
+
+        // Track button clicks
+        document.querySelectorAll('button, a.btn-primary, a.btn-secondary, a.btn-ai').forEach(element => {
+            element.addEventListener('click', function() {
+                trackInteraction('button_click', {
+                    text: this.textContent.trim(),
+                    type: this.className,
+                    href: this.href || null
+                });
+            });
+        });
+
+        console.log('🎵 MusicAI Platform Loaded - Ready for AI-powered music booking!');
+    </script>
+</body>
+</html>

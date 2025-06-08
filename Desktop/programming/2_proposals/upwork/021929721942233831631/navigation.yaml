@@ -1,0 +1,123 @@
+name: "MusicAI Platform - 9 Screenshot Portfolio Capture"
+description: "Captures 9 strategic screenshots of AI-powered music booking platform demo"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 30000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Screenshot 1: Homepage - Landing and overview
+  - type: navigate
+    description: "Navigate to homepage"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929721942233831631/index.html"
+    waitUntil: "networkidle2"
+  - type: wait
+    description: "Wait for page to fully load"
+    value: 3000
+  - type: screenshot
+    description: "Homepage - AI Music Platform Landing"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 2: Homepage features section
+  - type: evaluate
+    description: "Scroll to features section"
+    script: "document.querySelector('.section').scrollIntoView({ behavior: 'smooth' })"
+  - type: wait
+    description: "Wait for scroll animation"
+    value: 2000
+  - type: screenshot
+    description: "Homepage - Core Features Section"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 3: Homepage stats and performance metrics
+  - type: evaluate
+    description: "Scroll to stats section"
+    script: "document.querySelector('.stats-section').scrollIntoView({ behavior: 'smooth' })"
+  - type: wait
+    description: "Wait for scroll animation"
+    value: 2000
+  - type: screenshot
+    description: "Homepage - Platform Performance Stats"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 4: AI Booking page - Main interface
+  - type: navigate
+    description: "Navigate to AI Booking page"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929721942233831631/booking.html"
+    waitUntil: "networkidle2"
+  - type: wait
+    description: "Wait for booking page to load"
+    value: 3000
+  - type: screenshot
+    description: "AI Booking - Talent Booking Interface"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 5: AI Booking - Chat interaction
+  - type: evaluate
+    description: "Focus on AI chat section"
+    script: "document.querySelector('.ai-chat').scrollIntoView({ behavior: 'smooth' })"
+  - type: wait
+    description: "Wait for scroll"
+    value: 2000
+  - type: screenshot
+    description: "AI Booking - Chat Assistant Interface"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 6: Event Discovery page - Main chat interface
+  - type: navigate
+    description: "Navigate to Event Discovery page"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929721942233831631/discovery.html"
+    waitUntil: "networkidle2"
+  - type: wait
+    description: "Wait for discovery page to load"
+    value: 3000
+  - type: screenshot
+    description: "Event Discovery - Conversational AI Interface"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 7: Event Discovery - Quick suggestions
+  - type: evaluate
+    description: "Focus on suggestions section"
+    script: "document.querySelector('.quick-suggestions').scrollIntoView({ behavior: 'smooth' })"
+  - type: wait
+    description: "Wait for scroll"
+    value: 2000
+  - type: screenshot
+    description: "Event Discovery - Quick Search Suggestions"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 8: Admin Dashboard - Main overview
+  - type: navigate
+    description: "Navigate to Admin Dashboard"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021929721942233831631/admin.html"
+    waitUntil: "networkidle2"
+  - type: wait
+    description: "Wait for dashboard to load"
+    value: 3000
+  - type: screenshot
+    description: "Admin Dashboard - Platform Management Overview"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 9: Admin Dashboard - Analytics and AI insights
+  - type: evaluate
+    description: "Focus on analytics section"
+    script: "document.querySelector('.dashboard-grid').scrollIntoView({ behavior: 'smooth' })"
+  - type: wait
+    description: "Wait for scroll"
+    value: 2000
+  - type: screenshot
+    description: "Admin Dashboard - Analytics and AI Performance"
+    screenshot:
+      fullPage: true
