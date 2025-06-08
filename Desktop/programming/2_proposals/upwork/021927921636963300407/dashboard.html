@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Dashboard - AI Investment Analysis | Romina Day AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #059669;
+            --secondary-dark: #047857;
+            --secondary-light: #d1fae5;
+            
+            /* Neutral Colors */
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            
+            /* Accent Colors */
+            --accent-orange: #f59e0b;
+            --accent-red: #dc2626;
+            --accent-purple: #7c3aed;
+            
+            /* Background */
+            --bg-primary: #ffffff;
+            --bg-secondary: var(--gray-50);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            
+            /* Layout */
+            --container-max-width: 1200px;
+            --container-padding: var(--space-6);
+            --header-height: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: var(--gray-700);
+            background: var(--bg-secondary);
+        }
+
+        .container {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            padding: 0 var(--container-padding);
+        }
+
+        /* Header & Navigation */
+        .main-header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--gray-200);
+            height: var(--header-height);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: var(--space-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .brand-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .main-nav {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .nav-link {
+            color: var(--gray-700);
+            text-decoration: none;
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--space-2);
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: var(--header-height);
+            padding: var(--space-8) 0;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .dashboard-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .dashboard-controls {
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+        }
+
+        .time-filter {
+            padding: var(--space-2) var(--space-4);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--space-2);
+            background: white;
+            font-size: 0.875rem;
+        }
+
+        .refresh-btn {
+            padding: var(--space-2) var(--space-4);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--space-2);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            padding: var(--space-6);
+            transition: all 0.2s;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .stat-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: var(--space-1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+        }
+
+        .stat-icon.blue { background: var(--primary-light); color: var(--primary-color); }
+        .stat-icon.green { background: var(--secondary-light); color: var(--secondary-color); }
+        .stat-icon.orange { background: #fef3c7; color: var(--accent-orange); }
+        .stat-icon.purple { background: #ede9fe; color: var(--accent-purple); }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-1);
+        }
+
+        .stat-change {
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+        }
+
+        .stat-change.positive { color: var(--secondary-color); }
+        .stat-change.negative { color: var(--accent-red); }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .chart-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            overflow: hidden;
+        }
+
+        .chart-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .chart-period {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .chart-content {
+            padding: var(--space-6);
+            height: 400px;
+        }
+
+        /* Analysis Panel */
+        .analysis-panel {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            height: fit-content;
+        }
+
+        .analysis-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .analysis-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .analysis-subtitle {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .analysis-content {
+            padding: var(--space-6);
+        }
+
+        .analysis-item {
+            margin-bottom: var(--space-6);
+        }
+
+        .analysis-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .analysis-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .risk-score {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .risk-meter {
+            flex: 1;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .risk-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .risk-fill.low { background: var(--secondary-color); }
+        .risk-fill.medium { background: var(--accent-orange); }
+        .risk-fill.high { background: var(--accent-red); }
+
+        .risk-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .recommendation-list {
+            list-style: none;
+        }
+
+        .recommendation-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+            margin-bottom: var(--space-3);
+            padding: var(--space-3);
+            background: var(--gray-50);
+            border-radius: var(--space-2);
+        }
+
+        .recommendation-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .recommendation-icon.bullish { background: var(--secondary-light); color: var(--secondary-color); }
+        .recommendation-icon.bearish { background: #fee2e2; color: var(--accent-red); }
+        .recommendation-icon.neutral { background: #fef3c7; color: var(--accent-orange); }
+
+        .recommendation-text {
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            line-height: 1.5;
+        }
+
+        /* Real-time Feed */
+        .realtime-section {
+            margin-top: var(--space-8);
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-6);
+        }
+
+        .feed-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-6);
+        }
+
+        .activity-feed {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            padding: var(--space-6);
+        }
+
+        .feed-item {
+            display: flex;
+            gap: var(--space-4);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .feed-item:last-child {
+            border-bottom: none;
+        }
+
+        .feed-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .feed-content {
+            flex: 1;
+        }
+
+        .feed-action {
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            margin-bottom: var(--space-1);
+        }
+
+        .feed-time {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
+        /* Market Summary */
+        .market-summary {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            padding: var(--space-6);
+        }
+
+        .market-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .market-item:last-child {
+            border-bottom: none;
+        }
+
+        .market-name {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+
+        .market-price {
+            text-align: right;
+        }
+
+        .price-value {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .price-change {
+            font-size: 0.75rem;
+            margin-top: var(--space-1);
+        }
+
+        .price-change.positive { color: var(--secondary-color); }
+        .price-change.negative { color: var(--accent-red); }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+        }
+
+        .spinner {
+            border: 3px solid var(--gray-200);
+            border-top: 3px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments for desktop-only */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feed-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="header-container">
+                <div class="nav-brand">
+                    <div class="logo">RD</div>
+                    <span class="brand-name">Romina Day AI</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link active">Live Dashboard</a>
+                    <a href="api-demo.html" class="nav-link">API Docs</a>
+                    <a href="portfolio.html" class="nav-link">Portfolio</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <h1 class="dashboard-title">Investment Analysis Dashboard</h1>
+                <div class="dashboard-controls">
+                    <select class="time-filter" id="timeFilter">
+                        <option value="24h">Last 24 Hours</option>
+                        <option value="7d" selected>Last 7 Days</option>
+                        <option value="30d">Last 30 Days</option>
+                        <option value="90d">Last 90 Days</option>
+                    </select>
+                    <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+                </div>
+            </div>
+
+            <!-- Key Metrics -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Portfolio Value</span>
+                        <div class="stat-icon blue">💼</div>
+                    </div>
+                    <div class="stat-value" id="portfolioValue">$2.45M</div>
+                    <div class="stat-change positive">
+                        ↗ <span id="portfolioChange">+12.5%</span> vs last month
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Risk Score</span>
+                        <div class="stat-icon orange">⚠️</div>
+                    </div>
+                    <div class="stat-value" id="riskScore">6.2</div>
+                    <div class="stat-change positive">
+                        ↘ <span id="riskChange">-0.3</span> improvement
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">AI Confidence</span>
+                        <div class="stat-icon green">🤖</div>
+                    </div>
+                    <div class="stat-value" id="aiConfidence">94%</div>
+                    <div class="stat-change positive">
+                        ↗ <span id="confidenceChange">+2%</span> this week
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Active Analyses</span>
+                        <div class="stat-icon purple">📊</div>
+                    </div>
+                    <div class="stat-value" id="activeAnalyses">127</div>
+                    <div class="stat-change positive">
+                        ↗ <span id="analysesChange">+18</span> this week
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Performance Chart -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Portfolio Performance</h3>
+                        <span class="chart-period">Last 7 days</span>
+                    </div>
+                    <div class="chart-content">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- AI Analysis Panel -->
+                <div class="analysis-panel">
+                    <div class="analysis-header">
+                        <h3 class="analysis-title">AI Risk Analysis</h3>
+                        <p class="analysis-subtitle">Real-time assessment</p>
+                    </div>
+                    <div class="analysis-content">
+                        <div class="analysis-item">
+                            <div class="analysis-label">Overall Risk Level</div>
+                            <div class="risk-score">
+                                <div class="risk-meter">
+                                    <div class="risk-fill medium" style="width: 62%"></div>
+                                </div>
+                                <span class="risk-value">6.2/10</span>
+                            </div>
+                        </div>
+
+                        <div class="analysis-item">
+                            <div class="analysis-label">AI Recommendations</div>
+                            <ul class="recommendation-list">
+                                <li class="recommendation-item">
+                                    <div class="recommendation-icon bullish">↗</div>
+                                    <div class="recommendation-text">
+                                        Increase tech sector allocation by 5-8% based on momentum indicators
+                                    </div>
+                                </li>
+                                <li class="recommendation-item">
+                                    <div class="recommendation-icon bearish">↘</div>
+                                    <div class="recommendation-text">
+                                        Reduce energy exposure due to volatility concerns
+                                    </div>
+                                </li>
+                                <li class="recommendation-item">
+                                    <div class="recommendation-icon neutral">⚡</div>
+                                    <div class="recommendation-text">
+                                        Monitor upcoming earnings calls for key holdings
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="analysis-item">
+                            <div class="analysis-label">Confidence Score</div>
+                            <div class="risk-score">
+                                <div class="risk-meter">
+                                    <div class="risk-fill low" style="width: 94%"></div>
+                                </div>
+                                <span class="risk-value">94%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Real-time Activity -->
+            <div class="realtime-section">
+                <h2 class="section-title">Real-time Activity</h2>
+                
+                <div class="feed-grid">
+                    <div class="activity-feed">
+                        <h3 style="margin-bottom: var(--space-4); font-size: 1.125rem; font-weight: 600;">Latest Analysis Updates</h3>
+                        
+                        <div class="feed-item">
+                            <div class="feed-avatar">AI</div>
+                            <div class="feed-content">
+                                <div class="feed-action">Completed risk assessment for NVDA position</div>
+                                <div class="feed-time">2 minutes ago</div>
+                            </div>
+                        </div>
+
+                        <div class="feed-item">
+                            <div class="feed-avatar">ML</div>
+                            <div class="feed-content">
+                                <div class="feed-action">Updated sector allocation recommendations</div>
+                                <div class="feed-time">8 minutes ago</div>
+                            </div>
+                        </div>
+
+                        <div class="feed-item">
+                            <div class="feed-avatar">DA</div>
+                            <div class="feed-content">
+                                <div class="feed-action">Analyzed earnings impact for Q4 holdings</div>
+                                <div class="feed-time">15 minutes ago</div>
+                            </div>
+                        </div>
+
+                        <div class="feed-item">
+                            <div class="feed-avatar">AI</div>
+                            <div class="feed-content">
+                                <div class="feed-action">Generated portfolio optimization suggestions</div>
+                                <div class="feed-time">23 minutes ago</div>
+                            </div>
+                        </div>
+
+                        <div class="feed-item">
+                            <div class="feed-avatar">RS</div>
+                            <div class="feed-content">
+                                <div class="feed-action">Risk score updated based on market volatility</div>
+                                <div class="feed-time">31 minutes ago</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="market-summary">
+                        <h3 style="margin-bottom: var(--space-4); font-size: 1.125rem; font-weight: 600;">Market Summary</h3>
+                        
+                        <div class="market-item">
+                            <span class="market-name">S&P 500</span>
+                            <div class="market-price">
+                                <div class="price-value">4,756.50</div>
+                                <div class="price-change positive">+1.2%</div>
+                            </div>
+                        </div>
+
+                        <div class="market-item">
+                            <span class="market-name">NASDAQ</span>
+                            <div class="market-price">
+                                <div class="price-value">14,963.87</div>
+                                <div class="price-change positive">+0.8%</div>
+                            </div>
+                        </div>
+
+                        <div class="market-item">
+                            <span class="market-name">Dow Jones</span>
+                            <div class="market-price">
+                                <div class="price-value">38,109.43</div>
+                                <div class="price-change negative">-0.3%</div>
+                            </div>
+                        </div>
+
+                        <div class="market-item">
+                            <span class="market-name">VIX</span>
+                            <div class="market-price">
+                                <div class="price-value">13.42</div>
+                                <div class="price-change negative">-5.2%</div>
+                            </div>
+                        </div>
+
+                        <div class="market-item">
+                            <span class="market-name">USD/EUR</span>
+                            <div class="market-price">
+                                <div class="price-value">1.0892</div>
+                                <div class="price-change positive">+0.1%</div>
+                            </div>
+                        </div>
+
+                        <div class="market-item">
+                            <span class="market-name">Bitcoin</span>
+                            <div class="market-price">
+                                <div class="price-value">$67,234</div>
+                                <div class="price-change positive">+3.4%</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Performance Chart
+        let performanceChart;
+        
+        function initPerformanceChart() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            
+            const data = {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [
+                    {
+                        label: 'Portfolio Value',
+                        data: [2.35, 2.38, 2.41, 2.39, 2.42, 2.44, 2.45],
+                        borderColor: 'rgb(37, 99, 235)',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Benchmark (S&P 500)',
+                        data: [2.35, 2.36, 2.38, 2.37, 2.39, 2.40, 2.41],
+                        borderColor: 'rgb(107, 114, 128)',
+                        backgroundColor: 'rgba(107, 114, 128, 0.1)',
+                        tension: 0.4,
+                        fill: false,
+                        borderDash: [5, 5]
+                    }
+                ]
+            };
+
+            const config = {
+                type: 'line',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': $' + context.parsed.y + 'M';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Day of Week'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Value (Millions USD)'
+                            },
+                            beginAtZero: false,
+                            min: 2.3,
+                            max: 2.5
+                        }
+                    },
+                    interaction: {
+                        mode: 'nearest',
+                        axis: 'x',
+                        intersect: false
+                    }
+                }
+            };
+
+            performanceChart = new Chart(ctx, config);
+        }
+
+        // Data refresh functionality
+        function refreshDashboard() {
+            const refreshBtn = document.getElementById('refreshBtn');
+            refreshBtn.innerHTML = '<div class="spinner" style="width: 16px; height: 16px; border-width: 2px;"></div> Refreshing...';
+            refreshBtn.disabled = true;
+
+            // Simulate API call delay
+            setTimeout(() => {
+                // Update stats with slight variations
+                updateStats();
+                
+                // Update chart data
+                updateChartData();
+                
+                // Update activity feed
+                updateActivityFeed();
+                
+                refreshBtn.innerHTML = '↻ Refresh';
+                refreshBtn.disabled = false;
+                
+                // Store refresh in localStorage
+                const refreshData = {
+                    timestamp: new Date().toISOString(),
+                    action: 'dashboard_refresh'
+                };
+                let refreshHistory = JSON.parse(localStorage.getItem('refreshHistory') || '[]');
+                refreshHistory.push(refreshData);
+                localStorage.setItem('refreshHistory', JSON.stringify(refreshHistory));
+                
+            }, 2000);
+        }
+
+        function updateStats() {
+            // Simulate real-time data updates
+            const portfolioValue = 2.45 + (Math.random() - 0.5) * 0.1;
+            const riskScore = 6.2 + (Math.random() - 0.5) * 0.5;
+            const aiConfidence = 94 + Math.floor((Math.random() - 0.5) * 4);
+            const activeAnalyses = 127 + Math.floor((Math.random() - 0.5) * 10);
+
+            document.getElementById('portfolioValue').textContent = '$' + portfolioValue.toFixed(2) + 'M';
+            document.getElementById('riskScore').textContent = riskScore.toFixed(1);
+            document.getElementById('aiConfidence').textContent = aiConfidence + '%';
+            document.getElementById('activeAnalyses').textContent = activeAnalyses;
+
+            // Update risk meter
+            const riskFill = document.querySelector('.risk-fill');
+            const riskValueDisplay = document.querySelector('.risk-value');
+            riskFill.style.width = (riskScore * 10) + '%';
+            riskValueDisplay.textContent = riskScore.toFixed(1) + '/10';
+
+            // Update confidence meter
+            const confidenceFill = document.querySelectorAll('.risk-fill')[1];
+            confidenceFill.style.width = aiConfidence + '%';
+        }
+
+        function updateChartData() {
+            if (performanceChart) {
+                // Add new data point and remove oldest
+                const newValue = 2.45 + (Math.random() - 0.5) * 0.05;
+                const newBenchmark = 2.41 + (Math.random() - 0.5) * 0.03;
+                
+                performanceChart.data.datasets[0].data.push(newValue);
+                performanceChart.data.datasets[0].data.shift();
+                
+                performanceChart.data.datasets[1].data.push(newBenchmark);
+                performanceChart.data.datasets[1].data.shift();
+                
+                performanceChart.update();
+            }
+        }
+
+        function updateActivityFeed() {
+            const activities = [
+                'Completed sentiment analysis for tech sector',
+                'Updated risk models with latest market data',
+                'Generated new allocation recommendations',
+                'Analyzed correlation patterns in portfolio',
+                'Processed earnings guidance updates',
+                'Evaluated ESG scoring changes',
+                'Calculated optimal rebalancing strategy'
+            ];
+
+            const feed = document.querySelector('.activity-feed');
+            const firstItem = feed.querySelector('.feed-item');
+            
+            if (firstItem) {
+                // Create new item
+                const newItem = document.createElement('div');
+                newItem.className = 'feed-item';
+                newItem.innerHTML = `
+                    <div class="feed-avatar">AI</div>
+                    <div class="feed-content">
+                        <div class="feed-action">${activities[Math.floor(Math.random() * activities.length)]}</div>
+                        <div class="feed-time">Just now</div>
+                    </div>
+                `;
+                
+                // Insert at top
+                firstItem.parentNode.insertBefore(newItem, firstItem);
+                
+                // Remove last item
+                const items = feed.querySelectorAll('.feed-item');
+                if (items.length > 5) {
+                    items[items.length - 1].remove();
+                }
+            }
+        }
+
+        // Time filter functionality
+        function handleTimeFilterChange() {
+            const filter = document.getElementById('timeFilter').value;
+            const chartPeriod = document.querySelector('.chart-period');
+            
+            const periods = {
+                '24h': 'Last 24 hours',
+                '7d': 'Last 7 days',
+                '30d': 'Last 30 days',
+                '90d': 'Last 90 days'
+            };
+            
+            chartPeriod.textContent = periods[filter];
+            
+            // Update chart data based on period
+            if (performanceChart) {
+                let labels, data1, data2;
+                
+                switch(filter) {
+                    case '24h':
+                        labels = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '24:00'];
+                        data1 = [2.44, 2.45, 2.43, 2.46, 2.45, 2.44, 2.45];
+                        data2 = [2.40, 2.41, 2.39, 2.42, 2.41, 2.40, 2.41];
+                        break;
+                    case '30d':
+                        labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                        data1 = [2.35, 2.39, 2.42, 2.45];
+                        data2 = [2.32, 2.36, 2.38, 2.41];
+                        break;
+                    case '90d':
+                        labels = ['Month 1', 'Month 2', 'Month 3'];
+                        data1 = [2.28, 2.36, 2.45];
+                        data2 = [2.25, 2.33, 2.41];
+                        break;
+                    default:
+                        labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                        data1 = [2.35, 2.38, 2.41, 2.39, 2.42, 2.44, 2.45];
+                        data2 = [2.35, 2.36, 2.38, 2.37, 2.39, 2.40, 2.41];
+                }
+                
+                performanceChart.data.labels = labels;
+                performanceChart.data.datasets[0].data = data1;
+                performanceChart.data.datasets[1].data = data2;
+                performanceChart.update();
+            }
+        }
+
+        // Market data simulation
+        function simulateMarketData() {
+            const marketItems = document.querySelectorAll('.market-item');
+            
+            marketItems.forEach(item => {
+                const priceValue = item.querySelector('.price-value');
+                const priceChange = item.querySelector('.price-change');
+                
+                if (priceValue && priceChange) {
+                    // Small random price movements
+                    const currentPrice = parseFloat(priceValue.textContent.replace(/[^0-9.]/g, ''));
+                    const change = (Math.random() - 0.5) * 0.02; // ±1% change
+                    const newPrice = currentPrice * (1 + change);
+                    
+                    // Update price
+                    if (priceValue.textContent.includes('$')) {
+                        priceValue.textContent = '$' + newPrice.toFixed(0);
+                    } else {
+                        priceValue.textContent = newPrice.toFixed(2);
+                    }
+                    
+                    // Update change
+                    const changePercent = (change * 100).toFixed(1);
+                    priceChange.textContent = (change >= 0 ? '+' : '') + changePercent + '%';
+                    priceChange.className = 'price-change ' + (change >= 0 ? 'positive' : 'negative');
+                }
+            });
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            initPerformanceChart();
+            
+            // Event listeners
+            document.getElementById('refreshBtn').addEventListener('click', refreshDashboard);
+            document.getElementById('timeFilter').addEventListener('change', handleTimeFilterChange);
+            
+            // Set active navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === 'dashboard.html') {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Simulate real-time updates
+            setInterval(simulateMarketData, 30000); // Update every 30 seconds
+            setInterval(updateStats, 45000); // Update stats every 45 seconds
+            
+            // Track page view
+            const viewData = {
+                page: 'dashboard',
+                timestamp: new Date().toISOString(),
+                timeSpent: 0
+            };
+            localStorage.setItem('currentView', JSON.stringify(viewData));
+        });
+
+        // Track time spent on page
+        let startTime = Date.now();
+        window.addEventListener('beforeunload', function() {
+            const timeSpent = Date.now() - startTime;
+            const viewData = JSON.parse(localStorage.getItem('currentView') || '{}');
+            viewData.timeSpent = timeSpent;
+            
+            let analytics = JSON.parse(localStorage.getItem('pageAnalytics') || '[]');
+            analytics.push(viewData);
+            localStorage.setItem('pageAnalytics', JSON.stringify(analytics));
+        });
+    </script>
+</body>
+</html>

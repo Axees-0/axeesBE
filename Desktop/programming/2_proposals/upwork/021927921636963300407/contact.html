@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us - Start Your Project | Romina Day AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #059669;
+            --secondary-dark: #047857;
+            --secondary-light: #d1fae5;
+            
+            /* Neutral Colors */
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            
+            /* Accent Colors */
+            --accent-orange: #f59e0b;
+            --accent-red: #dc2626;
+            --accent-purple: #7c3aed;
+            
+            /* Background */
+            --bg-primary: #ffffff;
+            --bg-secondary: var(--gray-50);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-20: 5rem;
+            
+            /* Layout */
+            --container-max-width: 1200px;
+            --container-padding: var(--space-6);
+            --header-height: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: var(--gray-700);
+            background: var(--bg-secondary);
+        }
+
+        .container {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            padding: 0 var(--container-padding);
+        }
+
+        /* Header & Navigation */
+        .main-header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--gray-200);
+            height: var(--header-height);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: var(--space-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .brand-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .main-nav {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .nav-link {
+            color: var(--gray-700);
+            text-decoration: none;
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--space-2);
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: var(--header-height);
+            padding: var(--space-8) 0;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-12);
+            padding: var(--space-12) 0;
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+            color: white;
+            border-radius: var(--space-3);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-4);
+        }
+
+        .page-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            margin-bottom: var(--space-16);
+        }
+
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-12);
+            align-items: start;
+        }
+
+        /* Contact Form */
+        .contact-form-container {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            padding: var(--space-8);
+        }
+
+        .form-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-3);
+        }
+
+        .form-description {
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-4);
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-input, .form-textarea, .form-select {
+            padding: var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--space-2);
+            font-size: 0.875rem;
+            transition: all 0.2s;
+            font-family: var(--font-primary);
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-button {
+            padding: var(--space-4) var(--space-8);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--space-2);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+        }
+
+        .form-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .form-button:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+        }
+
+        /* Contact Info */
+        .contact-info {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            padding: var(--space-8);
+        }
+
+        .info-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .info-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-3);
+        }
+
+        .info-description {
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        .contact-methods {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-6);
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-2);
+            transition: all 0.2s;
+        }
+
+        .contact-method:hover {
+            background: var(--gray-50);
+            border-color: var(--primary-color);
+        }
+
+        .method-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .method-content {
+            flex: 1;
+        }
+
+        .method-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-1);
+        }
+
+        .method-detail {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+        }
+
+        .method-link {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .method-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Team Section */
+        .team-section {
+            background: var(--bg-primary);
+            border-radius: var(--space-3);
+            padding: var(--space-12);
+            margin-bottom: var(--space-16);
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            text-align: center;
+            margin-bottom: var(--space-4);
+        }
+
+        .section-description {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            text-align: center;
+            margin-bottom: var(--space-12);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-8);
+        }
+
+        .team-member {
+            text-align: center;
+            padding: var(--space-6);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            transition: all 0.2s;
+        }
+
+        .team-member:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .member-avatar {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4);
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .member-name {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .member-role {
+            font-size: 0.875rem;
+            color: var(--primary-color);
+            font-weight: 500;
+            margin-bottom: var(--space-3);
+        }
+
+        .member-bio {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            line-height: 1.6;
+        }
+
+        /* Process Section */
+        .process-section {
+            margin-bottom: var(--space-16);
+        }
+
+        .process-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-6);
+        }
+
+        .process-step {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            padding: var(--space-6);
+            text-align: center;
+            position: relative;
+        }
+
+        .process-step::after {
+            content: "→";
+            position: absolute;
+            top: 50%;
+            right: -15px;
+            transform: translateY(-50%);
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .process-step:last-child::after {
+            display: none;
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4);
+            font-weight: 600;
+        }
+
+        .step-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .step-description {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            line-height: 1.5;
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            background: var(--secondary-light);
+            border: 1px solid var(--secondary-color);
+            border-radius: var(--space-2);
+            padding: var(--space-4);
+            margin-top: var(--space-4);
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-title {
+            font-weight: 600;
+            color: var(--secondary-dark);
+            margin-bottom: var(--space-2);
+        }
+
+        .success-text {
+            color: var(--gray-700);
+            font-size: 0.875rem;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            border: 2px solid var(--gray-200);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .contact-grid {
+                grid-template-columns: 1fr;
+                gap: var(--space-8);
+            }
+            
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .process-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .process-step::after {
+                display: none;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="header-container">
+                <div class="nav-brand">
+                    <div class="logo">RD</div>
+                    <span class="brand-name">Romina Day AI</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link">Live Dashboard</a>
+                    <a href="api-demo.html" class="nav-link">API Docs</a>
+                    <a href="portfolio.html" class="nav-link">Portfolio</a>
+                    <a href="contact.html" class="nav-link active">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Let's Build Something Great</h1>
+                <p class="page-subtitle">Ready to transform your Streamlit prototype into a production-ready platform? Get in touch and let's discuss your project.</p>
+            </div>
+
+            <!-- Contact Form & Info -->
+            <section class="contact-section">
+                <div class="contact-grid">
+                    <!-- Contact Form -->
+                    <div class="contact-form-container">
+                        <div class="form-header">
+                            <h2 class="form-title">Start Your Project</h2>
+                            <p class="form-description">Tell us about your Streamlit prototype and requirements. We'll get back to you within 4 hours with a detailed proposal.</p>
+                        </div>
+
+                        <form class="contact-form" id="contact-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">First Name</label>
+                                    <input type="text" class="form-input" id="first-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Last Name</label>
+                                    <input type="text" class="form-input" id="last-name" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-input" id="email" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Company Name</label>
+                                <input type="text" class="form-input" id="company">
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">Project Type</label>
+                                    <select class="form-select" id="project-type" required>
+                                        <option value="">Select project type</option>
+                                        <option value="streamlit-migration">Streamlit to Production Migration</option>
+                                        <option value="api-development">API Development (FastAPI/Flask)</option>
+                                        <option value="frontend-rebuild">Frontend Rebuild (React/Vue)</option>
+                                        <option value="full-stack">Full-Stack Development</option>
+                                        <option value="ai-integration">AI/LLM Integration</option>
+                                        <option value="consultation">Technical Consultation</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Budget Range</label>
+                                    <select class="form-select" id="budget">
+                                        <option value="">Select budget range</option>
+                                        <option value="5k-15k">$5,000 - $15,000</option>
+                                        <option value="15k-30k">$15,000 - $30,000</option>
+                                        <option value="30k-50k">$30,000 - $50,000</option>
+                                        <option value="50k+">$50,000+</option>
+                                        <option value="consultation">Consultation First</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Project Description</label>
+                                <textarea class="form-textarea" id="project-description" placeholder="Tell us about your current Streamlit prototype, the functionality you need migrated, and your specific requirements..." required></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Timeline Requirements</label>
+                                <input type="text" class="form-input" id="timeline" placeholder="e.g., 4-6 weeks, ASAP, Flexible">
+                            </div>
+
+                            <button type="submit" class="form-button" id="submit-btn">
+                                Send Project Inquiry
+                            </button>
+
+                            <div class="success-message" id="success-message">
+                                <div class="success-title">Message Sent Successfully! 🎉</div>
+                                <div class="success-text">Thank you for your inquiry. Our team will review your project requirements and respond within 4 hours with a detailed proposal and next steps.</div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Contact Information -->
+                    <div class="contact-info">
+                        <div class="info-header">
+                            <h2 class="info-title">Get In Touch</h2>
+                            <p class="info-description">Multiple ways to reach our team of experts. We're here to help transform your AI prototype into a production-ready platform.</p>
+                        </div>
+
+                        <div class="contact-methods">
+                            <div class="contact-method">
+                                <div class="method-icon">📧</div>
+                                <div class="method-content">
+                                    <div class="method-title">Email</div>
+                                    <div class="method-detail">
+                                        <a href="mailto:hello@rominaday.ai" class="method-link">hello@rominaday.ai</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="contact-method">
+                                <div class="method-icon">💬</div>
+                                <div class="method-content">
+                                    <div class="method-title">Live Chat</div>
+                                    <div class="method-detail">Available Monday-Friday, 9 AM - 6 PM EST</div>
+                                </div>
+                            </div>
+
+                            <div class="contact-method">
+                                <div class="method-icon">📅</div>
+                                <div class="method-content">
+                                    <div class="method-title">Schedule Call</div>
+                                    <div class="method-detail">
+                                        <a href="#" class="method-link" onclick="scheduleCall()">Book a consultation</a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="contact-method">
+                                <div class="method-icon">🏢</div>
+                                <div class="method-content">
+                                    <div class="method-title">Office</div>
+                                    <div class="method-detail">New York, NY<br>Available for enterprise clients</div>
+                                </div>
+                            </div>
+
+                            <div class="contact-method">
+                                <div class="method-icon">⚡</div>
+                                <div class="method-content">
+                                    <div class="method-title">Response Time</div>
+                                    <div class="method-detail">4 hours average response<br>Same-day proposals</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Our Process -->
+            <section class="process-section">
+                <h2 class="section-title">Our Process</h2>
+                <p class="section-description">From initial consultation to production deployment, here's how we transform your Streamlit prototype</p>
+
+                <div class="process-grid">
+                    <div class="process-step">
+                        <div class="step-number">1</div>
+                        <h3 class="step-title">Discovery & Analysis</h3>
+                        <p class="step-description">Deep dive into your Streamlit prototype, understand requirements, and plan migration strategy</p>
+                    </div>
+
+                    <div class="process-step">
+                        <div class="step-number">2</div>
+                        <h3 class="step-title">Architecture Design</h3>
+                        <p class="step-description">Design scalable API architecture and modern frontend structure with security and performance in mind</p>
+                    </div>
+
+                    <div class="process-step">
+                        <div class="step-number">3</div>
+                        <h3 class="step-title">Development & Migration</h3>
+                        <p class="step-description">Extract logic, build FastAPI backend, implement React frontend with full feature parity</p>
+                    </div>
+
+                    <div class="process-step">
+                        <div class="step-number">4</div>
+                        <h3 class="step-title">Testing & Deployment</h3>
+                        <p class="step-description">Comprehensive testing, documentation, and production deployment with monitoring setup</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Team Section -->
+            <section class="team-section">
+                <h2 class="section-title">Meet Our Team</h2>
+                <p class="section-description">Expert developers specializing in AI platforms and financial technology</p>
+
+                <div class="team-grid">
+                    <div class="team-member">
+                        <div class="member-avatar">AS</div>
+                        <h3 class="member-name">Alex Smith</h3>
+                        <p class="member-role">Lead Full-Stack Developer</p>
+                        <p class="member-bio">10+ years in financial tech with expertise in Streamlit migrations and FastAPI development. Led 15+ successful platform transformations.</p>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-avatar">MJ</div>
+                        <h3 class="member-name">Maria Johnson</h3>
+                        <p class="member-role">AI/ML Engineering Lead</p>
+                        <p class="member-bio">Specialist in LLM integration and multi-agent systems. 8 years experience building AI-powered financial analysis platforms.</p>
+                    </div>
+
+                    <div class="team-member">
+                        <div class="member-avatar">DC</div>
+                        <h3 class="member-name">David Chen</h3>
+                        <p class="member-role">Frontend Architecture Lead</p>
+                        <p class="member-bio">React and Vue.js expert with focus on financial dashboards. Designed UX for $2B+ asset management platforms.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Form submission handling
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-btn');
+            const successMessage = document.getElementById('success-message');
+            
+            // Show loading state
+            submitBtn.innerHTML = '<div class="spinner"></div> Sending...';
+            submitBtn.disabled = true;
+            
+            // Collect form data
+            const formData = {
+                firstName: document.getElementById('first-name').value,
+                lastName: document.getElementById('last-name').value,
+                email: document.getElementById('email').value,
+                company: document.getElementById('company').value,
+                projectType: document.getElementById('project-type').value,
+                budget: document.getElementById('budget').value,
+                description: document.getElementById('project-description').value,
+                timeline: document.getElementById('timeline').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Simulate form submission
+            setTimeout(() => {
+                // Show success message
+                successMessage.classList.add('show');
+                
+                // Reset button
+                submitBtn.innerHTML = 'Message Sent Successfully!';
+                submitBtn.style.background = 'var(--secondary-color)';
+                
+                // Store form submission
+                let submissions = JSON.parse(localStorage.getItem('contactSubmissions') || '[]');
+                submissions.push(formData);
+                localStorage.setItem('contactSubmissions', JSON.stringify(submissions));
+                
+                // Scroll to success message
+                successMessage.scrollIntoView({ behavior: 'smooth' });
+                
+                // Reset form after delay
+                setTimeout(() => {
+                    document.getElementById('contact-form').reset();
+                    submitBtn.innerHTML = 'Send Another Inquiry';
+                    submitBtn.style.background = 'var(--primary-color)';
+                    submitBtn.disabled = false;
+                    successMessage.classList.remove('show');
+                }, 5000);
+                
+            }, 2000);
+        });
+
+        // Schedule call function
+        function scheduleCall() {
+            alert('Scheduling system opened! You would be redirected to our calendar booking system.');
+            
+            // Track scheduling action
+            const scheduleData = {
+                timestamp: new Date().toISOString(),
+                action: 'schedule_call_clicked',
+                page: 'contact'
+            };
+            
+            let actions = JSON.parse(localStorage.getItem('contactActions') || '[]');
+            actions.push(scheduleData);
+            localStorage.setItem('contactActions', JSON.stringify(actions));
+        }
+
+        // Form validation and interaction enhancements
+        function initFormEnhancements() {
+            const formInputs = document.querySelectorAll('.form-input, .form-textarea, .form-select');
+            
+            formInputs.forEach(input => {
+                // Add real-time validation
+                input.addEventListener('blur', function() {
+                    validateField(this);
+                });
+                
+                // Add character count for textarea
+                if (input.type === 'textarea' || input.tagName === 'TEXTAREA') {
+                    const charCount = document.createElement('div');
+                    charCount.style.fontSize = '0.75rem';
+                    charCount.style.color = 'var(--gray-500)';
+                    charCount.style.textAlign = 'right';
+                    charCount.style.marginTop = 'var(--space-1)';
+                    
+                    input.addEventListener('input', function() {
+                        const length = this.value.length;
+                        charCount.textContent = `${length}/1000 characters`;
+                        
+                        if (length > 800) {
+                            charCount.style.color = 'var(--accent-orange)';
+                        } else {
+                            charCount.style.color = 'var(--gray-500)';
+                        }
+                    });
+                    
+                    input.parentNode.appendChild(charCount);
+                }
+            });
+        }
+
+        function validateField(field) {
+            const value = field.value.trim();
+            let isValid = true;
+            let message = '';
+            
+            // Remove existing validation message
+            const existingMessage = field.parentNode.querySelector('.validation-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            // Validation logic
+            switch(field.type) {
+                case 'email':
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (value && !emailRegex.test(value)) {
+                        isValid = false;
+                        message = 'Please enter a valid email address';
+                    }
+                    break;
+                case 'text':
+                    if (field.required && !value) {
+                        isValid = false;
+                        message = 'This field is required';
+                    }
+                    break;
+            }
+            
+            // Show validation message
+            if (!isValid) {
+                const validationMessage = document.createElement('div');
+                validationMessage.className = 'validation-message';
+                validationMessage.style.color = 'var(--accent-red)';
+                validationMessage.style.fontSize = '0.75rem';
+                validationMessage.style.marginTop = 'var(--space-1)';
+                validationMessage.textContent = message;
+                
+                field.parentNode.appendChild(validationMessage);
+                field.style.borderColor = 'var(--accent-red)';
+            } else {
+                field.style.borderColor = 'var(--gray-300)';
+            }
+            
+            return isValid;
+        }
+
+        // Auto-save form data
+        function initAutoSave() {
+            const form = document.getElementById('contact-form');
+            const formElements = form.querySelectorAll('input, select, textarea');
+            
+            // Load saved data
+            const savedData = JSON.parse(localStorage.getItem('contactFormDraft') || '{}');
+            Object.keys(savedData).forEach(key => {
+                const element = document.getElementById(key);
+                if (element) {
+                    element.value = savedData[key];
+                }
+            });
+            
+            // Save data on change
+            formElements.forEach(element => {
+                element.addEventListener('input', function() {
+                    const formData = {};
+                    formElements.forEach(el => {
+                        if (el.id) {
+                            formData[el.id] = el.value;
+                        }
+                    });
+                    localStorage.setItem('contactFormDraft', JSON.stringify(formData));
+                });
+            });
+            
+            // Clear draft on successful submission
+            form.addEventListener('submit', function() {
+                setTimeout(() => {
+                    localStorage.removeItem('contactFormDraft');
+                }, 3000);
+            });
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set active navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === 'contact.html') {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Initialize form enhancements
+            initFormEnhancements();
+            initAutoSave();
+            
+            // Track page view
+            const viewData = {
+                page: 'contact',
+                timestamp: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            };
+            
+            let pageViews = JSON.parse(localStorage.getItem('contactPageViews') || '[]');
+            pageViews.push(viewData);
+            localStorage.setItem('contactPageViews', JSON.stringify(pageViews));
+            
+            // Track time spent on page
+            window.contactStartTime = Date.now();
+        });
+
+        // Track form interactions
+        document.addEventListener('change', function(e) {
+            if (e.target.matches('.form-input, .form-select, .form-textarea')) {
+                const interactionData = {
+                    timestamp: new Date().toISOString(),
+                    field: e.target.id,
+                    action: 'field_completed',
+                    page: 'contact'
+                };
+                
+                let interactions = JSON.parse(localStorage.getItem('formInteractions') || '[]');
+                interactions.push(interactionData);
+                localStorage.setItem('formInteractions', JSON.stringify(interactions));
+            }
+        });
+
+        // Track page exit time
+        window.addEventListener('beforeunload', function() {
+            if (window.contactStartTime) {
+                const timeSpent = Date.now() - window.contactStartTime;
+                const exitData = {
+                    page: 'contact',
+                    timeSpent: timeSpent,
+                    timestamp: new Date().toISOString()
+                };
+                
+                let exitEvents = JSON.parse(localStorage.getItem('pageExitEvents') || '[]');
+                exitEvents.push(exitData);
+                localStorage.setItem('pageExitEvents', JSON.stringify(exitEvents));
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+name: "Romina Day AI - Streamlit Migration Demo"
+description: "9 screenshot workflow capturing the complete AI investment platform demo for Upwork proposal"
+version: "1.0.0"
+
+config:
+  headless: true
+  timeout: 30000
+  viewport:
+    width: 1280
+    height: 720
+
+steps:
+  # Screenshot 1: Homepage Landing
+  - type: navigate
+    description: "Navigate to homepage - main landing page"
+    url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021927921636963300407/index.html"
+    waitUntil: "networkidle2"
+    
+  - type: waitForSelector
+    description: "Wait for hero section to load"
+    selector: ".hero, .main-content"
+    timeout: 10000
+    
+  - type: wait
+    description: "Wait for animations and dynamic content"
+    value: 3000
+    
+  - type: screenshot
+    description: "Capture homepage with hero section and features"
+    screenshot:
+      fullPage: true
+      
+  - type: assertText
+    description: "Verify homepage loaded correctly"
+    selector: "h1"
+    expected: "AI-Powered Investment Due Diligence"
+
+  # Screenshot 2: Dashboard Page
+  - type: click
+    description: "Navigate to live dashboard"
+    selector: "a[href='dashboard.html'], .nav-link:nth-child(2)"
+    
+  - type: wait
+    description: "Wait for dashboard page to load"
+    value: 3000
+    
+  - type: waitForSelector
+    description: "Wait for dashboard content"
+    selector: ".dashboard-header, .stats-grid"
+    timeout: 10000
+    
+  - type: screenshot
+    description: "Capture interactive dashboard with charts and metrics"
+    screenshot:
+      fullPage: true
+      
+  - type: assertText
+    description: "Verify dashboard loaded"
+    selector: ".dashboard-title"
+    expected: "Investment Analysis Dashboard"
+
+  # Screenshot 3: API Documentation
+  - type: click
+    description: "Navigate to API documentation"
+    selector: "a[href='api-demo.html'], .nav-link:nth-child(3)"
+    
+  - type: wait
+    description: "Wait for API demo page to load"
+    value: 3000
+    
+  - type: waitForSelector
+    description: "Wait for API content"
+    selector: ".page-header, .endpoints-grid"
+    timeout: 10000
+    
+  - type: screenshot
+    description: "Capture API documentation and code examples"
+    screenshot:
+      fullPage: true
+      
+  - type: assertText
+    description: "Verify API page loaded"
+    selector: ".page-title"
+    expected: "FastAPI Integration"
+
+  # Screenshot 4: API Demo Interaction
+  - type: click
+    description: "Show interactive API demo"
+    selector: ".try-button"
+    
+  - type: wait
+    description: "Wait for demo section to appear"
+    value: 2000
+    
+  - type: waitForSelector
+    description: "Wait for demo form"
+    selector: ".demo-section, .demo-form"
+    timeout: 8000
+    
+  - type: screenshot
+    description: "Capture live API demo interface"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 5: Portfolio Overview
+  - type: click
+    description: "Navigate to portfolio page"
+    selector: "a[href='portfolio.html'], .nav-link:nth-child(4)"
+    
+  - type: wait
+    description: "Wait for portfolio page to load"
+    value: 3000
+    
+  - type: waitForSelector
+    description: "Wait for portfolio content"
+    selector: ".portfolio-grid, .project-card"
+    timeout: 10000
+    
+  - type: screenshot
+    description: "Capture portfolio projects and case studies"
+    screenshot:
+      fullPage: true
+      
+  - type: assertText
+    description: "Verify portfolio page loaded"
+    selector: ".page-title"
+    expected: "Our Portfolio"
+
+  # Screenshot 6: Project Details Modal
+  - type: click
+    description: "Open project details modal"
+    selector: ".btn-primary"
+    
+  - type: wait
+    description: "Wait for modal to open"
+    value: 2000
+    
+  - type: waitForSelector
+    description: "Wait for modal content"
+    selector: ".modal-content, .modal-title"
+    timeout: 8000
+    
+  - type: screenshot
+    description: "Capture detailed project case study modal"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 7: Team & Testimonials Section
+  - type: click
+    description: "Close modal and scroll to team section"
+    selector: ".modal-close"
+    
+  - type: wait
+    description: "Wait for modal to close"
+    value: 1000
+    
+  - type: evaluate
+    description: "Scroll to team section"
+    script: |
+      const teamSection = document.querySelector('.team-section, .testimonials-section');
+      if (teamSection) {
+        teamSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    
+  - type: wait
+    description: "Wait for scroll completion"
+    value: 2000
+    
+  - type: screenshot
+    description: "Capture team and testimonials section"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 8: Contact Form
+  - type: click
+    description: "Navigate to contact page"
+    selector: "a[href='contact.html'], .nav-link:nth-child(5)"
+    
+  - type: wait
+    description: "Wait for contact page to load"
+    value: 3000
+    
+  - type: waitForSelector
+    description: "Wait for contact form"
+    selector: ".contact-form, .contact-grid"
+    timeout: 10000
+    
+  - type: screenshot
+    description: "Capture contact form and information"
+    screenshot:
+      fullPage: true
+      
+  - type: assertText
+    description: "Verify contact page loaded"
+    selector: ".page-title"
+    expected: "Let's Build Something Great"
+
+  # Screenshot 9: Contact Form Filled & Process Section
+  - type: type
+    description: "Fill company name field"
+    selector: "#company"
+    value: "Enterprise Financial Corp"
+    
+  - type: type
+    description: "Fill project description"
+    selector: "#project-description"
+    value: "We have a Streamlit prototype for investment analysis that needs to be migrated to production-ready FastAPI + React architecture for our institutional clients."
+    
+  - type: evaluate
+    description: "Scroll to process section"
+    script: |
+      const processSection = document.querySelector('.process-section');
+      if (processSection) {
+        processSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    
+  - type: wait
+    description: "Wait for final scroll and form state"
+    value: 2000
+    
+  - type: screenshot
+    description: "Capture filled form and process workflow"
+    screenshot:
+      fullPage: true
+
+  # Final Validation
+  - type: evaluate
+    description: "Collect final metrics and validation data"
+    script: |
+      ({
+        totalPages: ['index.html', 'dashboard.html', 'api-demo.html', 'portfolio.html', 'contact.html'].length,
+        currentUrl: window.location.href,
+        pageTitle: document.title,
+        hasNavigation: !!document.querySelector('.main-nav'),
+        hasCharts: !!document.querySelector('canvas'),
+        hasInteractivity: !!document.querySelector('.btn, button'),
+        formFields: document.querySelectorAll('input, select, textarea').length,
+        loadTime: performance.timing.loadEventEnd - performance.timing.navigationStart,
+        screenshotsCaptured: 9,
+        workflowComplete: true
+      })
+      
+  - type: assertVisible
+    description: "Verify final page elements are visible"
+    selector: ".main-content"

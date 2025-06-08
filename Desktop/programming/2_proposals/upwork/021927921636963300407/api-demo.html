@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Documentation - FastAPI Integration | Romina Day AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #dbeafe;
+            
+            /* Secondary Colors */
+            --secondary-color: #059669;
+            --secondary-dark: #047857;
+            --secondary-light: #d1fae5;
+            
+            /* Neutral Colors */
+            --gray-900: #111827;
+            --gray-800: #1f2937;
+            --gray-700: #374151;
+            --gray-600: #4b5563;
+            --gray-500: #6b7280;
+            --gray-400: #9ca3af;
+            --gray-300: #d1d5db;
+            --gray-200: #e5e7eb;
+            --gray-100: #f3f4f6;
+            --gray-50: #f9fafb;
+            
+            /* Accent Colors */
+            --accent-orange: #f59e0b;
+            --accent-red: #dc2626;
+            --accent-purple: #7c3aed;
+            --accent-green: #10b981;
+            
+            /* Background */
+            --bg-primary: #ffffff;
+            --bg-secondary: var(--gray-50);
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'Fira Code', 'Monaco', 'Cascadia Code', monospace;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-5: 1.25rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-10: 2.5rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            
+            /* Layout */
+            --container-max-width: 1200px;
+            --container-padding: var(--space-6);
+            --header-height: 4rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-primary);
+            line-height: 1.6;
+            color: var(--gray-700);
+            background: var(--bg-secondary);
+        }
+
+        .container {
+            max-width: var(--container-max-width);
+            margin: 0 auto;
+            padding: 0 var(--container-padding);
+        }
+
+        /* Header & Navigation */
+        .main-header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--gray-200);
+            height: var(--header-height);
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: var(--space-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .brand-name {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .main-nav {
+            display: flex;
+            gap: var(--space-2);
+        }
+
+        .nav-link {
+            color: var(--gray-700);
+            text-decoration: none;
+            padding: var(--space-3) var(--space-4);
+            border-radius: var(--space-2);
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .nav-link:hover {
+            background: var(--primary-light);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: var(--header-height);
+            padding: var(--space-8) 0;
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            margin-bottom: var(--space-12);
+            padding: var(--space-12) 0;
+            background: linear-gradient(135deg, var(--gray-900) 0%, var(--gray-800) 100%);
+            color: white;
+            border-radius: var(--space-3);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-4);
+        }
+
+        .page-subtitle {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* API Section */
+        .api-section {
+            margin-bottom: var(--space-16);
+        }
+
+        .section-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: var(--space-6);
+        }
+
+        .section-description {
+            font-size: 1.125rem;
+            color: var(--gray-600);
+            margin-bottom: var(--space-8);
+            line-height: 1.7;
+        }
+
+        /* Endpoint Grid */
+        .endpoints-grid {
+            display: grid;
+            gap: var(--space-6);
+        }
+
+        .endpoint-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        .endpoint-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .endpoint-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .endpoint-method {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .method-badge {
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--space-1);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .method-badge.post {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .method-badge.get {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .method-badge.put {
+            background: var(--accent-orange);
+            color: white;
+        }
+
+        .endpoint-path {
+            font-family: var(--font-mono);
+            font-size: 1rem;
+            color: var(--gray-900);
+            font-weight: 500;
+        }
+
+        .try-button {
+            padding: var(--space-2) var(--space-4);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--space-2);
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .try-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .endpoint-content {
+            padding: var(--space-6);
+        }
+
+        .endpoint-description {
+            margin-bottom: var(--space-6);
+            color: var(--gray-600);
+        }
+
+        /* Code Blocks */
+        .code-section {
+            margin-bottom: var(--space-6);
+        }
+
+        .code-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--gray-700);
+            margin-bottom: var(--space-3);
+        }
+
+        .code-block {
+            background: var(--gray-900);
+            border-radius: var(--space-2);
+            padding: var(--space-4);
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .code-block::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .code-content {
+            font-family: var(--font-mono);
+            font-size: 0.875rem;
+            color: #e5e7eb;
+            line-height: 1.6;
+        }
+
+        .code-keyword { color: #8b5cf6; }
+        .code-string { color: #10b981; }
+        .code-number { color: #f59e0b; }
+        .code-comment { color: #6b7280; }
+        .code-property { color: #3b82f6; }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: var(--space-4);
+        }
+
+        .tab-button {
+            padding: var(--space-3) var(--space-4);
+            border: none;
+            background: none;
+            color: var(--gray-600);
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .tab-button:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Demo Section */
+        .demo-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            padding: var(--space-8);
+            margin-bottom: var(--space-12);
+        }
+
+        .demo-header {
+            text-align: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .demo-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .demo-description {
+            color: var(--gray-600);
+        }
+
+        .demo-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: var(--space-6);
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: var(--space-2);
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--space-2);
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-button {
+            width: 100%;
+            padding: var(--space-3) var(--space-6);
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--space-2);
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .form-button:hover {
+            background: var(--primary-dark);
+        }
+
+        .form-button:disabled {
+            background: var(--gray-400);
+            cursor: not-allowed;
+        }
+
+        /* Response Section */
+        .response-section {
+            margin-top: var(--space-6);
+            display: none;
+        }
+
+        .response-section.show {
+            display: block;
+        }
+
+        .response-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .status-badge {
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--space-1);
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-badge.success {
+            background: var(--secondary-light);
+            color: var(--secondary-dark);
+        }
+
+        .status-badge.error {
+            background: #fee2e2;
+            color: var(--accent-red);
+        }
+
+        /* Loading Spinner */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+        }
+
+        .spinner {
+            border: 2px solid var(--gray-200);
+            border-top: 2px solid var(--primary-color);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Architecture Section */
+        .architecture-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-8);
+            margin-bottom: var(--space-12);
+        }
+
+        .architecture-card {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--space-3);
+            padding: var(--space-6);
+        }
+
+        .architecture-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            border-radius: var(--space-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: var(--space-4);
+            font-size: 1.5rem;
+        }
+
+        .architecture-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: var(--space-3);
+        }
+
+        .architecture-description {
+            color: var(--gray-600);
+            margin-bottom: var(--space-4);
+        }
+
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-2);
+            font-size: 0.875rem;
+            color: var(--gray-700);
+        }
+
+        .feature-check {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="container">
+            <div class="header-container">
+                <div class="nav-brand">
+                    <div class="logo">RD</div>
+                    <span class="brand-name">Romina Day AI</span>
+                </div>
+                <nav class="main-nav">
+                    <a href="index.html" class="nav-link">Home</a>
+                    <a href="dashboard.html" class="nav-link">Live Dashboard</a>
+                    <a href="api-demo.html" class="nav-link active">API Docs</a>
+                    <a href="portfolio.html" class="nav-link">Portfolio</a>
+                    <a href="contact.html" class="nav-link">Contact</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">FastAPI Integration</h1>
+                <p class="page-subtitle">Production-ready API architecture for your AI investment platform. Seamless migration from Streamlit to modern microservices.</p>
+            </div>
+
+            <!-- Architecture Overview -->
+            <section class="api-section">
+                <h2 class="section-title">Modern Architecture</h2>
+                <p class="section-description">Our approach transforms your Streamlit prototype into a scalable, maintainable API-first architecture designed for enterprise financial services.</p>
+                
+                <div class="architecture-grid">
+                    <div class="architecture-card">
+                        <div class="architecture-icon">🚀</div>
+                        <h3 class="architecture-title">FastAPI Backend</h3>
+                        <p class="architecture-description">High-performance async API with automatic documentation, type validation, and OpenAPI compliance.</p>
+                        <ul class="feature-list">
+                            <li class="feature-item"><span class="feature-check">✓</span> Automatic API documentation</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Type safety with Pydantic</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Async/await support</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Built-in security features</li>
+                        </ul>
+                    </div>
+
+                    <div class="architecture-card">
+                        <div class="architecture-icon">🤖</div>
+                        <h3 class="architecture-title">AI Agent Integration</h3>
+                        <p class="architecture-description">Modular AI agent system extracted from your Streamlit prototype with enhanced capabilities.</p>
+                        <ul class="feature-list">
+                            <li class="feature-item"><span class="feature-check">✓</span> Multi-agent orchestration</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> LLM integration (OpenAI, Anthropic)</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Custom model support</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Real-time analysis</li>
+                        </ul>
+                    </div>
+
+                    <div class="architecture-card">
+                        <div class="architecture-icon">💾</div>
+                        <h3 class="architecture-title">Data Processing</h3>
+                        <p class="architecture-description">Robust data pipelines for financial data ingestion, validation, and real-time processing.</p>
+                        <ul class="feature-list">
+                            <li class="feature-item"><span class="feature-check">✓</span> Pandas/NumPy optimization</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Database integration</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Data validation schemas</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Caching strategies</li>
+                        </ul>
+                    </div>
+
+                    <div class="architecture-card">
+                        <div class="architecture-icon">🔒</div>
+                        <h3 class="architecture-title">Enterprise Security</h3>
+                        <p class="architecture-description">Bank-grade security implementation with compliance features for financial services.</p>
+                        <ul class="feature-list">
+                            <li class="feature-item"><span class="feature-check">✓</span> OAuth2 + JWT authentication</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Role-based access control</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> API rate limiting</li>
+                            <li class="feature-item"><span class="feature-check">✓</span> Audit logging</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- API Endpoints -->
+            <section class="api-section">
+                <h2 class="section-title">Core API Endpoints</h2>
+                <p class="section-description">Essential endpoints extracted and enhanced from your Streamlit application logic.</p>
+
+                <div class="endpoints-grid">
+                    <!-- Investment Analysis Endpoint -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-method">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/v1/analyze/investment</span>
+                            </div>
+                            <button class="try-button" onclick="showDemo('investment-analysis')">Try It</button>
+                        </div>
+                        <div class="endpoint-content">
+                            <p class="endpoint-description">
+                                Core investment analysis endpoint that replicates your Streamlit prototype's main functionality with enhanced AI capabilities.
+                            </p>
+
+                            <div class="tabs">
+                                <button class="tab-button active" onclick="switchTab('investment', 'request')">Request</button>
+                                <button class="tab-button" onclick="switchTab('investment', 'response')">Response</button>
+                                <button class="tab-button" onclick="switchTab('investment', 'python')">Python</button>
+                            </div>
+
+                            <div class="tab-content active" id="investment-request">
+                                <div class="code-section">
+                                    <div class="code-label">Request Body</div>
+                                    <div class="code-block">
+                                        <div class="code-content">
+<pre>{
+  <span class="code-property">"company_symbol"</span>: <span class="code-string">"NVDA"</span>,
+  <span class="code-property">"investment_amount"</span>: <span class="code-number">1000000</span>,
+  <span class="code-property">"time_horizon"</span>: <span class="code-string">"12_months"</span>,
+  <span class="code-property">"risk_tolerance"</span>: <span class="code-string">"moderate"</span>,
+  <span class="code-property">"analysis_depth"</span>: <span class="code-string">"comprehensive"</span>,
+  <span class="code-property">"include_sentiment"</span>: <span class="code-keyword">true</span>,
+  <span class="code-property">"market_conditions"</span>: {
+    <span class="code-property">"sector"</span>: <span class="code-string">"technology"</span>,
+    <span class="code-property">"current_volatility"</span>: <span class="code-number">0.25</span>
+  }
+}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-content" id="investment-response">
+                                <div class="code-section">
+                                    <div class="code-label">Response Body</div>
+                                    <div class="code-block">
+                                        <div class="code-content">
+<pre>{
+  <span class="code-property">"analysis_id"</span>: <span class="code-string">"inv_analysis_12345"</span>,
+  <span class="code-property">"risk_score"</span>: <span class="code-number">6.2</span>,
+  <span class="code-property">"confidence_level"</span>: <span class="code-number">0.94</span>,
+  <span class="code-property">"recommendation"</span>: <span class="code-string">"BUY"</span>,
+  <span class="code-property">"target_price"</span>: <span class="code-number">875.00</span>,
+  <span class="code-property">"key_insights"</span>: [
+    <span class="code-string">"Strong Q4 earnings momentum"</span>,
+    <span class="code-string">"AI market expansion driving growth"</span>,
+    <span class="code-string">"Manageable debt-to-equity ratio"</span>
+  ],
+  <span class="code-property">"ai_agent_analysis"</span>: {
+    <span class="code-property">"sentiment_score"</span>: <span class="code-number">0.76</span>,
+    <span class="code-property">"technical_indicators"</span>: <span class="code-string">"bullish"</span>,
+    <span class="code-property">"fundamental_strength"</span>: <span class="code-number">8.1</span>
+  }
+}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-content" id="investment-python">
+                                <div class="code-section">
+                                    <div class="code-label">Python Integration</div>
+                                    <div class="code-block">
+                                        <div class="code-content">
+<pre><span class="code-keyword">import</span> requests
+<span class="code-keyword">import</span> json
+
+<span class="code-comment"># API endpoint</span>
+url = <span class="code-string">"https://api.rominaday.ai/v1/analyze/investment"</span>
+
+<span class="code-comment"># Request payload</span>
+payload = {
+    <span class="code-string">"company_symbol"</span>: <span class="code-string">"NVDA"</span>,
+    <span class="code-string">"investment_amount"</span>: <span class="code-number">1000000</span>,
+    <span class="code-string">"time_horizon"</span>: <span class="code-string">"12_months"</span>
+}
+
+<span class="code-comment"># Make request</span>
+response = requests.post(url, json=payload)
+analysis = response.json()
+
+<span class="code-keyword">print</span>(<span class="code-string">f"Risk Score: {analysis['risk_score']}"</span>)
+<span class="code-keyword">print</span>(<span class="code-string">f"Recommendation: {analysis['recommendation']}"</span>)</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Portfolio Optimization Endpoint -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-method">
+                                <span class="method-badge post">POST</span>
+                                <span class="endpoint-path">/api/v1/optimize/portfolio</span>
+                            </div>
+                            <button class="try-button" onclick="showDemo('portfolio-optimization')">Try It</button>
+                        </div>
+                        <div class="endpoint-content">
+                            <p class="endpoint-description">
+                                AI-powered portfolio optimization using modern portfolio theory with machine learning enhancements.
+                            </p>
+
+                            <div class="tabs">
+                                <button class="tab-button active" onclick="switchTab('portfolio', 'request')">Request</button>
+                                <button class="tab-button" onclick="switchTab('portfolio', 'response')">Response</button>
+                            </div>
+
+                            <div class="tab-content active" id="portfolio-request">
+                                <div class="code-section">
+                                    <div class="code-label">Request Body</div>
+                                    <div class="code-block">
+                                        <div class="code-content">
+<pre>{
+  <span class="code-property">"current_holdings"</span>: [
+    {<span class="code-property">"symbol"</span>: <span class="code-string">"AAPL"</span>, <span class="code-property">"weight"</span>: <span class="code-number">0.25</span>},
+    {<span class="code-property">"symbol"</span>: <span class="code-string">"GOOGL"</span>, <span class="code-property">"weight"</span>: <span class="code-number">0.20</span>},
+    {<span class="code-property">"symbol"</span>: <span class="code-string">"MSFT"</span>, <span class="code-property">"weight"</span>: <span class="code-number">0.30</span>}
+  ],
+  <span class="code-property">"target_return"</span>: <span class="code-number">0.12</span>,
+  <span class="code-property">"risk_tolerance"</span>: <span class="code-string">"moderate"</span>,
+  <span class="code-property">"rebalance_frequency"</span>: <span class="code-string">"quarterly"</span>
+}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-content" id="portfolio-response">
+                                <div class="code-section">
+                                    <div class="code-label">Response Body</div>
+                                    <div class="code-block">
+                                        <div class="code-content">
+<pre>{
+  <span class="code-property">"optimized_weights"</span>: [
+    {<span class="code-property">"symbol"</span>: <span class="code-string">"AAPL"</span>, <span class="code-property">"weight"</span>: <span class="code-number">0.22</span>},
+    {<span class="code-property">"symbol"</span>: <span class="code-string">"GOOGL"</span>, <span class="code-property">"weight"</span>: <span class="code-number">0.28</span>},
+    {<span class="code-property">"symbol"</span>: <span class="code-string">"MSFT"</span>, <span class="code-property">"weight"</span>: <span class="code-number">0.25</span>}
+  ],
+  <span class="code-property">"expected_return"</span>: <span class="code-number">0.124</span>,
+  <span class="code-property">"portfolio_risk"</span>: <span class="code-number">0.156</span>,
+  <span class="code-property">"sharpe_ratio"</span>: <span class="code-number">0.79</span>
+}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Assessment Endpoint -->
+                    <div class="endpoint-card">
+                        <div class="endpoint-header">
+                            <div class="endpoint-method">
+                                <span class="method-badge get">GET</span>
+                                <span class="endpoint-path">/api/v1/risk/assessment/{portfolio_id}</span>
+                            </div>
+                            <button class="try-button" onclick="showDemo('risk-assessment')">Try It</button>
+                        </div>
+                        <div class="endpoint-content">
+                            <p class="endpoint-description">
+                                Real-time risk assessment with VaR calculations, stress testing, and scenario analysis.
+                            </p>
+
+                            <div class="tabs">
+                                <button class="tab-button active" onclick="switchTab('risk', 'response')">Response</button>
+                                <button class="tab-button" onclick="switchTab('risk', 'curl')">cURL</button>
+                            </div>
+
+                            <div class="tab-content active" id="risk-response">
+                                <div class="code-section">
+                                    <div class="code-label">Response Body</div>
+                                    <div class="code-block">
+                                        <div class="code-content">
+<pre>{
+  <span class="code-property">"portfolio_id"</span>: <span class="code-string">"port_12345"</span>,
+  <span class="code-property">"overall_risk_score"</span>: <span class="code-number">6.2</span>,
+  <span class="code-property">"var_95"</span>: <span class="code-number">-0.045</span>,
+  <span class="code-property">"expected_shortfall"</span>: <span class="code-number">-0.067</span>,
+  <span class="code-property">"risk_factors"</span>: {
+    <span class="code-property">"market_risk"</span>: <span class="code-number">4.1</span>,
+    <span class="code-property">"credit_risk"</span>: <span class="code-number">2.8</span>,
+    <span class="code-property">"liquidity_risk"</span>: <span class="code-number">1.9</span>
+  },
+  <span class="code-property">"stress_test_results"</span>: {
+    <span class="code-property">"market_crash_scenario"</span>: <span class="code-number">-0.23</span>,
+    <span class="code-property">"interest_rate_shock"</span>: <span class="code-number">-0.12</span>
+  }
+}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="tab-content" id="risk-curl">
+                                <div class="code-section">
+                                    <div class="code-label">cURL Request</div>
+                                    <div class="code-block">
+                                        <div class="code-content">
+<pre>curl -X GET \
+  https://api.rominaday.ai/v1/risk/assessment/port_12345 \
+  -H <span class="code-string">'Authorization: Bearer YOUR_API_TOKEN'</span> \
+  -H <span class="code-string">'Content-Type: application/json'</span></pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Interactive Demo -->
+            <section class="demo-section" id="demo-section" style="display: none;">
+                <div class="demo-header">
+                    <h3 class="demo-title">Live API Demo</h3>
+                    <p class="demo-description">Test our investment analysis endpoint with real-time AI processing</p>
+                </div>
+
+                <form class="demo-form" id="demo-form">
+                    <div class="form-group">
+                        <label class="form-label">Company Symbol</label>
+                        <input type="text" class="form-input" id="company-symbol" placeholder="e.g., NVDA, AAPL, TSLA" value="NVDA">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Investment Amount (USD)</label>
+                        <input type="number" class="form-input" id="investment-amount" placeholder="1000000" value="1000000">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Time Horizon</label>
+                        <select class="form-input" id="time-horizon">
+                            <option value="3_months">3 Months</option>
+                            <option value="6_months">6 Months</option>
+                            <option value="12_months" selected>12 Months</option>
+                            <option value="24_months">24 Months</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Additional Analysis Notes</label>
+                        <textarea class="form-textarea" id="analysis-notes" placeholder="Any specific factors to consider in the analysis..."></textarea>
+                    </div>
+
+                    <button type="submit" class="form-button" id="submit-demo">
+                        Analyze Investment
+                    </button>
+                </form>
+
+                <div class="response-section" id="response-section">
+                    <div class="response-header">
+                        <h4>API Response</h4>
+                        <span class="status-badge success" id="status-badge">200 OK</span>
+                    </div>
+                    <div class="code-block">
+                        <div class="code-content" id="response-content">
+                            <!-- Response will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        // Tab switching functionality
+        function switchTab(section, tab) {
+            // Remove active class from all tabs in section
+            const tabButtons = document.querySelectorAll(`#${section}-request, #${section}-response, #${section}-python, #${section}-curl`).forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            const buttons = document.querySelectorAll('.tab-button');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected tab
+            const targetContent = document.getElementById(`${section}-${tab}`);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+            
+            // Set active button
+            event.target.classList.add('active');
+        }
+
+        // Show demo section
+        function showDemo(demoType) {
+            const demoSection = document.getElementById('demo-section');
+            demoSection.style.display = 'block';
+            demoSection.scrollIntoView({ behavior: 'smooth' });
+            
+            // Update demo based on type
+            const demoTitle = document.querySelector('.demo-title');
+            const demoDescription = document.querySelector('.demo-description');
+            
+            switch(demoType) {
+                case 'investment-analysis':
+                    demoTitle.textContent = 'Investment Analysis Demo';
+                    demoDescription.textContent = 'Test our core investment analysis endpoint with real-time AI processing';
+                    break;
+                case 'portfolio-optimization':
+                    demoTitle.textContent = 'Portfolio Optimization Demo';
+                    demoDescription.textContent = 'Experience AI-powered portfolio optimization algorithms';
+                    break;
+                case 'risk-assessment':
+                    demoTitle.textContent = 'Risk Assessment Demo';
+                    demoDescription.textContent = 'Real-time risk analysis with VaR and stress testing';
+                    break;
+            }
+        }
+
+        // Demo form submission
+        document.getElementById('demo-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submit-demo');
+            const responseSection = document.getElementById('response-section');
+            const responseContent = document.getElementById('response-content');
+            
+            // Show loading state
+            submitBtn.innerHTML = '<div class="loading"><div class="spinner"></div>Analyzing...</div>';
+            submitBtn.disabled = true;
+            
+            // Collect form data
+            const formData = {
+                company_symbol: document.getElementById('company-symbol').value,
+                investment_amount: parseInt(document.getElementById('investment-amount').value),
+                time_horizon: document.getElementById('time-horizon').value,
+                analysis_notes: document.getElementById('analysis-notes').value
+            };
+            
+            // Simulate API call
+            setTimeout(() => {
+                // Generate realistic response
+                const mockResponse = {
+                    analysis_id: `inv_analysis_${Date.now()}`,
+                    timestamp: new Date().toISOString(),
+                    request_data: formData,
+                    risk_score: (Math.random() * 4 + 4).toFixed(1),
+                    confidence_level: (Math.random() * 0.1 + 0.9).toFixed(2),
+                    recommendation: Math.random() > 0.3 ? "BUY" : "HOLD",
+                    target_price: (Math.random() * 100 + 500).toFixed(2),
+                    key_insights: [
+                        "Strong quarterly performance indicators",
+                        "Favorable market sentiment analysis",
+                        "Solid fundamental metrics alignment",
+                        "Positive technical momentum signals"
+                    ],
+                    ai_agent_analysis: {
+                        sentiment_score: (Math.random() * 0.4 + 0.6).toFixed(2),
+                        technical_indicators: Math.random() > 0.5 ? "bullish" : "neutral",
+                        fundamental_strength: (Math.random() * 2 + 7).toFixed(1),
+                        processing_time_ms: Math.floor(Math.random() * 500 + 1200)
+                    }
+                };
+                
+                // Display response
+                responseContent.innerHTML = `<pre>${JSON.stringify(mockResponse, null, 2)}</pre>`;
+                responseSection.classList.add('show');
+                
+                // Reset button
+                submitBtn.innerHTML = 'Analyze Investment';
+                submitBtn.disabled = false;
+                
+                // Scroll to response
+                responseSection.scrollIntoView({ behavior: 'smooth' });
+                
+                // Store demo interaction
+                const demoData = {
+                    timestamp: new Date().toISOString(),
+                    endpoint: 'investment-analysis',
+                    input: formData,
+                    response: mockResponse
+                };
+                
+                let demoHistory = JSON.parse(localStorage.getItem('demoHistory') || '[]');
+                demoHistory.push(demoData);
+                localStorage.setItem('demoHistory', JSON.stringify(demoHistory));
+                
+            }, 2500); // Simulate realistic API response time
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set active navigation
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === 'api-demo.html') {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Track page view
+            const viewData = {
+                page: 'api-demo',
+                timestamp: new Date().toISOString(),
+                section: 'documentation'
+            };
+            
+            let pageViews = JSON.parse(localStorage.getItem('pageViews') || '[]');
+            pageViews.push(viewData);
+            localStorage.setItem('pageViews', JSON.stringify(pageViews));
+        });
+
+        // Track section interactions
+        document.addEventListener('click', function(e) {
+            if (e.target.matches('.try-button')) {
+                const interactionData = {
+                    timestamp: new Date().toISOString(),
+                    action: 'try_endpoint',
+                    endpoint: e.target.getAttribute('onclick').match(/'([^']+)'/)[1],
+                    page: 'api-demo'
+                };
+                
+                let interactions = JSON.parse(localStorage.getItem('apiInteractions') || '[]');
+                interactions.push(interactionData);
+                localStorage.setItem('apiInteractions', JSON.stringify(interactions));
+            }
+        });
+    </script>
+</body>
+</html>
