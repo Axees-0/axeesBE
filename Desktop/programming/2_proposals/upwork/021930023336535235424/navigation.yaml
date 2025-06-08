@@ -1,207 +1,132 @@
-name: "AWS Data Pipeline Automation Demo - Workflow"
-description: "Automated testing workflow for AWS data pipeline automation demo showcasing email processing, S3 storage, Glue transformations, and reporting capabilities"
+name: "AWS Data Pipeline Demo - 9 Screenshot Capture"
+description: "Captures 9 strategic screenshots of AWS data pipeline automation demo main sections"
 version: "1.0.0"
 
 config:
   headless: true
-  timeout: 15000
+  timeout: 30000
   viewport:
     width: 1280
     height: 720
 
 steps:
-  # Navigate to demo homepage
+  # Screenshot 1: Homepage Hero Section
   - type: navigate
     description: "Navigate to AWS Pipeline Demo homepage"
     url: "file:///Users/Mike/Desktop/programming/2_proposals/upwork/021930023336535235424/index.html"
-    screenshot: true
-    
-  # Wait for main content to load
-  - type: wait-for-selector
-    description: "Wait for main hero content to load"
-    selector: ".hero-section"
-    
-  # Verify main heading and value proposition
-  - type: assertText
-    description: "Verify main value proposition heading"
-    selector: ".hero-text h1"
-    expected: "Transform Your 15-Year Manual Process Into an Automated AWS Pipeline"
-    
-  # Test pipeline animation
-  - type: wait-for-selector
-    description: "Wait for pipeline animation to load"
-    selector: "#pipelineVisual"
-    
-  # Test navigation to dashboard
+    waitUntil: "networkidle2"
+  - type: wait
+    description: "Wait for page to fully load"
+    value: 3000
+  - type: screenshot
+    description: "Homepage hero and value proposition"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 2: Homepage Problem Section
+  - type: evaluate
+    description: "Scroll to problem section"
+    script: "document.querySelector('.problem-section').scrollIntoView({behavior: 'smooth', block: 'start'})"
+  - type: wait
+    description: "Wait for scroll to complete"
+    value: 2000
+  - type: screenshot
+    description: "Problem identification section"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 3: Homepage Solution Section
+  - type: evaluate
+    description: "Scroll to solution section"
+    script: "document.querySelector('.solution-section').scrollIntoView({behavior: 'smooth', block: 'start'})"
+  - type: wait
+    description: "Wait for scroll to complete"
+    value: 2000
+  - type: screenshot
+    description: "AWS solution workflow"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 4: Pipeline Dashboard Main View
   - type: click
     description: "Navigate to Pipeline Dashboard"
     selector: "a[href='pipeline-dashboard.html']"
-    screenshot: true
-    
-  # Wait for dashboard to load
-  - type: wait-for-selector
-    description: "Wait for dashboard container to load"
+  - type: wait
+    description: "Wait for dashboard to load"
+    value: 3000
+  - type: waitForSelector
+    description: "Wait for dashboard container"
     selector: ".dashboard-container"
-    
-  # Verify dashboard title
-  - type: assertText
-    description: "Verify dashboard page title"
-    selector: ".dashboard-title h1"
-    expected: "Pipeline Dashboard"
-    
-  # Test live indicator
-  - type: wait-for-selector
-    description: "Wait for live indicator to appear"
-    selector: ".live-indicator"
-    
-  # Test pipeline simulation
-  - type: click
-    description: "Test simulate email functionality"
-    selector: "button[onclick='simulateNewEmail()']"
-    screenshot: true
-    
-  # Wait for loading overlay
-  - type: wait-for-selector
-    description: "Wait for loading overlay to appear"
-    selector: ".loading-overlay.show"
-    
-  # Wait for simulation to complete
+  - type: screenshot
+    description: "Pipeline dashboard overview"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 5: Dashboard Pipeline Flow Visualization
   - type: evaluate
-    description: "Wait for email simulation to complete"
-    script: |
-      return new Promise((resolve) => {
-        const checkCompleted = () => {
-          const overlay = document.querySelector('.loading-overlay');
-          if (!overlay.classList.contains('show')) {
-            resolve(true);
-          } else {
-            setTimeout(checkCompleted, 1000);
-          }
-        };
-        checkCompleted();
-      });
-    
-  # Navigate to data transformation page
+    description: "Scroll to pipeline flow section"
+    script: "document.querySelector('.pipeline-flow-card').scrollIntoView({behavior: 'smooth', block: 'center'})"
+  - type: wait
+    description: "Wait for scroll and animations"
+    value: 2000
+  - type: screenshot
+    description: "Pipeline flow visualization"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 6: Data Transformation Page
   - type: click
-    description: "Navigate to Data Transformation page"
+    description: "Navigate to Data Transformation"
     selector: "a[href='data-transformation.html']"
-    screenshot: true
-    
-  # Wait for transformation page to load
-  - type: wait-for-selector
-    description: "Wait for transformation container to load"
+  - type: wait
+    description: "Wait for transformation page to load"
+    value: 3000
+  - type: waitForSelector
+    description: "Wait for transformation container"
     selector: ".transformation-container"
-    
-  # Verify transformation page title
-  - type: assertText
-    description: "Verify transformation page title"
-    selector: ".page-header h1"
-    expected: "AWS Glue Data Transformation"
-    
-  # Test job selection
-  - type: click
-    description: "Test Glue job selection"
-    selector: ".job-item:nth-child(2)"
-    
-  # Test tab switching to script view
+  - type: screenshot
+    description: "AWS Glue job configuration"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 7: Transformation Script View
   - type: click
     description: "Switch to script tab"
     selector: ".tab:nth-child(2)"
-    
-  # Verify script content loads
-  - type: wait-for-selector
-    description: "Wait for code editor to load"
+  - type: wait
+    description: "Wait for script tab to load"
+    value: 2000
+  - type: waitForSelector
+    description: "Wait for code editor"
     selector: ".code-editor"
-    
-  # Test transformation preview
-  - type: click
-    description: "Test transformation run"
-    selector: "button[onclick='testTransformation()']"
-    
-  # Navigate to reporting page
-  - type: click
-    description: "Navigate to Reporting page"
-    selector: "a[href='reporting.html']"
-    screenshot: true
-    
-  # Wait for reporting page to load
-  - type: wait-for-selector
-    description: "Wait for reporting container to load"
-    selector: ".reporting-container"
-    
-  # Verify reporting page title
-  - type: assertText
-    description: "Verify reporting page title"
-    selector: ".page-title h1"
-    expected: "Automated Reporting"
-    
-  # Test report selection
-  - type: click
-    description: "Test report selection"
-    selector: ".report-item:nth-child(2)"
-    
-  # Test schedule selection
-  - type: click
-    description: "Test schedule option selection"
-    selector: ".schedule-option:nth-child(2)"
-    
-  # Test send test report
-  - type: click
-    description: "Test send test report functionality"
-    selector: "button[onclick='sendTestReport()']"
-    
-  # Wait for test report status
-  - type: wait-for-selector
-    description: "Wait for test report status message"
-    selector: ".status-message.show"
-    
-  # Test report preview
-  - type: click
-    description: "Test report preview functionality"
-    selector: "button[onclick='previewReport()']"
-    
-  # Verify charts load in preview
-  - type: wait-for-selector
-    description: "Wait for charts to load in preview"
-    selector: "#salesTrendChart"
-    
-  # Navigate back to homepage
-  - type: click
-    description: "Navigate back to homepage"
-    selector: "a[href='index.html']"
-    screenshot: true
-    
-  # Test problem section visibility
-  - type: wait-for-selector
-    description: "Wait for problem section to load"
-    selector: ".problem-section"
-    
-  # Test solution section visibility
-  - type: wait-for-selector
-    description: "Wait for solution section to load"
-    selector: ".solution-section"
-    
-  # Test metrics section
-  - type: wait-for-selector
-    description: "Wait for metrics section to load"
-    selector: ".metrics-section"
-    
-  # Verify key metrics are displayed
-  - type: assertText
-    description: "Verify reduction in manual work metric"
-    selector: ".metric-card:nth-child(1) .metric-value"
-    expected: "95%"
-    
-  # Test CTA section
-  - type: wait-for-selector
-    description: "Wait for CTA section to load"
-    selector: ".cta-section"
-    
-  # Final screenshot of completed demo
   - type: screenshot
-    description: "Final screenshot of demo completion"
-    
-  # Verify footer loads
-  - type: wait-for-selector
-    description: "Wait for footer to load"
-    selector: ".aws-footer"
+    description: "Glue transformation script"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 8: Automated Reporting Page
+  - type: click
+    description: "Navigate to Reporting"
+    selector: "a[href='reporting.html']"
+  - type: wait
+    description: "Wait for reporting page to load"
+    value: 3000
+  - type: waitForSelector
+    description: "Wait for reporting container"
+    selector: ".reporting-container"
+  - type: screenshot
+    description: "Automated reporting interface"
+    screenshot:
+      fullPage: true
+
+  # Screenshot 9: Report Preview Section
+  - type: evaluate
+    description: "Scroll to report preview"
+    script: "document.querySelector('.report-preview').scrollIntoView({behavior: 'smooth', block: 'center'})"
+  - type: wait
+    description: "Wait for scroll to complete"
+    value: 2000
+  - type: screenshot
+    description: "Report preview with charts and data"
+    screenshot:
+      fullPage: true
