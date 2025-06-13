@@ -1,0 +1,127 @@
+# Environment variables
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Node modules
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+*.log.*
+
+# Build artifacts
+dist/
+build/
+*.pid
+*.seed
+*.pid.lock
+
+# Test coverage
+coverage/
+.nyc_output/
+test-results.xml
+junit.xml
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp/
+tmp/
+*.tmp
+*.temp
+.cache/
+
+# Uploads (should be stored elsewhere in production)
+uploads/
+public/uploads/
+
+# OS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# AWS
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+.ebextensions/
+
+# Certificates and keys
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Database
+*.sqlite
+*.sqlite3
+*.db
+
+# Documentation build
+docs/_build/
+docs/.doctrees/
+
+# Python (if any scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Package lock files (keep one or the other)
+# package-lock.json
+# yarn.lock
+
+# Test artifacts
+test-report.html
+mochawesome-report/
+
+# Performance reports
+performance-report.json
+complexity-report/
+
+# ESLint
+.eslintcache
+eslint-report.json
+
+# Monitoring
+.monitor/
+
+# Redis dump
+dump.rdb
+
+# PM2
+.pm2/
+
+# Custom
+TODO.txt
+NOTES.txt
+*.draft
+
+# Sensitive data patterns
+*secret*
+*credential*
+*password*
+!*password*.js  # Allow password utility files
+!*password*.test.js  # Allow password test files
