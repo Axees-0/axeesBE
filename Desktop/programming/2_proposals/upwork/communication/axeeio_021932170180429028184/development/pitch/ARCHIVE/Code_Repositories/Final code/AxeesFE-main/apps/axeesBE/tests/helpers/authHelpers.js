@@ -51,9 +51,15 @@ const authHelpers = {
   /**
    * Generate JWT token for a user
    */
-  generateJWTToken: (userId, expiresIn = '24h') => {
+  generateJWTToken: (user, expiresIn = '24h') => {
+    const payload = {
+      id: user._id ? user._id.toString() : user.toString(),
+      role: user.role,
+      userType: user.userType
+    };
+    
     return jwt.sign(
-      { id: userId },
+      payload,
       process.env.JWT_SECRET || 'test-jwt-secret',
       { expiresIn }
     );
@@ -62,8 +68,8 @@ const authHelpers = {
   /**
    * Get authorization header for a user
    */
-  getAuthHeader: (userId) => {
-    const token = authHelpers.generateJWTToken(userId);
+  getAuthHeader: (user) => {
+    const token = authHelpers.generateJWTToken(user);
     return { Authorization: `Bearer ${token}` };
   },
 
@@ -72,7 +78,7 @@ const authHelpers = {
    */
   createAuthenticatedUser: async (userData = {}) => {
     const user = await authHelpers.createTestUser(userData);
-    const authHeader = authHelpers.getAuthHeader(user._id);
+    const authHeader = authHelpers.getAuthHeader(user);
     return { user, authHeader };
   },
 
@@ -81,7 +87,7 @@ const authHelpers = {
    */
   createAuthenticatedMarketer: async (userData = {}) => {
     const user = await authHelpers.createTestMarketer(userData);
-    const authHeader = authHelpers.getAuthHeader(user._id);
+    const authHeader = authHelpers.getAuthHeader(user);
     return { user, authHeader };
   },
 
@@ -90,7 +96,7 @@ const authHelpers = {
    */
   createAuthenticatedCreator: async (userData = {}) => {
     const user = await authHelpers.createTestCreator(userData);
-    const authHeader = authHelpers.getAuthHeader(user._id);
+    const authHeader = authHelpers.getAuthHeader(user);
     return { user, authHeader };
   },
 

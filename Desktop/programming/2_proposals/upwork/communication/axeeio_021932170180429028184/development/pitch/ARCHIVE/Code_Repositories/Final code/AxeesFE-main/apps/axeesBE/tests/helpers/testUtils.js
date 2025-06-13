@@ -339,17 +339,21 @@ const testUtils = {
   generateMilestoneApprovalData: (action = 'approve', overrides = {}) => {
     const baseData = {
       milestoneId: new mongoose.Types.ObjectId().toString(),
-      action: action,
-      ...overrides
+      action: action
     };
 
-    if (action === 'reject') {
+    // Set action-specific defaults only if not provided in overrides
+    if (action === 'reject' && !overrides.feedback) {
       baseData.feedback = 'Please revise according to feedback';
-    } else if (action === 'approve') {
+    } else if (action === 'approve' && !overrides.rating) {
       baseData.rating = 5;
     }
 
-    return baseData;
+    // Apply overrides after setting defaults to ensure custom values take precedence
+    return {
+      ...baseData,
+      ...overrides
+    };
   },
 
   /**
@@ -408,12 +412,13 @@ const testUtils = {
         break;
         
       case 'ready_for_completion':
+        const totalPayment = dealData.paymentInfo?.paymentAmount || 1000;
         deal = await testUtils.createDealWithMilestones(dealData, [
           testUtils.createTestMilestone({
             name: 'Completed Milestone',
             status: 'approved',
             completedAt: new Date(),
-            amount: dealData.paymentInfo?.paymentAmount || 1000
+            amount: totalPayment * 0.7 // Use 70% for milestone, leaving 30% for final payment
           })
         ]);
         break;

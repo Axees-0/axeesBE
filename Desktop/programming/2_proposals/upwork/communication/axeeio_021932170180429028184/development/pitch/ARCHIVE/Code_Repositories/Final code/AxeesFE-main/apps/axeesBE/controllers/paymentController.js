@@ -154,7 +154,7 @@ async function notifyUser(userId, title, message, data = {}, targetUrl) {
 
     // Send push notification
     if (user.deviceToken) {
-      await showNotifications(
+      await sendPushNotification(
         user.deviceToken,
         title,
         message,
@@ -169,27 +169,12 @@ async function notifyUser(userId, title, message, data = {}, targetUrl) {
 
     // Send email
     if (user.email) {
-      const { subject, content } = await generateEmailContent(
-        {
-          dealName: data.dealName || "Deal",
-          _id: data.dealId,
-          status: data.newStatus || title,
-          paymentAmount: data.paymentAmount,
-          milestoneName: data.milestoneName,
-        },
-        title.toLowerCase().replace(/\s+/g, "_"),
-        { name: user.name || "User", email: user.email },
-        user.role || "user"
-      );
-
-      const mailOptions = {
-        from: process.env.EMAIL_FROM || '"Axees Team" <no-reply@axees.com>',
-        to: user.email,
-        subject,
-        html: content,
-      };
-
-      await transporter.sendMail(mailOptions);
+      await sendEmail(user.email, title, {
+        userName: user.name || "User",
+        message: message,
+        buttonText: "View Details",
+        buttonLink: targetUrl || `${process.env.FRONTEND_URL}/dashboard`
+      });
     }
   } catch (error) {
     console.error("notifyUser error:", error);
@@ -288,24 +273,7 @@ exports.createCheckoutSessionHelper = async ({
       payment_intent_data: { metadata } // <-- same for the PaymentIntent
     });
 
-    // Assuming `dealId` is available in the metadata
-    const deal = await Deal.findById(metadata.dealId);
-    const user = await User.findById(metadata.userId);
-
-    // Add the deal transactionId and payment method, and the user's name
-    const earningData = {
-      user: metadata.userId,
-      deal: metadata.dealId,
-      amount,
-      transactionId: deal?.paymentInfo?.transactions?.[0]?.transactionId || null,
-      paymentMethod: deal?.paymentInfo?.transactions?.[0]?.paymentMethod || null,
-      userName: user?.userName || "Unknown User",  // Add user name here
-      createdAt: new Date(),
-    };
-
-    // Save the earning record
-    const newEarning = new Earning(earningData);
-    await newEarning.save();
+    // Earning creation handled separately via webhook
 
     return {
       clientSecret: session.client_secret,
@@ -1171,21 +1139,7 @@ exports.createCheckoutSessionHelper = async ({
 };
 
 
-exports.createCheckoutSession = async (req, res) => {
-  try {
-    const { amount, currency, quantity, metadata } = req.body;
-    const sessionData = await this.createCheckoutSessionHelper({
-      amount,
-      currency,
-      quantity,
-      metadata,
-    });
-    res.json(sessionData);
-  } catch (error) {
-    console.error("Error creating checkout session:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
+// Duplicate removed - using the version with auth check at line 321
 
 exports.getSessionStatus = async (req, res) => {
   try {
@@ -1228,6 +1182,11 @@ exports.handleWebhook = async (req, res) => {
   } catch (err) {
     console.error('Webhook signature verification failed:', err.message);
     return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // Ensure event exists before processing
+  if (!event || !event.type) {
+    return res.status(400).send('Invalid webhook event');
   }
 
   switch (event.type) {
@@ -1633,16 +1592,7 @@ exports.requestPayout = async (req, res) => {
 
 
 
-exports.createCheckoutSession = async (req, res) => {
-  try {
-    const { amount, currency, quantity, metadata } = req.body;
-    const sessionData = await this.createCheckoutSessionHelper({ amount, currency, quantity, metadata });
-    res.json(sessionData);
-  } catch (error) {
-    console.error("Error creating checkout session:", error);
-    res.status(500).json({ error: error.message });
-  }
-};
+// Duplicate removed - using the version with auth check at line 321
 
 exports.cancelOfferAndProcessRefund = async (req, res) => {
   try {
@@ -1722,6 +1672,11 @@ exports.cancelOfferAndProcessRefund = async (req, res) => {
 };
 
 exports.createPaymentIntent = async (req, res) => {
+  // Check authentication
+  if (!req.user?.id) {
+    return res.status(401).json({ error: "Unauthorized: User not authenticated" });
+  }
+
   const { amount, currency = "usd", metadata } = req.body;
 
   try {
@@ -1730,11 +1685,14 @@ exports.createPaymentIntent = async (req, res) => {
       return res.status(400).json({ error: "Amount is required" });
     }
 
+    // Add userId to metadata
+    const updatedMetadata = { ...metadata, userId: req.user.id };
+
     // Create a PaymentIntent
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Stripe expects the amount in cents
       currency: currency,
-      metadata: metadata, // You can add additional metadata here (dealId, milestoneId, etc.)
+      metadata: updatedMetadata, // Include userId and any additional metadata
     });
 
     // Send the client secret to the frontend
@@ -1828,10 +1786,10 @@ exports.confirmPayment = async (req, res) => {
               transactionId: confirmedIntent.id,
               status: "Escrowed",
               paidAt: new Date(),
-              type: "escrow_creation",
+              type: "escrow",
             });
 
-            deal.paymentInfo.paymentStatus = 'Escrowed';
+            deal.paymentInfo.paymentStatus = 'Paid';
             await deal.save();
 
             // Create earning record for creator (held in escrow)

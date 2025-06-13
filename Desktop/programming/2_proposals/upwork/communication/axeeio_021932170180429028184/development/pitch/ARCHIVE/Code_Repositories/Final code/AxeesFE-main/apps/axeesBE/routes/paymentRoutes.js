@@ -6,32 +6,7 @@ const paymentController = require("../controllers/paymentController");
 
 
 
-/**
- * @swagger
- * /payments/create-checkout-session:
- *   post:
- *     summary: Create a new Stripe checkout session.
- *     tags: [Payments]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/CheckoutSessionRequest'
- *     responses:
- *       200:
- *         description: Checkout session created successfully.
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/CheckoutSessionResponse'
- *       500:
- *         description: Internal server error.
- */
-router.post(
-  "/create-checkout-session",
-  paymentController.createCheckoutSession
-);
+// Moved to after auth middleware
 
 
 /**
@@ -64,10 +39,47 @@ router.get("/session-status", paymentController.getSessionStatus);
 
 
 
-// const { manualAuth } = require("../controllers/authController");
-// router.use(manualAuth);
+const { manualAuth } = require("../controllers/authController");
 
+// Public routes (no auth required)
+router.post(
+  "/webhook",
+  express.raw({ type: "application/json" }),
+  paymentController.handleWebhook
+);
+
+// Apply auth middleware to all subsequent routes
+router.use(manualAuth);
+
+// Protected routes (auth required)
 router.post("/paymentmethod",paymentController.addPaymentMethod);
+
+/**
+ * @swagger
+ * /payments/create-checkout-session:
+ *   post:
+ *     summary: Create a new Stripe checkout session.
+ *     tags: [Payments]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CheckoutSessionRequest'
+ *     responses:
+ *       200:
+ *         description: Checkout session created successfully.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CheckoutSessionResponse'
+ *       500:
+ *         description: Internal server error.
+ */
+router.post(
+  "/create-checkout-session",
+  paymentController.createCheckoutSession
+);
 // apply manualAuth to every route in this router
 
 /**
@@ -303,9 +315,4 @@ router.post('/withdrawmoney',paymentController.withdrawMoney);
 
 router.get  ("/paymentmethods",     paymentController.fetchPaymentMethods); // ⇦ NEW
 
-router.post(
-  "/webhook",
-  express.raw({ type: "application/json" }),
-  paymentController.handleWebhook
-);
 module.exports = router;//

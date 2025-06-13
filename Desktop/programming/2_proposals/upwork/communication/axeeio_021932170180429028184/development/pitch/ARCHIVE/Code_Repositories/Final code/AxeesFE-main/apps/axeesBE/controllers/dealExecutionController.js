@@ -60,6 +60,11 @@ exports.submitMilestone = async (req, res) => {
       return res.status(400).json({ error: "Milestone ID is required" });
     }
 
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(milestoneId)) {
+      return res.status(500).json({ error: "Invalid milestone ID format" });
+    }
+
     if (!deliverables || deliverables.length === 0) {
       return res.status(400).json({ error: "At least one deliverable is required" });
     }
@@ -171,6 +176,11 @@ exports.approveMilestone = async (req, res) => {
     // Validate required fields
     if (!milestoneId) {
       return res.status(400).json({ error: "Milestone ID is required" });
+    }
+
+    // Validate ObjectId format
+    if (!mongoose.Types.ObjectId.isValid(milestoneId)) {
+      return res.status(500).json({ error: "Invalid milestone ID format" });
     }
 
     if (!action || !['approve', 'reject'].includes(action)) {
