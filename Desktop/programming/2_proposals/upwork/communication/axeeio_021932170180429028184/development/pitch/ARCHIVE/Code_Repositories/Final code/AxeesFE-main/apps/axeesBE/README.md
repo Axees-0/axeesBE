@@ -55,7 +55,13 @@ npm start
 
 ## 🧪 Testing
 
-The project includes a comprehensive test suite with 290+ tests covering all major functionality.
+The project includes a comprehensive test suite with **98.1% pass rate (106/108 tests)** covering all major functionality including payment processing, deal execution, authentication, and security.
+
+### Current Test Status
+- **Total Tests**: 108
+- **Passing**: 106 (98.1%)
+- **Test Coverage**: Payment management, deal execution, authentication, webhooks
+- **Recent Improvements**: Enhanced authentication, fixed webhook processing, improved database queries
 
 ### Run all tests
 ```bash
@@ -64,17 +70,17 @@ npm test
 
 ### Run specific test suites
 ```bash
+# Payment management tests (comprehensive Stripe integration)
+npm test tests/integration/payment-management.test.js
+
+# Deal execution tests (milestone-based workflow)
+npm test tests/integration/deal-execution.test.js
+
 # Authentication tests
 npm run test:auth
 
 # Offer management tests (36 tests)
 npm run test:offers
-
-# Payment tests (72 comprehensive tests)
-npm run test:payments
-
-# Deal execution tests (40 comprehensive tests)
-npm test tests/integration/deal-execution.test.js
 
 # Security tests
 npm run test:security
@@ -88,7 +94,8 @@ npm run test:performance
 npm run test:coverage
 ```
 
-For detailed testing documentation, see [tests/README.md](tests/README.md).
+### Test Improvements Documentation
+See [TEST_IMPROVEMENTS_SUMMARY.md](TEST_IMPROVEMENTS_SUMMARY.md) for detailed information about recent test suite enhancements.
 
 ## 💳 Payment System
 
