@@ -46,6 +46,8 @@
     "test:performance": "jest tests/integration/performance-baseline.test.js",
     "test:auth": "jest tests/integration/auth.test.js tests/integration/auth-profile.test.js",
     "test:offers": "jest tests/integration/offer-management.test.js",
+    "test:payments": "jest tests/integration/payment-management.test.js",
+    "test:payments:verbose": "jest tests/integration/payment-management.test.js --verbose",
     "test:ci": "jest --ci --coverage --maxWorkers=2",
     "lint": "eslint . --ext .js",
     "lint:fix": "eslint . --ext .js --fix"

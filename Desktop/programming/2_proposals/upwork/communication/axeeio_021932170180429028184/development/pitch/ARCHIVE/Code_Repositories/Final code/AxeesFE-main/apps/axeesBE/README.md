@@ -70,6 +70,9 @@ npm run test:auth
 # Offer management tests (36 tests)
 npm run test:offers
 
+# Payment tests (72 comprehensive tests)
+npm run test:payments
+
 # Security tests
 npm run test:security
 
@@ -83,6 +86,98 @@ npm run test:coverage
 ```
 
 For detailed testing documentation, see [tests/README.md](tests/README.md).
+
+## 💳 Payment System
+
+### Payment Features
+- **Stripe Integration**: Full Stripe payment processing with webhooks
+- **Escrow System**: Secure escrow payments for deal transactions
+- **Multiple Payment Types**: Support for offer fees, milestone funding, and final payments
+- **Advanced Filtering**: Comprehensive payment history with date range, status, and pagination
+- **Real-time Webhooks**: Automatic payment status updates via Stripe webhooks
+- **Role-based Access**: Admin override capabilities for payment management
+
+### Payment API Endpoints
+
+#### Core Payment Processing
+```http
+POST /api/payments/create-payment-intent
+```
+Creates a Stripe payment intent with amount validation and currency handling.
+
+**Request Body:**
+```json
+{
+  "amount": 50.00,
+  "currency": "usd",
+  "metadata": {
+    "dealId": "64a1b2c3d4e5f6789012",
+    "paymentType": "escrowPayment"
+  }
+}
+```
+
+```http
+POST /api/payments/confirm-payment
+```
+Confirms payment intent and creates escrow records for deals.
+
+**Request Body:**
+```json
+{
+  "paymentIntentId": "pi_test_1234567890",
+  "paymentMethodId": "pm_test_1234567890",
+  "dealId": "64a1b2c3d4e5f6789012",
+  "escrowAmount": 500
+}
+```
+
+#### Payment History & Reporting
+```http
+GET /api/payments/history?page=1&limit=50&status=completed&includeCount=true
+```
+Retrieves payment history with advanced filtering and pagination.
+
+**Query Parameters:**
+- `page` - Page number (default: 1)
+- `limit` - Items per page (1-100, default: 50)
+- `status` - Filter by status: pending, completed, failed, escrowed, released
+- `filter` - Date filter: last30days or dateRange
+- `startDate` - Start date for dateRange filter (YYYY-MM-DD)
+- `endDate` - End date for dateRange filter (YYYY-MM-DD)
+- `cursor` - Cursor for cursor-based pagination
+- `includeCount` - Include total count in response
+- `adminUserId` - Admin override to view other user's payments
+
+**Response:**
+```json
+{
+  "data": [...],
+  "pagination": {
+    "page": 1,
+    "limit": 50,
+    "hasMore": true,
+    "total": 150,
+    "totalPages": 3,
+    "nextCursor": "2024-12-06T10:30:00.000Z"
+  },
+  "filters": {
+    "applied": {
+      "status": "completed",
+      "dateRange": { "startDate": "2024-01-01", "endDate": "2024-01-31" }
+    }
+  }
+}
+```
+
+### Testing
+The payment system includes 72 comprehensive tests covering:
+- Payment intent creation and validation
+- Payment confirmation with escrow handling
+- Webhook processing and signature validation
+- Advanced pagination and filtering
+- Error handling and edge cases
+- Role-based access control
 
 ## 📚 API Documentation
 
@@ -113,11 +208,18 @@ http://localhost:3000/api-docs
 - `GET /api/marketer/offers/:id` - Get offer details
 - `POST /api/marketer/offers/:id/respond` - Respond to offer
 
-#### Payments
-- `POST /api/payments/checkout` - Create checkout session
+#### Payments (Enhanced with Full Stripe Integration)
+- `POST /api/payments/create-payment-intent` - Create Stripe payment intent
+- `POST /api/payments/confirm-payment` - Confirm payment with escrow support
+- `GET /api/payments/history` - Get comprehensive payment history with advanced filtering
+- `POST /api/payments/create-checkout-session` - Create checkout session
+- `GET /api/payments/session-status` - Get payment session status
+- `POST /api/payments/webhook` - Handle Stripe webhooks
 - `GET /api/payments/methods` - List payment methods
 - `POST /api/payments/withdraw` - Request withdrawal
-- `GET /api/payments/earnings` - Get earnings history
+- `GET /api/payments/earnings` - Get earnings with pagination and filtering
+- `GET /api/payments/earnings/summary` - Get earnings summary
+- `GET /api/payments/earnings/:id` - Get individual earning details
 
 #### Chat
 - `GET /api/chats/` - List chat rooms
