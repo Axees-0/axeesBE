@@ -55,7 +55,7 @@ npm start
 
 ## 🧪 Testing
 
-The project includes a comprehensive test suite with 250+ tests covering all major functionality.
+The project includes a comprehensive test suite with 290+ tests covering all major functionality.
 
 ### Run all tests
 ```bash
@@ -72,6 +72,9 @@ npm run test:offers
 
 # Payment tests (72 comprehensive tests)
 npm run test:payments
+
+# Deal execution tests (40 comprehensive tests)
+npm test tests/integration/deal-execution.test.js
 
 # Security tests
 npm run test:security
@@ -96,6 +99,88 @@ For detailed testing documentation, see [tests/README.md](tests/README.md).
 - **Advanced Filtering**: Comprehensive payment history with date range, status, and pagination
 - **Real-time Webhooks**: Automatic payment status updates via Stripe webhooks
 - **Role-based Access**: Admin override capabilities for payment management
+
+### Deal Execution API Endpoints
+
+The Deal Execution API provides milestone-based project management with role-based access control, payment automation, and comprehensive workflow tracking.
+
+#### Core Deal Execution Flow
+
+```http
+PUT /api/v1/deals/:id/submit-milestone
+```
+Allows creators to submit deliverables for funded milestones.
+
+**Request Body:**
+```json
+{
+  "milestoneId": "64a1b2c3d4e5f6789012",
+  "deliverables": [
+    {
+      "type": "file",
+      "url": "/uploads/deliverables/design-mockup.jpg",
+      "originalName": "design-mockup.jpg"
+    },
+    {
+      "type": "text",
+      "content": "Content has been created according to specifications."
+    }
+  ],
+  "notes": "Milestone completed successfully"
+}
+```
+
+```http
+PUT /api/v1/deals/:id/approve-milestone
+```
+Allows marketers to approve or reject submitted milestone deliverables.
+
+**Request Body:**
+```json
+{
+  "milestoneId": "64a1b2c3d4e5f6789012",
+  "action": "approve",
+  "rating": 5
+}
+```
+
+For rejection:
+```json
+{
+  "milestoneId": "64a1b2c3d4e5f6789012",
+  "action": "reject",
+  "feedback": "Please revise according to brand guidelines"
+}
+```
+
+```http
+POST /api/v1/deals/:id/complete
+```
+Completes a deal with optional final payment and rating.
+
+**Request Body:**
+```json
+{
+  "rating": 5,
+  "feedback": "Excellent work, very satisfied",
+  "triggerFinalPayment": true
+}
+```
+
+#### File Upload Support
+
+```http
+POST /api/v1/deals/:id/upload-deliverable
+```
+Upload files that can be used as milestone deliverables (supports images, documents, videos up to 50MB).
+
+#### Key Features:
+- **Role-based access**: Creators submit, Marketers approve
+- **Automatic payments**: Milestone approval triggers payment release
+- **Notification system**: Real-time updates for all parties
+- **File upload**: Support for multiple file types with validation
+- **Error handling**: Comprehensive validation and error responses
+- **Duplicate prevention**: Prevents duplicate submissions and completions
 
 ### Payment API Endpoints
 

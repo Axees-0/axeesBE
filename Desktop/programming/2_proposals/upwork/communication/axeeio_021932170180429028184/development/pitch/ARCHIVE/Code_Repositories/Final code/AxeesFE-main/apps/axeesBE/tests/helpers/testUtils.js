@@ -1,4 +1,5 @@
 // tests/helpers/testUtils.js
+const mongoose = require('mongoose');
 const Deal = require('../../models/deal');
 const Earning = require('../../models/earnings');
 const Payout = require('../../models/payouts');
@@ -219,6 +220,235 @@ const testUtils = {
         error: expect.stringContaining(errorMessage)
       }));
     }
+  },
+
+  /**
+   * Create a test deal with milestones
+   */
+  createDealWithMilestones: async (dealData = {}, milestonesData = []) => {
+    const defaultMilestones = milestonesData.length > 0 ? milestonesData : [
+      {
+        name: 'Content Creation',
+        amount: 500,
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        description: 'Create initial content',
+        status: 'pending',
+        deliverables: [],
+        feedback: []
+      },
+      {
+        name: 'Content Review',
+        amount: 300,
+        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+        description: 'Review and revise content',
+        status: 'pending',
+        deliverables: [],
+        feedback: []
+      }
+    ];
+
+    const deal = await testUtils.createTestDeal({
+      ...dealData,
+      milestones: defaultMilestones.map(milestone => ({
+        ...milestone,
+        _id: new mongoose.Types.ObjectId(),
+        createdAt: new Date(),
+        createdBy: dealData.creatorId || new mongoose.Types.ObjectId()
+      }))
+    });
+
+    return deal;
+  },
+
+  /**
+   * Create a test milestone for a deal
+   */
+  createTestMilestone: (milestoneData = {}) => {
+    return {
+      _id: new mongoose.Types.ObjectId(),
+      name: 'Test Milestone',
+      amount: 500,
+      dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      description: 'Test milestone description',
+      status: 'pending',
+      deliverables: [],
+      feedback: [],
+      createdAt: new Date(),
+      createdBy: new mongoose.Types.ObjectId(),
+      ...milestoneData
+    };
+  },
+
+  /**
+   * Create test deliverable data
+   */
+  createTestDeliverable: (deliverableData = {}) => {
+    return {
+      type: 'file',
+      url: '/uploads/test-file.jpg',
+      originalName: 'test-file.jpg',
+      content: null,
+      submittedAt: new Date(),
+      submittedBy: new mongoose.Types.ObjectId(),
+      ...deliverableData
+    };
+  },
+
+  /**
+   * Create mock file upload data
+   */
+  createMockFileUpload: (fileData = {}) => {
+    return {
+      fieldname: 'files',
+      originalname: 'test-document.pdf',
+      encoding: '7bit',
+      mimetype: 'application/pdf',
+      destination: '/uploads/deliverables',
+      filename: `${Date.now()}-test-document.pdf`,
+      path: `/uploads/deliverables/${Date.now()}-test-document.pdf`,
+      size: 1024 * 100, // 100KB
+      ...fileData
+    };
+  },
+
+  /**
+   * Generate test milestone submission data
+   */
+  generateMilestoneSubmissionData: (overrides = {}) => {
+    return {
+      milestoneId: new mongoose.Types.ObjectId().toString(),
+      deliverables: [
+        {
+          type: 'file',
+          url: '/uploads/deliverables/test-file.jpg',
+          originalName: 'design-mockup.jpg'
+        },
+        {
+          type: 'text',
+          content: 'Here is the completed work as requested.'
+        }
+      ],
+      notes: 'Work completed according to specifications',
+      ...overrides
+    };
+  },
+
+  /**
+   * Generate test milestone approval data
+   */
+  generateMilestoneApprovalData: (action = 'approve', overrides = {}) => {
+    const baseData = {
+      milestoneId: new mongoose.Types.ObjectId().toString(),
+      action: action,
+      ...overrides
+    };
+
+    if (action === 'reject') {
+      baseData.feedback = 'Please revise according to feedback';
+    } else if (action === 'approve') {
+      baseData.rating = 5;
+    }
+
+    return baseData;
+  },
+
+  /**
+   * Generate test deal completion data
+   */
+  generateDealCompletionData: (overrides = {}) => {
+    return {
+      rating: 5,
+      feedback: 'Excellent work, very satisfied with the results',
+      triggerFinalPayment: true,
+      ...overrides
+    };
+  },
+
+  /**
+   * Create a deal in specific state for testing
+   */
+  createDealInState: async (state, dealData = {}, milestonesData = []) => {
+    let deal;
+    
+    switch (state) {
+      case 'with_funded_milestone':
+        deal = await testUtils.createDealWithMilestones(dealData, [
+          testUtils.createTestMilestone({
+            name: 'Funded Milestone',
+            status: 'active',
+            fundedAt: new Date()
+          })
+        ]);
+        break;
+        
+      case 'with_submitted_milestone':
+        deal = await testUtils.createDealWithMilestones(dealData, [
+          testUtils.createTestMilestone({
+            name: 'Submitted Milestone',
+            status: 'submitted',
+            submittedAt: new Date(),
+            deliverables: [testUtils.createTestDeliverable()]
+          })
+        ]);
+        break;
+        
+      case 'with_approved_milestones':
+        deal = await testUtils.createDealWithMilestones(dealData, [
+          testUtils.createTestMilestone({
+            name: 'Approved Milestone 1',
+            status: 'approved',
+            completedAt: new Date()
+          }),
+          testUtils.createTestMilestone({
+            name: 'Approved Milestone 2',
+            status: 'approved',
+            completedAt: new Date()
+          })
+        ]);
+        break;
+        
+      case 'ready_for_completion':
+        deal = await testUtils.createDealWithMilestones(dealData, [
+          testUtils.createTestMilestone({
+            name: 'Completed Milestone',
+            status: 'approved',
+            completedAt: new Date(),
+            amount: dealData.paymentInfo?.paymentAmount || 1000
+          })
+        ]);
+        break;
+        
+      default:
+        deal = await testUtils.createDealWithMilestones(dealData, milestonesData);
+    }
+    
+    return deal;
+  },
+
+  /**
+   * Assert milestone status and properties
+   */
+  assertMilestoneStatus: (milestone, expectedStatus, additionalChecks = {}) => {
+    expect(milestone.status).toBe(expectedStatus);
+    
+    Object.keys(additionalChecks).forEach(key => {
+      expect(milestone[key]).toBeDefined();
+      if (additionalChecks[key] !== null) {
+        expect(milestone[key]).toBe(additionalChecks[key]);
+      }
+    });
+  },
+
+  /**
+   * Assert deal has expected milestones
+   */
+  assertDealMilestones: (deal, expectedCount, statusCounts = {}) => {
+    expect(deal.milestones).toHaveLength(expectedCount);
+    
+    Object.keys(statusCounts).forEach(status => {
+      const milestonesWithStatus = deal.milestones.filter(m => m.status === status);
+      expect(milestonesWithStatus).toHaveLength(statusCounts[status]);
+    });
   },
 
   /**
