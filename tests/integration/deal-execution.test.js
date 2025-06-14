@@ -16,7 +16,7 @@ const Payout = require('../../models/payouts');
 const Notification = require('../../models/Notification');
 
 // Import routes
-const dealExecutionRoutes = require('../../routes/dealExecutionRoutes');
+const marketerDealRoutes = require('../../routes/marketerDealRoutes');
 
 // Create Express app for testing
 const app = express();
@@ -38,7 +38,7 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/api/v1/deals', dealExecutionRoutes);
+app.use('/api/marketer/deals', marketerDealRoutes);
 
 describe('Deal Execution Tests', () => {
   let testCreator, testMarketer, testDeal, testMilestone;
@@ -84,7 +84,7 @@ describe('Deal Execution Tests', () => {
     await testUtils.cleanupTestData();
   });
 
-  describe('PUT /api/v1/deals/:id/submit-milestone', () => {
+  describe('PUT /api/marketer/deals/:id/submit-milestone', () => {
     describe('✅ Success Cases', () => {
       it('should submit milestone deliverables successfully', async () => {
         const submissionData = testUtils.generateMilestoneSubmissionData({
@@ -104,7 +104,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -134,7 +134,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -155,7 +155,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -170,7 +170,7 @@ describe('Deal Execution Tests', () => {
         });
 
         await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -193,7 +193,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .send(submissionData);
 
         expect(response.status).toBe(401);
@@ -205,7 +205,7 @@ describe('Deal Execution Tests', () => {
         delete submissionData.milestoneId;
 
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -220,7 +220,7 @@ describe('Deal Execution Tests', () => {
         };
 
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -235,7 +235,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${invalidDealId}/submit-milestone`)
+          .put(`/api/marketer/deals/${invalidDealId}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -250,7 +250,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -264,7 +264,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(marketerAuthHeader)
           .send(submissionData);
 
@@ -279,13 +279,13 @@ describe('Deal Execution Tests', () => {
         });
 
         await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
         // Attempt duplicate submission
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -305,7 +305,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${unfundedDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${unfundedDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData);
 
@@ -315,7 +315,7 @@ describe('Deal Execution Tests', () => {
     });
   });
 
-  describe('PUT /api/v1/deals/:id/approve-milestone', () => {
+  describe('PUT /api/marketer/deals/:id/approve-milestone', () => {
     let submittedDeal, submittedMilestone;
 
     beforeEach(async () => {
@@ -336,7 +336,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(marketerAuthHeader)
           .send(approvalData);
 
@@ -359,7 +359,7 @@ describe('Deal Execution Tests', () => {
         });
 
         await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(marketerAuthHeader)
           .send(approvalData);
 
@@ -389,7 +389,7 @@ describe('Deal Execution Tests', () => {
         });
 
         await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(marketerAuthHeader)
           .send(approvalData);
 
@@ -412,7 +412,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(marketerAuthHeader)
           .send(rejectionData);
 
@@ -436,7 +436,7 @@ describe('Deal Execution Tests', () => {
         });
 
         await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(marketerAuthHeader)
           .send(rejectionData);
 
@@ -458,7 +458,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .send(approvalData);
 
         expect(response.status).toBe(401);
@@ -471,7 +471,7 @@ describe('Deal Execution Tests', () => {
         };
 
         const response = await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(marketerAuthHeader)
           .send(approvalData);
 
@@ -486,7 +486,7 @@ describe('Deal Execution Tests', () => {
         };
 
         const response = await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(marketerAuthHeader)
           .send(approvalData);
 
@@ -501,7 +501,7 @@ describe('Deal Execution Tests', () => {
         };
 
         const response = await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(marketerAuthHeader)
           .send(rejectionData);
 
@@ -515,7 +515,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(creatorAuthHeader)
           .send(approvalData);
 
@@ -535,7 +535,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${pendingDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${pendingDeal._id}/approve-milestone`)
           .set(marketerAuthHeader)
           .send(approvalData);
 
@@ -554,7 +554,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${submittedDeal._id}/approve-milestone`)
+          .put(`/api/marketer/deals/${submittedDeal._id}/approve-milestone`)
           .set(unauthorizedUserData.authHeader)
           .send(approvalData);
 
@@ -564,7 +564,7 @@ describe('Deal Execution Tests', () => {
     });
   });
 
-  describe('POST /api/v1/deals/:id/complete', () => {
+  describe('POST /api/marketer/deals/:id/complete', () => {
     let completableDeal;
 
     beforeEach(async () => {
@@ -589,7 +589,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .set(marketerAuthHeader)
           .send(completionData);
 
@@ -613,7 +613,7 @@ describe('Deal Execution Tests', () => {
         });
 
         await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .set(marketerAuthHeader)
           .send(completionData);
 
@@ -637,7 +637,7 @@ describe('Deal Execution Tests', () => {
         const completionData = testUtils.generateDealCompletionData();
 
         await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .set(marketerAuthHeader)
           .send(completionData);
 
@@ -653,7 +653,7 @@ describe('Deal Execution Tests', () => {
 
       it('should allow completion without rating or feedback', async () => {
         const response = await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .set(marketerAuthHeader)
           .send({});
 
@@ -668,7 +668,7 @@ describe('Deal Execution Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .set(marketerAuthHeader)
           .send(completionData);
 
@@ -683,7 +683,7 @@ describe('Deal Execution Tests', () => {
         const completionData = testUtils.generateDealCompletionData();
 
         const response = await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .send(completionData);
 
         expect(response.status).toBe(401);
@@ -695,7 +695,7 @@ describe('Deal Execution Tests', () => {
         const completionData = testUtils.generateDealCompletionData();
 
         const response = await request(app)
-          .post(`/api/v1/deals/${invalidDealId}/complete`)
+          .post(`/api/marketer/deals/${invalidDealId}/complete`)
           .set(marketerAuthHeader)
           .send(completionData);
 
@@ -707,7 +707,7 @@ describe('Deal Execution Tests', () => {
         const completionData = testUtils.generateDealCompletionData();
 
         const response = await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .set(creatorAuthHeader)
           .send(completionData);
 
@@ -718,13 +718,13 @@ describe('Deal Execution Tests', () => {
       it('should return 400 for already completed deal', async () => {
         // Complete the deal first
         await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .set(marketerAuthHeader)
           .send({});
 
         // Try to complete again
         const response = await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .set(marketerAuthHeader)
           .send({});
 
@@ -742,7 +742,7 @@ describe('Deal Execution Tests', () => {
         const completionData = testUtils.generateDealCompletionData();
 
         const response = await request(app)
-          .post(`/api/v1/deals/${incompleteDeal._id}/complete`)
+          .post(`/api/marketer/deals/${incompleteDeal._id}/complete`)
           .set(marketerAuthHeader)
           .send(completionData);
 
@@ -758,7 +758,7 @@ describe('Deal Execution Tests', () => {
         };
 
         const response = await request(app)
-          .post(`/api/v1/deals/${completableDeal._id}/complete`)
+          .post(`/api/marketer/deals/${completableDeal._id}/complete`)
           .set(marketerAuthHeader)
           .send(completionData);
 
@@ -769,12 +769,12 @@ describe('Deal Execution Tests', () => {
   });
 
   describe('File Upload Tests', () => {
-    describe('POST /api/v1/deals/:id/upload-deliverable', () => {
+    describe('POST /api/marketer/deals/:id/upload-deliverable', () => {
       it('should handle file upload for deliverables', async () => {
         // This test would require actual file upload simulation
         // For now, we test the basic endpoint structure
         const response = await request(app)
-          .post(`/api/v1/deals/${testDeal._id}/upload-deliverable`)
+          .post(`/api/marketer/deals/${testDeal._id}/upload-deliverable`)
           .set(creatorAuthHeader);
 
         // Without actual files, should return 400
@@ -784,7 +784,7 @@ describe('Deal Execution Tests', () => {
 
       it('should return 401 for unauthenticated file upload', async () => {
         const response = await request(app)
-          .post(`/api/v1/deals/${testDeal._id}/upload-deliverable`);
+          .post(`/api/marketer/deals/${testDeal._id}/upload-deliverable`);
 
         expect(response.status).toBe(401);
         expect(response.body).toHaveProperty('error', 'Unauthorized: User not authenticated');
@@ -795,7 +795,7 @@ describe('Deal Execution Tests', () => {
   describe('Edge Cases and Error Handling', () => {
     it('should handle malformed ObjectId in deal ID', async () => {
       const response = await request(app)
-        .put('/api/v1/deals/invalid-id/submit-milestone')
+        .put('/api/marketer/deals/invalid-id/submit-milestone')
         .set(creatorAuthHeader)
         .send(testUtils.generateMilestoneSubmissionData());
 
@@ -808,7 +808,7 @@ describe('Deal Execution Tests', () => {
       });
 
       const response = await request(app)
-        .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+        .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
         .set(creatorAuthHeader)
         .send(submissionData);
 
@@ -827,7 +827,7 @@ describe('Deal Execution Tests', () => {
         });
 
         const response = await request(app)
-          .put(`/api/v1/deals/${testDeal._id}/submit-milestone`)
+          .put(`/api/marketer/deals/${testDeal._id}/submit-milestone`)
           .set(creatorAuthHeader)
           .send(submissionData)
           .catch(err => {

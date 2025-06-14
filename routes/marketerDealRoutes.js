@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const dealController = require("../controllers/marketerDealController");
+const dealExecutionController = require("../controllers/dealExecutionController");
 
 /**
  * @swagger
@@ -709,5 +710,11 @@ router.delete(
    "/:dealId/release-half",
   dealController.releaseFirstHalfEscrow
 );
+
+// Deal Execution Routes (for test compatibility)
+router.put("/:id/submit-milestone", dealExecutionController.submitMilestone);
+router.put("/:id/approve-milestone", dealExecutionController.approveMilestone);
+router.post("/:id/complete", dealExecutionController.completeDeal);
+router.post("/:id/upload-deliverable", dealExecutionController.uploadDeliverable);
 
 module.exports = router;
