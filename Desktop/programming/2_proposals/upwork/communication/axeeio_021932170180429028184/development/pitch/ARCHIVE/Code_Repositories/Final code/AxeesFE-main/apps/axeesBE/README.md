@@ -11,6 +11,7 @@ Axees is an influencer marketing platform connecting brands/marketers with conte
 - **Real-time Chat**: SSE-based messaging with file attachments
 - **Deal Execution**: Milestone-based project management
 - **Security**: Comprehensive security measures against common vulnerabilities
+- **Monitoring**: Production-ready latency tracking, cost monitoring, and KPI dashboard
 
 ## 📋 Prerequisites
 - Node.js 18.x or 20.x
@@ -345,6 +346,25 @@ axeesBE/
 ├── .gitignore        # Git ignore rules
 └── README.md         # This file
 ```
+
+## 📊 Monitoring
+
+### Monitoring Services
+The application includes comprehensive monitoring services for tracking performance, costs, and KPIs:
+
+- **LatencyMonitor**: Tracks latency across data ingestion and signal processing pipelines
+- **CostTracker**: Monitors costs including Databento billing, infrastructure, and per-signal costs
+- **KPIDashboard**: Centralized dashboard for all KPIs with alerting capabilities
+
+### Monitoring Endpoints
+- `GET /api/monitoring/dashboard` - Complete dashboard data
+- `GET /api/monitoring/kpis` - Current KPI values
+- `GET /api/monitoring/alerts` - Active alerts
+- `GET /api/monitoring/latency` - Latency metrics and percentiles
+- `GET /api/monitoring/costs` - Cost tracking and Databento billing
+- `POST /api/monitoring/costs/databento` - Record Databento usage
+
+See `services/monitoring/README.md` for detailed documentation.
 
 ## 🔒 Security
 - JWT-based authentication

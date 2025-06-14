@@ -34,6 +34,7 @@
    const connectRoutes         = require('./routes/connectRoutes');
    const findRoutes            = require('./routes/findRoutes');
    const tempUserRoutes        = require('./routes/tempUser');
+   const monitoringRoutes      = require('./routes/monitoring');
    
    /* cron job */
    require('./cron/activationReminders');
@@ -102,6 +103,7 @@ mongoose
    app.use('/api/marketer/deals',     marketerDealRoutes);
    app.use('/api/find',               findRoutes);
    app.use('/api/temp-users',         tempUserRoutes);
+   app.use('/api/monitoring',         monitoringRoutes);
    
    /* Payments need req.user.id – inject via manualAuth first */
    app.use('/api/connect', manualAuth, connectRoutes);
