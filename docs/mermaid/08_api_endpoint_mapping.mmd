@@ -1,0 +1,101 @@
+mindmap
+  root((Axees API))
+    Authentication
+      /api/auth
+        login
+        register/start
+        register/verify-otp
+        check-phone
+        password-reset
+        resend-otp
+    Account Management
+      /api/account
+        register/set-profile
+        update-name
+        update-username
+        set-email
+        set-password
+        profile/:userId
+        :userId/avatar
+        :userId/media-package
+        creator/:userId
+        marketer/:userId
+        creator/:userId/social-handles
+        creator/:userId/portfolio
+    User Management
+      /api/users
+        getAllUsers
+        createUser
+        :userId
+        :userId/favorites
+        :viewerId/hide
+    Offer System
+      /api/marketer/offers
+        payment-status
+        create/get/update/delete
+        :offerId/send
+        :offerId/counter
+        :offerId/accept
+        :offerId/reject
+        :offerId/cancel
+        drafts
+        :offerId/viewed/:role
+    Deal Management
+      /api/marketer/deals
+        create
+        getDeals
+        :dealId/milestones
+        :dealId/milestones/:milestoneId/fund
+        :dealId/milestones/:milestoneId/submit
+        :dealId/milestones/:milestoneId/review
+        :dealId/offer-content
+        :dealId/approve-offer-content
+        :dealId/submit-proof
+        :dealId/proofs/:proofId/review
+        :dealId/release-first-half
+        :dealId/cancel
+    Chat System
+      /api/chats
+        getChatRooms
+        :chatId/messages
+        :chatId/stream
+        :chatId/mark-read
+        messages/:id/read
+        search
+        unread-count
+    Payment System
+      /api/payments
+        create-checkout-session
+        session-status
+        paymentmethod
+        withdraw
+        withdrawals/history
+        earnings
+        earnings/summary
+        refund
+        webhook
+    AI Discovery
+      /api/find
+        searchCreators
+        refresh
+    Connect Integration
+      /api/connect
+        onboard
+        verify/:connectId
+    Invitations
+      /api/invite
+        create
+        my-invites
+        status/:inviteToken
+        accept
+        :inviteId
+    Notifications
+      /api/notifications
+        getNotifications
+        mark-read
+        delete
+    Temp Users
+      /api/temp-users
+        convert/:userName
+        status/:userName
+        cleanup

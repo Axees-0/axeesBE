@@ -1,0 +1,41 @@
+graph TB
+    subgraph "User Types"
+        M[Marketer]
+        C[Creator]
+        T[TempUser/AI]
+    end
+    
+    subgraph "Core Modules"
+        AUTH[Authentication System]
+        USERS[User Management]
+        OFFERS[Offer System]
+        DEALS[Deal Management]
+        CHAT[Chat System]
+        PAY[Payment System]
+        AI[AI Discovery]
+    end
+    
+    subgraph "External Services"
+        STRIPE[Stripe Payments]
+        FIREBASE[Firebase Push]
+        TWILIO[Twilio SMS]
+        OPENAI[OpenAI API]
+        AWS[AWS S3 Storage]
+    end
+    
+    M --> AUTH
+    C --> AUTH
+    T --> AI
+    
+    AUTH --> USERS
+    USERS --> OFFERS
+    OFFERS --> CHAT
+    OFFERS --> DEALS
+    DEALS --> PAY
+    
+    PAY --> STRIPE
+    AUTH --> TWILIO
+    CHAT --> FIREBASE
+    AI --> OPENAI
+    OFFERS --> AWS
+    DEALS --> AWS

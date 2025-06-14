@@ -1,0 +1,67 @@
+sequenceDiagram
+    participant U as User
+    participant S as Splash Screen
+    participant L as Login Screen
+    participant R as Registration Flow
+    participant A as App Main
+    participant API as Backend API
+    participant SMS as SMS Service
+    
+    Note over U,SMS: App Initialization
+    U->>S: Open App
+    S->>S: Check Auth State
+    S->>L: Navigate to Login
+    
+    Note over U,SMS: Login Flow
+    U->>L: Enter phone + password
+    L->>API: POST /api/auth/login
+    API-->>L: Auth token + user data
+    L->>A: Navigate to Main App
+    
+    Note over U,SMS: Forgot Password Flow
+    U->>L: Tap "Forgot Password"
+    L->>L: Show Forgot Password Screen
+    U->>L: Enter phone number
+    L->>API: POST /api/auth/password-reset
+    API->>SMS: Send OTP
+    SMS-->>U: OTP Code
+    L->>L: Show OTP Verification
+    U->>L: Enter OTP
+    L->>API: POST /api/auth/verify-reset-otp
+    API-->>L: OTP verified
+    L->>L: Show Reset Password Screen
+    U->>L: Enter new password
+    L->>API: POST /api/auth/complete-password-reset
+    API-->>L: Password reset complete
+    L->>L: Navigate to Login
+    
+    Note over U,SMS: Registration Flow
+    U->>L: Tap "Register"
+    L->>R: Show Registration Preview
+    U->>R: Continue
+    R->>R: Show User Type Selection
+    U->>R: Select Creator/Marketer
+    R->>R: Show Phone Registration
+    U->>R: Enter phone number
+    R->>API: POST /api/auth/register/start
+    API->>SMS: Send OTP
+    SMS-->>U: OTP Code
+    R->>R: Show OTP Verification
+    U->>R: Enter OTP
+    R->>API: POST /api/auth/register/verify-otp
+    API-->>R: User created + temp token
+    R->>R: Show Name Input
+    U->>R: Enter full name
+    R->>R: Show Username Input
+    U->>R: Enter username
+    R->>R: Show Email Input
+    U->>R: Enter email
+    R->>API: POST /api/account/register/set-profile
+    API-->>R: Profile updated
+    R->>R: Show Success Message
+    R->>A: Navigate to Main App
+    
+    Note over U,SMS: Session Management
+    A->>API: Periodic token validation
+    API-->>A: Token status
+    A->>L: Auto-logout if expired

@@ -1,0 +1,35 @@
+sequenceDiagram
+    participant U as User
+    participant API as Axees API
+    participant SMS as Twilio SMS
+    participant DB as Database
+    
+    U->>API: POST /api/auth/check-phone
+    API->>DB: Check if phone exists
+    DB-->>API: Phone status
+    API-->>U: Phone availability
+    
+    U->>API: POST /api/auth/register/start
+    API->>SMS: Send OTP
+    SMS-->>U: OTP Code
+    API-->>U: OTP sent confirmation
+    
+    U->>API: POST /api/auth/register/verify-otp
+    API->>DB: Create temp user
+    DB-->>API: User created
+    API-->>U: User ID + token
+    
+    U->>API: POST /api/account/register/set-profile
+    API->>DB: Update user profile
+    DB-->>API: Profile updated
+    API-->>U: Profile set
+    
+    U->>API: POST /api/account/set-email
+    API->>DB: Update email
+    DB-->>API: Email updated
+    API-->>U: Email set
+    
+    U->>API: POST /api/account/set-password
+    API->>DB: Activate user account
+    DB-->>API: Account activated
+    API-->>U: Registration complete

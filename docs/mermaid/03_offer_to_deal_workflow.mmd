@@ -1,0 +1,63 @@
+flowchart TD
+    START([User Logged In]) --> ROLE{User Role?}
+    
+    %% Marketer Flow
+    ROLE -->|Marketer| M_SEARCH[Search Creators]
+    M_SEARCH --> M_FIND[Find Creator Profile]
+    M_FIND --> M_DRAFT[Create Offer Draft]
+    M_DRAFT --> M_REVIEW[Review Draft]
+    M_REVIEW --> M_SEND[Send Offer to Creator]
+    
+    %% Creator Discovery
+    M_SEARCH --> AI_SEARCH[AI Creator Discovery]
+    AI_SEARCH --> TEMP_USERS[Browse AI Profiles]
+    TEMP_USERS --> M_FIND
+    
+    %% Creator Flow
+    ROLE -->|Creator| C_OFFERS[View Received Offers]
+    C_OFFERS --> C_REVIEW[Review Offer Details]
+    
+    %% Offer Sent State
+    M_SEND --> OFFER_SENT[Offer Status: Sent]
+    OFFER_SENT --> NOTIFY_C[Notify Creator]
+    NOTIFY_C --> C_REVIEW
+    
+    %% Negotiation Loop
+    C_REVIEW --> C_DECISION{Creator Decision}
+    C_DECISION -->|Accept| C_ACCEPT[Accept Offer]
+    C_DECISION -->|Counter| C_COUNTER[Create Counter Offer]
+    C_DECISION -->|Reject| C_REJECT[Reject Offer]
+    
+    C_COUNTER --> NOTIFY_M[Notify Marketer]
+    NOTIFY_M --> M_COUNTER_REVIEW[Review Counter]
+    M_COUNTER_REVIEW --> M_DECISION{Marketer Decision}
+    M_DECISION -->|Accept| M_ACCEPT[Accept Counter]
+    M_DECISION -->|Counter| M_COUNTER[Create Counter]
+    M_DECISION -->|Reject| M_REJECT[Reject Counter]
+    
+    M_COUNTER --> C_REVIEW
+    
+    %% Deal Creation
+    C_ACCEPT --> CREATE_DEAL[Create Deal]
+    M_ACCEPT --> CREATE_DEAL
+    
+    CREATE_DEAL --> CHAT_CREATE[Auto-create Chat Room]
+    CREATE_DEAL --> DEAL_ACTIVE[Deal Status: Active]
+    
+    %% Deal Management
+    DEAL_ACTIVE --> MILESTONES[Setup Milestones]
+    MILESTONES --> FUND_MILESTONE[Fund Milestone]
+    FUND_MILESTONE --> WORK_PHASE[Work Submission Phase]
+    WORK_PHASE --> CONTENT_PHASE[Content Approval Phase]
+    CONTENT_PHASE --> PROOF_PHASE[Proof Submission Phase]
+    PROOF_PHASE --> PAYMENT_RELEASE[Payment Release]
+    PAYMENT_RELEASE --> DEAL_COMPLETE[Deal Complete]
+    
+    %% Termination States
+    C_REJECT --> OFFER_END[Offer Ended]
+    M_REJECT --> OFFER_END
+    
+    style START fill:#e1f5fe
+    style CREATE_DEAL fill:#c8e6c9
+    style DEAL_COMPLETE fill:#4caf50
+    style OFFER_END fill:#ffcdd2

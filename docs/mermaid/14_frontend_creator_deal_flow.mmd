@@ -1,0 +1,67 @@
+stateDiagram-v2
+    [*] --> NotificationReceived : Offer notification arrives
+    
+    NotificationReceived --> ViewOffer : Tap notification
+    NotificationReceived --> OffersTab : Navigate manually
+    
+    OffersTab --> OffersList : View pending offers
+    OffersList --> ViewOffer : Select specific offer
+    
+    ViewOffer --> OfferDetails : Review offer details
+    OfferDetails --> CreatorDecision : Make decision
+    
+    CreatorDecision --> AcceptOffer : Accept terms
+    CreatorDecision --> RejectOffer : Decline offer
+    CreatorDecision --> CreateCounter : Counter-offer
+    
+    CreateCounter --> CounterForm : Edit terms/price
+    CounterForm --> SendCounter : Submit counter
+    SendCounter --> WaitMarketerResponse : Wait for marketer
+    
+    WaitMarketerResponse --> CounterAccepted : Marketer accepts
+    WaitMarketerResponse --> CounterRejected : Marketer rejects
+    WaitMarketerResponse --> NewCounterReceived : New counter received
+    
+    NewCounterReceived --> ViewOffer : Review new terms
+    CounterRejected --> [*] : End negotiation
+    
+    AcceptOffer --> DealActive : Deal becomes active
+    CounterAccepted --> DealActive : Deal becomes active
+    
+    DealActive --> WorkInProgress : Begin content creation
+    WorkInProgress --> ContentCreated : Content completed
+    ContentCreated --> SubmitContent : Submit for approval
+    
+    SubmitContent --> ContentUnderReview : Awaiting marketer review
+    ContentUnderReview --> ContentApproved : Marketer approves
+    ContentUnderReview --> ContentRevision : Revision requested
+    
+    ContentRevision --> WorkInProgress : Make changes
+    ContentApproved --> PostContent : Post on social media
+    
+    PostContent --> UploadProof : Submit proof of posting
+    UploadProof --> ProofUnderReview : Awaiting verification
+    
+    ProofUnderReview --> ProofApproved : Marketer verifies
+    ProofUnderReview --> ProofRejection : Proof rejected
+    
+    ProofRejection --> UploadProof : Resubmit proof
+    ProofApproved --> PaymentReleased : Payment processed
+    
+    PaymentReleased --> EarningsUpdated : Earnings credited
+    EarningsUpdated --> DealCompleted : Deal finished
+    
+    DealCompleted --> ViewEarnings : Check earnings
+    DealCompleted --> WithdrawFunds : Request withdrawal
+    
+    WithdrawFunds --> PaymentMethodSelect : Choose method
+    PaymentMethodSelect --> AddPaymentMethod : Add new method
+    PaymentMethodSelect --> ProcessWithdrawal : Process existing
+    
+    AddPaymentMethod --> PaymentMethodSelect : Return to selection
+    ProcessWithdrawal --> WithdrawalProcessing : Processing
+    WithdrawalProcessing --> WithdrawalComplete : Funds transferred
+    
+    RejectOffer --> [*] : End flow
+    DealCompleted --> [*] : End flow
+    WithdrawalComplete --> [*] : End flow

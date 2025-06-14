@@ -1,0 +1,34 @@
+flowchart TD
+    SEARCH_START([Marketer Searches Creators]) --> QUERY[Search Query Processing]
+    
+    QUERY --> DB_SEARCH[Search Real Users]
+    DB_SEARCH --> DB_RESULTS[Real User Results]
+    
+    QUERY --> AI_CHECK{Need AI Backfill?}
+    AI_CHECK -->|Yes| AI_SEARCH[Query OpenAI]
+    AI_CHECK -->|No| COMBINE_RESULTS
+    
+    AI_SEARCH --> APIFY_EXTRACT[Extract Social Data via Apify]
+    APIFY_EXTRACT --> AI_PROFILES[Generate AI Profiles]
+    AI_PROFILES --> TEMP_DB[Save as TempUsers]
+    TEMP_DB --> AI_RESULTS[AI Generated Results]
+    
+    DB_RESULTS --> COMBINE_RESULTS[Combine Results]
+    AI_RESULTS --> COMBINE_RESULTS
+    
+    COMBINE_RESULTS --> FILTER[Apply Filters & Preferences]
+    FILTER --> RANK[Rank by Relevance]
+    RANK --> FINAL_RESULTS[Return to Marketer]
+    
+    FINAL_RESULTS --> SELECT_CREATOR[Marketer Selects Creator]
+    SELECT_CREATOR --> CONVERT_CHECK{Is TempUser?}
+    CONVERT_CHECK -->|Yes| CONVERT_TEMP[Convert to Real User]
+    CONVERT_CHECK -->|No| CREATE_OFFER[Create Offer]
+    
+    CONVERT_TEMP --> CREATE_OFFER
+    CREATE_OFFER --> OFFER_FLOW[Continue Offer Flow]
+    
+    style AI_SEARCH fill:#fff3e0
+    style AI_PROFILES fill:#fff3e0
+    style TEMP_DB fill:#fff3e0
+    style CONVERT_TEMP fill:#e8f5e8

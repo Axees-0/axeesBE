@@ -1,0 +1,130 @@
+graph TB
+    subgraph "App Container"
+        APP[App.tsx]
+        LAYOUT[_layout.tsx]
+        INDEX[index.tsx]
+    end
+    
+    subgraph "Authentication Components"
+        LOGIN[LoginScreen]
+        REGISTER[RegistrationFlow]
+        OTP[OTPVerification]
+        FORGOT[ForgotPassword]
+    end
+    
+    subgraph "Main Navigation"
+        TAB_NAV[TabNavigation]
+        EXPLORE[ExploreTab]
+        DEALS[DealsTab]
+        MESSAGES[MessagesTab]
+        NOTIFICATIONS[NotificationsTab]
+        PROFILE[ProfileTab]
+    end
+    
+    subgraph "Shared Components"
+        BUTTON[CustomButton]
+        INPUT[CustomInput]
+        MODAL[CustomModal]
+        CARD[CreatorCard]
+        HEADER[CustomHeader]
+        TEXT[ThemedText]
+        VIEW[ThemedView]
+    end
+    
+    subgraph "Feature Components"
+        OFFER_FORM[OfferCreationForm]
+        PAYMENT_MODAL[PaymentModal]
+        CHAT_BUBBLE[ChatBubble]
+        PROFILE_CARD[ProfileCard]
+        EARNINGS_CARD[EarningsCard]
+        DEAL_CARD[DealCard]
+    end
+    
+    subgraph "Context Providers"
+        AUTH_CTX[AuthContext]
+        THEME_CTX[ThemeContext]
+        PAYMENT_CTX[PaymentContext]
+        MESSAGE_CTX[MessageContext]
+    end
+    
+    subgraph "Hooks & Utilities"
+        USE_AUTH[useAuth]
+        USE_THEME[useThemeColor]
+        USE_TAB[useTabBarIcon]
+        USE_COLOR[useColorScheme]
+        VALIDATIONS[Validation Utils]
+    end
+    
+    subgraph "External Integrations"
+        FIREBASE[Firebase Messaging]
+        STRIPE[Stripe Payments]
+        CAMERA[Camera/ImagePicker]
+        STORAGE[AsyncStorage]
+    end
+    
+    %% App Structure
+    APP --> LAYOUT
+    LAYOUT --> INDEX
+    INDEX --> TAB_NAV
+    
+    %% Authentication Flow
+    LAYOUT --> LOGIN
+    LOGIN --> REGISTER
+    REGISTER --> OTP
+    LOGIN --> FORGOT
+    
+    %% Main Navigation
+    TAB_NAV --> EXPLORE
+    TAB_NAV --> DEALS
+    TAB_NAV --> MESSAGES
+    TAB_NAV --> NOTIFICATIONS
+    TAB_NAV --> PROFILE
+    
+    %% Component Usage
+    EXPLORE --> CARD
+    EXPLORE --> HEADER
+    DEALS --> DEAL_CARD
+    MESSAGES --> CHAT_BUBBLE
+    PROFILE --> PROFILE_CARD
+    PROFILE --> EARNINGS_CARD
+    
+    %% Feature Components
+    EXPLORE --> OFFER_FORM
+    OFFER_FORM --> PAYMENT_MODAL
+    PAYMENT_MODAL --> STRIPE
+    
+    %% Shared Components Usage
+    LOGIN --> BUTTON
+    LOGIN --> INPUT
+    REGISTER --> BUTTON
+    REGISTER --> INPUT
+    OFFER_FORM --> BUTTON
+    OFFER_FORM --> INPUT
+    OFFER_FORM --> MODAL
+    
+    %% Context Integration
+    APP --> AUTH_CTX
+    APP --> THEME_CTX
+    APP --> PAYMENT_CTX
+    APP --> MESSAGE_CTX
+    
+    %% Hook Usage
+    LOGIN --> USE_AUTH
+    EXPLORE --> USE_THEME
+    TAB_NAV --> USE_TAB
+    HEADER --> USE_COLOR
+    OFFER_FORM --> VALIDATIONS
+    
+    %% External Service Integration
+    AUTH_CTX --> STORAGE
+    MESSAGE_CTX --> FIREBASE
+    PAYMENT_CTX --> STRIPE
+    PROFILE --> CAMERA
+    
+    %% Styling
+    style APP fill:#e1f5fe
+    style AUTH_CTX fill:#c8e6c9
+    style TAB_NAV fill:#fff3e0
+    style SHARED fill:#f3e5f5
+    style FIREBASE fill:#ffecb3
+    style STRIPE fill:#ffcdd2

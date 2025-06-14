@@ -1,0 +1,39 @@
+sequenceDiagram
+    participant M as Marketer
+    participant API as Axees API
+    participant STRIPE as Stripe
+    participant ESCROW as Escrow Account
+    participant C as Creator
+    participant BANK as Creator Bank
+    
+    Note over M,BANK: Milestone Funding Phase
+    M->>API: Fund Milestone
+    API->>STRIPE: Create Payment Intent
+    STRIPE-->>API: Payment Intent ID
+    API-->>M: Checkout Session
+    
+    M->>STRIPE: Complete Payment
+    STRIPE->>ESCROW: Transfer to Escrow
+    STRIPE->>API: Webhook: Payment Success
+    API->>API: Update Milestone Status: Funded
+    
+    Note over M,BANK: Work Completion Phase
+    C->>API: Submit Work
+    API-->>M: Notify Marketer
+    M->>API: Approve Work
+    API->>API: Update Status: Approved
+    
+    Note over M,BANK: Payment Release Phase
+    M->>API: Release Payment
+    API->>STRIPE: Transfer from Escrow
+    STRIPE->>BANK: Transfer to Creator
+    STRIPE->>API: Webhook: Transfer Complete
+    API->>API: Record Earning
+    API-->>C: Payment Notification
+    
+    Note over M,BANK: Withdrawal Process
+    C->>API: Request Withdrawal
+    API->>STRIPE: Create Payout
+    STRIPE->>BANK: Direct Transfer
+    STRIPE->>API: Webhook: Payout Complete
+    API-->>C: Withdrawal Complete

@@ -1,0 +1,34 @@
+flowchart TD
+    REQUEST[API Request] --> VALIDATE[Validate Input]
+    VALIDATE -->|Valid| AUTH_CHECK[Check Authentication]
+    VALIDATE -->|Invalid| ERROR_400[400 Bad Request]
+    
+    AUTH_CHECK -->|Authenticated| AUTHORIZE[Check Authorization]
+    AUTH_CHECK -->|Not Authenticated| ERROR_401[401 Unauthorized]
+    
+    AUTHORIZE -->|Authorized| PROCESS[Process Request]
+    AUTHORIZE -->|Not Authorized| ERROR_403[403 Forbidden]
+    
+    PROCESS -->|Success| SUCCESS_200[200 Success]
+    PROCESS -->|Resource Not Found| ERROR_404[404 Not Found]
+    PROCESS -->|Server Error| ERROR_500[500 Internal Error]
+    PROCESS -->|Business Logic Error| ERROR_422[422 Unprocessable]
+    
+    SUCCESS_200 --> LOG_SUCCESS[Log Success]
+    ERROR_400 --> LOG_ERROR[Log Error]
+    ERROR_401 --> LOG_ERROR
+    ERROR_403 --> LOG_ERROR
+    ERROR_404 --> LOG_ERROR
+    ERROR_422 --> LOG_ERROR
+    ERROR_500 --> LOG_ERROR
+    
+    LOG_SUCCESS --> RESPONSE[Return Response]
+    LOG_ERROR --> RESPONSE
+    
+    style SUCCESS_200 fill:#c8e6c9
+    style ERROR_400 fill:#ffcdd2
+    style ERROR_401 fill:#ffcdd2
+    style ERROR_403 fill:#ffcdd2
+    style ERROR_404 fill:#ffcdd2
+    style ERROR_422 fill:#ffcdd2
+    style ERROR_500 fill:#ffcdd2

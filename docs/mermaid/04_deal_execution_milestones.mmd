@@ -1,0 +1,35 @@
+stateDiagram-v2
+    [*] --> DealCreated : Offer Accepted
+    
+    DealCreated --> MilestoneSetup : Setup Milestones
+    MilestoneSetup --> MilestonePending : Milestone Created
+    
+    MilestonePending --> MilestoneFunded : Marketer Funds
+    MilestoneFunded --> WorkInProgress : Creator Starts Work
+    WorkInProgress --> WorkSubmitted : Creator Submits
+    
+    WorkSubmitted --> WorkApproved : Marketer Approves
+    WorkSubmitted --> WorkRevision : Marketer Requests Changes
+    WorkRevision --> WorkInProgress : Creator Revises
+    
+    WorkApproved --> ContentSubmission : Submit Content for Approval
+    ContentSubmission --> ContentApproved : Marketer Approves Content
+    ContentSubmission --> ContentRevision : Request Content Changes
+    ContentRevision --> ContentSubmission : Creator Revises Content
+    
+    ContentApproved --> ProofSubmission : Creator Posts & Submits Proof
+    ProofSubmission --> ProofApproved : Marketer Verifies
+    ProofSubmission --> ProofRevision : Proof Rejected
+    ProofRevision --> ProofSubmission : Resubmit Proof
+    
+    ProofApproved --> PaymentReleased : Release Escrow Payment
+    PaymentReleased --> MilestoneComplete : Milestone Completed
+    
+    MilestoneComplete --> MilestoneSetup : Next Milestone
+    MilestoneComplete --> DealComplete : All Milestones Done
+    
+    DealCreated --> DealCancelled : Cancel Deal
+    WorkInProgress --> DealCancelled : Cancel Deal
+    
+    DealComplete --> [*]
+    DealCancelled --> [*]

@@ -1,0 +1,96 @@
+flowchart TD
+    subgraph "Creator Journey"
+        C_START([Creator Downloads App])
+        C_REG[Register as Creator]
+        C_PROFILE[Complete Profile Setup]
+        C_WAIT[Wait for Offers]
+        C_NOTIF[Receive Offer Notification]
+        C_REVIEW[Review Offer Details]
+        C_DECIDE{Accept/Counter/Reject?}
+        C_ACCEPT[Accept Offer]
+        C_COUNTER[Create Counter Offer]
+        C_WORK[Create Content]
+        C_SUBMIT[Submit for Approval]
+        C_POST[Post on Social Media]
+        C_PROOF[Upload Proof]
+        C_PAID[Receive Payment]
+        C_WITHDRAW[Withdraw Earnings]
+    end
+    
+    subgraph "Marketer Journey"
+        M_START([Marketer Downloads App])
+        M_REG[Register as Marketer]
+        M_PROFILE[Complete Company Profile]
+        M_EXPLORE[Explore Creators]
+        M_SEARCH[Search & Filter]
+        M_VIEW[View Creator Profiles]
+        M_OFFER[Create Offer]
+        M_PAY[Make Payment]
+        M_SENT[Offer Sent]
+        M_WAIT[Wait for Response]
+        M_NEGOTIATE[Handle Negotiation]
+        M_APPROVE[Approve Content]
+        M_VERIFY[Verify Proof]
+        M_COMPLETE[Mark Deal Complete]
+    end
+    
+    subgraph "Shared Interactions"
+        CHAT[In-App Messaging]
+        NOTIFS[Push Notifications]
+        SUPPORT[Customer Support]
+    end
+    
+    %% Creator Flow
+    C_START --> C_REG
+    C_REG --> C_PROFILE
+    C_PROFILE --> C_WAIT
+    C_WAIT --> C_NOTIF
+    C_NOTIF --> C_REVIEW
+    C_REVIEW --> C_DECIDE
+    C_DECIDE -->|Accept| C_ACCEPT
+    C_DECIDE -->|Counter| C_COUNTER
+    C_ACCEPT --> C_WORK
+    C_COUNTER --> M_NEGOTIATE
+    C_WORK --> C_SUBMIT
+    C_SUBMIT --> M_APPROVE
+    C_POST --> C_PROOF
+    C_PROOF --> M_VERIFY
+    C_PAID --> C_WITHDRAW
+    
+    %% Marketer Flow
+    M_START --> M_REG
+    M_REG --> M_PROFILE
+    M_PROFILE --> M_EXPLORE
+    M_EXPLORE --> M_SEARCH
+    M_SEARCH --> M_VIEW
+    M_VIEW --> M_OFFER
+    M_OFFER --> M_PAY
+    M_PAY --> M_SENT
+    M_SENT --> M_WAIT
+    M_WAIT --> C_REVIEW
+    M_NEGOTIATE --> C_REVIEW
+    M_APPROVE --> C_POST
+    M_VERIFY --> C_PAID
+    C_PAID --> M_COMPLETE
+    
+    %% Shared Interactions
+    C_REVIEW -.-> CHAT
+    M_NEGOTIATE -.-> CHAT
+    C_WORK -.-> CHAT
+    M_APPROVE -.-> CHAT
+    
+    C_NOTIF -.-> NOTIFS
+    M_SENT -.-> NOTIFS
+    C_PAID -.-> NOTIFS
+    
+    C_PROFILE -.-> SUPPORT
+    M_PROFILE -.-> SUPPORT
+    
+    %% Styling
+    style C_START fill:#e8f5e8
+    style M_START fill:#fff3e0
+    style C_PAID fill:#c8e6c9
+    style M_COMPLETE fill:#c8e6c9
+    style CHAT fill:#e1f5fe
+    style NOTIFS fill:#f3e5f5
+    style SUPPORT fill:#fff3e0
