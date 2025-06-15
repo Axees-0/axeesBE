@@ -37,9 +37,7 @@ const Offer = require('../../models/offer');
 const Deal = require('../../models/deal');
 const ChatRoom = require('../../models/ChatRoom');
 const Message = require('../../models/message');
-const Payment = require('../../models/Payment');
-const Notification = require('../../models/notification');
-const Wallet = require('../../models/wallet');
+const Notification = require('../../models/Notification');
 const { generateTestToken } = require('../helpers/auth');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
@@ -352,33 +350,40 @@ describe('Database Integration Tests', () => {
         }
       });
 
-      it('should rollback payment transaction on failure', async () => {
-        // Test payment transaction rollback scenario
+      it('should rollback deal creation on failure', async () => {
+        // Test deal transaction rollback scenario
         const session = await mongoose.startSession();
         session.startTransaction();
 
         try {
-          // Create initial payment record
-          const payment = await Payment.create([{
-            userId: marketerUser._id,
-            amount: 1000,
-            currency: 'USD',
-            type: 'escrowPayment',
-            status: 'pending',
-            stripePaymentIntentId: 'pi_test_failed',
-            metadata: {
-              dealId: new mongoose.Types.ObjectId(),
-              paymentType: 'escrowPayment'
-            }
+          // Create initial deal record
+          const deal = await Deal.create([{
+            marketerId: marketerUser._id,
+            creatorId: creatorUser._id,
+            dealName: 'Test Deal Rollback',
+            dealNumber: 'DEAL-ROLLBACK-001',
+            status: 'Active',
+            paymentInfo: {
+              currency: 'USD',
+              paymentAmount: 1000,
+              paymentNeeded: true,
+              transactions: []
+            },
+            milestones: [{
+              name: 'Test Milestone',
+              amount: 1000,
+              dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+              status: 'Pending'
+            }]
           }], { session });
 
-          // Simulate a failure condition (e.g., insufficient funds)
-          throw new Error('Insufficient funds');
+          // Simulate a failure condition
+          throw new Error('Payment processing failed');
 
           // This code should not execute
-          await Payment.findByIdAndUpdate(
-            payment[0]._id,
-            { status: 'completed' },
+          await Deal.findByIdAndUpdate(
+            deal[0]._id,
+            { status: 'Completed' },
             { session }
           );
 
@@ -386,10 +391,10 @@ describe('Database Integration Tests', () => {
         } catch (error) {
           await session.abortTransaction();
           
-          // Verify payment was not created
-          const payments = await Payment.find({ stripePaymentIntentId: 'pi_test_failed' });
-          expect(payments).toHaveLength(0);
-          expect(error.message).toBe('Insufficient funds');
+          // Verify deal was not created
+          const deals = await Deal.find({ dealNumber: 'DEAL-ROLLBACK-001' });
+          expect(deals).toHaveLength(0);
+          expect(error.message).toBe('Payment processing failed');
         } finally {
           session.endSession();
         }
@@ -447,43 +452,57 @@ describe('Database Integration Tests', () => {
         }
       });
 
-      it('should ensure data consistency during concurrent transactions', async () => {
+      it('should ensure data consistency during concurrent deal updates', async () => {
         // Test concurrent transactions don't corrupt data
-        const initialBalance = 10000;
+        const initialAmount = 10000;
         
-        // Create a test wallet
-        const wallet = await Wallet.create({
-          userId: marketerUser._id,
-          balance: initialBalance,
-          currency: 'USD',
-          transactions: []
+        // Create a test deal
+        const deal = await Deal.create({
+          marketerId: marketerUser._id,
+          creatorId: creatorUser._id,
+          dealName: 'Concurrent Test Deal',
+          dealNumber: 'DEAL-CONCURRENT-001',
+          status: 'Active',
+          paymentInfo: {
+            currency: 'USD',
+            paymentAmount: initialAmount,
+            paymentNeeded: true,
+            paidAmount: 0,
+            transactions: []
+          },
+          milestones: [{
+            name: 'Milestone 1',
+            amount: 6000,
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            status: 'Pending'
+          }, {
+            name: 'Milestone 2',
+            amount: 4000,
+            dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+            status: 'Pending'
+          }]
         });
 
-        // Simulate concurrent withdrawals
-        const withdrawal1 = async () => {
+        // Simulate concurrent milestone completions
+        const completeMilestone1 = async () => {
           const session = await mongoose.startSession();
           session.startTransaction();
           try {
-            const currentWallet = await Wallet.findById(wallet._id).session(session);
-            if (currentWallet.balance >= 6000) {
-              await Wallet.findByIdAndUpdate(
-                wallet._id,
+            const currentDeal = await Deal.findById(deal._id).session(session);
+            const milestone = currentDeal.milestones[0];
+            if (milestone.status === 'Pending') {
+              await Deal.findByIdAndUpdate(
+                deal._id,
                 { 
-                  $inc: { balance: -6000 },
-                  $push: { 
-                    transactions: {
-                      type: 'withdrawal',
-                      amount: 6000,
-                      timestamp: new Date()
-                    }
-                  }
+                  $set: { 'milestones.0.status': 'Completed' },
+                  $inc: { 'paymentInfo.paidAmount': milestone.amount }
                 },
                 { session }
               );
               await session.commitTransaction();
               return true;
             }
-            throw new Error('Insufficient balance');
+            throw new Error('Milestone already completed');
           } catch (error) {
             await session.abortTransaction();
             return false;
@@ -492,30 +511,25 @@ describe('Database Integration Tests', () => {
           }
         };
 
-        const withdrawal2 = async () => {
+        const completeMilestone2 = async () => {
           const session = await mongoose.startSession();
           session.startTransaction();
           try {
-            const currentWallet = await Wallet.findById(wallet._id).session(session);
-            if (currentWallet.balance >= 6000) {
-              await Wallet.findByIdAndUpdate(
-                wallet._id,
+            const currentDeal = await Deal.findById(deal._id).session(session);
+            const milestone = currentDeal.milestones[0];
+            if (milestone.status === 'Pending') {
+              await Deal.findByIdAndUpdate(
+                deal._id,
                 { 
-                  $inc: { balance: -6000 },
-                  $push: { 
-                    transactions: {
-                      type: 'withdrawal',
-                      amount: 6000,
-                      timestamp: new Date()
-                    }
-                  }
+                  $set: { 'milestones.0.status': 'Completed' },
+                  $inc: { 'paymentInfo.paidAmount': milestone.amount }
                 },
                 { session }
               );
               await session.commitTransaction();
               return true;
             }
-            throw new Error('Insufficient balance');
+            throw new Error('Milestone already completed');
           } catch (error) {
             await session.abortTransaction();
             return false;
@@ -524,16 +538,16 @@ describe('Database Integration Tests', () => {
           }
         };
 
-        // Execute concurrent withdrawals
-        const [result1, result2] = await Promise.all([withdrawal1(), withdrawal2()]);
+        // Execute concurrent milestone completions
+        const [result1, result2] = await Promise.all([completeMilestone1(), completeMilestone2()]);
         
         // Only one should succeed
         expect([result1, result2].filter(r => r === true)).toHaveLength(1);
         
-        // Verify final balance
-        const finalWallet = await Wallet.findById(wallet._id);
-        expect(finalWallet.balance).toBe(4000); // 10000 - 6000
-        expect(finalWallet.transactions).toHaveLength(1);
+        // Verify final state
+        const finalDeal = await Deal.findById(deal._id);
+        expect(finalDeal.milestones[0].status).toBe('Completed');
+        expect(finalDeal.paymentInfo.paidAmount).toBe(6000);
       });
     });
 
