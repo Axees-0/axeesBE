@@ -743,7 +743,7 @@ exports.createOffer = (req, res) => {
         offerName: req.body.offerName,
         description: req.body.description,
         deliverables,
-        proposedAmount: req.body.amount,
+        proposedAmount: req.body.proposedAmount || req.body.amount,
         currency: req.body.currency || "USD",
         desiredReviewDate: req.body.desiredReviewDate,
         desiredPostDate: req.body.desiredPostDate,
@@ -1054,9 +1054,6 @@ exports.saveDraft = (req, res) => {
         });
       }
 
-      // B) Log for debugging
-      console.log("Request body (draft):", req.body);
-      console.log("Request files:", req.files);
 
       // C) Ensure "files" array shape
       if (!req.files) {
@@ -1075,6 +1072,7 @@ exports.saveDraft = (req, res) => {
         offerType,
         offerName,
         amount,
+        proposedAmount,
         notes,
         reviewDate,
         postDate,
@@ -1082,6 +1080,8 @@ exports.saveDraft = (req, res) => {
         description,
         creatorId,
       } = req.body;
+      
+      const finalAmount = proposedAmount || amount;
 
       // If offerId is blank => treat as null
       let offerIdValid =
@@ -1106,7 +1106,7 @@ exports.saveDraft = (req, res) => {
       const draftData = {
         userId,
         offerId: offerIdValid, // can be used for linking a draft to an existing offer
-        amount,
+        amount: finalAmount,
         notes,
         reviewDate: reviewDate ? new Date(reviewDate) : null, // Ensure Date object
         postDate: postDate ? new Date(postDate) : null, // Ensure Date object
@@ -1187,7 +1187,6 @@ exports.updateExistingDraft = (req, res) => {
       }
 
       const { draftId } = req.params;
-      console.log("Updating draft ID:", draftId);
 
       const draft = await Draft.findById(draftId);
       if (!draft) {
@@ -1241,7 +1240,7 @@ exports.updateExistingDraft = (req, res) => {
       draft.userId = req.body.userId || draft.userId;
       draft.creatorId = req.body.creatorId || draft.creatorId;
       draft.offerType = req.body.offerType || "custom";
-      draft.amount = req.body.amount || 0;
+      draft.amount = req.body.proposedAmount || req.body.amount || 0;
       draft.notes = req.body.notes || "";
       draft.description = req.body.description || "";
       draft.reviewDate = req.body.reviewDate
@@ -1381,7 +1380,6 @@ exports.sendOffer = (req, res) => {
         });
       }
 
-      console.log("Files received in sendOffer:", req.files);
 
       const { offerId } = req.params;
       const offer = await Offer.findById(offerId)
@@ -1397,6 +1395,7 @@ exports.sendOffer = (req, res) => {
         description,
         notes,
         amount,
+        proposedAmount,
         reviewDate,
         postDate,
         draftId,
@@ -1409,7 +1408,7 @@ exports.sendOffer = (req, res) => {
       // Update offer fields
       if (description) offer.description = description;
       if (notes) offer.notes = notes;
-      if (amount) offer.proposedAmount = Number(amount);
+      if (proposedAmount || amount) offer.proposedAmount = Number(proposedAmount || amount);
 
       // Parse dates correctly - match field names from frontend
       if (reviewDate) offer.desiredReviewDate = new Date(reviewDate);
