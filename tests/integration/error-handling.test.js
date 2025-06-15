@@ -158,8 +158,9 @@ describe('Error Handling Tests', () => {
 
           expect(response.status).toBe(400);
           const errorMessage = response.body.message || response.body.error || response.body.msg;
-        if (errorMessage) {
-          expect(errorMessage).toMatch(/phone|invalid/i);
+          if (errorMessage) {
+            expect(errorMessage).toMatch(/phone|invalid/i);
+          }
         }
       });
 
@@ -180,8 +181,9 @@ describe('Error Handling Tests', () => {
 
           expect(response.status).toBe(400);
           const errorMessage = response.body.message || response.body.error || response.body.msg;
-        if (errorMessage) {
-          expect(errorMessage).toMatch(/email|invalid/i);
+          if (errorMessage) {
+            expect(errorMessage).toMatch(/email|invalid/i);
+          }
         }
       });
 
@@ -199,8 +201,9 @@ describe('Error Handling Tests', () => {
 
           expect(response.status).toBe(400);
           const errorMessage = response.body.message || response.body.error || response.body.msg;
-        if (errorMessage) {
-          expect(errorMessage).toMatch(/id|invalid/i);
+          if (errorMessage) {
+            expect(errorMessage).toMatch(/id|invalid/i);
+          }
         }
       });
 
@@ -296,6 +299,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/platforms|array|invalid/i);
+        }
       });
     });
 
@@ -345,6 +349,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/password|invalid|unauthorized/i);
+        }
       });
 
       it('should return 401 for invalid OTP verification', async () => {
@@ -367,6 +372,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/code|invalid|otp/i);
+        }
       });
 
       it('should return 401 for non-existent user in token', async () => {
@@ -563,6 +569,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/not found|offer/i);
+        }
       });
 
       it('should return 404 for deleted resources', async () => {
@@ -648,6 +655,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/already|exists|conflict/i);
+        }
       });
 
       it('should return 409 for duplicate username', async () => {
@@ -681,6 +689,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/username|already|exists/i);
+        }
       });
     });
 
@@ -702,6 +711,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/large|size|limit/i);
+        }
       });
 
       it('should return 413 for oversized request body', async () => {
@@ -745,6 +755,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/file|type|unsupported/i);
+        }
       });
     });
 
@@ -772,6 +783,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/date|past|invalid/i);
+        }
       });
 
       it('should return 422 for invalid state transitions', async () => {
@@ -804,6 +816,7 @@ describe('Error Handling Tests', () => {
         const errorMessage = response.body.message || response.body.error || response.body.msg;
         if (errorMessage) {
           expect(errorMessage).toMatch(/already|accepted|status/i);
+        }
       });
     });
 
