@@ -212,6 +212,6 @@ userSchema.index({
 
 
 // Explain index usage
-console.log('🔍 User model: Added indexes for better query performance');
+// User model: Added indexes for better query performance
 
 module.exports = mongoose.model("User", userSchema);
