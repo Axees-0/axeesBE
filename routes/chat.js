@@ -183,43 +183,6 @@ router.get('/:chatId/messages', async (req, res) => {
 });
 
 
-/** Send message */
-// In your message creation route:
-router.post('/:chatId/messages', async (req, res) => {
-  const meId = toObjectId(getCallerId(req), 'userId', res);
-  if (!meId) return;
-  console.log("usd")
-
-  const { text, attachments, receiverId } = req.body;
-  if (!text && !attachments?.length) return res.status(400).send('Empty');
-  if (text && !isMessageAllowed(text))   return res.status(400).send('Forbidden text');
-
-  // Create the message document
-  const msg = await Message.create({
-    chatId: new Types.ObjectId(req.params.chatId),
-    senderId: meId,
-    text,
-    attachments,
-  });
-
-  // Update the chat room with the last message and increase the unread count for the receiver.
-  await ChatRoom.findByIdAndUpdate(req.params.chatId, {
-    $set : { lastMessage: { text, sender: meId, createdAt: msg.createdAt } },
-    $inc: { [`unreadCount.${receiverId}`]: 1 },
-  });
-
-  // Broadcast the new message to all connected SSE clients for this chat room.
-  if (sseClients[req.params.chatId]) {
-    sseClients[req.params.chatId].forEach(clientRes => {
-      clientRes.write(`data: ${JSON.stringify(msg)}\n\n`);
-    });
-  }
-
-  // Schedule notification check after 2 minutes - DON'T AWAIT THIS
-  checkAndSendNotification(msg, receiverId); // Removed the await
-
-  res.json(msg);
-});
 
 // Notification checker function
 const checkAndSendNotification = async (msg, receiverId) => {

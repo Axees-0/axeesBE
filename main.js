@@ -30,6 +30,7 @@
    const marketerOfferRoutes   = require('./routes/marketerOfferRoutes');
    const marketerDealRoutes    = require('./routes/marketerDealRoutes');
    const chatRoutes            = require('./routes/chat');
+   const chatV1Routes          = require('./routes/chatV1');
    const paymentRoutes         = require('./routes/paymentRoutes');
    const connectRoutes         = require('./routes/connectRoutes');
    const findRoutes            = require('./routes/findRoutes');
@@ -106,6 +107,7 @@ mongoose
    app.use('/api/payments', manualAuth, paymentRoutes);
    
    app.use('/api/chats',              chatRoutes);
+   app.use('/api/v1/chat',            chatV1Routes);
    
    /* ── 7.  ROOT & 404 ----------------------------------------------------- */
    app.get('/', (_req, res) => res.status(200).send('Hello from Axees backend!'));

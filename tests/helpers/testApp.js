@@ -40,6 +40,7 @@ const inviteRoutes = require('../../routes/inviteRoutes');
 const marketerOfferRoutes = require('../../routes/marketerOfferRoutes');
 const marketerDealRoutes = require('../../routes/marketerDealRoutes');
 const chatRoutes = require('../../routes/chat');
+const chatV1Routes = require('../../routes/chatV1');
 const paymentRoutes = require('../../routes/paymentRoutes');
 const { manualAuth } = require('../../controllers/authController');
 const connectRoutes = require('../../routes/connectRoutes');
@@ -65,6 +66,7 @@ app.use('/api/marketer/offers', marketerOfferRoutes);
 
 app.use('/api/marketer/deals', manualAuth, marketerDealRoutes);
 app.use('/api/chats', chatRoutes);
+app.use('/api/v1/chat', chatV1Routes);
 // Add auth middleware to payment routes (except webhook endpoint)
 app.use('/api/payments/webhook', paymentRoutes);
 app.use('/api/payments', manualAuth, paymentRoutes);
