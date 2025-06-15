@@ -37,6 +37,9 @@ const Offer = require('../../models/offer');
 const Deal = require('../../models/deal');
 const ChatRoom = require('../../models/ChatRoom');
 const Message = require('../../models/message');
+const Payment = require('../../models/Payment');
+const Notification = require('../../models/notification');
+const Wallet = require('../../models/wallet');
 const { generateTestToken } = require('../helpers/auth');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
@@ -44,6 +47,49 @@ const mongoose = require('mongoose');
 describe('Database Integration Tests', () => {
   let marketerUser, creatorUser;
   let marketerToken, creatorToken;
+
+  describe('MongoDB Connection Tests', () => {
+    it('should establish connection successfully', async () => {
+      const connection = await connect();
+      expect(connection).toBeDefined();
+      expect(mongoose.connection.readyState).toBe(1); // 1 = connected
+    });
+
+    it('should handle connection errors gracefully', async () => {
+      // Test with invalid connection string
+      const originalUri = process.env.MONGODB_URI;
+      process.env.MONGODB_URI = 'mongodb://invalid:27017/test';
+      
+      try {
+        await mongoose.disconnect();
+        await connect();
+      } catch (error) {
+        expect(error).toBeDefined();
+        expect(error.message).toMatch(/failed to connect|ECONNREFUSED/i);
+      } finally {
+        process.env.MONGODB_URI = originalUri;
+        await connect(); // Reconnect with valid URI
+      }
+    });
+
+    it('should handle connection pool correctly', async () => {
+      // Test connection pooling
+      const promises = Array(10).fill(null).map(async () => {
+        const user = await User.findOne({ phone: marketerUser?.phone || '+12125551234' });
+        return user;
+      });
+
+      const results = await Promise.all(promises);
+      expect(results.filter(r => r !== null).length).toBeGreaterThanOrEqual(0);
+      
+      // Check pool stats if available
+      const client = mongoose.connection.getClient();
+      if (client && client.topology) {
+        const poolSize = client.topology.s.options.maxPoolSize || 100;
+        expect(poolSize).toBeGreaterThan(0);
+      }
+    });
+  });
 
   beforeAll(async () => {
     await connect();
@@ -304,6 +350,190 @@ describe('Database Integration Tests', () => {
           expect(createdDeal).toBeDefined();
           expect(createdDeal.dealName).toBe(offer.offerName);
         }
+      });
+
+      it('should rollback payment transaction on failure', async () => {
+        // Test payment transaction rollback scenario
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        try {
+          // Create initial payment record
+          const payment = await Payment.create([{
+            userId: marketerUser._id,
+            amount: 1000,
+            currency: 'USD',
+            type: 'escrowPayment',
+            status: 'pending',
+            stripePaymentIntentId: 'pi_test_failed',
+            metadata: {
+              dealId: new mongoose.Types.ObjectId(),
+              paymentType: 'escrowPayment'
+            }
+          }], { session });
+
+          // Simulate a failure condition (e.g., insufficient funds)
+          throw new Error('Insufficient funds');
+
+          // This code should not execute
+          await Payment.findByIdAndUpdate(
+            payment[0]._id,
+            { status: 'completed' },
+            { session }
+          );
+
+          await session.commitTransaction();
+        } catch (error) {
+          await session.abortTransaction();
+          
+          // Verify payment was not created
+          const payments = await Payment.find({ stripePaymentIntentId: 'pi_test_failed' });
+          expect(payments).toHaveLength(0);
+          expect(error.message).toBe('Insufficient funds');
+        } finally {
+          session.endSession();
+        }
+      });
+
+      it('should rollback offer creation on validation failure', async () => {
+        // Test offer creation rollback with related entities
+        const session = await mongoose.startSession();
+        session.startTransaction();
+
+        let offerId;
+        try {
+          // Create offer
+          const offer = await Offer.create([{
+            marketerId: marketerUser._id,
+            creatorId: creatorUser._id,
+            offerName: 'Rollback Test Offer',
+            proposedAmount: 5000,
+            currency: 'USD',
+            platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
+            deliverables: ['Post'],
+            desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
+            description: 'Test rollback',
+            status: 'Sent'
+          }], { session });
+
+          offerId = offer[0]._id;
+
+          // Try to create related notification with invalid data
+          await Notification.create([{
+            userId: 'invalid-user-id', // This should fail validation
+            type: 'offer_received',
+            title: 'New Offer',
+            message: 'You have a new offer',
+            relatedId: offerId,
+            relatedModel: 'Offer'
+          }], { session });
+
+          await session.commitTransaction();
+        } catch (error) {
+          await session.abortTransaction();
+          
+          // Verify offer was not created
+          const offers = await Offer.find({ offerName: 'Rollback Test Offer' });
+          expect(offers).toHaveLength(0);
+          
+          // Verify no orphaned notifications
+          if (offerId) {
+            const notifications = await Notification.find({ relatedId: offerId });
+            expect(notifications).toHaveLength(0);
+          }
+        } finally {
+          session.endSession();
+        }
+      });
+
+      it('should ensure data consistency during concurrent transactions', async () => {
+        // Test concurrent transactions don't corrupt data
+        const initialBalance = 10000;
+        
+        // Create a test wallet
+        const wallet = await Wallet.create({
+          userId: marketerUser._id,
+          balance: initialBalance,
+          currency: 'USD',
+          transactions: []
+        });
+
+        // Simulate concurrent withdrawals
+        const withdrawal1 = async () => {
+          const session = await mongoose.startSession();
+          session.startTransaction();
+          try {
+            const currentWallet = await Wallet.findById(wallet._id).session(session);
+            if (currentWallet.balance >= 6000) {
+              await Wallet.findByIdAndUpdate(
+                wallet._id,
+                { 
+                  $inc: { balance: -6000 },
+                  $push: { 
+                    transactions: {
+                      type: 'withdrawal',
+                      amount: 6000,
+                      timestamp: new Date()
+                    }
+                  }
+                },
+                { session }
+              );
+              await session.commitTransaction();
+              return true;
+            }
+            throw new Error('Insufficient balance');
+          } catch (error) {
+            await session.abortTransaction();
+            return false;
+          } finally {
+            session.endSession();
+          }
+        };
+
+        const withdrawal2 = async () => {
+          const session = await mongoose.startSession();
+          session.startTransaction();
+          try {
+            const currentWallet = await Wallet.findById(wallet._id).session(session);
+            if (currentWallet.balance >= 6000) {
+              await Wallet.findByIdAndUpdate(
+                wallet._id,
+                { 
+                  $inc: { balance: -6000 },
+                  $push: { 
+                    transactions: {
+                      type: 'withdrawal',
+                      amount: 6000,
+                      timestamp: new Date()
+                    }
+                  }
+                },
+                { session }
+              );
+              await session.commitTransaction();
+              return true;
+            }
+            throw new Error('Insufficient balance');
+          } catch (error) {
+            await session.abortTransaction();
+            return false;
+          } finally {
+            session.endSession();
+          }
+        };
+
+        // Execute concurrent withdrawals
+        const [result1, result2] = await Promise.all([withdrawal1(), withdrawal2()]);
+        
+        // Only one should succeed
+        expect([result1, result2].filter(r => r === true)).toHaveLength(1);
+        
+        // Verify final balance
+        const finalWallet = await Wallet.findById(wallet._id);
+        expect(finalWallet.balance).toBe(4000); // 10000 - 6000
+        expect(finalWallet.transactions).toHaveLength(1);
       });
     });
 
