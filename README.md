@@ -10,6 +10,7 @@ Axees is an influencer marketing platform connecting brands/marketers with conte
 - **Payment Integration**: Stripe integration with escrow payments
 - **Real-time Chat**: SSE-based messaging with file attachments
 - **Deal Execution**: Milestone-based project management
+- **Demo Mode**: Isolated demo environment with data restrictions and auto-cleanup
 - **Security**: Comprehensive security measures against common vulnerabilities
 
 ## 📋 Prerequisites
@@ -87,6 +88,29 @@ npm run test:security
 
 # Performance tests
 npm run test:performance
+```
+
+### Comprehensive Test Runner
+The platform includes a unified test runner for orchestrated testing across all categories:
+
+```bash
+# Run all test suites with comprehensive reporting
+npm run test:comprehensive
+
+# Run specific test categories
+npm run test:comprehensive:core
+npm run test:comprehensive:chat
+npm run test:comprehensive:performance
+npm run test:comprehensive:production
+
+# Generate test insights and trends
+npm run test:aggregate
+
+# Demo mode testing
+npm run test:demo
+
+# Chat performance testing
+npm run test:chat-performance
 ```
 
 ### Generate coverage report
