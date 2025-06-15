@@ -81,7 +81,10 @@ describe('Database Integration Tests', () => {
       userType: 'Creator',
       isActive: true,
       creatorData: {
-        platforms: ['Instagram', 'TikTok'],
+        platforms: [
+          { platform: 'instagram', handle: '@testcreator', followersCount: 50000 },
+          { platform: 'tiktok', handle: '@testcreator_tiktok', followersCount: 50000 }
+        ],
         categories: ['technology', 'lifestyle'],
         nicheTopics: ['tech', 'gadgets'],
         achievements: 'Tech influencer with 100k followers',
@@ -408,7 +411,7 @@ describe('Database Integration Tests', () => {
           isActive: true,
           ...(i % 2 === 0 ? {
             creatorData: {
-              platforms: ['Instagram'],
+              platforms: [{ platform: 'instagram', handle: '@testuser', followersCount: 1000 }],
               categories: ['technology'],
               nicheTopics: ['tech'],
               achievements: `Achievements ${i}`,
@@ -620,7 +623,7 @@ describe('Database Integration Tests', () => {
           userType: 'Creator',
           isActive: true,
           creatorData: {
-            platforms: ['Instagram'],
+            platforms: [{ platform: 'instagram', handle: '@testuser', followersCount: 1000 }],
             categories: ['technology'],
             nicheTopics: ['tech'],
             achievements: '',
@@ -652,7 +655,7 @@ describe('Database Integration Tests', () => {
             userType: 'Creator',
             isActive: true,
             creatorData: {
-              platforms: ['Instagram'],
+              platforms: [{ platform: 'instagram', handle: '@testuser', followersCount: 1000 }],
               categories: ['technology'],
               nicheTopics: ['tech'],
               achievements: '',
@@ -683,7 +686,7 @@ describe('Database Integration Tests', () => {
             userType: 'Creator',
             isActive: true,
             creatorData: {
-              platforms: ['Instagram'],
+              platforms: [{ platform: 'instagram', handle: '@testuser', followersCount: 1000 }],
               categories: ['technology'],
               nicheTopics: ['tech'],
               achievements: '',
@@ -769,7 +772,7 @@ describe('Database Integration Tests', () => {
           userType: 'Creator',
           isActive: true,
           creatorData: {
-            platforms: ['Instagram'],
+            platforms: [{ platform: 'instagram', handle: '@concurrent', followersCount: 1000 }],
             categories: ['technology'],
             nicheTopics: ['tech'],
             achievements: '',
@@ -809,7 +812,7 @@ describe('Database Integration Tests', () => {
           isActive: true,
           ...(i % 2 === 0 ? {
             creatorData: {
-              platforms: ['Instagram'],
+              platforms: [{ platform: 'instagram', handle: '@testuser', followersCount: 1000 }],
               categories: ['technology'],
               nicheTopics: ['tech'],
               achievements: `Bulk achievements ${i}`,
@@ -868,7 +871,11 @@ describe('Database Integration Tests', () => {
         userType: 'Creator',
         isActive: true,
         creatorData: {
-          platforms: ['Instagram', 'YouTube', 'TikTok'],
+          platforms: [
+            { platform: 'instagram', handle: '@largedata', followersCount: 200000 },
+            { platform: 'youtube', handle: '@largedata_yt', followersCount: 200000 },
+            { platform: 'tiktok', handle: '@largedata_tt', followersCount: 100000 }
+          ],
           categories: ['technology', 'lifestyle', 'entertainment'],
           nicheTopics: ['tech', 'gadgets', 'reviews'],
           achievements: 'Major tech influencer with multiple achievements',

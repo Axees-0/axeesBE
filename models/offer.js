@@ -26,6 +26,7 @@ const offerSchema = new Schema({
   },
   offerName: { type: String, required: true },
   description: { type: String },
+  platforms: [{ type: String }],
   deliverables: [{ type: String }],
   desiredReviewDate: { type: Date },
   desiredPostDate: { type: Date },
