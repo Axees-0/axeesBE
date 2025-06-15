@@ -50,8 +50,8 @@ const { connect, closeDatabase, clearDatabase } = require('../helpers/database')
 const User = require('../../models/User');
 const Offer = require('../../models/offer');
 const Deal = require('../../models/deal');
-const Chat = require('../../models/chat');
-const Message = require('../../models/message');
+const ChatRoom = require('../../models/ChatRoom');
+const Message = require('../../models/Message');
 const { generateTestToken } = require('../helpers/auth');
 const bcrypt = require('bcrypt');
 
@@ -432,7 +432,7 @@ describe('Performance Baseline Tests', () => {
           }
         });
 
-        const chat = await Chat.create({
+        const chat = await ChatRoom.create({
           participants: [marketer._id, testUser._id],
           unreadCount: {
             [marketer._id.toString()]: 0,
@@ -452,7 +452,7 @@ describe('Performance Baseline Tests', () => {
       });
 
       it('should send messages within performance threshold', async () => {
-        const chat = await Chat.findOne();
+        const chat = await ChatRoom.findOne();
         const iterations = 10;
         const times = [];
 
@@ -483,7 +483,7 @@ describe('Performance Baseline Tests', () => {
       });
 
       it('should retrieve message history within performance threshold', async () => {
-        const chat = await Chat.findOne();
+        const chat = await ChatRoom.findOne();
         const iterations = 15;
         const times = [];
 
