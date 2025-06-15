@@ -73,7 +73,7 @@ describe('Performance Baseline Tests', () => {
       userType: 'Creator',
       isActive: true,
       creatorData: {
-        platforms: ['Instagram'],
+        platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
         categories: ['technology'],
         nicheTopics: ['tech'],
         achievements: '',
@@ -105,7 +105,7 @@ describe('Performance Baseline Tests', () => {
       userType: 'Creator',
       isActive: true,
       creatorData: {
-        platforms: ['Instagram'],
+        platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
         categories: ['technology'],
         nicheTopics: ['tech'],
         achievements: '',
@@ -183,8 +183,8 @@ describe('Performance Baseline Tests', () => {
         const averageTime = times.reduce((a, b) => a + b, 0) / times.length;
         measurePerformance('Authentication - Login', averageTime);
 
-        // Performance threshold: login should complete within 500ms on average
-        expect(averageTime).toBeLessThan(500);
+        // Performance threshold: auth endpoints should complete within 200ms on average
+        expect(averageTime).toBeLessThan(200);
         console.log(`Login average response time: ${Math.round(averageTime)}ms`);
       });
 
@@ -236,8 +236,8 @@ describe('Performance Baseline Tests', () => {
         const averageTime = times.reduce((a, b) => a + b, 0) / times.length;
         measurePerformance('Authentication - Full Registration', averageTime);
 
-        // Performance threshold: full registration should complete within 2 seconds on average
-        expect(averageTime).toBeLessThan(2000);
+        // Performance threshold: auth endpoints should complete within 200ms on average
+        expect(averageTime).toBeLessThan(200);
         console.log(`Registration average response time: ${Math.round(averageTime)}ms`);
       });
     });
@@ -264,8 +264,8 @@ describe('Performance Baseline Tests', () => {
         const averageTime = times.reduce((a, b) => a + b, 0) / times.length;
         measurePerformance('User Management - Get Profile', averageTime);
 
-        // Performance threshold: profile retrieval should complete within 200ms on average
-        expect(averageTime).toBeLessThan(200);
+        // Performance threshold: user endpoints should complete within 150ms on average
+        expect(averageTime).toBeLessThan(150);
         console.log(`Get profile average response time: ${Math.round(averageTime)}ms`);
       });
 
@@ -293,8 +293,8 @@ describe('Performance Baseline Tests', () => {
         const averageTime = times.reduce((a, b) => a + b, 0) / times.length;
         measurePerformance('User Management - Update Profile', averageTime);
 
-        // Performance threshold: profile update should complete within 300ms on average
-        expect(averageTime).toBeLessThan(300);
+        // Performance threshold: user endpoints should complete within 150ms on average
+        expect(averageTime).toBeLessThan(150);
         console.log(`Update profile average response time: ${Math.round(averageTime)}ms`);
       });
     });
@@ -339,7 +339,7 @@ describe('Performance Baseline Tests', () => {
               offerName: `Performance Test Offer ${i}`,
               proposedAmount: 1000 + (i * 100),
               currency: 'USD',
-              platforms: ['Instagram'],
+              platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
               deliverables: ['Post', 'Story'],
               desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
               desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -356,8 +356,8 @@ describe('Performance Baseline Tests', () => {
         const averageTime = times.reduce((a, b) => a + b, 0) / times.length;
         measurePerformance('Offer Management - Create Offer', averageTime);
 
-        // Performance threshold: offer creation should complete within 400ms on average
-        expect(averageTime).toBeLessThan(400);
+        // Performance threshold: offer creation should complete within 300ms on average
+        expect(averageTime).toBeLessThan(300);
         console.log(`Create offer average response time: ${Math.round(averageTime)}ms`);
       });
 
@@ -371,7 +371,7 @@ describe('Performance Baseline Tests', () => {
             offerName: `Test Offer ${i}`,
             proposedAmount: 1000 + (i * 100),
             currency: 'USD',
-            platforms: ['Instagram'],
+            platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
             deliverables: ['Post'],
             desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -573,7 +573,7 @@ describe('Performance Baseline Tests', () => {
             offerName: `Concurrent Offer ${i}`,
             proposedAmount: 1000 + (i * 50),
             currency: 'USD',
-            platforms: ['Instagram'],
+            platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
             deliverables: ['Post'],
             desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -617,7 +617,7 @@ describe('Performance Baseline Tests', () => {
         }
       });
 
-      const chat = await Chat.create({
+      const chat = await ChatRoom.create({
         participants: [marketer._id, testUser._id],
         unreadCount: {
           [marketer._id.toString()]: 0,
@@ -671,7 +671,7 @@ describe('Performance Baseline Tests', () => {
           isActive: true,
           ...(i % 2 === 0 ? {
             creatorData: {
-              platforms: ['Instagram'],
+              platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
               categories: ['technology'],
               nicheTopics: ['tech'],
               achievements: `Bulk achievements ${i}`,
@@ -782,7 +782,7 @@ describe('Performance Baseline Tests', () => {
           userType: 'Creator',
           isActive: true,
           creatorData: {
-            platforms: ['Instagram'],
+            platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
             categories: ['technology'],
             nicheTopics: ['tech'],
             achievements: `Page achievements ${i}`,
@@ -919,7 +919,7 @@ describe('Performance Baseline Tests', () => {
           offerName: `Relationship Offer ${i}`,
           proposedAmount: 2000 + (i * 100),
           currency: 'USD',
-          platforms: ['Instagram'],
+          platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
           deliverables: ['Post', 'Story'],
           desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -952,7 +952,7 @@ describe('Performance Baseline Tests', () => {
       }
 
       // Create chat with messages
-      const chat = await Chat.create({
+      const chat = await ChatRoom.create({
         participants: [marketer._id, testUser._id],
         unreadCount: {
           [marketer._id.toString()]: 0,

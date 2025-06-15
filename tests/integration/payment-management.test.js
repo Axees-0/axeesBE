@@ -1456,7 +1456,7 @@ describe('Payment Management Tests', () => {
       expect(response.body).toHaveProperty('data');
       // Since we created 100 + the 2 from beforeEach, minus pagination limit of 50
       expect(response.body.data.length).toBeGreaterThan(0);
-      expect(endTime - startTime).toBeLessThan(5000); // Should complete within 5 seconds
+      expect(endTime - startTime).toBeLessThan(500); // Should complete within 500ms per payment endpoint SLA
     });
   });
 

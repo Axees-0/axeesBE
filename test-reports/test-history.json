@@ -1,0 +1,17 @@
+[
+  {
+    "timestamp": "2025-06-15T15:36:25.752Z",
+    "passRate": 0,
+    "duration": 6496,
+    "totalTests": 0,
+    "passedTests": 0,
+    "failedTests": 0,
+    "categories": [
+      {
+        "name": "integration",
+        "passRate": 0,
+        "duration": 6496
+      }
+    ]
+  }
+]

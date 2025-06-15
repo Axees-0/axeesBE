@@ -1,0 +1,153 @@
+{
+  "metadata": {
+    "generatedAt": "2025-06-15T15:36:25.748Z",
+    "testRunTime": "2025-06-15T15:34:14.901Z",
+    "version": {
+      "name": "axeesBE",
+      "version": "1.0.0"
+    }
+  },
+  "summary": {
+    "overview": {
+      "totalTests": 0,
+      "passedTests": 0,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "passRate": 0,
+      "failRate": 0,
+      "duration": 6496,
+      "status": "poor"
+    },
+    "categories": [
+      {
+        "name": "integration",
+        "tests": 0,
+        "passed": 0,
+        "failed": 0,
+        "passRate": 0,
+        "duration": 6496,
+        "status": "poor"
+      }
+    ],
+    "testFiles": {
+      "total": 1,
+      "passed": 0,
+      "failed": 1,
+      "slowest": [
+        {
+          "file": "demo-mode-tests.test.js",
+          "category": "integration",
+          "status": "failed",
+          "duration": 6496,
+          "tests": {
+            "total": 0,
+            "passed": 0,
+            "failed": 0,
+            "skipped": 0
+          }
+        }
+      ],
+      "fastest": [
+        {
+          "file": "demo-mode-tests.test.js",
+          "category": "integration",
+          "status": "failed",
+          "duration": 6496,
+          "tests": {
+            "total": 0,
+            "passed": 0,
+            "failed": 0,
+            "skipped": 0
+          }
+        }
+      ]
+    }
+  },
+  "trends": {
+    "available": false,
+    "message": "Insufficient historical data for trend analysis"
+  },
+  "categoryAnalysis": {
+    "integration": {
+      "performance": {
+        "averageDuration": 6496,
+        "slowestFiles": [
+          {
+            "file": "demo-mode-tests.test.js",
+            "duration": 6496,
+            "status": "failed"
+          }
+        ]
+      },
+      "reliability": {
+        "flakyTests": 0,
+        "flakyFiles": [],
+        "consistencyScore": 0
+      },
+      "coverage": {
+        "totalFiles": 1,
+        "passingFiles": 0,
+        "failingFiles": 1
+      }
+    }
+  },
+  "performanceMetrics": {
+    "executionTime": {
+      "total": 6496,
+      "average": 6496,
+      "slowestCategory": {
+        "name": "integration",
+        "duration": 6496
+      },
+      "fastestCategory": {
+        "name": "integration",
+        "duration": 6496
+      }
+    },
+    "throughput": {
+      "testsPerSecond": 0,
+      "testsPerMinute": 0
+    },
+    "resourceUsage": {
+      "estimatedCpuTime": 4547,
+      "estimatedMemoryPeak": 0,
+      "estimatedIOOperations": 0,
+      "efficiency": 0
+    }
+  },
+  "recommendations": [
+    {
+      "type": "critical",
+      "category": "quality",
+      "title": "Critical: Low test pass rate",
+      "description": "Only 0% of tests are passing. Immediate action required.",
+      "action": "Review and fix failing tests immediately",
+      "priority": 1
+    },
+    {
+      "type": "warning",
+      "category": "category-specific",
+      "title": "integration category needs attention",
+      "description": "integration tests have 0% pass rate.",
+      "action": "Review integration test implementations",
+      "priority": 2
+    }
+  ],
+  "history": [
+    {
+      "timestamp": "2025-06-15T15:36:25.752Z",
+      "passRate": 0,
+      "duration": 6496,
+      "totalTests": 0,
+      "passedTests": 0,
+      "failedTests": 0,
+      "categories": [
+        {
+          "name": "integration",
+          "passRate": 0,
+          "duration": 6496
+        }
+      ]
+    }
+  ]
+}
