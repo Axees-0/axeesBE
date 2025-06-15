@@ -311,6 +311,21 @@ jest.mock('nodemailer', () => ({
   })
 }));
 
+// Mock MessageCentral
+jest.mock('../../utils/messageCentral', () => ({
+  sendOtp: jest.fn().mockResolvedValue(123456),
+  verifyOtp: jest.fn().mockImplementation((verificationId, code) => {
+    // Check if verificationId is the mock value we set (123456)
+    // and code is the valid OTP '123456'
+    if (verificationId === 123456 && code === '123456') {
+      return Promise.resolve(true);
+    }
+    // Reject all other combinations
+    return Promise.reject(new Error('Invalid OTP code'));
+  }),
+  getMessageCentralToken: jest.fn().mockResolvedValue('mock-token-12345')
+}));
+
 // Mock OpenAI (v4+ compatible with named exports)
 jest.mock('openai', () => ({
   OpenAI: jest.fn().mockImplementation(() => ({

@@ -1,6 +1,18 @@
 // Test app configuration
 // This provides a configured Express app for testing without starting the server
 
+// Mock MessageCentral FIRST before any other requires
+jest.mock('../../utils/messageCentral', () => ({
+  sendOtp: jest.fn().mockResolvedValue(123456),
+  verifyOtp: jest.fn().mockImplementation((verificationId, code) => {
+    if (verificationId === 123456 && code === '123456') {
+      return Promise.resolve(true);
+    }
+    return Promise.reject(new Error('Invalid OTP code'));
+  }),
+  getMessageCentralToken: jest.fn().mockResolvedValue('mock-token-12345')
+}));
+
 if (process.env.NODE_ENV !== 'test') {
   require('dotenv').config({ path: '.env.test' });
 }
