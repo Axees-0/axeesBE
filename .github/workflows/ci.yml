@@ -136,6 +136,66 @@ jobs:
         name: codecov-umbrella
         fail_ci_if_error: false
 
+    - name: Generate Coverage Badge
+      uses: tj-actions/coverage-badge-js@v2
+      if: github.ref == 'refs/heads/main'
+      with:
+        output: coverage-badge.svg
+
+    - name: Verify Coverage Requirements
+      run: |
+        # Extract coverage percentages from Jest coverage summary
+        if [ -f "coverage/coverage-summary.json" ]; then
+          STATEMENTS=$(cat coverage/coverage-summary.json | jq -r '.total.statements.pct')
+          BRANCHES=$(cat coverage/coverage-summary.json | jq -r '.total.branches.pct')
+          FUNCTIONS=$(cat coverage/coverage-summary.json | jq -r '.total.functions.pct')
+          LINES=$(cat coverage/coverage-summary.json | jq -r '.total.lines.pct')
+        else
+          echo "❌ Coverage summary not found"
+          exit 1
+        fi
+
+        echo "📊 Coverage Summary:"
+        echo "Statements: ${STATEMENTS}%"
+        echo "Branches: ${BRANCHES}%"
+        echo "Functions: ${FUNCTIONS}%"
+        echo "Lines: ${LINES}%"
+
+        # Set coverage requirements (as specified in phase requirements)
+        MIN_STATEMENTS=80
+        MIN_BRANCHES=75
+        MIN_FUNCTIONS=80
+        MIN_LINES=80
+
+        # Check coverage requirements
+        if (( $(echo "${STATEMENTS} >= ${MIN_STATEMENTS}" | bc -l) )); then
+          echo "✅ Statements coverage (${STATEMENTS}%) meets requirement (${MIN_STATEMENTS}%)"
+        else
+          echo "❌ Statements coverage (${STATEMENTS}%) below requirement (${MIN_STATEMENTS}%)"
+          exit 1
+        fi
+
+        if (( $(echo "${BRANCHES} >= ${MIN_BRANCHES}" | bc -l) )); then
+          echo "✅ Branches coverage (${BRANCHES}%) meets requirement (${MIN_BRANCHES}%)"
+        else
+          echo "❌ Branches coverage (${BRANCHES}%) below requirement (${MIN_BRANCHES}%)"
+          exit 1
+        fi
+
+        if (( $(echo "${FUNCTIONS} >= ${MIN_FUNCTIONS}" | bc -l) )); then
+          echo "✅ Functions coverage (${FUNCTIONS}%) meets requirement (${MIN_FUNCTIONS}%)"
+        else
+          echo "❌ Functions coverage (${FUNCTIONS}%) below requirement (${MIN_FUNCTIONS}%)"
+          exit 1
+        fi
+
+        if (( $(echo "${LINES} >= ${MIN_LINES}" | bc -l) )); then
+          echo "✅ Lines coverage (${LINES}%) meets requirement (${MIN_LINES}%)"
+        else
+          echo "❌ Lines coverage (${LINES}%) below requirement (${MIN_LINES}%)"
+          exit 1
+        fi
+
     - name: Upload test results
       uses: actions/upload-artifact@v3
       if: always()

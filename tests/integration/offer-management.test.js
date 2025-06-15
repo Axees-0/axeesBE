@@ -159,7 +159,11 @@ describe('Offer Management API Tests', () => {
       expect(response.body.offer.offerName).toBe(offerData.offerName);
       expect(response.body.offer.marketerId).toBe(offerData.marketerId);
       expect(response.body.offer.creatorId).toBe(offerData.creatorId);
+<<<<<<< HEAD
       expect(response.body.offer.proposedAmount).toBe(offerData.amount);
+=======
+      expect(response.body.offer.proposedAmount).toBe(offerData.proposedAmount);
+>>>>>>> feature/testing-infrastructure
       expect(response.body.offer.deliverables).toEqual(offerData.deliverables);
       expect(response.body.chatRoomId).toBeDefined();
     });
@@ -882,7 +886,11 @@ describe('Offer Management API Tests', () => {
         marketerId: marketerUser._id.toString(),
         creatorId: creatorUser._id.toString(),
         offerName: '', // Empty name
+<<<<<<< HEAD
         amount: 1000
+=======
+        proposedAmount: 1000
+>>>>>>> feature/testing-infrastructure
       };
 
       const response = await request(app)
@@ -900,7 +908,11 @@ describe('Offer Management API Tests', () => {
         creatorId: creatorUser._id.toString(),
         offerName: 'Test Offer',
         deliverables: 'Should be array', // Invalid format
+<<<<<<< HEAD
         amount: 1000
+=======
+        proposedAmount: 1000
+>>>>>>> feature/testing-infrastructure
       };
 
       const response = await request(app)
@@ -918,7 +930,11 @@ describe('Offer Management API Tests', () => {
         marketerId: marketerUser._id.toString(),
         creatorId: creatorUser._id.toString(),
         offerName: 'Date Test Offer',
+<<<<<<< HEAD
         amount: 1000,
+=======
+        proposedAmount: 1000,
+>>>>>>> feature/testing-infrastructure
         desiredReviewDate: 'invalid-date', // Invalid date format
         desiredPostDate: new Date()
       };
@@ -937,7 +953,11 @@ describe('Offer Management API Tests', () => {
         marketerId: marketerUser._id.toString(),
         creatorId: creatorUser._id.toString(),
         offerName: 'Currency Test Offer',
+<<<<<<< HEAD
         amount: 1000,
+=======
+        proposedAmount: 1000,
+>>>>>>> feature/testing-infrastructure
         currency: 'INVALID' // Invalid currency code
       };
 

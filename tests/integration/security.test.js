@@ -35,6 +35,8 @@ const { connect, closeDatabase, clearDatabase } = require('../helpers/database')
 const User = require('../../models/User');
 const Offer = require('../../models/offer');
 const Deal = require('../../models/deal');
+const ChatRoom = require('../../models/ChatRoom');
+const Message = require('../../models/Message');
 const { generateTestToken } = require('../helpers/auth');
 const bcrypt = require('bcrypt');
 

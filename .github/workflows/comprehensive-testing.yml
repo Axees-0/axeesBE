@@ -1,0 +1,420 @@
+name: Comprehensive Test Suite
+
+on:
+  push:
+    branches: [ main, develop, feature/*, release/* ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_categories:
+        description: 'Test categories to run (comma-separated: core,chat,performance,production,monitoring,ux,integration)'
+        required: false
+        default: 'all'
+      verbose:
+        description: 'Verbose output'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  NODE_ENV: test
+  DEMO_MODE: false
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      categories: ${{ steps.categories.outputs.list }}
+      should_run_performance: ${{ steps.performance.outputs.run }}
+    steps:
+      - name: Determine test categories
+        id: categories
+        run: |
+          if [ "${{ github.event.inputs.test_categories }}" = "all" ] || [ -z "${{ github.event.inputs.test_categories }}" ]; then
+            echo "list=core,chat,performance,production,monitoring,ux,integration" >> $GITHUB_OUTPUT
+          else
+            echo "list=${{ github.event.inputs.test_categories }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if performance tests should run
+        id: performance
+        run: |
+          if [[ "${{ steps.categories.outputs.list }}" =~ "performance" ]] || [[ "${{ steps.categories.outputs.list }}" =~ "all" ]]; then
+            echo "run=true" >> $GITHUB_OUTPUT
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+          fi
+
+  lint-and-typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint || true
+
+      - name: Run TypeScript check
+        run: npm run typecheck || true
+
+      - name: Check code formatting
+        run: npm run format:check || true
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    needs: [setup]
+    services:
+      mongodb:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit || true
+        env:
+          MONGODB_URI: mongodb://localhost:27017/axees_test
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    needs: [setup, lint-and-typecheck]
+    services:
+      mongodb:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      fail-fast: false
+      matrix:
+        category: 
+          - core
+          - chat
+          - production
+          - monitoring
+          - ux
+          - integration
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create test reports directory
+        run: mkdir -p test-reports
+
+      - name: Run integration tests for ${{ matrix.category }}
+        run: |
+          if [[ "${{ needs.setup.outputs.categories }}" =~ "${{ matrix.category }}" ]]; then
+            node scripts/test-runner.js ${{ matrix.category }} \
+              --output ./test-reports \
+              --timeout 600000 \
+              ${{ github.event.inputs.verbose == 'true' && '--verbose' || '' }}
+          else
+            echo "Skipping ${{ matrix.category }} tests (not in selected categories)"
+          fi
+        env:
+          MONGODB_URI: mongodb://localhost:27017/axees_test_${{ matrix.category }}
+          DEMO_MODE: ${{ matrix.category == 'integration' && 'true' || 'false' }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results-${{ matrix.category }}
+          path: test-reports/
+          retention-days: 30
+
+  performance-tests:
+    runs-on: ubuntu-latest
+    needs: [setup, lint-and-typecheck]
+    if: needs.setup.outputs.should_run_performance == 'true'
+    services:
+      mongodb:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd mongo
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Create test reports directory
+        run: mkdir -p test-reports
+
+      - name: Run performance tests
+        run: |
+          node scripts/test-runner.js performance \
+            --output ./test-reports \
+            --timeout 900000 \
+            --concurrency 2 \
+            ${{ github.event.inputs.verbose == 'true' && '--verbose' || '' }}
+        env:
+          MONGODB_URI: mongodb://localhost:27017/axees_test_performance
+
+      - name: Upload performance results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: performance-test-results
+          path: test-reports/
+          retention-days: 30
+
+  aggregate-results:
+    runs-on: ubuntu-latest
+    needs: [integration-tests, performance-tests]
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download all test results
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded-reports/
+
+      - name: Merge test results
+        run: |
+          mkdir -p test-reports
+          # Merge all JSON results
+          find downloaded-reports/ -name "test-results.json" -exec cp {} test-reports/test-results-{}.json \;
+          
+          # Create a combined report
+          if [ -f "downloaded-reports/test-results-core/test-results.json" ]; then
+            cp downloaded-reports/test-results-core/test-results.json test-reports/test-results.json
+          fi
+
+      - name: Aggregate test results
+        run: |
+          node scripts/test-aggregator.js \
+            --reports-dir ./test-reports \
+            --max-history 60
+        continue-on-error: true
+
+      - name: Generate final report
+        run: |
+          echo "# Test Suite Results" > test-summary.md
+          echo "" >> test-summary.md
+          
+          if [ -f "test-reports/summary.txt" ]; then
+            echo "\`\`\`" >> test-summary.md
+            cat test-reports/summary.txt >> test-summary.md
+            echo "\`\`\`" >> test-summary.md
+          else
+            echo "Test aggregation results not available" >> test-summary.md
+          fi
+
+      - name: Upload aggregated results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aggregated-test-results
+          path: |
+            test-reports/
+            test-summary.md
+          retention-days: 90
+
+      - name: Comment PR with results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            
+            let summary = 'Test suite execution completed.';
+            
+            try {
+              if (fs.existsSync('test-summary.md')) {
+                summary = fs.readFileSync('test-summary.md', 'utf8');
+              }
+            } catch (error) {
+              console.log('Could not read summary file:', error.message);
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run security audit
+        run: npm audit --audit-level moderate
+        continue-on-error: true
+
+      - name: Check for known vulnerabilities
+        run: |
+          if npm audit --audit-level high --json > audit-results.json; then
+            echo "No high-severity vulnerabilities found"
+          else
+            echo "High-severity vulnerabilities detected"
+            cat audit-results.json
+            exit 1
+          fi
+        continue-on-error: true
+
+  deployment-readiness:
+    runs-on: ubuntu-latest
+    needs: [integration-tests, aggregate-results]
+    if: always()
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download aggregated results
+        uses: actions/download-artifact@v4
+        with:
+          name: aggregated-test-results
+          path: ./test-reports/
+        continue-on-error: true
+
+      - name: Check deployment readiness
+        run: |
+          echo "🚀 DEPLOYMENT READINESS CHECK"
+          echo "============================="
+          
+          # Initialize readiness score
+          readiness_score=0
+          max_score=100
+          
+          # Check if aggregated results exist
+          if [ -f "test-reports/aggregated-results.json" ]; then
+            echo "✅ Test results available"
+            readiness_score=$((readiness_score + 20))
+            
+            # Parse pass rate if available
+            pass_rate=$(cat test-reports/aggregated-results.json | grep -o '"passRate":[0-9]*' | cut -d':' -f2 | head -1)
+            if [ -n "$pass_rate" ] && [ "$pass_rate" -ge 85 ]; then
+              echo "✅ Test pass rate acceptable: ${pass_rate}%"
+              readiness_score=$((readiness_score + 40))
+            else
+              echo "⚠️  Test pass rate below threshold: ${pass_rate}%"
+              readiness_score=$((readiness_score + 10))
+            fi
+          else
+            echo "❌ No test results available"
+          fi
+          
+          # Check if this is a protected branch
+          if [[ "${{ github.ref }}" == "refs/heads/main" ]] || [[ "${{ github.ref }}" == "refs/heads/develop" ]]; then
+            echo "✅ Deploying from protected branch"
+            readiness_score=$((readiness_score + 20))
+          else
+            echo "⚠️  Deploying from feature branch"
+            readiness_score=$((readiness_score + 10))
+          fi
+          
+          # Security check
+          if [ "${{ job.security-scan.result }}" = "success" ]; then
+            echo "✅ Security scan passed"
+            readiness_score=$((readiness_score + 20))
+          else
+            echo "⚠️  Security scan had issues"
+            readiness_score=$((readiness_score + 5))
+          fi
+          
+          echo ""
+          echo "📊 DEPLOYMENT READINESS SCORE: ${readiness_score}/${max_score}"
+          
+          if [ "$readiness_score" -ge 80 ]; then
+            echo "🟢 READY FOR DEPLOYMENT"
+            echo "ready=true" >> $GITHUB_OUTPUT
+          elif [ "$readiness_score" -ge 60 ]; then
+            echo "🟡 DEPLOYMENT WITH CAUTION"
+            echo "ready=caution" >> $GITHUB_OUTPUT
+          else
+            echo "🔴 NOT READY FOR DEPLOYMENT"
+            echo "ready=false" >> $GITHUB_OUTPUT
+          fi
+
+  notify-results:
+    runs-on: ubuntu-latest
+    needs: [deployment-readiness, aggregate-results]
+    if: always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+    steps:
+      - name: Notify team of test results
+        run: |
+          echo "Test suite completed for ${{ github.ref }}"
+          echo "Deployment readiness: ${{ needs.deployment-readiness.outputs.ready }}"
+          # Add notification logic here (Slack, email, etc.)

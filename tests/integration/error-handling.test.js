@@ -63,8 +63,8 @@ const { connect, closeDatabase, clearDatabase } = require('../helpers/database')
 const User = require('../../models/User');
 const Offer = require('../../models/offer');
 const Deal = require('../../models/deal');
-const Chat = require('../../models/chat');
-const Message = require('../../models/message');
+const ChatRoom = require('../../models/ChatRoom');
+const Message = require('../../models/Message');
 const { generateTestToken } = require('../helpers/auth');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
@@ -88,7 +88,7 @@ describe('Error Handling Tests', () => {
       userType: 'Creator',
       isActive: true,
       creatorData: {
-        platforms: ['Instagram'],
+        platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
         categories: ['technology'],
         nicheTopics: ['tech'],
         achievements: '',
@@ -201,7 +201,7 @@ describe('Error Handling Tests', () => {
           offerName: 'Test Offer',
           proposedAmount: -1000, // Negative amount
           currency: 'USD',
-          platforms: ['Instagram'],
+          platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
           deliverables: ['Post'],
           desiredReviewDate: new Date(),
           desiredPostDate: new Date(),
@@ -223,7 +223,7 @@ describe('Error Handling Tests', () => {
           offerName: 'Test Offer',
           proposedAmount: 1000,
           currency: 'USD',
-          platforms: ['Instagram'],
+          platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
           deliverables: ['Post'],
           desiredReviewDate: 'invalid-date',
           desiredPostDate: 'also-invalid',
@@ -383,7 +383,7 @@ describe('Error Handling Tests', () => {
           userType: 'Creator',
           isActive: true,
           creatorData: {
-            platforms: ['TikTok'],
+            platforms: [{ platform: 'TikTok', handle: '@otheruser', followersCount: 5000 }],
             categories: ['entertainment'],
             nicheTopics: ['comedy'],
             achievements: '',
@@ -414,7 +414,7 @@ describe('Error Handling Tests', () => {
           offerName: 'Test Offer',
           proposedAmount: 1000,
           currency: 'USD',
-          platforms: ['Instagram'],
+          platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
           deliverables: ['Content'],
           desiredReviewDate: new Date(),
           desiredPostDate: new Date(),
@@ -432,7 +432,7 @@ describe('Error Handling Tests', () => {
           userType: 'Creator',
           isActive: true,
           creatorData: {
-            platforms: ['YouTube'],
+            platforms: [{ platform: 'YouTube', handle: '@unauthorized', followersCount: 2000 }],
             categories: ['lifestyle'],
             nicheTopics: ['fashion'],
             achievements: '',
@@ -486,7 +486,7 @@ describe('Error Handling Tests', () => {
           userType: 'Creator',
           isActive: true,
           creatorData: {
-            platforms: ['Instagram'],
+            platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
             categories: ['technology'],
             nicheTopics: ['tech'],
             achievements: '',
@@ -496,7 +496,7 @@ describe('Error Handling Tests', () => {
           }
         });
 
-        const chat = await Chat.create({
+        const chat = await ChatRoom.create({
           participants: [marketerUser._id, creatorUser._id],
           unreadCount: {
             [marketerUser._id.toString()]: 0,
@@ -556,7 +556,7 @@ describe('Error Handling Tests', () => {
           }
         });
 
-        const chat = await Chat.create({
+        const chat = await ChatRoom.create({
           participants: [marketerUser._id, testUser._id],
           unreadCount: {
             [marketerUser._id.toString()]: 0,
@@ -718,7 +718,7 @@ describe('Error Handling Tests', () => {
           offerName: 'Test Offer',
           proposedAmount: 1000,
           currency: 'USD',
-          platforms: ['Instagram'],
+          platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
           deliverables: ['Post'],
           desiredReviewDate: new Date('2020-01-01'), // Past date
           desiredPostDate: new Date('2020-01-01'), // Past date
@@ -742,7 +742,7 @@ describe('Error Handling Tests', () => {
           offerName: 'Test Offer',
           proposedAmount: 1000,
           currency: 'USD',
-          platforms: ['Instagram'],
+          platforms: [{ platform: 'Instagram', handle: '@testuser', followersCount: 1000 }],
           deliverables: ['Content'],
           desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),

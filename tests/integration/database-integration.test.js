@@ -37,6 +37,7 @@ const Offer = require('../../models/offer');
 const Deal = require('../../models/deal');
 const ChatRoom = require('../../models/ChatRoom');
 const Message = require('../../models/message');
+const Notification = require('../../models/Notification');
 const { generateTestToken } = require('../helpers/auth');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
@@ -623,7 +624,7 @@ describe('Database Integration Tests', () => {
           userType: 'Creator',
           isActive: true,
           creatorData: {
-            platforms: [{ platform: 'instagram', handle: '@testuser', followersCount: 1000 }],
+            platforms: ['Instagram'],
             categories: ['technology'],
             nicheTopics: ['tech'],
             achievements: '',
@@ -772,7 +773,7 @@ describe('Database Integration Tests', () => {
           userType: 'Creator',
           isActive: true,
           creatorData: {
-            platforms: [{ platform: 'instagram', handle: '@concurrent', followersCount: 1000 }],
+            platforms: ['Instagram'],
             categories: ['technology'],
             nicheTopics: ['tech'],
             achievements: '',
@@ -871,11 +872,7 @@ describe('Database Integration Tests', () => {
         userType: 'Creator',
         isActive: true,
         creatorData: {
-          platforms: [
-            { platform: 'instagram', handle: '@largedata', followersCount: 200000 },
-            { platform: 'youtube', handle: '@largedata_yt', followersCount: 200000 },
-            { platform: 'tiktok', handle: '@largedata_tt', followersCount: 100000 }
-          ],
+          platforms: ['Instagram', 'YouTube', 'TikTok'],
           categories: ['technology', 'lifestyle', 'entertainment'],
           nicheTopics: ['tech', 'gadgets', 'reviews'],
           achievements: 'Major tech influencer with multiple achievements',

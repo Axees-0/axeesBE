@@ -50,8 +50,8 @@ const { connect, closeDatabase, clearDatabase } = require('../helpers/database')
 const User = require('../../models/User');
 const Offer = require('../../models/offer');
 const Deal = require('../../models/deal');
-const Chat = require('../../models/chat');
-const Message = require('../../models/message');
+const ChatRoom = require('../../models/ChatRoom');
+const Message = require('../../models/Message');
 const { generateTestToken } = require('../helpers/auth');
 const bcrypt = require('bcrypt');
 
@@ -73,7 +73,7 @@ describe('Performance Baseline Tests', () => {
       userType: 'Creator',
       isActive: true,
       creatorData: {
-        platforms: ['Instagram'],
+        platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
         categories: ['technology'],
         nicheTopics: ['tech'],
         achievements: '',
@@ -105,7 +105,7 @@ describe('Performance Baseline Tests', () => {
       userType: 'Creator',
       isActive: true,
       creatorData: {
-        platforms: ['Instagram'],
+        platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
         categories: ['technology'],
         nicheTopics: ['tech'],
         achievements: '',
@@ -339,7 +339,7 @@ describe('Performance Baseline Tests', () => {
               offerName: `Performance Test Offer ${i}`,
               proposedAmount: 1000 + (i * 100),
               currency: 'USD',
-              platforms: ['Instagram'],
+              platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
               deliverables: ['Post', 'Story'],
               desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
               desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -371,7 +371,7 @@ describe('Performance Baseline Tests', () => {
             offerName: `Test Offer ${i}`,
             proposedAmount: 1000 + (i * 100),
             currency: 'USD',
-            platforms: ['Instagram'],
+            platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
             deliverables: ['Post'],
             desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -432,7 +432,7 @@ describe('Performance Baseline Tests', () => {
           }
         });
 
-        const chat = await Chat.create({
+        const chat = await ChatRoom.create({
           participants: [marketer._id, testUser._id],
           unreadCount: {
             [marketer._id.toString()]: 0,
@@ -452,7 +452,7 @@ describe('Performance Baseline Tests', () => {
       });
 
       it('should send messages within performance threshold', async () => {
-        const chat = await Chat.findOne();
+        const chat = await ChatRoom.findOne();
         const iterations = 10;
         const times = [];
 
@@ -483,7 +483,7 @@ describe('Performance Baseline Tests', () => {
       });
 
       it('should retrieve message history within performance threshold', async () => {
-        const chat = await Chat.findOne();
+        const chat = await ChatRoom.findOne();
         const iterations = 15;
         const times = [];
 
@@ -573,7 +573,7 @@ describe('Performance Baseline Tests', () => {
             offerName: `Concurrent Offer ${i}`,
             proposedAmount: 1000 + (i * 50),
             currency: 'USD',
-            platforms: ['Instagram'],
+            platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
             deliverables: ['Post'],
             desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -617,7 +617,7 @@ describe('Performance Baseline Tests', () => {
         }
       });
 
-      const chat = await Chat.create({
+      const chat = await ChatRoom.create({
         participants: [marketer._id, testUser._id],
         unreadCount: {
           [marketer._id.toString()]: 0,
@@ -671,7 +671,7 @@ describe('Performance Baseline Tests', () => {
           isActive: true,
           ...(i % 2 === 0 ? {
             creatorData: {
-              platforms: ['Instagram'],
+              platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
               categories: ['technology'],
               nicheTopics: ['tech'],
               achievements: `Bulk achievements ${i}`,
@@ -782,7 +782,7 @@ describe('Performance Baseline Tests', () => {
           userType: 'Creator',
           isActive: true,
           creatorData: {
-            platforms: ['Instagram'],
+            platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
             categories: ['technology'],
             nicheTopics: ['tech'],
             achievements: `Page achievements ${i}`,
@@ -919,7 +919,7 @@ describe('Performance Baseline Tests', () => {
           offerName: `Relationship Offer ${i}`,
           proposedAmount: 2000 + (i * 100),
           currency: 'USD',
-          platforms: ['Instagram'],
+          platforms: [{ platform: 'Instagram', handle: '@perfuser', followersCount: 10000 }],
           deliverables: ['Post', 'Story'],
           desiredReviewDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
           desiredPostDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
@@ -952,7 +952,7 @@ describe('Performance Baseline Tests', () => {
       }
 
       // Create chat with messages
-      const chat = await Chat.create({
+      const chat = await ChatRoom.create({
         participants: [marketer._id, testUser._id],
         unreadCount: {
           [marketer._id.toString()]: 0,

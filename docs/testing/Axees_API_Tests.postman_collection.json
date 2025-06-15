@@ -1,0 +1,967 @@
+{
+  "info": {
+    "name": "Axees Platform API Tests",
+    "description": "Comprehensive API test collection for the Axees influencer marketing platform",
+    "version": "1.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "{{base_url}}",
+      "type": "string"
+    },
+    {
+      "key": "user_id",
+      "value": "{{user_id}}",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "{{auth_token}}",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🔐 Authentication",
+      "description": "User authentication and registration flows",
+      "item": [
+        {
+          "name": "Register - Start",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains success message', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "    pm.expect(responseJson.message).to.include('OTP sent');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+12125551234\",\n  \"userType\": \"Creator\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/start",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register", "start"]
+            }
+          }
+        },
+        {
+          "name": "Register - Verify OTP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response contains temporary token', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('tempToken');",
+                  "    pm.collectionVariables.set('temp_token', responseJson.tempToken);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+12125551234\",\n  \"otp\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/verify",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register", "verify"]
+            }
+          }
+        },
+        {
+          "name": "Register - Complete",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response contains user and token', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('user');",
+                  "    pm.expect(responseJson).to.have.property('token');",
+                  "    pm.collectionVariables.set('auth_token', responseJson.token);",
+                  "    pm.collectionVariables.set('user_id', responseJson.user._id);",
+                  "});",
+                  "",
+                  "pm.test('User has correct structure', function () {",
+                  "    const user = pm.response.json().user;",
+                  "    pm.expect(user).to.have.property('_id');",
+                  "    pm.expect(user).to.have.property('phone');",
+                  "    pm.expect(user).to.have.property('userType');",
+                  "    pm.expect(user).to.not.have.property('password');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{temp_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Test Creator\",\n  \"userName\": \"testcreator123\",\n  \"email\": \"test@creator.com\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/complete",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register", "complete"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 500ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test('Response contains auth token', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('token');",
+                  "    pm.collectionVariables.set('auth_token', responseJson.token);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+12125551234\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "👤 User Management",
+      "description": "User profile and management operations",
+      "item": [
+        {
+          "name": "Get User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 150ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(150);",
+                  "});",
+                  "",
+                  "pm.test('Profile contains required fields', function () {",
+                  "    const user = pm.response.json().user;",
+                  "    pm.expect(user).to.have.property('_id');",
+                  "    pm.expect(user).to.have.property('phone');",
+                  "    pm.expect(user).to.have.property('userType');",
+                  "    pm.expect(user).to.not.have.property('password');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/account/profile/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "account", "profile", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Profile updated successfully', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('user');",
+                  "    pm.expect(responseJson.user.name).to.eq('Updated Test Creator');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Test Creator\",\n  \"bio\": \"Updated bio for testing\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/account/profile/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "account", "profile", "{{user_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📝 Offer Management",
+      "description": "Offer creation, listing, and management",
+      "item": [
+        {
+          "name": "Create Offer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 400ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(400);",
+                  "});",
+                  "",
+                  "pm.test('Offer created successfully', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('offer');",
+                  "    pm.expect(responseJson.offer).to.have.property('_id');",
+                  "    pm.collectionVariables.set('offer_id', responseJson.offer._id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"creatorId\": \"{{user_id}}\",\n  \"offerName\": \"Test Campaign Offer\",\n  \"description\": \"Test campaign for Instagram post\",\n  \"proposedAmount\": 1000,\n  \"currency\": \"USD\",\n  \"platforms\": [\"Instagram\"],\n  \"deliverables\": [\"Post\", \"Story\"],\n  \"desiredPostDate\": \"2024-12-31\",\n  \"desiredReviewDate\": \"2024-12-25\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/marketer/offers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "marketer", "offers"]
+            }
+          }
+        },
+        {
+          "name": "List Offers",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 300ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(300);",
+                  "});",
+                  "",
+                  "pm.test('Response contains offers array', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('offers');",
+                  "    pm.expect(responseJson.offers).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketer/offers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "marketer", "offers"]
+            }
+          }
+        },
+        {
+          "name": "Get Specific Offer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Offer details returned', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('offer');",
+                  "    pm.expect(responseJson.offer).to.have.property('_id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketer/offers/{{offer_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "marketer", "offers", "{{offer_id}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💳 Payment Management",
+      "description": "Payment processing and financial operations",
+      "item": [
+        {
+          "name": "Create Checkout Session",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 500ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test('Checkout session created', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('sessionId');",
+                  "    pm.expect(responseJson).to.have.property('sessionUrl');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"currency\": \"USD\",\n  \"description\": \"Test payment for offer\",\n  \"offerId\": \"{{offer_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/payments/checkout",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "checkout"]
+            }
+          }
+        },
+        {
+          "name": "Get Payment Methods",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Payment methods returned', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('paymentMethods');",
+                  "    pm.expect(responseJson.paymentMethods).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments/methods",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "methods"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "💬 Chat & Messaging",
+      "description": "Real-time messaging and chat functionality",
+      "item": [
+        {
+          "name": "Create Chat Room",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Chat room created', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('chatId');",
+                  "    pm.collectionVariables.set('chat_id', responseJson.chatId);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"recipientId\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chats"]
+            }
+          }
+        },
+        {
+          "name": "Send Message",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 201', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('Response time is less than 250ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(250);",
+                  "});",
+                  "",
+                  "pm.test('Message sent successfully', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('message');",
+                  "    pm.expect(responseJson.message).to.have.property('_id');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"text\": \"Hello from Postman test!\",\n  \"receiverId\": \"{{user_id}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/chats/{{chat_id}}/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chats", "{{chat_id}}", "messages"]
+            }
+          }
+        },
+        {
+          "name": "Get Messages",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('Messages retrieved', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('messages');",
+                  "    pm.expect(responseJson.messages).to.be.an('array');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/chats/{{chat_id}}/messages",
+              "host": ["{{base_url}}"],
+              "path": ["api", "chats", "{{chat_id}}", "messages"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔒 Security Tests",
+      "description": "Security validation and error handling tests",
+      "item": [
+        {
+          "name": "Test Unauthorized Access (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error message is present', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('error');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/account/profile/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "account", "profile", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Test Invalid Token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "",
+                  "pm.test('Error response format', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('error');",
+                  "    pm.expect(responseJson.error).to.not.contain('sensitive');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.jwt.token"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/account/profile/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "account", "profile", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Test Non-existent Endpoint (404)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 404', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});",
+                  "",
+                  "pm.test('Error response structure', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('error');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/nonexistent/endpoint",
+              "host": ["{{base_url}}"],
+              "path": ["api", "nonexistent", "endpoint"]
+            }
+          }
+        },
+        {
+          "name": "Test Invalid Request Body (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status code is 400', function () {",
+                  "    pm.response.to.have.status(400);",
+                  "});",
+                  "",
+                  "pm.test('Validation error response', function () {",
+                  "    const responseJson = pm.response.json();",
+                  "    pm.expect(responseJson).to.have.property('error');",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"invalid\": \"json\",\n  \"missing_required_fields\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register/start",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register", "start"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚡ Performance Tests",
+      "description": "Performance benchmarking tests",
+      "item": [
+        {
+          "name": "Auth Performance Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Auth endpoint response time < 200ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(200);",
+                  "});",
+                  "",
+                  "pm.test('Response successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"phone\": \"+12125551234\",\n  \"password\": \"SecurePassword123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "User Endpoint Performance Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('User endpoint response time < 150ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(150);",
+                  "});",
+                  "",
+                  "pm.test('Response successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/account/profile/{{user_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "account", "profile", "{{user_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Offer List Performance Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Offer list endpoint response time < 300ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(300);",
+                  "});",
+                  "",
+                  "pm.test('Response successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/marketer/offers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "marketer", "offers"]
+            }
+          }
+        },
+        {
+          "name": "Payment Performance Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Payment endpoint response time < 500ms', function () {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(500);",
+                  "});",
+                  "",
+                  "pm.test('Response successful', function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 201]);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "x-user-id",
+                "value": "{{user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/api/payments/methods",
+              "host": ["{{base_url}}"],
+              "path": ["api", "payments", "methods"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Set base URL if not set",
+          "if (!pm.collectionVariables.get('base_url')) {",
+          "    pm.collectionVariables.set('base_url', 'http://localhost:3000');",
+          "}"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "// Global test for all requests",
+          "pm.test('Response has correct Content-Type', function () {",
+          "    pm.expect(pm.response.headers.get('Content-Type')).to.include('application/json');",
+          "});",
+          "",
+          "// Log response time for performance monitoring",
+          "console.log(`${pm.info.requestName}: ${pm.response.responseTime}ms`);"
+        ]
+      }
+    }
+  ]
+}
