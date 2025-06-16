@@ -54,6 +54,7 @@
    const paymentAutoPopulationRoutes = require('./routes/paymentAutoPopulationRoutes');
    const offerCollaborationRoutes = require('./routes/offerCollaborationRoutes');
    const disputeResolutionRoutes = require('./routes/disputeResolutionRoutes');
+   const utilityRoutes = require('./routes/utilityRoutes');
    
    /* cron job */
    require('./cron/activationReminders');
@@ -166,6 +167,7 @@ mongoose
    app.use('/api/payment-autopop', manualAuth, paymentAutoPopulationRoutes);
    app.use('/api/offers', manualAuth, offerCollaborationRoutes);
    app.use('/api/deals', manualAuth, disputeResolutionRoutes);
+   app.use('/api/utils', utilityRoutes);
    
    app.use('/api/chats',              chatRoutes);
    

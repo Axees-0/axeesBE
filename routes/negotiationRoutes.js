@@ -28,4 +28,17 @@ router.get("/:offerId/visual-diff", negotiationController.getOfferVisualDiff);
 // GET /api/negotiation/analytics/user - Get user negotiation analytics
 router.get("/analytics/user", negotiationController.getNegotiationAnalytics);
 
+// Comment Routes for Negotiation Timeline
+// GET /api/negotiation/:offerId/comments - Get all comments for an offer
+router.get("/:offerId/comments", negotiationController.getOfferComments);
+
+// POST /api/negotiation/:offerId/comments - Add a new comment
+router.post("/:offerId/comments", negotiationController.addOfferComment);
+
+// PUT /api/negotiation/:offerId/comments/:commentId - Update a comment
+router.put("/:offerId/comments/:commentId", negotiationController.updateOfferComment);
+
+// DELETE /api/negotiation/:offerId/comments/:commentId - Delete a comment
+router.delete("/:offerId/comments/:commentId", negotiationController.deleteOfferComment);
+
 module.exports = router;

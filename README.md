@@ -6,13 +6,16 @@ Axees is an influencer marketing platform connecting brands/marketers with conte
 ## 🚀 Features
 - **Authentication**: Phone-based OTP authentication with JWT tokens
 - **User Management**: Separate flows for Creators and Marketers
-- **Offer System**: Complete offer lifecycle with negotiations
+- **Offer System**: Complete offer lifecycle with real-time collaboration and negotiations
 - **Payment Integration**: Stripe integration with escrow payments
 - **Real-time Chat**: SSE-based messaging with file attachments
 - **Deal Execution**: Milestone-based project management
 - **AI-Powered Creator Discovery**: Advanced influencer search with competitive intelligence
 - **Security**: Comprehensive security measures against common vulnerabilities
-- **Frontend Integration**: Complete frontend integration with centralized authentication, dynamic navigation, and OTP-based registration flow
+- **Frontend Integration**: Complete frontend-backend integration with Phase 1-3 implementations
+  - Phase 1: Infrastructure setup and API integration
+  - Phase 2: Authentication system with JWT and OTP verification
+  - Phase 3: Core features - offer creation, real-time collaboration, and negotiation with comments
 
 ## 📋 Prerequisites
 - Node.js 18.x or 20.x
@@ -65,11 +68,17 @@ The backend now includes an integrated demo frontend with a comprehensive API cl
   - Global loading state management
   - JWT token handling and automatic refresh
   - Phone-based authentication with OTP verification
+  - Email verification and comment API integration
 - **Authentication System**: Complete phone/OTP registration and login flow
   - AuthContext for centralized state management
   - Auto-logout with token expiry warnings
   - Protected route handling
   - Multi-tab session synchronization
+- **Offer Management**: Complete offer lifecycle implementation
+  - Multi-step offer creation with draft saving
+  - Real-time collaboration with conflict resolution
+  - Negotiation system with comment timeline
+  - Email retry mechanism with exponential backoff
 - **Dynamic Navigation**: Role-based navigation with user dropdown
 - **Loading Indicators**: Visual feedback during API operations
 - **Demo Pages**: Fully styled demo pages showcasing platform features

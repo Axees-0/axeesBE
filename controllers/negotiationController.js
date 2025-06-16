@@ -1238,4 +1238,266 @@ const calculateTotalNegotiationDuration = (history, offerCreatedAt) => {
   return Math.round((endDate - startDate) / (1000 * 60 * 60 * 24) * 100) / 100; // days
 };
 
+// Get all comments for an offer
+exports.getOfferComments = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const userId = req.user?.id || req.body?.userId || req.query?.userId;
+
+    if (!userId) {
+      return errorResponse(res, 401, "User ID is required");
+    }
+
+    const offer = await Offer.findById(offerId)
+      .populate({
+        path: 'comments.userId',
+        select: 'name email profileImage'
+      })
+      .select('comments marketerId creatorId');
+
+    if (!offer) {
+      return errorResponse(res, 404, "Offer not found");
+    }
+
+    // Check if user has access to this offer
+    const isMarketer = offer.marketerId.toString() === userId;
+    const isCreator = offer.creatorId.toString() === userId;
+    
+    if (!isMarketer && !isCreator) {
+      return errorResponse(res, 403, "You don't have access to this offer");
+    }
+
+    // Format comments for response
+    const formattedComments = offer.comments.map(comment => ({
+      id: comment._id,
+      userId: comment.userId._id,
+      userName: comment.userId.name,
+      userEmail: comment.userId.email,
+      userImage: comment.userId.profileImage,
+      userRole: comment.userRole,
+      comment: comment.comment,
+      createdAt: comment.createdAt,
+      updatedAt: comment.updatedAt,
+      isEdited: comment.isEdited,
+      editHistory: comment.editHistory,
+      isOwnComment: comment.userId._id.toString() === userId
+    }));
+
+    return successResponse(res, 200, "Comments retrieved successfully", {
+      comments: formattedComments,
+      totalComments: formattedComments.length
+    });
+  } catch (error) {
+    return handleServerError(res, error);
+  }
+};
+
+// Add a new comment to an offer
+exports.addOfferComment = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const { comment } = req.body;
+    const userId = req.user?.id || req.body?.userId || req.query?.userId;
+
+    if (!userId) {
+      return errorResponse(res, 401, "User ID is required");
+    }
+
+    if (!comment || comment.trim().length === 0) {
+      return errorResponse(res, 400, "Comment cannot be empty");
+    }
+
+    if (comment.length > 500) {
+      return errorResponse(res, 400, "Comment exceeds maximum length of 500 characters");
+    }
+
+    const offer = await Offer.findById(offerId);
+    if (!offer) {
+      return errorResponse(res, 404, "Offer not found");
+    }
+
+    // Check if user has access to this offer
+    const isMarketer = offer.marketerId.toString() === userId;
+    const isCreator = offer.creatorId.toString() === userId;
+    
+    if (!isMarketer && !isCreator) {
+      return errorResponse(res, 403, "You don't have access to this offer");
+    }
+
+    // Determine user role
+    const userRole = isMarketer ? 'marketer' : 'creator';
+
+    // Add comment to offer
+    const newComment = {
+      userId: userId,
+      userRole: userRole,
+      comment: comment.trim(),
+      createdAt: new Date(),
+      isEdited: false,
+      editHistory: []
+    };
+
+    offer.comments.push(newComment);
+    offer.negotiationMetrics.lastActivity = new Date();
+    
+    await offer.save();
+
+    // Get the newly added comment with populated user data
+    const updatedOffer = await Offer.findById(offerId)
+      .populate({
+        path: 'comments.userId',
+        select: 'name email profileImage'
+      });
+
+    const addedComment = updatedOffer.comments[updatedOffer.comments.length - 1];
+
+    // Send notification to the other party
+    const recipientId = isMarketer ? offer.creatorId : offer.marketerId;
+    const notification = new Notification({
+      recipientId: recipientId,
+      type: 'negotiation_comment',
+      message: `New comment on offer "${offer.offerName}"`,
+      relatedOfferId: offer._id
+    });
+    await notification.save();
+
+    return successResponse(res, 201, "Comment added successfully", {
+      comment: {
+        id: addedComment._id,
+        userId: addedComment.userId._id,
+        userName: addedComment.userId.name,
+        userEmail: addedComment.userId.email,
+        userImage: addedComment.userId.profileImage,
+        userRole: addedComment.userRole,
+        comment: addedComment.comment,
+        createdAt: addedComment.createdAt,
+        isEdited: addedComment.isEdited,
+        isOwnComment: true
+      }
+    });
+  } catch (error) {
+    return handleServerError(res, error);
+  }
+};
+
+// Update an existing comment
+exports.updateOfferComment = async (req, res) => {
+  try {
+    const { offerId, commentId } = req.params;
+    const { comment } = req.body;
+    const userId = req.user?.id || req.body?.userId || req.query?.userId;
+
+    if (!userId) {
+      return errorResponse(res, 401, "User ID is required");
+    }
+
+    if (!comment || comment.trim().length === 0) {
+      return errorResponse(res, 400, "Comment cannot be empty");
+    }
+
+    if (comment.length > 500) {
+      return errorResponse(res, 400, "Comment exceeds maximum length of 500 characters");
+    }
+
+    const offer = await Offer.findById(offerId);
+    if (!offer) {
+      return errorResponse(res, 404, "Offer not found");
+    }
+
+    // Find the comment
+    const commentIndex = offer.comments.findIndex(c => c._id.toString() === commentId);
+    if (commentIndex === -1) {
+      return errorResponse(res, 404, "Comment not found");
+    }
+
+    const existingComment = offer.comments[commentIndex];
+
+    // Check if user owns this comment
+    if (existingComment.userId.toString() !== userId) {
+      return errorResponse(res, 403, "You can only edit your own comments");
+    }
+
+    // Save previous version to edit history
+    existingComment.editHistory.push({
+      editedAt: new Date(),
+      previousComment: existingComment.comment
+    });
+
+    // Update comment
+    existingComment.comment = comment.trim();
+    existingComment.updatedAt = new Date();
+    existingComment.isEdited = true;
+
+    await offer.save();
+
+    // Get updated comment with populated user data
+    const updatedOffer = await Offer.findById(offerId)
+      .populate({
+        path: 'comments.userId',
+        select: 'name email profileImage'
+      });
+
+    const updatedComment = updatedOffer.comments[commentIndex];
+
+    return successResponse(res, 200, "Comment updated successfully", {
+      comment: {
+        id: updatedComment._id,
+        userId: updatedComment.userId._id,
+        userName: updatedComment.userId.name,
+        userEmail: updatedComment.userId.email,
+        userImage: updatedComment.userId.profileImage,
+        userRole: updatedComment.userRole,
+        comment: updatedComment.comment,
+        createdAt: updatedComment.createdAt,
+        updatedAt: updatedComment.updatedAt,
+        isEdited: updatedComment.isEdited,
+        editHistory: updatedComment.editHistory,
+        isOwnComment: true
+      }
+    });
+  } catch (error) {
+    return handleServerError(res, error);
+  }
+};
+
+// Delete a comment
+exports.deleteOfferComment = async (req, res) => {
+  try {
+    const { offerId, commentId } = req.params;
+    const userId = req.user?.id || req.body?.userId || req.query?.userId;
+
+    if (!userId) {
+      return errorResponse(res, 401, "User ID is required");
+    }
+
+    const offer = await Offer.findById(offerId);
+    if (!offer) {
+      return errorResponse(res, 404, "Offer not found");
+    }
+
+    // Find the comment
+    const commentIndex = offer.comments.findIndex(c => c._id.toString() === commentId);
+    if (commentIndex === -1) {
+      return errorResponse(res, 404, "Comment not found");
+    }
+
+    const comment = offer.comments[commentIndex];
+
+    // Check if user owns this comment
+    if (comment.userId.toString() !== userId) {
+      return errorResponse(res, 403, "You can only delete your own comments");
+    }
+
+    // Remove comment
+    offer.comments.splice(commentIndex, 1);
+    await offer.save();
+
+    return successResponse(res, 200, "Comment deleted successfully", {
+      deletedCommentId: commentId
+    });
+  } catch (error) {
+    return handleServerError(res, error);
+  }
+};
+
 module.exports = exports;

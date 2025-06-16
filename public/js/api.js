@@ -305,6 +305,177 @@ class AxeesAPI {
     });
   }
 
+  async saveDraft(offerId, draftData) {
+    const endpoint = offerId ? `/marketer/${offerId}/draft` : '/marketer/drafts';
+    return this.request(endpoint, {
+      method: offerId ? 'PUT' : 'POST',
+      body: JSON.stringify(draftData)
+    });
+  }
+
+  async getDraft(draftId) {
+    return this.request(`/marketer/drafts/${draftId}`);
+  }
+
+  async verifyEmail(email) {
+    return this.request('/utils/verify-email', {
+      method: 'POST',
+      body: JSON.stringify({ email })
+    });
+  }
+
+  async sendOffer(offerId, recipientEmail) {
+    return this.request(`/marketer/${offerId}/send`, {
+      method: 'POST',
+      body: JSON.stringify({ recipientEmail })
+    });
+  }
+
+  async sendOfferWithRetry(offerId, recipientEmail, maxRetries = 3) {
+    let lastError;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        // First verify email if it's the first attempt
+        if (attempt === 1) {
+          await this.verifyEmail(recipientEmail);
+        }
+        
+        const response = await this.sendOffer(offerId, recipientEmail);
+        
+        if (response.success) {
+          return {
+            ...response,
+            emailVerified: true,
+            attemptNumber: attempt,
+            totalAttempts: maxRetries
+          };
+        }
+        
+        throw new Error(response.message || 'Send failed');
+        
+      } catch (error) {
+        lastError = error;
+        
+        // Don't retry on validation errors
+        if (error.message.includes('Invalid email') || 
+            error.message.includes('Email verification failed')) {
+          throw error;
+        }
+        
+        if (attempt < maxRetries) {
+          const delay = Math.min(1000 * Math.pow(2, attempt - 1), 10000); // Max 10s delay
+          
+          // Notify about retry attempt
+          window.dispatchEvent(new CustomEvent('email-retry-attempt', {
+            detail: { 
+              attempt, 
+              maxRetries, 
+              delay,
+              error: error.message 
+            }
+          }));
+          
+          await this.sleep(delay);
+        }
+      }
+    }
+    
+    // All retries failed
+    throw new Error(`Failed to send offer after ${maxRetries} attempts: ${lastError.message}`);
+  }
+
+  async getOfferComparison(offerId) {
+    return this.request(`/marketer/${offerId}/negotiation-comparison`);
+  }
+
+  async acceptOffer(offerId, terms) {
+    return this.request(`/marketer/${offerId}/accept`, {
+      method: 'POST',
+      body: JSON.stringify(terms)
+    });
+  }
+
+  async rejectOffer(offerId, reason) {
+    return this.request(`/marketer/${offerId}/reject`, {
+      method: 'POST',
+      body: JSON.stringify({ reason })
+    });
+  }
+
+  async counterOffer(offerId, counterData) {
+    return this.request(`/marketer/${offerId}/counter`, {
+      method: 'POST',
+      body: JSON.stringify(counterData)
+    });
+  }
+
+  async getOfferHistory(offerId) {
+    return this.request(`/marketer/${offerId}/edit-history`);
+  }
+
+  async startCollaboration(offerId, section) {
+    return this.request(`/offers/${offerId}/collaboration/start`, {
+      method: 'POST',
+      body: JSON.stringify({ section })
+    });
+  }
+
+  async endCollaboration(offerId) {
+    return this.request(`/offers/${offerId}/collaboration/end`, {
+      method: 'POST'
+    });
+  }
+
+  async getActiveCollaborators(offerId) {
+    return this.request(`/offers/${offerId}/collaboration/collaborators`);
+  }
+
+  async updateCollaborationActivity(offerId, section) {
+    return this.request(`/offers/${offerId}/collaboration/activity`, {
+      method: 'PUT',
+      body: JSON.stringify({ section, lastActivity: new Date().toISOString() })
+    });
+  }
+
+  async checkOfferVersion(offerId, currentVersion) {
+    return this.request(`/offers/${offerId}/version/${currentVersion}`);
+  }
+
+  async getOfferVersions(offerId) {
+    return this.request(`/offers/${offerId}/versions`);
+  }
+
+  async revertToVersion(offerId, version) {
+    return this.request(`/offers/${offerId}/revert/${version}`, {
+      method: 'POST'
+    });
+  }
+
+  async getOfferComments(offerId) {
+    return this.request(`/negotiation/${offerId}/comments`);
+  }
+
+  async addOfferComment(offerId, comment) {
+    return this.request(`/negotiation/${offerId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ comment })
+    });
+  }
+
+  async deleteOfferComment(offerId, commentId) {
+    return this.request(`/negotiation/${offerId}/comments/${commentId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async updateOfferComment(offerId, commentId, comment) {
+    return this.request(`/negotiation/${offerId}/comments/${commentId}`, {
+      method: 'PUT',
+      body: JSON.stringify({ comment })
+    });
+  }
+
   async getWalletBalance() {
     return this.request('/payments/wallet/balance');
   }

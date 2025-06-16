@@ -121,6 +121,18 @@ const offerSchema = new Schema({
     }],
     version: { type: Number, required: true }
   }],
+  comments: [{
+    userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
+    userRole: { type: String, enum: ["marketer", "creator"], required: true },
+    comment: { type: String, required: true, maxLength: 500 },
+    createdAt: { type: Date, default: Date.now },
+    updatedAt: { type: Date },
+    isEdited: { type: Boolean, default: false },
+    editHistory: [{
+      editedAt: { type: Date, default: Date.now },
+      previousComment: { type: String, required: true }
+    }]
+  }],
   currentEditors: [{
     userId: { type: Schema.Types.ObjectId, ref: "User" },
     sessionId: String,
