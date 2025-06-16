@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deal Marketplace - Axees</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            
+            /* Secondary Colors */
+            --secondary-color: #ec4899;
+            --secondary-light: #f472b6;
+            --secondary-dark: #db2777;
+            
+            /* Neutral Colors */
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            /* Background Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-dark: #1f2937;
+            --bg-card: #ffffff;
+            
+            /* Text Colors */
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-white: #ffffff;
+            
+            /* Status Colors */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-24: 6rem;
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            --font-extrabold: 800;
+            
+            /* Border Radius */
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-2xl: 1rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-primary);
+            font-size: var(--text-base);
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .nav-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-bold);
+            font-size: var(--text-lg);
+        }
+
+        .brand-name {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background: var(--gray-50);
+        }
+
+        .nav-link.active {
+            font-weight: var(--font-semibold);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--space-3);
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-semibold);
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--text-white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--gray-300);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        .main-content {
+            padding: var(--space-8) 0;
+        }
+
+        /* Page Header */
+        .page-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .page-title {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            margin: 0 0 var(--space-2) 0;
+            color: var(--text-primary);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: var(--text-lg);
+            margin: 0;
+        }
+
+        /* Search and Filters */
+        .search-section {
+            background: var(--bg-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            margin-bottom: var(--space-8);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .search-input {
+            flex: 1;
+            padding: var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-size: var(--text-base);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        .filters {
+            display: flex;
+            gap: var(--space-4);
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .filter-label {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .filter-select {
+            padding: var(--space-2) var(--space-3);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            background: var(--bg-primary);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        /* Deal Grid */
+        .deals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .deal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .deal-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .deal-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .deal-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .brand-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-bold);
+            font-size: var(--text-lg);
+        }
+
+        .brand-info h3 {
+            margin: 0 0 var(--space-1) 0;
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .brand-verified {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-size: var(--text-sm);
+            color: var(--success);
+        }
+
+        .deal-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0 0 var(--space-2) 0;
+        }
+
+        .deal-description {
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: var(--space-4);
+        }
+
+        .deal-tags {
+            display: flex;
+            gap: var(--space-2);
+            flex-wrap: wrap;
+        }
+
+        .deal-tag {
+            padding: var(--space-1) var(--space-2);
+            background: var(--gray-100);
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            border-radius: var(--radius-md);
+        }
+
+        .deal-body {
+            padding: var(--space-6);
+        }
+
+        .deal-requirements {
+            margin-bottom: var(--space-4);
+        }
+
+        .requirements-title {
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-2);
+        }
+
+        .requirement-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-bottom: var(--space-1);
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .requirement-icon {
+            color: var(--success);
+        }
+
+        .deal-footer {
+            padding: var(--space-6);
+            border-top: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .deal-payment {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-1);
+        }
+
+        .payment-amount {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--success);
+        }
+
+        .payment-type {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+        }
+
+        .deal-deadline {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: var(--space-1);
+        }
+
+        .deadline-date {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .deadline-label {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+        }
+
+        /* Featured Deal */
+        .featured-deal {
+            border: 2px solid var(--primary-color);
+            position: relative;
+        }
+
+        .featured-badge {
+            position: absolute;
+            top: -1px;
+            right: var(--space-4);
+            background: var(--primary-color);
+            color: white;
+            padding: var(--space-1) var(--space-3);
+            border-radius: 0 0 var(--radius-md) var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: var(--space-16) var(--space-6);
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: var(--text-4xl);
+            margin-bottom: var(--space-4);
+        }
+
+        .empty-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            margin-bottom: var(--space-2);
+            color: var(--text-primary);
+        }
+
+        .empty-description {
+            margin-bottom: var(--space-6);
+        }
+
+        /* Loading State */
+        .loading-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: var(--space-6);
+        }
+
+        .skeleton-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            animation: pulse 2s infinite;
+        }
+
+        .skeleton-line {
+            background: var(--gray-200);
+            border-radius: var(--radius-md);
+            height: 1rem;
+            margin-bottom: var(--space-2);
+        }
+
+        .skeleton-line.short {
+            width: 60%;
+        }
+
+        .skeleton-line.medium {
+            width: 80%;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .deals-grid,
+            .loading-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .deal-footer {
+                flex-direction: column;
+                gap: var(--space-4);
+                align-items: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="nav-logo">A</div>
+                <span class="brand-name">Axees</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="marketplace.html" class="nav-link active">Marketplace</a></li>
+                <li><a href="brands.html" class="nav-link">For Brands</a></li>
+                <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                <li><a href="profile.html" class="nav-link">Profile</a></li>
+            </ul>
+            <div class="nav-actions">
+                <div class="user-avatar" onclick="window.location.href='profile.html'">JD</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1 class="page-title">Deal Marketplace</h1>
+                <p class="page-subtitle">Discover amazing collaboration opportunities with top brands</p>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="search-section">
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search for brands, campaigns, or keywords..." id="searchInput">
+                    <button class="btn btn-primary" onclick="searchDeals()">Search</button>
+                </div>
+                
+                <div class="filters">
+                    <div class="filter-group">
+                        <label class="filter-label">Category</label>
+                        <select class="filter-select" id="categoryFilter" onchange="filterDeals()">
+                            <option value="">All Categories</option>
+                            <option value="fashion">Fashion & Style</option>
+                            <option value="tech">Technology</option>
+                            <option value="beauty">Beauty & Cosmetics</option>
+                            <option value="fitness">Health & Fitness</option>
+                            <option value="lifestyle">Lifestyle</option>
+                            <option value="food">Food & Beverage</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Budget Range</label>
+                        <select class="filter-select" id="budgetFilter" onchange="filterDeals()">
+                            <option value="">Any Budget</option>
+                            <option value="0-500">$0 - $500</option>
+                            <option value="500-1000">$500 - $1,000</option>
+                            <option value="1000-2500">$1,000 - $2,500</option>
+                            <option value="2500-5000">$2,500 - $5,000</option>
+                            <option value="5000+">$5,000+</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Duration</label>
+                        <select class="filter-select" id="durationFilter" onchange="filterDeals()">
+                            <option value="">Any Duration</option>
+                            <option value="1-week">1 Week</option>
+                            <option value="2-weeks">2 Weeks</option>
+                            <option value="1-month">1 Month</option>
+                            <option value="3-months">3 Months</option>
+                            <option value="ongoing">Ongoing</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label class="filter-label">Sort By</label>
+                        <select class="filter-select" id="sortFilter" onchange="sortDeals()">
+                            <option value="newest">Newest First</option>
+                            <option value="budget-high">Highest Budget</option>
+                            <option value="budget-low">Lowest Budget</option>
+                            <option value="deadline">Deadline Soon</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Deals Grid -->
+            <div class="deals-grid" id="dealsGrid">
+                <!-- Loading state initially -->
+            </div>
+
+            <!-- Empty State (hidden initially) -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">🔍</div>
+                <h3 class="empty-title">No deals found</h3>
+                <p class="empty-description">Try adjusting your search criteria or filters to find more opportunities</p>
+                <button class="btn btn-primary" onclick="clearFilters()">Clear Filters</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Sample deals data
+        const dealsData = [
+            {
+                id: 1,
+                brand: 'StyleCo',
+                brandLogo: 'SC',
+                verified: true,
+                title: 'Summer Fashion Collection Campaign',
+                description: 'Showcase our latest summer collection with authentic lifestyle content. Looking for creators who embody confidence and style.',
+                category: 'fashion',
+                tags: ['Fashion', 'Lifestyle', 'Summer'],
+                requirements: [
+                    '50K+ followers on Instagram',
+                    'High engagement rate (>5%)',
+                    'Fashion/lifestyle content focus'
+                ],
+                budget: 2500,
+                budgetType: 'Per Campaign',
+                deadline: '2024-07-15',
+                featured: true
+            },
+            {
+                id: 2,
+                brand: 'TechFlow',
+                brandLogo: 'TF',
+                verified: true,
+                title: 'Smart Gadget Review Series',
+                description: 'Create comprehensive reviews for our latest smart home devices. Perfect for tech enthusiasts who love exploring innovation.',
+                category: 'tech',
+                tags: ['Technology', 'Reviews', 'Smart Home'],
+                requirements: [
+                    '25K+ followers on YouTube',
+                    'Tech content expertise',
+                    'Professional video quality'
+                ],
+                budget: 1800,
+                budgetType: 'Per Video',
+                deadline: '2024-07-20',
+                featured: false
+            },
+            {
+                id: 3,
+                brand: 'GlowBeauty',
+                brandLogo: 'GB',
+                verified: true,
+                title: 'Natural Skincare Launch',
+                description: 'Help us launch our new organic skincare line with authentic testimonials and tutorials.',
+                category: 'beauty',
+                tags: ['Beauty', 'Skincare', 'Organic'],
+                requirements: [
+                    '30K+ followers on TikTok',
+                    'Beauty content focus',
+                    'Authentic testimonials'
+                ],
+                budget: 1200,
+                budgetType: 'Per Post',
+                deadline: '2024-07-10',
+                featured: false
+            },
+            {
+                id: 4,
+                brand: 'FitLife',
+                brandLogo: 'FL',
+                verified: true,
+                title: 'Wellness Journey Partnership',
+                description: 'Join our 30-day wellness challenge and document your journey with our fitness products and nutrition plans.',
+                category: 'fitness',
+                tags: ['Fitness', 'Wellness', 'Challenge'],
+                requirements: [
+                    '40K+ followers combined',
+                    'Health & fitness content',
+                    '30-day commitment'
+                ],
+                budget: 3200,
+                budgetType: 'Full Campaign',
+                deadline: '2024-08-01',
+                featured: true
+            },
+            {
+                id: 5,
+                brand: 'EcoLiving',
+                brandLogo: 'EL',
+                verified: true,
+                title: 'Sustainable Lifestyle Brand Ambassador',
+                description: 'Become our brand ambassador and promote sustainable living with our eco-friendly products.',
+                category: 'lifestyle',
+                tags: ['Sustainability', 'Eco-Friendly', 'Ambassador'],
+                requirements: [
+                    '60K+ followers across platforms',
+                    'Sustainability advocacy',
+                    'Long-term partnership'
+                ],
+                budget: 5000,
+                budgetType: 'Monthly',
+                deadline: '2024-07-25',
+                featured: true
+            },
+            {
+                id: 6,
+                brand: 'TasteMakers',
+                brandLogo: 'TM',
+                verified: true,
+                title: 'Artisan Coffee Experience',
+                description: 'Share the story of our artisan coffee beans and create content around the perfect brewing experience.',
+                category: 'food',
+                tags: ['Coffee', 'Artisan', 'Experience'],
+                requirements: [
+                    '20K+ food enthusiast followers',
+                    'High-quality photography',
+                    'Storytelling skills'
+                ],
+                budget: 900,
+                budgetType: 'Per Campaign',
+                deadline: '2024-07-18',
+                featured: false
+            }
+        ];
+
+        let filteredDeals = [...dealsData];
+        let isLoading = true;
+
+        // Initialize page
+        window.addEventListener('load', function() {
+            showLoadingState();
+            setTimeout(() => {
+                hideLoadingState();
+                renderDeals(filteredDeals);
+            }, 1500);
+        });
+
+        function showLoadingState() {
+            const grid = document.getElementById('dealsGrid');
+            grid.innerHTML = '';
+            
+            for (let i = 0; i < 6; i++) {
+                const skeleton = document.createElement('div');
+                skeleton.className = 'skeleton-card';
+                skeleton.innerHTML = `
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                    <div class="skeleton-line medium"></div>
+                    <div class="skeleton-line"></div>
+                    <div class="skeleton-line short"></div>
+                `;
+                grid.appendChild(skeleton);
+            }
+        }
+
+        function hideLoadingState() {
+            isLoading = false;
+        }
+
+        function renderDeals(deals) {
+            const grid = document.getElementById('dealsGrid');
+            const emptyState = document.getElementById('emptyState');
+            
+            if (deals.length === 0) {
+                grid.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            grid.style.display = 'grid';
+            emptyState.style.display = 'none';
+            grid.innerHTML = '';
+            
+            deals.forEach(deal => {
+                const dealCard = createDealCard(deal);
+                grid.appendChild(dealCard);
+            });
+        }
+
+        function createDealCard(deal) {
+            const card = document.createElement('div');
+            card.className = `deal-card ${deal.featured ? 'featured-deal' : ''}`;
+            
+            const requirementsList = deal.requirements.map(req => 
+                `<div class="requirement-item">
+                    <span class="requirement-icon">✓</span>
+                    <span>${req}</span>
+                </div>`
+            ).join('');
+            
+            const tagsList = deal.tags.map(tag => 
+                `<span class="deal-tag">${tag}</span>`
+            ).join('');
+            
+            card.innerHTML = `
+                ${deal.featured ? '<div class="featured-badge">Featured</div>' : ''}
+                <div class="deal-header">
+                    <div class="deal-brand">
+                        <div class="brand-logo">${deal.brandLogo}</div>
+                        <div class="brand-info">
+                            <h3>${deal.brand}</h3>
+                            ${deal.verified ? '<div class="brand-verified"><span>✓</span> Verified Brand</div>' : ''}
+                        </div>
+                    </div>
+                    <h2 class="deal-title">${deal.title}</h2>
+                    <p class="deal-description">${deal.description}</p>
+                    <div class="deal-tags">${tagsList}</div>
+                </div>
+                <div class="deal-body">
+                    <div class="deal-requirements">
+                        <div class="requirements-title">Requirements:</div>
+                        ${requirementsList}
+                    </div>
+                </div>
+                <div class="deal-footer">
+                    <div class="deal-payment">
+                        <div class="payment-amount">$${deal.budget.toLocaleString()}</div>
+                        <div class="payment-type">${deal.budgetType}</div>
+                    </div>
+                    <div class="deal-deadline">
+                        <div class="deadline-date">${formatDate(deal.deadline)}</div>
+                        <div class="deadline-label">Application Deadline</div>
+                    </div>
+                </div>
+            `;
+            
+            card.addEventListener('click', () => openDealModal(deal));
+            
+            return card;
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric' 
+            });
+        }
+
+        function openDealModal(deal) {
+            alert(`Deal Details: ${deal.title}\n\nBrand: ${deal.brand}\nBudget: $${deal.budget.toLocaleString()}\nDeadline: ${formatDate(deal.deadline)}\n\nThis would open a detailed modal with:\n• Full campaign brief\n• Application form\n• Brand portfolio\n• Timeline details\n• Payment terms`);
+        }
+
+        function searchDeals() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            if (!searchTerm.trim()) {
+                filteredDeals = [...dealsData];
+            } else {
+                filteredDeals = dealsData.filter(deal => 
+                    deal.title.toLowerCase().includes(searchTerm) ||
+                    deal.brand.toLowerCase().includes(searchTerm) ||
+                    deal.description.toLowerCase().includes(searchTerm) ||
+                    deal.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+                );
+            }
+            
+            applyFilters();
+        }
+
+        function filterDeals() {
+            applyFilters();
+        }
+
+        function applyFilters() {
+            const category = document.getElementById('categoryFilter').value;
+            const budget = document.getElementById('budgetFilter').value;
+            const duration = document.getElementById('durationFilter').value;
+            
+            let filtered = [...filteredDeals];
+            
+            if (category) {
+                filtered = filtered.filter(deal => deal.category === category);
+            }
+            
+            if (budget) {
+                const [min, max] = budget.split('-');
+                if (max === undefined) {
+                    // Handle "5000+" case
+                    filtered = filtered.filter(deal => deal.budget >= parseInt(min));
+                } else {
+                    filtered = filtered.filter(deal => 
+                        deal.budget >= parseInt(min) && deal.budget <= parseInt(max)
+                    );
+                }
+            }
+            
+            renderDeals(filtered);
+        }
+
+        function sortDeals() {
+            const sortBy = document.getElementById('sortFilter').value;
+            
+            let sorted = [...filteredDeals];
+            
+            switch (sortBy) {
+                case 'budget-high':
+                    sorted.sort((a, b) => b.budget - a.budget);
+                    break;
+                case 'budget-low':
+                    sorted.sort((a, b) => a.budget - b.budget);
+                    break;
+                case 'deadline':
+                    sorted.sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+                    break;
+                case 'newest':
+                default:
+                    sorted.sort((a, b) => b.id - a.id);
+                    break;
+            }
+            
+            renderDeals(sorted);
+        }
+
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('budgetFilter').value = '';
+            document.getElementById('durationFilter').value = '';
+            document.getElementById('sortFilter').value = 'newest';
+            
+            filteredDeals = [...dealsData];
+            renderDeals(filteredDeals);
+        }
+
+        // Add enter key support for search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchDeals();
+            }
+        });
+
+        // Save search preferences
+        function savePreferences() {
+            const preferences = {
+                lastSearch: document.getElementById('searchInput').value,
+                lastCategory: document.getElementById('categoryFilter').value,
+                lastBudget: document.getElementById('budgetFilter').value,
+                lastSort: document.getElementById('sortFilter').value
+            };
+            
+            localStorage.setItem('axees_marketplace_prefs', JSON.stringify(preferences));
+        }
+
+        // Load saved preferences
+        function loadPreferences() {
+            const saved = localStorage.getItem('axees_marketplace_prefs');
+            if (saved) {
+                const prefs = JSON.parse(saved);
+                document.getElementById('searchInput').value = prefs.lastSearch || '';
+                document.getElementById('categoryFilter').value = prefs.lastCategory || '';
+                document.getElementById('budgetFilter').value = prefs.lastBudget || '';
+                document.getElementById('sortFilter').value = prefs.lastSort || 'newest';
+            }
+        }
+
+        // Auto-save preferences on change
+        document.querySelectorAll('#searchInput, #categoryFilter, #budgetFilter, #sortFilter').forEach(element => {
+            element.addEventListener('change', savePreferences);
+        });
+
+        // Load preferences on page load
+        window.addEventListener('load', loadPreferences);
+
+        // Add animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe deal cards for animation
+        function observeCards() {
+            document.querySelectorAll('.deal-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+        }
+
+        // Call observeCards after rendering deals
+        const originalRenderDeals = renderDeals;
+        renderDeals = function(deals) {
+            originalRenderDeals(deals);
+            setTimeout(observeCards, 100);
+        };
+    </script>
+    
+    <!-- API Integration Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/loading-indicator.js"></script>
+</body>
+</html>

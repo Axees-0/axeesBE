@@ -1,0 +1,916 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brand Portal - Axees</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            
+            /* Secondary Colors */
+            --secondary-color: #ec4899;
+            --secondary-light: #f472b6;
+            --secondary-dark: #db2777;
+            
+            /* Neutral Colors */
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            /* Background Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-dark: #1f2937;
+            --bg-card: #ffffff;
+            
+            /* Text Colors */
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-white: #ffffff;
+            
+            /* Status Colors */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-24: 6rem;
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --text-5xl: 3rem;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            --font-extrabold: 800;
+            
+            /* Border Radius */
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-2xl: 1rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-primary);
+            font-size: var(--text-base);
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .nav-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-bold);
+            font-size: var(--text-lg);
+        }
+
+        .brand-name {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background: var(--gray-50);
+        }
+
+        .nav-link.active {
+            font-weight: var(--font-semibold);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--space-3);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--text-white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        .btn-lg {
+            padding: var(--space-3) var(--space-6);
+            font-size: var(--text-base);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border-color: var(--gray-300);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-50);
+            border-color: var(--gray-400);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        /* Hero Section */
+        .brand-hero {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--text-white);
+            padding: var(--space-24) 0;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: var(--text-5xl);
+            font-weight: var(--font-extrabold);
+            margin: 0 0 var(--space-6) 0;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: var(--text-xl);
+            margin: 0 0 var(--space-8) 0;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: var(--space-4);
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-hero {
+            background: var(--text-white);
+            color: var(--primary-color);
+            font-weight: var(--font-semibold);
+        }
+
+        .btn-hero:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-outline-white {
+            background: transparent;
+            color: var(--text-white);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .btn-outline-white:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--text-white);
+        }
+
+        /* Features Section */
+        .features {
+            padding: var(--space-24) 0;
+            background: var(--bg-primary);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            margin: 0 0 var(--space-4) 0;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: var(--text-xl);
+            color: var(--text-secondary);
+            margin: 0 0 var(--space-16) 0;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-8);
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .feature-card:hover {
+            box-shadow: var(--shadow-lg);
+            transform: translateY(-2px);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-2xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto var(--space-4) auto;
+            font-size: var(--text-2xl);
+            color: var(--text-white);
+        }
+
+        .feature-title {
+            font-size: var(--text-xl);
+            font-weight: var(--font-semibold);
+            margin: 0 0 var(--space-3) 0;
+            color: var(--text-primary);
+        }
+
+        .feature-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Dashboard Preview */
+        .dashboard-preview {
+            padding: var(--space-24) 0;
+            background: var(--bg-secondary);
+        }
+
+        .preview-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-16);
+            align-items: center;
+        }
+
+        .preview-content h2 {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            margin: 0 0 var(--space-4) 0;
+            color: var(--text-primary);
+        }
+
+        .preview-content p {
+            font-size: var(--text-lg);
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+            line-height: 1.6;
+        }
+
+        .preview-image {
+            background: var(--bg-card);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-2xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-xl);
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .preview-mockup {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, var(--gray-50), var(--gray-100));
+            border-radius: var(--radius-lg);
+            display: flex;
+            flex-direction: column;
+            padding: var(--space-4);
+        }
+
+        .mockup-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-3) 0;
+            border-bottom: 1px solid var(--gray-200);
+            margin-bottom: var(--space-4);
+        }
+
+        .mockup-title {
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .mockup-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-3);
+            margin-bottom: var(--space-4);
+        }
+
+        .mockup-stat {
+            background: var(--bg-primary);
+            padding: var(--space-3);
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: var(--text-lg);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+        }
+
+        .stat-label {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .mockup-chart {
+            flex: 1;
+            background: var(--bg-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: var(--text-sm);
+        }
+
+        /* Testimonials */
+        .testimonials {
+            padding: var(--space-24) 0;
+            background: var(--bg-primary);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: var(--space-8);
+        }
+
+        .testimonial-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--space-8);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .testimonial-content {
+            font-style: italic;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-6);
+            line-height: 1.6;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .author-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-semibold);
+        }
+
+        .author-info h4 {
+            margin: 0;
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .author-info p {
+            margin: 0;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        /* CTA Section */
+        .cta {
+            background: var(--gray-800);
+            color: var(--text-white);
+            padding: var(--space-24) 0;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: var(--text-4xl);
+            font-weight: var(--font-bold);
+            margin: 0 0 var(--space-4) 0;
+        }
+
+        .cta-subtitle {
+            font-size: var(--text-xl);
+            opacity: 0.9;
+            margin: 0 0 var(--space-8) 0;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .hero-title {
+                font-size: var(--text-3xl);
+            }
+
+            .hero-subtitle {
+                font-size: var(--text-lg);
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .section-title {
+                font-size: var(--text-3xl);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-container {
+                grid-template-columns: 1fr;
+                gap: var(--space-8);
+            }
+
+            .testimonials-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .mockup-stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="nav-logo">A</div>
+                <span class="brand-name">Axees</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="dashboard.html" class="nav-link">Dashboard</a></li>
+                <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
+                <li><a href="brands.html" class="nav-link active">For Brands</a></li>
+                <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                <li><a href="profile.html" class="nav-link">Profile</a></li>
+            </ul>
+            <div class="nav-actions">
+                <button class="btn btn-secondary" onclick="showDemo()">View Demo</button>
+                <button class="btn btn-primary" onclick="startBrandTrial()">Start Free Trial</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="brand-hero">
+        <div class="container">
+            <h1 class="hero-title">Scale Your Brand with Authentic Creators</h1>
+            <p class="hero-subtitle">Connect with verified influencers, launch campaigns effortlessly, and track performance with AI-powered insights.</p>
+            <div class="hero-actions">
+                <button class="btn btn-lg btn-hero" onclick="startBrandTrial()">Start Your Campaign</button>
+                <button class="btn btn-lg btn-outline-white" onclick="window.location.href='analytics.html'">View Analytics Demo</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Everything You Need to Succeed</h2>
+            <p class="section-subtitle">Comprehensive tools to manage influencer campaigns from discovery to ROI measurement</p>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Smart Creator Discovery</h3>
+                    <p class="feature-description">AI-powered matching algorithm finds creators who align perfectly with your brand values, audience, and campaign goals.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Campaign Automation</h3>
+                    <p class="feature-description">Streamline your workflow with automated campaign creation, creator outreach, and content approval processes.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3 class="feature-title">Real-Time Analytics</h3>
+                    <p class="feature-description">Track campaign performance, ROI, and engagement metrics with comprehensive analytics dashboards and reporting.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🛡️</div>
+                    <h3 class="feature-title">Content Verification</h3>
+                    <p class="feature-description">Ensure brand safety with automated content analysis, authenticity checks, and quality assurance workflows.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💳</div>
+                    <h3 class="feature-title">Secure Payments</h3>
+                    <p class="feature-description">Automated payment processing with milestone tracking, dispute resolution, and transparent fee structure.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📈</div>
+                    <h3 class="feature-title">Growth Insights</h3>
+                    <p class="feature-description">AI-powered recommendations to optimize your campaigns, improve ROI, and scale your influencer marketing efforts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section class="dashboard-preview">
+        <div class="container">
+            <div class="preview-container">
+                <div class="preview-content">
+                    <h2>Powerful Brand Dashboard</h2>
+                    <p>Manage all your influencer campaigns from one centralized dashboard. Track performance, monitor ROI, and optimize campaigns with real-time data and AI-powered insights.</p>
+                    <button class="btn btn-lg btn-primary" onclick="window.location.href='analytics.html'">Explore Dashboard</button>
+                </div>
+                
+                <div class="preview-image">
+                    <div class="preview-mockup">
+                        <div class="mockup-header">
+                            <div class="mockup-title">Campaign Performance</div>
+                            <div style="font-size: var(--text-sm); color: var(--success);">● Live</div>
+                        </div>
+                        <div class="mockup-stats">
+                            <div class="mockup-stat">
+                                <div class="stat-number" id="reachStat">0</div>
+                                <div class="stat-label">Total Reach</div>
+                            </div>
+                            <div class="mockup-stat">
+                                <div class="stat-number" id="engagementStat">0%</div>
+                                <div class="stat-label">Engagement</div>
+                            </div>
+                            <div class="mockup-stat">
+                                <div class="stat-number" id="roiStat">0x</div>
+                                <div class="stat-label">ROI</div>
+                            </div>
+                            <div class="mockup-stat">
+                                <div class="stat-number" id="creatorseStat">0</div>
+                                <div class="stat-label">Active Creators</div>
+                            </div>
+                        </div>
+                        <div class="mockup-chart">
+                            📈 Performance trending upward
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">Trusted by Leading Brands</h2>
+            <p class="section-subtitle">See how top companies are scaling their marketing with Axees</p>
+            
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        "Axees transformed our influencer marketing strategy. We saw a 300% increase in ROI within the first quarter and found amazing creators we never would have discovered otherwise."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">SM</div>
+                        <div class="author-info">
+                            <h4>Sarah Martinez</h4>
+                            <p>Marketing Director, FashionForward</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        "The AI-powered creator matching is incredible. We're now working with micro-influencers who deliver better engagement rates than mega-influencers at a fraction of the cost."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">JC</div>
+                        <div class="author-info">
+                            <h4>James Chen</h4>
+                            <p>Head of Growth, TechFlow</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        "Campaign management has never been easier. What used to take weeks now happens in days, and the content quality verification gives us complete peace of mind."
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">AR</div>
+                        <div class="author-info">
+                            <h4>Amanda Rodriguez</h4>
+                            <p>Brand Manager, EcoLiving</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2 class="cta-title">Ready to Scale Your Influence Marketing?</h2>
+            <p class="cta-subtitle">Join hundreds of brands who are already seeing incredible results with Axees</p>
+            <div class="hero-actions">
+                <button class="btn btn-lg btn-primary" onclick="startBrandTrial()">Start Free Trial</button>
+                <button class="btn btn-lg btn-outline" onclick="scheduleDemo()">Schedule Demo</button>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Animate dashboard stats
+        window.addEventListener('load', function() {
+            setTimeout(animateDashboardStats, 1000);
+        });
+
+        function animateDashboardStats() {
+            const stats = [
+                { element: 'reachStat', target: 2.4, suffix: 'M' },
+                { element: 'engagementStat', target: 8.7, suffix: '%' },
+                { element: 'roiStat', target: 4.2, suffix: 'x' },
+                { element: 'creatorseStat', target: 156, suffix: '' }
+            ];
+
+            stats.forEach((stat, index) => {
+                setTimeout(() => {
+                    animateValue(stat.element, stat.target, stat.suffix);
+                }, index * 200);
+            });
+        }
+
+        function animateValue(elementId, target, suffix) {
+            const element = document.getElementById(elementId);
+            let current = 0;
+            const increment = target / 50;
+            const isDecimal = target % 1 !== 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                
+                let displayValue = isDecimal ? current.toFixed(1) : Math.floor(current);
+                element.textContent = displayValue + suffix;
+            }, 30);
+        }
+
+        function startBrandTrial() {
+            alert('Free Trial Signup would include:\n\n✅ 14-day free trial\n✅ Access to creator database\n✅ Campaign creation tools\n✅ Analytics dashboard\n✅ Dedicated support\n\nNo credit card required to start!');
+        }
+
+        function scheduleDemo() {
+            alert('Demo Scheduling would offer:\n\n📅 30-minute personalized demo\n🎯 Custom use case walkthrough\n📊 ROI projection analysis\n🤝 Strategy consultation\n💼 Enterprise features overview\n\nAvailable times: Mon-Fri 9AM-6PM EST');
+        }
+
+        function showDemo() {
+            window.location.href = 'analytics.html';
+        }
+
+        // Add intersection observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe feature cards for animation
+        document.querySelectorAll('.feature-card, .testimonial-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Add hover effects to cards
+        document.querySelectorAll('.feature-card, .testimonial-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Simulate live dashboard updates
+        function simulateLiveUpdates() {
+            const elements = ['reachStat', 'engagementStat', 'roiStat', 'creatorseStat'];
+            
+            setInterval(() => {
+                const randomElement = elements[Math.floor(Math.random() * elements.length)];
+                const element = document.getElementById(randomElement);
+                
+                if (element) {
+                    element.style.color = 'var(--success)';
+                    element.style.transform = 'scale(1.1)';
+                    
+                    setTimeout(() => {
+                        element.style.color = 'var(--primary-color)';
+                        element.style.transform = 'scale(1)';
+                    }, 500);
+                }
+            }, 3000);
+        }
+
+        // Start live updates after page load
+        setTimeout(simulateLiveUpdates, 2000);
+
+        // Save brand interest to localStorage
+        function trackBrandInterest() {
+            const brandInterest = {
+                visitTime: new Date().toISOString(),
+                pageViews: (localStorage.getItem('axees_brand_views') || 0) + 1,
+                interests: ['influencer-marketing', 'brand-portal', 'campaign-management']
+            };
+            
+            localStorage.setItem('axees_brand_interest', JSON.stringify(brandInterest));
+            localStorage.setItem('axees_brand_views', brandInterest.pageViews);
+        }
+
+        // Track page visit
+        trackBrandInterest();
+
+        // Add scroll-triggered animations for stats
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const stats = entry.target.querySelectorAll('.mockup-stat');
+                    stats.forEach((stat, index) => {
+                        setTimeout(() => {
+                            stat.style.transform = 'scale(1.05)';
+                            setTimeout(() => {
+                                stat.style.transform = 'scale(1)';
+                            }, 200);
+                        }, index * 100);
+                    });
+                }
+            });
+        });
+
+        const previewSection = document.querySelector('.preview-mockup');
+        if (previewSection) {
+            statsObserver.observe(previewSection);
+        }
+    </script>
+    
+    <!-- API Integration Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/loading-indicator.js"></script>
+</body>
+</html>

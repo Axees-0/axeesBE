@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creator Dashboard - Axees</title>
+    <style>
+        :root {
+            /* Primary Colors */
+            --primary-color: #6366f1;
+            --primary-light: #818cf8;
+            --primary-dark: #4f46e5;
+            
+            /* Secondary Colors */
+            --secondary-color: #ec4899;
+            --secondary-light: #f472b6;
+            --secondary-dark: #db2777;
+            
+            /* Neutral Colors */
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            /* Background Colors */
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-dark: #1f2937;
+            --bg-card: #ffffff;
+            
+            /* Text Colors */
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-white: #ffffff;
+            
+            /* Status Colors */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --error: #ef4444;
+            --info: #3b82f6;
+            
+            /* Spacing */
+            --space-1: 0.25rem;
+            --space-2: 0.5rem;
+            --space-3: 0.75rem;
+            --space-4: 1rem;
+            --space-6: 1.5rem;
+            --space-8: 2rem;
+            --space-12: 3rem;
+            --space-16: 4rem;
+            --space-24: 6rem;
+            
+            /* Typography */
+            --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --text-sm: 0.875rem;
+            --text-base: 1rem;
+            --text-lg: 1.125rem;
+            --text-xl: 1.25rem;
+            --text-2xl: 1.5rem;
+            --text-3xl: 1.875rem;
+            --text-4xl: 2.25rem;
+            --font-medium: 500;
+            --font-semibold: 600;
+            --font-bold: 700;
+            --font-extrabold: 800;
+            
+            /* Border Radius */
+            --radius-md: 0.375rem;
+            --radius-lg: 0.5rem;
+            --radius-xl: 0.75rem;
+            --radius-2xl: 1rem;
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-primary);
+            font-size: var(--text-base);
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: var(--bg-secondary);
+        }
+
+        /* Navigation */
+        .main-nav {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 64px;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .nav-logo {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-bold);
+            font-size: var(--text-lg);
+        }
+
+        .brand-name {
+            font-size: var(--text-xl);
+            font-weight: var(--font-bold);
+            color: var(--primary-color);
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            gap: var(--space-8);
+        }
+
+        .nav-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: var(--font-medium);
+            padding: var(--space-2) var(--space-3);
+            border-radius: var(--radius-md);
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-color);
+            background: var(--gray-50);
+        }
+
+        .nav-link.active {
+            font-weight: var(--font-semibold);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: var(--space-3);
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: var(--font-semibold);
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: var(--space-2) var(--space-4);
+            border: 1px solid transparent;
+            border-radius: var(--radius-md);
+            font-family: var(--font-primary);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: var(--text-white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--text-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 var(--space-6);
+        }
+
+        .main-content {
+            padding: var(--space-8) 0;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--space-8);
+        }
+
+        .dashboard-title {
+            font-size: var(--text-3xl);
+            font-weight: var(--font-bold);
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .dashboard-subtitle {
+            color: var(--text-secondary);
+            margin-top: var(--space-1);
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            padding: var(--space-6);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: var(--space-4);
+        }
+
+        .stat-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-lg);
+            margin-bottom: var(--space-3);
+        }
+
+        .stat-icon.earnings {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-icon.followers {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+        }
+
+        .stat-icon.engagement {
+            background-color: rgba(236, 72, 153, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .stat-icon.deals {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-value {
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-2);
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: var(--space-1);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .stat-change.positive {
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: var(--error);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-6);
+            margin-bottom: var(--space-8);
+        }
+
+        .dashboard-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: var(--text-lg);
+            font-weight: var(--font-semibold);
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .card-body {
+            padding: var(--space-6);
+        }
+
+        /* Chart Container */
+        .chart-container {
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            position: relative;
+        }
+
+        .chart-placeholder {
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Activity Feed */
+        .activity-item {
+            display: flex;
+            gap: var(--space-3);
+            padding: var(--space-4) 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-sm);
+            flex-shrink: 0;
+        }
+
+        .activity-icon.deal {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--info);
+        }
+
+        .activity-icon.payment {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .activity-icon.content {
+            background-color: rgba(236, 72, 153, 0.1);
+            color: var(--secondary-color);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            font-size: var(--text-sm);
+            color: var(--text-primary);
+            margin-bottom: var(--space-1);
+        }
+
+        .activity-time {
+            font-size: var(--text-sm);
+            color: var(--text-muted);
+        }
+
+        /* Deal Cards */
+        .deals-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--space-4);
+        }
+
+        .deal-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            transition: all 0.2s ease;
+        }
+
+        .deal-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .deal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: var(--space-3);
+        }
+
+        .deal-title {
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .deal-amount {
+            font-weight: var(--font-semibold);
+            color: var(--success);
+        }
+
+        .deal-brand {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            margin-bottom: var(--space-2);
+        }
+
+        .deal-status {
+            display: inline-block;
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .deal-status.active {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .deal-status.pending {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .deal-status.completed {
+            background-color: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-4);
+            margin-top: var(--space-8);
+        }
+
+        .action-card {
+            background: var(--bg-card);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            padding: var(--space-6);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-card:hover {
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: var(--radius-xl);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-xl);
+            margin: 0 auto var(--space-3) auto;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+        }
+
+        .action-title {
+            font-weight: var(--font-semibold);
+            margin: 0 0 var(--space-1) 0;
+            color: var(--text-primary);
+        }
+
+        .action-description {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: var(--space-4);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="nav-logo">A</div>
+                <span class="brand-name">Axees</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="dashboard.html" class="nav-link active">Dashboard</a></li>
+                <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
+                <li><a href="brands.html" class="nav-link">For Brands</a></li>
+                <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                <li><a href="profile.html" class="nav-link">Profile</a></li>
+            </ul>
+            <div class="nav-actions">
+                <div class="user-avatar" onclick="window.location.href='profile.html'">JD</div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Dashboard Header -->
+            <div class="dashboard-header">
+                <div>
+                    <h1 class="dashboard-title">Welcome back, Jordan! 👋</h1>
+                    <p class="dashboard-subtitle">Here's what's happening with your creator journey</p>
+                </div>
+                <button class="btn btn-primary" onclick="window.location.href='marketplace.html'">Browse Deals</button>
+            </div>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon earnings">💰</div>
+                    <div class="stat-value" id="earningsValue">$0</div>
+                    <div class="stat-label">Total Earnings</div>
+                    <div class="stat-change positive">
+                        <span>↗</span>
+                        <span>+23.5% from last month</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon followers">👥</div>
+                    <div class="stat-value" id="followersValue">0</div>
+                    <div class="stat-label">Total Followers</div>
+                    <div class="stat-change positive">
+                        <span>↗</span>
+                        <span>+12.3% growth rate</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon engagement">❤️</div>
+                    <div class="stat-value" id="engagementValue">0%</div>
+                    <div class="stat-label">Engagement Rate</div>
+                    <div class="stat-change positive">
+                        <span>↗</span>
+                        <span>+5.2% this week</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon deals">🤝</div>
+                    <div class="stat-value" id="dealsValue">0</div>
+                    <div class="stat-label">Active Deals</div>
+                    <div class="stat-change positive">
+                        <span>↗</span>
+                        <span>3 new opportunities</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Performance Chart -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Performance Overview</h3>
+                        <button class="btn btn-secondary" onclick="window.location.href='analytics.html'">View Details</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="performanceChart">
+                            <div class="chart-placeholder">
+                                <div style="font-size: var(--text-lg); margin-bottom: var(--space-2);">📊</div>
+                                <div>Interactive performance chart will be rendered here</div>
+                                <div style="font-size: var(--text-sm); color: var(--text-muted); margin-top: var(--space-2);">
+                                    Showing engagement, reach, and earnings trends
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recent Activity</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="activity-item">
+                            <div class="activity-icon deal">🤝</div>
+                            <div class="activity-content">
+                                <div class="activity-text">New collaboration proposal from TechStyle</div>
+                                <div class="activity-time">2 hours ago</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon payment">💰</div>
+                            <div class="activity-content">
+                                <div class="activity-text">Payment received: $1,250 from FashionForward</div>
+                                <div class="activity-time">5 hours ago</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon content">📸</div>
+                            <div class="activity-content">
+                                <div class="activity-text">Content approved for BeautyBrand campaign</div>
+                                <div class="activity-time">1 day ago</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon deal">🎯</div>
+                            <div class="activity-content">
+                                <div class="activity-text">Campaign milestone completed</div>
+                                <div class="activity-time">2 days ago</div>
+                            </div>
+                        </div>
+
+                        <div class="activity-item">
+                            <div class="activity-icon payment">💎</div>
+                            <div class="activity-content">
+                                <div class="activity-text">Profile verification completed</div>
+                                <div class="activity-time">3 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Deals -->
+            <div class="dashboard-card">
+                <div class="card-header">
+                    <h3 class="card-title">Active Collaborations</h3>
+                    <button class="btn btn-secondary" onclick="window.location.href='marketplace.html'">Browse More</button>
+                </div>
+                <div class="card-body">
+                    <div class="deals-grid">
+                        <div class="deal-card">
+                            <div class="deal-header">
+                                <div>
+                                    <h4 class="deal-title">Summer Fashion Collection</h4>
+                                    <div class="deal-brand">TrendyStyles Co.</div>
+                                </div>
+                                <div class="deal-amount">$2,500</div>
+                            </div>
+                            <div class="deal-status active">Active</div>
+                        </div>
+
+                        <div class="deal-card">
+                            <div class="deal-header">
+                                <div>
+                                    <h4 class="deal-title">Tech Product Review</h4>
+                                    <div class="deal-brand">InnovateTech</div>
+                                </div>
+                                <div class="deal-amount">$1,800</div>
+                            </div>
+                            <div class="deal-status pending">Pending Review</div>
+                        </div>
+
+                        <div class="deal-card">
+                            <div class="deal-header">
+                                <div>
+                                    <h4 class="deal-title">Lifestyle Brand Partnership</h4>
+                                    <div class="deal-brand">LifeStyle Luxe</div>
+                                </div>
+                                <div class="deal-amount">$3,200</div>
+                            </div>
+                            <div class="deal-status completed">Completed</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="action-card" onclick="window.location.href='marketplace.html'">
+                    <div class="action-icon">🎯</div>
+                    <h4 class="action-title">Find Deals</h4>
+                    <p class="action-description">Discover new collaboration opportunities</p>
+                </div>
+
+                <div class="action-card" onclick="createContent()">
+                    <div class="action-icon">📸</div>
+                    <h4 class="action-title">Create Content</h4>
+                    <p class="action-description">Upload and manage your content</p>
+                </div>
+
+                <div class="action-card" onclick="window.location.href='analytics.html'">
+                    <div class="action-icon">📊</div>
+                    <h4 class="action-title">View Analytics</h4>
+                    <p class="action-description">Track your performance metrics</p>
+                </div>
+
+                <div class="action-card" onclick="window.location.href='profile.html'">
+                    <div class="action-icon">⚙️</div>
+                    <h4 class="action-title">Settings</h4>
+                    <p class="action-description">Manage your profile and preferences</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Animate stats on page load
+        window.addEventListener('load', function() {
+            animateStats();
+            initializeChartPlaceholder();
+        });
+
+        function animateStats() {
+            const stats = [
+                { element: 'earningsValue', target: 12450, prefix: '$', suffix: '' },
+                { element: 'followersValue', target: 156000, prefix: '', suffix: 'K' },
+                { element: 'engagementValue', target: 8.4, prefix: '', suffix: '%' },
+                { element: 'dealsValue', target: 7, prefix: '', suffix: '' }
+            ];
+
+            stats.forEach((stat, index) => {
+                setTimeout(() => {
+                    animateValue(stat.element, stat.target, stat.prefix, stat.suffix);
+                }, index * 200);
+            });
+        }
+
+        function animateValue(elementId, target, prefix, suffix) {
+            const element = document.getElementById(elementId);
+            let current = 0;
+            const increment = target / 50;
+            const isDecimal = target % 1 !== 0;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                
+                let displayValue = isDecimal ? current.toFixed(1) : Math.floor(current);
+                
+                if (suffix === 'K' && target >= 1000) {
+                    displayValue = (current / 1000).toFixed(1);
+                }
+                
+                element.textContent = prefix + displayValue + suffix;
+            }, 30);
+        }
+
+        function initializeChartPlaceholder() {
+            const chartContainer = document.getElementById('performanceChart');
+            
+            // Create a simple animated chart placeholder
+            chartContainer.innerHTML = `
+                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                    <div style="width: 80%; height: 60%; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); border-radius: var(--radius-lg); opacity: 0.1; position: relative; overflow: hidden;">
+                        <div style="position: absolute; bottom: 0; left: 10%; width: 15%; height: 40%; background: var(--primary-color); opacity: 0.7; border-radius: 4px 4px 0 0;"></div>
+                        <div style="position: absolute; bottom: 0; left: 30%; width: 15%; height: 65%; background: var(--secondary-color); opacity: 0.7; border-radius: 4px 4px 0 0;"></div>
+                        <div style="position: absolute; bottom: 0; left: 50%; width: 15%; height: 50%; background: var(--primary-color); opacity: 0.7; border-radius: 4px 4px 0 0;"></div>
+                        <div style="position: absolute; bottom: 0; left: 70%; width: 15%; height: 80%; background: var(--secondary-color); opacity: 0.7; border-radius: 4px 4px 0 0;"></div>
+                    </div>
+                    <div style="margin-top: var(--space-4); text-align: center; color: var(--text-secondary);">
+                        <div style="font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Performance Trending Up! 📈</div>
+                        <div style="font-size: var(--text-sm);">Interactive charts powered by Chart.js</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function createContent() {
+            alert('Content creation feature would open:\n\n• Media upload interface\n• Campaign content builder\n• AI-powered optimization suggestions\n• Content calendar management');
+        }
+
+        // Add hover effects to cards
+        document.querySelectorAll('.stat-card, .deal-card, .action-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Save dashboard state to localStorage
+        const dashboardState = {
+            lastVisit: new Date().toISOString(),
+            totalEarnings: 12450,
+            totalFollowers: 156000,
+            engagementRate: 8.4,
+            activeDeals: 7
+        };
+
+        localStorage.setItem('axees_dashboard', JSON.stringify(dashboardState));
+
+        // Add notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 80px;
+                right: 20px;
+                background: var(--bg-card);
+                border: 1px solid var(--gray-200);
+                border-radius: var(--radius-lg);
+                padding: var(--space-4);
+                box-shadow: var(--shadow-lg);
+                z-index: 1000;
+                max-width: 300px;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+            `;
+            
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: var(--space-2);">
+                    <div style="font-size: var(--text-lg);">${type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️'}</div>
+                    <div style="font-size: var(--text-sm);">${message}</div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+
+        // Show welcome notification
+        setTimeout(() => {
+            showNotification('Welcome back! You have 3 new collaboration opportunities.', 'success');
+        }, 1000);
+    </script>
+    
+    <!-- API Integration Scripts -->
+    <script src="/js/api.js"></script>
+    <script src="/js/auth.js"></script>
+    <script src="/js/loading-indicator.js"></script>
+</body>
+</html>

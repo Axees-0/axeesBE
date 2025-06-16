@@ -12,6 +12,7 @@ Axees is an influencer marketing platform connecting brands/marketers with conte
 - **Deal Execution**: Milestone-based project management
 - **AI-Powered Creator Discovery**: Advanced influencer search with competitive intelligence
 - **Security**: Comprehensive security measures against common vulnerabilities
+- **Frontend Integration**: Integrated demo frontend with API client, retry logic, and loading states
 
 ## 📋 Prerequisites
 - Node.js 18.x or 20.x
@@ -52,6 +53,45 @@ npm run dev
 
 # Production mode
 npm start
+```
+
+## 🌐 Frontend Integration
+
+The backend now includes an integrated demo frontend with a comprehensive API client layer.
+
+### Frontend Features
+- **API Client**: Centralized API integration (`/public/js/api.js`)
+  - Automatic retry logic with exponential backoff
+  - Global loading state management
+  - JWT token handling
+  - Error handling and recovery
+- **Authentication**: Complete login/signup flow with JWT integration
+- **Loading Indicators**: Visual feedback during API operations
+- **Demo Pages**: Fully styled demo pages showcasing platform features
+
+### Accessing the Frontend
+Once the server is running, access the frontend at:
+- Landing Page: `http://localhost:8080/`
+- Dashboard: `http://localhost:8080/dashboard.html`
+- Marketplace: `http://localhost:8080/marketplace.html`
+- Profile: `http://localhost:8080/profile.html`
+
+### API Client Usage
+```javascript
+// The global API client is available in all pages
+const response = await axeesAPI.login(email, password);
+const offers = await axeesAPI.getOffers();
+const profile = await axeesAPI.getProfile();
+
+// Check loading state
+if (axeesAPI.isLoading()) {
+  // Show custom loading UI
+}
+
+// Listen for loading events
+window.addEventListener('axees-loading-change', (event) => {
+  console.log(event.detail.endpoint, event.detail.isLoading);
+});
 ```
 
 ## 🧪 Testing

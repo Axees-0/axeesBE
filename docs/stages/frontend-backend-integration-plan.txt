@@ -1,0 +1,198 @@
+- Frontend-Backend Integration Plan
+  - Phase 1: Setup and Infrastructure
+    - Move demo frontend files to main project
+      - Copy all HTML files from /demo/ to project root
+      - Create /public/ directory for static assets
+      - Set up Express static file serving
+      - Update main.js to serve frontend pages
+    - Create API integration layer
+      - Create /public/js/api.js for centralized API calls
+      - Set up axios or fetch wrapper
+      - Configure API base URL and headers
+      - Add error handling and retry logic
+    - Set up CORS configuration
+      - Update backend CORS settings for local development
+      - Configure allowed origins
+      - Set up credentials support for cookies/JWT
+  - Phase 2: Authentication Integration
+    - Implement login/signup flow
+      - Create login modal/page
+      - Connect to /api/auth/login endpoint
+      - Store JWT token in localStorage
+      - Implement token refresh mechanism
+    - Create AuthContext
+      - Build authentication state management
+      - Add user session handling
+      - Implement auto-logout on token expiry
+      - Add protected route handling
+    - Update navigation
+      - Show/hide menu items based on auth state
+      - Add user profile dropdown
+      - Implement logout functionality
+  - Phase 3: Core Features Integration
+    - Offer Creation System (Bug #2)
+      - Create OfferCreationForm component
+        - Build multi-step form UI
+        - Connect to /api/offers/create endpoint
+        - Add email validation before submission
+        - Implement draft saving functionality
+      - Fix email notification system
+        - Verify email addresses on backend
+        - Add email preview before sending
+        - Implement retry mechanism for failed emails
+    - Offer Editing (Bug #3)
+      - Enable real-time collaboration
+        - Connect to /api/offers/collaboration endpoints
+        - Implement polling for live updates
+        - Add conflict resolution UI
+        - Show active editors indicator
+      - Add version control
+        - Display offer history timeline
+        - Implement revert functionality
+        - Show diff between versions
+    - Offer Negotiation (Bug #9)
+      - Create comparison view
+        - Build side-by-side offer display
+        - Connect to /api/offers/compare endpoint
+        - Add visual diff highlighting
+        - Implement accept/reject actions
+      - Add negotiation timeline
+        - Show conversation history
+        - Display status changes
+        - Add comment functionality
+  - Phase 4: Payment System Integration
+    - Credit Card Management (Bug #4)
+      - Create PaymentModal component
+        - Build Stripe Elements integration
+        - Connect to /api/payments/methods endpoints
+        - Add card validation UI
+        - Implement 3D Secure flow
+      - Auto-populate payment info
+        - Load saved cards from profile
+        - Add default payment method selection
+        - Sync with user profile updates
+    - Trial Offer System (Bug #13-15)
+      - Implement $1 trial flow
+        - Add trial indicator on offer creation
+        - Connect to /api/offers/trial endpoint
+        - Show pricing breakdown clearly
+        - Handle trial-to-full conversion
+      - Update wallet functionality
+        - Display current balance
+        - Add fund wallet modal
+        - Show transaction history
+        - Implement auto-deduction logic
+    - Payment Persistence (Bug #16)
+      - Secure payment data storage
+        - Implement tokenization flow
+        - Add payment method verification
+        - Store only tokenized data
+        - Add PCI compliance measures
+  - Phase 5: Deal Management Integration
+    - Milestone System (Bug #20)
+      - Create milestone UI
+        - Build 4-milestone limit interface
+        - Connect to /api/deals/milestones endpoint
+        - Add clear milestone labels
+        - Implement percentage validation
+      - Payment release automation (Bug #21)
+        - Show automatic release schedule
+        - Add manual override controls
+        - Implement dispute workflow
+        - Display release status clearly
+    - Deal Dashboard (Bug #8)
+      - Connect dashboard metrics
+        - Fetch data from /api/deals/dashboard
+        - Calculate and display ARR
+        - Show performance trends
+        - Add export functionality
+    - Calendar Integration (Bug #10)
+      - Enhance calendar view
+        - Connect to /api/calendar/events
+        - Display milestone dates
+        - Show payment schedules
+        - Add event creation/editing
+  - Phase 6: Profile and Documentation
+    - Profile Completion (Bug #12)
+      - Create profile wizard
+        - Connect to /api/profile/completion
+        - Show completion percentage
+        - Block offers if incomplete
+        - Add verification badges
+    - Document Upload (Bug #5)
+      - Fix upload functionality
+        - Connect to /api/uploads endpoint
+        - Add progress indicators
+        - Implement chunked uploads
+        - Add file type validation
+    - Proof Submission (Bug #6)
+      - Create visual proof system
+        - Build proof upload interface
+        - Connect to payment triggers
+        - Add verification workflow
+        - Show approval status
+  - Phase 7: Real-time Features
+    - Chat System Integration
+      - Create ChatBubble component
+        - Connect to SSE endpoints
+        - Build message interface
+        - Add typing indicators
+        - Implement read receipts
+    - Notification System (Bug #22)
+      - Real-time notifications
+        - Connect to /api/notifications/stream
+        - Build notification dropdown
+        - Add push notification support
+        - Implement notification preferences
+    - Contextual Communication (Bug #23)
+      - Smart notifications
+        - Ghost account alerts
+        - Documentation reminders
+        - Deadline warnings
+        - AI-powered suggestions
+  - Phase 8: Advanced Features
+    - QR Code System (Bug #18)
+      - Dual-purpose QR implementation
+        - Generate QR codes for connections
+        - Handle ghost account creation
+        - Direct offer creation flow
+        - Account conversion process
+    - Agreement Display (Bug #24)
+      - AI-powered summaries
+        - Connect to /api/agreements/summarize
+        - Highlight critical terms
+        - Add expandable sections
+        - Implement acceptance flow
+    - Admin Dashboard (Bug #25)
+      - Create admin interface
+        - Connect to /api/admin endpoints
+        - Build analytics displays
+        - Add user management tools
+        - Implement moderation workflows
+  - Phase 9: Testing and Optimization
+    - Component Testing
+      - Test all form submissions
+      - Verify API error handling
+      - Check authentication flows
+      - Test payment processing
+    - Integration Testing
+      - End-to-end user journeys
+      - Cross-browser compatibility
+      - Mobile responsiveness
+      - Performance optimization
+    - Security Hardening
+      - Input validation on all forms
+      - XSS prevention measures
+      - CSRF token implementation
+      - Rate limiting on API calls
+  - Phase 10: Deployment Preparation
+    - Build Process Setup
+      - Configure webpack/bundling
+      - Set up environment variables
+      - Create production builds
+      - Optimize asset loading
+    - Documentation
+      - API integration guide
+      - Component documentation
+      - Deployment instructions
+      - Troubleshooting guide
