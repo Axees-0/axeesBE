@@ -1,0 +1,56 @@
+stateDiagram-v2
+    [*] --> ExploreTab : Marketer opens app
+    
+    ExploreTab --> SearchResults : Browse creators
+    SearchResults --> CreatorProfile : Select creator
+    
+    CreatorProfile --> OfferModal : Tap "Create Offer"
+    
+    OfferModal --> PreMadeOffers : Select offer type
+    OfferModal --> CustomOffer : Create custom
+    
+    PreMadeOffers --> OfferDetails : Configure pre-made
+    OfferDetails --> PreviewPayment : Review offer
+    
+    CustomOffer --> CustomOfferForm : Fill offer details
+    CustomOfferForm --> SaveDraft : Save as draft
+    CustomOfferForm --> PreviewPayment : Continue to payment
+    
+    SaveDraft --> DraftsHistory : Stored in drafts
+    DraftsHistory --> CustomOfferForm : Resume editing
+    
+    PreviewPayment --> PaymentForm : Enter payment details
+    PaymentForm --> ProcessingPayment : Submit payment
+    ProcessingPayment --> PaymentSuccess : Payment approved
+    ProcessingPayment --> PaymentError : Payment failed
+    
+    PaymentError --> PaymentForm : Retry payment
+    PaymentSuccess --> SuccessMessage : Show confirmation
+    SuccessMessage --> OfferSent : Offer sent to creator
+    
+    OfferSent --> OfferHistory : View in history
+    OfferSent --> CreatorResponse : Wait for response
+    
+    CreatorResponse --> OfferAccepted : Creator accepts
+    CreatorResponse --> OfferRejected : Creator rejects
+    CreatorResponse --> CounterReceived : Creator counters
+    
+    CounterReceived --> ReviewCounter : Review counter-offer
+    ReviewCounter --> AcceptCounter : Accept counter
+    ReviewCounter --> RejectCounter : Reject counter
+    ReviewCounter --> CreateCounter : Create new counter
+    
+    CreateCounter --> CounterSent : Send counter-offer
+    CounterSent --> CreatorResponse : Wait for response
+    
+    AcceptCounter --> DealCreated : Deal established
+    OfferAccepted --> DealCreated : Deal established
+    
+    DealCreated --> DealManagement : Monitor progress
+    DealManagement --> ContentReview : Review submissions
+    ContentReview --> ProofVerification : Verify proof of posting
+    ProofVerification --> DealCompleted : Mark complete
+    
+    OfferRejected --> [*] : End flow
+    RejectCounter --> [*] : End flow
+    DealCompleted --> [*] : End flow

@@ -1,0 +1,42 @@
+sequenceDiagram
+    participant U1 as User 1
+    participant API as Axees API
+    participant SSE as SSE Stream
+    participant DB as Database
+    participant FIREBASE as Firebase
+    participant U2 as User 2
+    
+    Note over U1,U2: Chat Initialization
+    U1->>API: GET /api/chats
+    API->>DB: Get chat rooms
+    DB-->>API: Chat list
+    API-->>U1: Chat rooms
+    
+    U1->>API: GET /api/chats/:chatId/stream
+    API->>SSE: Establish SSE connection
+    SSE-->>U1: Connected
+    
+    Note over U1,U2: Message Sending
+    U1->>API: POST /api/chats/:chatId/messages
+    API->>DB: Save message
+    DB-->>API: Message saved
+    API->>SSE: Broadcast to connected users
+    SSE-->>U2: New message event
+    
+    Note over U1,U2: Push Notification (2min delay)
+    API->>API: Schedule notification job
+    API->>FIREBASE: Send push notification
+    FIREBASE-->>U2: Push notification
+    
+    Note over U1,U2: File Sharing
+    U1->>API: POST /api/chats/:chatId/messages (with file)
+    API->>API: Upload to AWS S3
+    API->>DB: Save message with file URL
+    API->>SSE: Broadcast message
+    SSE-->>U2: File message
+    
+    Note over U1,U2: Read Status
+    U2->>API: POST /api/chats/:chatId/mark-read
+    API->>DB: Update read status
+    API->>SSE: Broadcast read status
+    SSE-->>U1: Messages marked read

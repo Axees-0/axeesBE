@@ -1,0 +1,84 @@
+flowchart TD
+    subgraph "Device Detection"
+        DEVICE_CHECK[Device Type Detection]
+        SCREEN_SIZE[Screen Size Analysis]
+        PLATFORM_CHECK[Platform Detection]
+    end
+    
+    subgraph "Mobile Layout (< 768px)"
+        MOBILE_NAV[Bottom Tab Navigation]
+        MOBILE_STACK[Stack Navigation]
+        MOBILE_MODAL[Full Screen Modals]
+        MOBILE_CARDS[Vertical Card Layout]
+        MOBILE_FORMS[Single Column Forms]
+    end
+    
+    subgraph "Tablet Layout (768px - 1024px)"
+        TABLET_NAV[Side Navigation + Tabs]
+        TABLET_GRID[2-Column Grid Layout]
+        TABLET_MODAL[Centered Modals]
+        TABLET_FORMS[Two Column Forms]
+    end
+    
+    subgraph "Desktop Layout (> 1024px)"
+        DESKTOP_NAV[Horizontal Navigation]
+        DESKTOP_SIDEBAR[Persistent Sidebar]
+        DESKTOP_GRID[Multi-Column Grid]
+        DESKTOP_MODAL[Overlay Modals]
+        DESKTOP_FORMS[Horizontal Forms]
+    end
+    
+    subgraph "Component Adaptations"
+        ADAPTIVE_HEADER[Responsive Headers]
+        ADAPTIVE_BUTTONS[Scalable Buttons]
+        ADAPTIVE_TEXT[Fluid Typography]
+        ADAPTIVE_IMAGES[Responsive Images]
+        ADAPTIVE_SPACING[Dynamic Spacing]
+    end
+    
+    subgraph "Platform-Specific Features"
+        IOS_FEATURES[iOS Native Elements]
+        ANDROID_FEATURES[Android Material Design]
+        WEB_FEATURES[Web-Specific Components]
+    end
+    
+    DEVICE_CHECK --> SCREEN_SIZE
+    SCREEN_SIZE --> PLATFORM_CHECK
+    
+    PLATFORM_CHECK -->|Mobile| MOBILE_NAV
+    PLATFORM_CHECK -->|Tablet| TABLET_NAV
+    PLATFORM_CHECK -->|Desktop| DESKTOP_NAV
+    
+    MOBILE_NAV --> MOBILE_STACK
+    MOBILE_STACK --> MOBILE_MODAL
+    MOBILE_MODAL --> MOBILE_CARDS
+    MOBILE_CARDS --> MOBILE_FORMS
+    
+    TABLET_NAV --> TABLET_GRID
+    TABLET_GRID --> TABLET_MODAL
+    TABLET_MODAL --> TABLET_FORMS
+    
+    DESKTOP_NAV --> DESKTOP_SIDEBAR
+    DESKTOP_SIDEBAR --> DESKTOP_GRID
+    DESKTOP_GRID --> DESKTOP_MODAL
+    DESKTOP_MODAL --> DESKTOP_FORMS
+    
+    MOBILE_FORMS --> ADAPTIVE_HEADER
+    TABLET_FORMS --> ADAPTIVE_HEADER
+    DESKTOP_FORMS --> ADAPTIVE_HEADER
+    
+    ADAPTIVE_HEADER --> ADAPTIVE_BUTTONS
+    ADAPTIVE_BUTTONS --> ADAPTIVE_TEXT
+    ADAPTIVE_TEXT --> ADAPTIVE_IMAGES
+    ADAPTIVE_IMAGES --> ADAPTIVE_SPACING
+    
+    PLATFORM_CHECK -->|iOS| IOS_FEATURES
+    PLATFORM_CHECK -->|Android| ANDROID_FEATURES
+    PLATFORM_CHECK -->|Web| WEB_FEATURES
+    
+    %% Styling
+    style DEVICE_CHECK fill:#e1f5fe
+    style MOBILE_NAV fill:#e8f5e8
+    style TABLET_NAV fill:#fff3e0
+    style DESKTOP_NAV fill:#f3e5f5
+    style ADAPTIVE_HEADER fill:#fce4ec

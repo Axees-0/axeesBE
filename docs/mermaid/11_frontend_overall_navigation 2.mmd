@@ -1,0 +1,75 @@
+flowchart TD
+    START([App Launch]) --> SPLASH[Splash Screen]
+    SPLASH --> AUTH_CHECK{User Authenticated?}
+    
+    %% Authentication Flow
+    AUTH_CHECK -->|No| LOGIN[Login Screen]
+    LOGIN --> REG_OPTION{New User?}
+    REG_OPTION -->|Yes| REG_PREVIEW[Registration Preview]
+    REG_OPTION -->|No| LOGIN_SUBMIT[Submit Login]
+    LOGIN_SUBMIT --> MAIN_APP
+    
+    LOGIN --> FORGOT_PASS[Forgot Password]
+    FORGOT_PASS --> OTP_VERIFY[OTP Verification]
+    OTP_VERIFY --> RESET_PASS[Reset Password]
+    RESET_PASS --> LOGIN
+    
+    %% Registration Flow
+    REG_PREVIEW --> USER_TYPE[Select User Type]
+    USER_TYPE --> REG_PHONE[Phone Registration]
+    REG_PHONE --> REG_OTP[Registration OTP]
+    REG_OTP --> REG_NAME[Name Input]
+    REG_NAME --> REG_USERNAME[Username Input]
+    REG_USERNAME --> REG_EMAIL[Email Registration]
+    REG_EMAIL --> REG_SUCCESS[Registration Success]
+    REG_SUCCESS --> MAIN_APP
+    
+    %% Main App Navigation
+    AUTH_CHECK -->|Yes| MAIN_APP[Main App - Tab Navigation]
+    
+    MAIN_APP --> TAB_EXPLORE[Explore Tab]
+    MAIN_APP --> TAB_DEALS[Deals Tab]
+    MAIN_APP --> TAB_MESSAGES[Messages Tab]
+    MAIN_APP --> TAB_NOTIFICATIONS[Notifications Tab]
+    MAIN_APP --> TAB_PROFILE[Profile Tab]
+    
+    %% Tab Specific Flows
+    TAB_EXPLORE --> SEARCH_RESULTS[Search/Discovery Results]
+    SEARCH_RESULTS --> CREATOR_PROFILE[Creator Profile View]
+    CREATOR_PROFILE --> OFFER_MODAL[Create Offer Modal]
+    
+    TAB_DEALS --> ROLE_CHECK{User Role?}
+    ROLE_CHECK -->|Marketer| MARKETER_OFFERS[Marketer Offer History]
+    ROLE_CHECK -->|Creator| CREATOR_OFFERS[Creator Deal History]
+    
+    TAB_MESSAGES --> MESSAGE_LIST[Message List]
+    MESSAGE_LIST --> INDIVIDUAL_CHAT[Individual Chat]
+    
+    TAB_NOTIFICATIONS --> NOTIFICATION_CENTER[Notification Center]
+    
+    TAB_PROFILE --> PROFILE_VIEW[Profile View]
+    PROFILE_VIEW --> SETTINGS[Settings Menu]
+    PROFILE_VIEW --> EDIT_PROFILE[Edit Profile]
+    
+    %% Settings Flow
+    SETTINGS --> NOTIF_SETTINGS[Notification Settings]
+    SETTINGS --> CHANGE_PASS[Change Password]
+    SETTINGS --> INVITE_MGMT[Invite Management]
+    SETTINGS --> LOGOUT[Logout]
+    LOGOUT --> LOGIN
+    
+    %% Payment Flow
+    TAB_PROFILE --> PAYMENT_SECTION{Payment Section}
+    PAYMENT_SECTION -->|Creator| CREATOR_EARNINGS[Creator Earnings]
+    PAYMENT_SECTION -->|Marketer| MARKETER_PAYMENTS[Marketer Payments]
+    
+    CREATOR_EARNINGS --> WITHDRAW[Withdraw Money]
+    CREATOR_EARNINGS --> TRANSACTION_DETAILS[Transaction Details]
+    CREATOR_EARNINGS --> ADD_PAYMENT_METHOD[Add Payment Method]
+    
+    %% Styling
+    style START fill:#e1f5fe
+    style MAIN_APP fill:#c8e6c9
+    style LOGIN fill:#fff3e0
+    style REG_SUCCESS fill:#c8e6c9
+    style LOGOUT fill:#ffcdd2

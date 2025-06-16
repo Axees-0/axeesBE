@@ -1,0 +1,50 @@
+{
+  "summary": {
+    "totalTests": 0,
+    "passedTests": 0,
+    "failedTests": 0,
+    "skippedTests": 0,
+    "passRate": 0,
+    "failRate": 0,
+    "duration": 6496,
+    "status": "poor"
+  },
+  "keyFindings": [
+    {
+      "type": "overall",
+      "title": "Test Suite Status: POOR",
+      "description": "0% of tests passing (0/0)"
+    },
+    {
+      "type": "quality",
+      "title": "Categories needing attention",
+      "description": "integration have low pass rates"
+    }
+  ],
+  "actionItems": [
+    {
+      "type": "critical",
+      "category": "quality",
+      "title": "Critical: Low test pass rate",
+      "description": "Only 0% of tests are passing. Immediate action required.",
+      "action": "Review and fix failing tests immediately",
+      "priority": 1
+    },
+    {
+      "type": "warning",
+      "category": "category-specific",
+      "title": "integration category needs attention",
+      "description": "integration tests have 0% pass rate.",
+      "action": "Review integration test implementations",
+      "priority": 2
+    }
+  ],
+  "trends": [],
+  "nextSteps": [
+    "Immediate: Fix critical failing tests",
+    "Short-term: Analyze and resolve test instability",
+    "Review and address high-priority recommendations",
+    "Monitor test trends and performance over time",
+    "Consider test optimization for improved execution time"
+  ]
+}

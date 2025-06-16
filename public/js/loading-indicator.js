@@ -125,7 +125,7 @@ class LoadingIndicator {
     
     // Log loading activity for debugging
     if (window.axeesDebug) {
-      console.log(`[LoadingIndicator] ${endpoint}: ${isLoading ? 'started' : 'finished'} (${this.loadingCount} active)`);
+      // Loading state updated for endpoint
     }
   }
 

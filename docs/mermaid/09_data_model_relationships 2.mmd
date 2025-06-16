@@ -1,0 +1,110 @@
+erDiagram
+    USER {
+        string _id
+        string phone
+        string email
+        string userType
+        object creatorData
+        object marketerData
+        array socialHandles
+        array portfolio
+        array favorites
+        boolean isActive
+        date createdAt
+    }
+    
+    OFFER {
+        string _id
+        string marketerId
+        string creatorId
+        string status
+        object details
+        number budget
+        array attachments
+        date deadline
+        array negotiationHistory
+        date createdAt
+    }
+    
+    DEAL {
+        string _id
+        string offerId
+        string marketerId
+        string creatorId
+        string status
+        array milestones
+        array proofSubmissions
+        array contentSubmissions
+        object paymentInfo
+        date createdAt
+    }
+    
+    CHATROOM {
+        string _id
+        array participants
+        string offerId
+        object lastMessage
+        object unreadCounts
+        date createdAt
+    }
+    
+    MESSAGE {
+        string _id
+        string chatId
+        string senderId
+        string content
+        array attachments
+        boolean isRead
+        date createdAt
+    }
+    
+    TEMPUSER {
+        string _id
+        string userName
+        string status
+        object profile
+        array socialHandles
+        date expiresAt
+        date createdAt
+    }
+    
+    EARNING {
+        string _id
+        string userId
+        string dealId
+        number amount
+        string status
+        string paymentMethod
+        date createdAt
+    }
+    
+    PAYOUT {
+        string _id
+        string marketerId
+        string offerId
+        number amount
+        string status
+        string stripePaymentId
+        date createdAt
+    }
+    
+    NOTIFICATION {
+        string _id
+        string userId
+        string type
+        string title
+        string message
+        object data
+        boolean isRead
+        date createdAt
+    }
+    
+    USER ||--o{ OFFER : "creates/receives"
+    OFFER ||--|| DEAL : "becomes"
+    OFFER ||--|| CHATROOM : "triggers"
+    USER ||--o{ MESSAGE : "sends"
+    CHATROOM ||--o{ MESSAGE : "contains"
+    DEAL ||--o{ EARNING : "generates"
+    OFFER ||--|| PAYOUT : "requires"
+    USER ||--o{ NOTIFICATION : "receives"
+    TEMPUSER ||--o| USER : "converts to"

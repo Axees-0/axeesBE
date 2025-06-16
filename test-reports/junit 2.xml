@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="core" tests="0" failures="0" time="68.705">
+    <testcase name="user-management.test.js" classname="core" time="13.076">
+      <failure message="Test failed">(node:18208) [MONGOOSE] Warning: Duplicate schema index on {&quot;dealNumber&quot;:1} found. This is often due to declaring an index using both &quot;index: true&quot; and &quot;schema.index()&quot;. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18208) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:18208) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+FAIL tests/integration/user-management.test.js (11.23 s)
+  User Management API Tests
+    GET /api/account/profile/:userId
+      ✓ should return user profile with correct structure (616 ms)
+      ✓ should return creator data structure for Creator users (232 ms)
+      ✓ should return 404 for non-existent user (192 ms)
+      ✓ should return 400 for invalid user ID format (157 ms)
+    PUT /api/account/profile/:userId
+      ✓ should update basic profile fields (210 ms)
+      ✓ should reject duplicate phone number (192 ms)
+      ✕ should allow updating phone to the same phone (no change) (182 ms)
+      ✓ should return 404 for non-existent user (150 ms)
+    PATCH /api/account/creator/:userId
+      ✓ should update creator data successfully (185 ms)
+      ✓ should initialize creatorData if it does not exist (190 ms)
+      ✓ should reject creator data update for Marketer users (168 ms)
+    PATCH /api/account/marketer/:userId
+      ✓ should update marketer data successfully (194 ms)
+      ✓ should initialize marketerData if it does not exist (191 ms)
+    POST /api/account/creator/:userId/social-handles
+      ✓ should add social handle to creator successfully (162 ms)
+      ✓ should require platform and handle (139 ms)
+      ✓ should work for both Creator and Marketer users (171 ms)
+    PATCH /api/account/creator/:userId/social-handles/:handleId
+      ✓ should update social handle successfully (184 ms)
+      ✓ should return 404 for non-existent handle (190 ms)
+    DELETE /api/account/creator/:userId/social-handles/:handleId
+      ✓ should delete social handle successfully (229 ms)
+      ✓ should return 404 for non-existent handle (179 ms)
+    POST /api/account/creator/:userId/portfolio
+      ✓ should add portfolio item successfully (170 ms)
+      ✓ should reject portfolio addition for Marketer users (172 ms)
+    PATCH /api/account/creator/:userId/portfolio/:itemId
+      ✓ should update portfolio item successfully (210 ms)
+      ✓ should return 404 for non-existent portfolio item (189 ms)
+    DELETE /api/account/creator/:userId/portfolio/:itemId
+      ✓ should delete portfolio item successfully (249 ms)
+      ✓ should return 404 for non-existent portfolio item (202 ms)
+    PATCH /api/account/settings/:userId
+      ✓ should update user settings successfully (196 ms)
+      ✓ should update partial settings (177 ms)
+    POST /api/account/change-password/:userId
+      ✓ should change password successfully with correct current password (288 ms)
+      ✓ should reject password change with incorrect current password (237 ms)
+      ✓ should require both current and new password (159 ms)
+    DELETE /api/account/:userId
+      ✓ should soft delete user account (195 ms)
+      ✓ should soft delete without reason (167 ms)
+      ✓ should return 404 for non-existent user (154 ms)
+    PUT /api/account/device-token/:userId
+      ✓ should update device token successfully (190 ms)
+      ✓ should require deviceToken in request body (162 ms)
+      ✓ should return 404 for non-existent user (173 ms)
+
+  ● User Management API Tests › PUT /api/account/profile/:userId › should allow updating phone to the same phone (no change)
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 404
+
+      197 |         .send({ phone: &#39;+12125551234&#39;, name: &#39;Same Phone Update&#39; });
+      198 |
+    &gt; 199 |       expect(response.status).toBe(200);
+          |                               ^
+      200 |       expect(response.body.user.name).toBe(&#39;Same Phone Update&#39;);
+      201 |     });
+      202 |
+
+      at Object.toBe (tests/integration/user-management.test.js:199:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+Test Suites: 1 failed, 1 total
+Tests:       1 failed, 36 passed, 37 total
+Snapshots:   0 total
+Time:        11.311 s
+Ran all test suites matching /tests\/integration\/user-management.test.js/i.
+</failure>
+    </testcase>
+    <testcase name="database-integration.test.js" classname="core" time="55.629">
+      <failure message="Test failed">(node:18203) [MONGOOSE] Warning: Duplicate schema index on {&quot;dealNumber&quot;:1} found. This is often due to declaring an index using both &quot;index: true&quot; and &quot;schema.index()&quot;. Please remove the duplicate index definition.
+(Use `node --trace-warnings ...` to show where the warning was created)
+(node:18203) [MONGODB DRIVER] Warning: useNewUrlParser is a deprecated option: useNewUrlParser has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+(node:18203) [MONGODB DRIVER] Warning: useUnifiedTopology is a deprecated option: useUnifiedTopology has no effect since Node.js Driver version 4.0.0 and will be removed in the next major version
+FAIL tests/integration/database-integration.test.js (53.777 s)
+  Database Integration Tests
+    Data Consistency
+      User Data Integrity
+        ✓ should maintain referential integrity in user relationships (592 ms)
+        ✕ should handle cascading updates correctly (269 ms)
+        ✓ should prevent orphaned documents (223 ms)
+      Transaction Integrity
+        ✓ should handle concurrent offer creation correctly (199 ms)
+        ✓ should handle concurrent user updates correctly (201 ms)
+        ✓ should maintain atomicity in complex operations (235 ms)
+      Index Performance and Uniqueness
+        ✓ should enforce unique constraints correctly (241 ms)
+        ✓ should enforce username uniqueness (232 ms)
+        ✓ should handle case-insensitive uniqueness correctly (249 ms)
+    Query Performance
+      ✕ should perform user search queries efficiently (31988 ms)
+      ✕ should perform offer listing queries efficiently (2049 ms)
+      ✕ should handle pagination efficiently (1787 ms)
+      ✕ should perform complex filtering queries efficiently (1806 ms)
+    Data Validation
+      Schema Validation
+        ✓ should validate required fields correctly (136 ms)
+        ✓ should validate field types correctly (195 ms)
+        ✓ should validate enum values correctly (213 ms)
+        ✓ should validate array fields correctly (201 ms)
+        ✓ should validate nested object schemas correctly (202 ms)
+      Custom Validation Rules
+        ✕ should validate phone number format (208 ms)
+        ✕ should validate email format (224 ms)
+        ✕ should validate date ranges correctly (159 ms)
+        ✕ should validate amount ranges correctly (148 ms)
+    Database Connection Handling
+      ✓ should handle connection timeouts gracefully (353 ms)
+      ✓ should handle concurrent database operations (331 ms)
+    Memory Usage and Cleanup
+      ✓ should properly clean up after bulk operations (7098 ms)
+      ✓ should handle large document queries efficiently (366 ms)
+
+  ● Database Integration Tests › Data Consistency › User Data Integrity › should handle cascading updates correctly
+
+    TypeError: Cannot read properties of null (reading &#39;name&#39;)
+
+      167 |         // Verify updated name is reflected in populated documents
+      168 |         const populatedOffer = await Offer.findById(offer._id).populate(&#39;marketerId&#39;);
+    &gt; 169 |         expect(populatedOffer.marketerId.name).toBe(newName);
+          |                                          ^
+      170 |       });
+      171 |
+      172 |       it(&#39;should prevent orphaned documents&#39;, async () =&gt; {
+
+      at Object.name (tests/integration/database-integration.test.js:169:42)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● Database Integration Tests › Query Performance › should perform user search queries efficiently
+
+    CastError: Cast to ObjectId failed for value &quot;search&quot; (type string) at path &quot;_id&quot; for model &quot;TempUser&quot;
+
+      at SchemaObjectId.Object.&lt;anonymous&gt;.SchemaObjectId.cast (node_modules/mongoose/lib/schema/objectId.js:251:11)
+      at SchemaObjectId.Object.&lt;anonymous&gt;.SchemaType.applySetters (node_modules/mongoose/lib/schemaType.js:1255:12)
+      at SchemaObjectId.Object.&lt;anonymous&gt;.SchemaType.castForQuery (node_modules/mongoose/lib/schemaType.js:1673:17)
+      at cast (node_modules/mongoose/lib/cast.js:390:32)
+      at model.Query.Object.&lt;anonymous&gt;.Query.cast (node_modules/mongoose/lib/query.js:5055:12)
+      at model.Query.Object.&lt;anonymous&gt;.Query._castConditions (node_modules/mongoose/lib/query.js:2351:10)
+      at model.Query._findOne (node_modules/mongoose/lib/query.js:2674:8)
+      at model.Query.exec (node_modules/mongoose/lib/query.js:4604:80)
+
+  ● Database Integration Tests › Query Performance › should perform user search queries efficiently
+
+    thrown: &quot;Exceeded timeout of 30000 ms for a test.
+    Add a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.&quot;
+
+      459 |     });
+      460 |
+    &gt; 461 |     it(&#39;should perform user search queries efficiently&#39;, async () =&gt; {
+          |     ^
+      462 |       const startTime = Date.now();
+      463 |       
+      464 |       const response = await request(app)
+
+      at it (tests/integration/database-integration.test.js:461:5)
+      at describe (tests/integration/database-integration.test.js:396:3)
+      at Object.describe (tests/integration/database-integration.test.js:44:1)
+
+  ● Database Integration Tests › Query Performance › should perform offer listing queries efficiently
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 400
+
+      487 |       const queryTime = endTime - startTime;
+      488 |
+    &gt; 489 |       expect(response.status).toBe(200);
+          |                               ^
+      490 |       expect(queryTime).toBeLessThan(1000); // Should complete within 1 second
+      491 |       expect(response.body).toHaveProperty(&#39;offers&#39;);
+      492 |     });
+
+      at Object.toBe (tests/integration/database-integration.test.js:489:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● Database Integration Tests › Query Performance › should handle pagination efficiently
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 400
+
+      508 |       const queryTime = endTime - startTime;
+      509 |
+    &gt; 510 |       expect(response.status).toBe(200);
+          |                               ^
+      511 |       expect(queryTime).toBeLessThan(1000); // Should complete within 1 second
+      512 |       
+      513 |       if (response.body.offers) {
+
+      at Object.toBe (tests/integration/database-integration.test.js:510:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● Database Integration Tests › Query Performance › should perform complex filtering queries efficiently
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: 200
+    Received: 400
+
+      533 |       const queryTime = endTime - startTime;
+      534 |
+    &gt; 535 |       expect(response.status).toBe(200);
+          |                               ^
+      536 |       expect(queryTime).toBeLessThan(1500); // Complex queries can take a bit longer
+      537 |     });
+      538 |   });
+
+      at Object.toBe (tests/integration/database-integration.test.js:535:31)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● Database Integration Tests › Data Validation › Custom Validation Rules › should validate phone number format
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {&quot;__v&quot;: 0, &quot;_id&quot;: &quot;684ee8b53abcc82b1732de85&quot;, &quot;createdAt&quot;: 2025-06-15T15:37:25.234Z, &quot;creatorData&quot;: {&quot;_id&quot;: &quot;684ee8b53abcc82b1732de86&quot;, &quot;achievements&quot;: &quot;&quot;, &quot;businessVentures&quot;: &quot;&quot;, &quot;categories&quot;: [&quot;technology&quot;], &quot;combinedViews&quot;: 0, &quot;deals&quot;: 0, &quot;listedEvents&quot;: 0, &quot;nicheTopics&quot;: [&quot;tech&quot;], &quot;offers&quot;: 0, &quot;platforms&quot;: [{&quot;_id&quot;: &quot;684ee8b53abcc82b1732de87&quot;, &quot;followersCount&quot;: 1000, &quot;handle&quot;: &quot;@testuser&quot;, &quot;platform&quot;: &quot;instagram&quot;}], &quot;portfolio&quot;: [], &quot;profileViews&quot;: 0, &quot;totalFollowers&quot;: 1000}, &quot;email&quot;: &quot;test@example.com&quot;, &quot;emailVerified&quot;: false, &quot;favorites&quot;: [], &quot;isActive&quot;: true, &quot;name&quot;: &quot;Test User&quot;, &quot;password&quot;: &quot;$2b$10$06AFnGEN1io4zaZPJtuuiel4a7XLQvVcnzqxCXL0ltZW0itSiQ.bu&quot;, &quot;paymentMethods&quot;: [], &quot;settings&quot;: {&quot;_id&quot;: &quot;684ee8b53abcc82b1732de88&quot;, &quot;notifications&quot;: {&quot;email&quot;: true, &quot;push&quot;: true, &quot;sms&quot;: true}, &quot;privacy&quot;: {&quot;showEmail&quot;: false, &quot;showPhone&quot;: false}}, &quot;status&quot;: &quot;active&quot;, &quot;stripeConnectId&quot;: null, &quot;stripeCustomerId&quot;: null, &quot;tags&quot;: [], &quot;updatedAt&quot;: 2025-06-15T15:37:25.238Z, &quot;userName&quot;: &quot;testuser123&quot;, &quot;userType&quot;: &quot;Creator&quot;}
+
+      666 |           };
+      667 |
+    &gt; 668 |           await expect(User.create(invalidUser)).rejects.toThrow();
+          |                 ^
+      669 |         }
+      670 |       });
+      671 |
+
+      at expect (node_modules/expect/build/index.js:113:15)
+      at Object.expect (tests/integration/database-integration.test.js:668:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● Database Integration Tests › Data Validation › Custom Validation Rules › should validate email format
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {&quot;__v&quot;: 0, &quot;_id&quot;: &quot;684ee8b53abcc82b1732dea1&quot;, &quot;createdAt&quot;: 2025-06-15T15:37:25.447Z, &quot;creatorData&quot;: {&quot;_id&quot;: &quot;684ee8b53abcc82b1732dea2&quot;, &quot;achievements&quot;: &quot;&quot;, &quot;businessVentures&quot;: &quot;&quot;, &quot;categories&quot;: [&quot;technology&quot;], &quot;combinedViews&quot;: 0, &quot;deals&quot;: 0, &quot;listedEvents&quot;: 0, &quot;nicheTopics&quot;: [&quot;tech&quot;], &quot;offers&quot;: 0, &quot;platforms&quot;: [{&quot;_id&quot;: &quot;684ee8b53abcc82b1732dea3&quot;, &quot;followersCount&quot;: 1000, &quot;handle&quot;: &quot;@testuser&quot;, &quot;platform&quot;: &quot;instagram&quot;}], &quot;portfolio&quot;: [], &quot;profileViews&quot;: 0, &quot;totalFollowers&quot;: 1000}, &quot;email&quot;: &quot;not-an-email&quot;, &quot;emailVerified&quot;: false, &quot;favorites&quot;: [], &quot;isActive&quot;: true, &quot;name&quot;: &quot;Test User&quot;, &quot;password&quot;: &quot;$2b$10$RV2pkTZNe1xI8pez3oPVYerd5qdpHw2ZPZwMN3593TSRikyQzRzXK&quot;, &quot;paymentMethods&quot;: [], &quot;phone&quot;: &quot;+12125559996&quot;, &quot;settings&quot;: {&quot;_id&quot;: &quot;684ee8b53abcc82b1732dea4&quot;, &quot;notifications&quot;: {&quot;email&quot;: true, &quot;push&quot;: true, &quot;sms&quot;: true}, &quot;privacy&quot;: {&quot;showEmail&quot;: false, &quot;showPhone&quot;: false}}, &quot;status&quot;: &quot;active&quot;, &quot;stripeConnectId&quot;: null, &quot;stripeCustomerId&quot;: null, &quot;tags&quot;: [], &quot;updatedAt&quot;: 2025-06-15T15:37:25.452Z, &quot;userName&quot;: &quot;testuser456&quot;, &quot;userType&quot;: &quot;Creator&quot;}
+
+      697 |           };
+      698 |
+    &gt; 699 |           await expect(User.create(invalidUser)).rejects.toThrow();
+          |                 ^
+      700 |         }
+      701 |       });
+      702 |
+
+      at expect (node_modules/expect/build/index.js:113:15)
+      at Object.expect (tests/integration/database-integration.test.js:699:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+
+  ● Database Integration Tests › Data Validation › Custom Validation Rules › should validate date ranges correctly
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {&quot;__v&quot;: 0, &quot;_id&quot;: &quot;684ee8b53abcc82b1732debd&quot;, &quot;attachments&quot;: [], &quot;counters&quot;: [], &quot;createdAt&quot;: 2025-06-15T15:37:25.609Z, &quot;creatorId&quot;: &quot;684ee8b53abcc82b1732deb7&quot;, &quot;currency&quot;: &quot;USD&quot;, &quot;deliverables&quot;: [&quot;Post&quot;], &quot;description&quot;: &quot;Invalid date order&quot;, &quot;desiredPostDate&quot;: 2025-06-22T15:37:25.609Z, &quot;desiredReviewDate&quot;: 2025-06-29T15:37:25.609Z, &quot;marketerId&quot;: &quot;684ee8b53abcc82b1732deb3&quot;, &quot;offerName&quot;: &quot;Invalid Date Offer&quot;, &quot;offerType&quot;: &quot;standard&quot;, &quot;platforms&quot;: [&quot;Instagram&quot;], &quot;proposedAmount&quot;: 1000, &quot;updatedAt&quot;: 2025-06-15T15:37:25.612Z, &quot;viewedByCreator&quot;: false, &quot;viewedByMarketer&quot;: false}
+
+      717 |
+      718 |         // This should be caught by business logic validation
+    &gt; 719 |         await expect(Offer.create(invalidOffer)).rejects.toThrow();
+          |               ^
+      720 |       });
+      721 |
+      722 |       it(&#39;should validate amount ranges correctly&#39;, async () =&gt; {
+
+      at expect (node_modules/expect/build/index.js:113:15)
+      at Object.expect (tests/integration/database-integration.test.js:719:15)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7)
+      at Object.&lt;anonymous&gt; (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+  ● Database Integration Tests › Data Validation › Custom Validation Rules › should validate amount ranges correctly
+
+    expect(received).rejects.toThrow()
+
+    Received promise resolved instead of rejected
+    Resolved to value: {&quot;__v&quot;: 0, &quot;_id&quot;: &quot;684ee8b53abcc82b1732ded6&quot;, &quot;attachments&quot;: [], &quot;counters&quot;: [], &quot;createdAt&quot;: 2025-06-15T15:37:25.759Z, &quot;creatorId&quot;: &quot;684ee8b53abcc82b1732ded0&quot;, &quot;currency&quot;: &quot;USD&quot;, &quot;deliverables&quot;: [&quot;Post&quot;], &quot;description&quot;: &quot;Negative amount test&quot;, &quot;desiredPostDate&quot;: 2025-06-29T15:37:25.758Z, &quot;desiredReviewDate&quot;: 2025-06-22T15:37:25.758Z, &quot;marketerId&quot;: &quot;684ee8b53abcc82b1732decc&quot;, &quot;offerName&quot;: &quot;Negative Amount Offer&quot;, &quot;offerType&quot;: &quot;standard&quot;, &quot;platforms&quot;: [&quot;Instagram&quot;], &quot;proposedAmount&quot;: -1000, &quot;updatedAt&quot;: 2025-06-15T15:37:25.761Z, &quot;viewedByCreator&quot;: false, &quot;viewedByMarketer&quot;: false}
+
+      735 |         };
+      736 |
+    &gt; 737 |         await expect(Offer.create(invalidOffer)).rejects.toThrow();
+          |               ^
+      738 |       });
+      739 |     });
+      740 |   });
+
+      at expect (node_modules/expect/build/index.js:113:15)
+      at Object.expect (tests/integration/database-integration.test.js:737:15)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7)
+      at Object.&lt;anonymous&gt; (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+Test Suites: 1 failed, 1 total
+Tests:       9 failed, 17 passed, 26 total
+Snapshots:   0 total
+Time:        53.865 s, estimated 58 s
+Ran all test suites matching /tests\/integration\/database-integration.test.js/i.
+
+Jest has detected the following 1 open handle potentially keeping Jest from exiting:
+
+  ●  TCPSERVERWRAP
+
+      463 |       
+      464 |       const response = await request(app)
+    &gt; 465 |         .get(&#39;/api/users/search&#39;)
+          |          ^
+      466 |         .query({ search: &#39;Test User&#39;, userType: &#39;Creator&#39; })
+      467 |         .set(&#39;x-user-id&#39;, marketerUser._id.toString());
+      468 |
+
+      at Test.serverAddress (node_modules/supertest/lib/test.js:63:35)
+      at new Test (node_modules/supertest/lib/test.js:49:14)
+      at Object.obj.&lt;computed&gt; [as get] (node_modules/supertest/index.js:39:18)
+      at Object.get (tests/integration/database-integration.test.js:465:10)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:3:17)
+      at asyncGeneratorStep (node_modules/@babel/runtime/helpers/asyncToGenerator.js:17:9)
+      at _next (node_modules/@babel/runtime/helpers/asyncToGenerator.js:22:7)
+      at Object.&lt;anonymous&gt; (node_modules/@babel/runtime/helpers/asyncToGenerator.js:14:12)
+
+</failure>
+    </testcase>
+  </testsuite>
+</testsuites>

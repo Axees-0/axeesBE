@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const dealController = require("../controllers/marketerDealController");
 const dealExecutionController = require("../controllers/dealExecutionController");
+const paymentReleaseController = require("../controllers/paymentReleaseController");
 
 /**
  * @swagger
@@ -716,5 +717,14 @@ router.put("/:id/submit-milestone", dealExecutionController.submitMilestone);
 router.put("/:id/approve-milestone", dealExecutionController.approveMilestone);
 router.post("/:id/complete", dealExecutionController.completeDeal);
 router.post("/:id/upload-deliverable", dealExecutionController.uploadDeliverable);
+
+// Automatic Payment Release Routes
+router.post("/process-automatic-releases", paymentReleaseController.processAutomaticReleases);
+router.post("/:dealId/milestones/:milestoneId/manual-release", paymentReleaseController.triggerManualRelease);
+router.get("/automatic-release-schedule", paymentReleaseController.getAutomaticReleaseSchedule);
+
+// Dispute Resolution Routes
+router.post("/:dealId/milestones/:milestoneId/dispute", paymentReleaseController.createDispute);
+router.put("/:dealId/milestones/:milestoneId/dispute/resolve", paymentReleaseController.resolveDispute);
 
 module.exports = router;

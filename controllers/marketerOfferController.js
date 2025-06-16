@@ -119,10 +119,26 @@ const OFFER_STATUSES = {
   CANCELLED: "Cancelled",
 };
 
+// Simple backup email template for critical failures
+const generateBackupEmail = (offer, action, recipientName) => {
+  const subject = `Offer ${action.replace('_', ' ')} - ${offer.offerName}`;
+  const content = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <h2>Offer ${action.replace('_', ' ')}</h2>
+      <p>Hello ${recipientName},</p>
+      <p>There has been an update to your offer "${offer.offerName}".</p>
+      <p>Please visit the Axees platform to view the details.</p>
+      <p>Thank you,<br>The Axees Team</p>
+    </div>
+  `;
+  return { subject, content };
+};
+
 // Helper function to generate email content
 const generateEmailContent = async (offer, action, recipient, role) => {
-  const formattedAmount = formatCurrency(offer.proposedAmount, offer.currency);
-  const formattedDate = formatDate(offer.desiredPostDate);
+  try {
+    const formattedAmount = formatCurrency(offer.proposedAmount, offer.currency);
+    const formattedDate = formatDate(offer.desiredPostDate);
 
   // Retrieve the counter offer (if exists)
   const counterOffer =
@@ -394,6 +410,31 @@ const generateEmailContent = async (offer, action, recipient, role) => {
         subject
       );
       break;
+
+    case "offer_updated":
+      subject = "Offer Updated";
+      const baseUrlUpdate = process.env.FRONTEND_URL || "http://localhost:8081";
+      offerUrl = `${baseUrlUpdate}/UOM10CreatorOfferDetails?offerId=${offer._id}&${role === "creator" ? "marketerId" : "creatorId"}=${role === "creator" ? offer.marketerId._id : offer.creatorId._id}&role=${role}`;
+      content = emailTemplate(
+        `
+        <h2 style="margin:0 0 20px 0;font-size:22px;color:#430B92;">Offer Updated</h2>
+        <p style="margin:0 0 15px 0;">Hello ${recipient.name},</p>
+        <p style="margin:0 0 15px 0;">${
+          role === "creator"
+            ? `${marketerName} has made changes to the offer "${offer.offerName}"`
+            : `${creatorName} has made changes to the offer "${offer.offerName}"`
+        }</p>
+        <div style="text-align: left; margin: 20px 0;">
+          <p><strong>Offer:</strong> ${offer.offerName}</p>
+          <p><strong>Amount:</strong> ${formattedAmount}</p>
+          <p><strong>Last Updated:</strong> ${new Date().toLocaleDateString()}</p>
+        </div>
+        <a href="${offerUrl}" style="${BUTTON_STYLE}">Review Changes</a>
+      `,
+        subject
+      );
+      break;
+
     default:
       subject = "Offer Update";
       const baseUrlDefault =
@@ -411,6 +452,16 @@ const generateEmailContent = async (offer, action, recipient, role) => {
   }
 
   return { subject, content };
+  } catch (error) {
+    console.error('Error generating email content, using backup template:', error.message);
+    return generateBackupEmail(offer, action, recipient.name || 'User');
+  }
+};
+
+// Email validation helper
+const isValidEmail = (email) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return email && emailRegex.test(email.trim());
 };
 
 // Helper to send notifications based on offer status
@@ -425,8 +476,18 @@ const sendOfferNotification = async (offer, action) => {
     );
 
     if (!creator || !marketer) {
-      console.error("Creator or marketer not found");
-      return;
+      console.error("Creator or marketer not found for offer:", offer._id);
+      return { success: false, error: "Users not found" };
+    }
+
+    // Validate email addresses
+    if (creator.email && !isValidEmail(creator.email)) {
+      console.warn("Invalid creator email format:", creator.email);
+      creator.email = null; // Don't send to invalid email
+    }
+    if (marketer.email && !isValidEmail(marketer.email)) {
+      console.warn("Invalid marketer email format:", marketer.email);
+      marketer.email = null; // Don't send to invalid email
     }
 
     const creatorName = creator.name || "Creator";
@@ -634,26 +695,56 @@ const sendOfferNotification = async (offer, action) => {
           notification.role
         );
 
-      if (notification.user.email) {
-        await transporter.sendMail({
-          from: process.env.EMAIL_FROM || '"Offer System" <noreply@example.com>',
-          to:   notification.user.email,
-          subject: emailSubject,
-          html: emailContent,
-          attachments: [
-            {
+      if (notification.user.email && isValidEmail(notification.user.email)) {
+        try {
+          // Check if logo file exists before including it
+          const logoPath = path.join(__dirname, "../uploads/assets/icon.png");
+          const attachments = [];
+          
+          if (fs.existsSync(logoPath)) {
+            attachments.push({
               filename: "logo.png",
-              path: path.join(__dirname, "../uploads/assets/icon.png"),
+              path: logoPath,
               cid: "axees-logo"
-            }
-          ]
-        });
+            });
+          } else {
+            console.warn("Logo file not found, sending email without logo attachment");
+          }
+
+          await transporter.sendMail({
+            from: process.env.EMAIL_FROM || '"Axees Offer System" <noreply@axees.io>',
+            to: notification.user.email.trim(),
+            subject: emailSubject,
+            html: emailContent,
+            attachments
+          });
+          
+          console.log(`✅ Email sent successfully to ${notification.role}: ${notification.user.email}`);
+        } catch (emailError) {
+          console.error(`❌ Failed to send email to ${notification.role}:`, {
+            email: notification.user.email,
+            error: emailError.message,
+            offerId: offer._id,
+            action
+          });
+          
+          // Log email failure for potential retry mechanism
+          // Could implement email queue/retry logic here
+        }
       } else {
-        console.log(`${notification.role} email not found`);
+        console.log(`⚠️  ${notification.role} email not found or invalid:`, notification.user.email);
       }
     }
+    
+    return { success: true, message: "Notifications sent successfully" };
   } catch (error) {
-    console.error("Error sending notification:", error);
+    console.error("❌ Critical error in sendOfferNotification:", {
+      error: error.message,
+      stack: error.stack,
+      offerId: offer?._id,
+      action
+    });
+    return { success: false, error: error.message };
   }
 };
 
@@ -735,11 +826,11 @@ exports.createOffer = (req, res) => {
       const offerId = new mongoose.Types.ObjectId();
 
       // 2) Create the Offer document with the basic fields
-      const newOffer = new Offer({
+      const offerData = {
         _id: offerId,
         marketerId: req.body.marketerId,
         creatorId: req.body.creatorId,
-        offerType: req.body.offerType || "custom",
+        offerType: req.body.offerType || "standard",
         offerName: req.body.offerName,
         description: req.body.description,
         deliverables,
@@ -750,7 +841,31 @@ exports.createOffer = (req, res) => {
         status: req.body.status || "Sent",
         notes: req.body.notes,
         attachments: [],
-      });
+      };
+
+      // Handle trial offer setup
+      if (req.body.offerType === 'trial' || req.body.isTrialOffer) {
+        const trialDuration = req.body.trialDuration || 7;
+        const trialStartDate = new Date();
+        const trialEndDate = new Date(trialStartDate.getTime() + trialDuration * 24 * 60 * 60 * 1000);
+        const autoConvertDate = new Date(trialEndDate.getTime() + 24 * 60 * 60 * 1000);
+
+        offerData.offerType = 'trial';
+        offerData.trialDetails = {
+          isTrialOffer: true,
+          trialAmount: req.body.trialAmount || 1,
+          trialDuration: trialDuration,
+          fullAmount: req.body.amount,
+          autoConvertDate: autoConvertDate,
+          trialStatus: 'pending',
+          remindersSent: []
+        };
+
+        // For trial offers, the proposed amount should be the full amount
+        offerData.proposedAmount = req.body.amount;
+      }
+
+      const newOffer = new Offer(offerData);
 
       // 3) Create final folder for the new offer
       const finalFolder = path.join(
@@ -869,7 +984,11 @@ exports.createOffer = (req, res) => {
       );
 
       // Send push notification
-      await sendOfferNotification(newOffer, "new_offer");
+      const notificationResult = await sendOfferNotification(newOffer, "new_offer");
+      if (!notificationResult.success) {
+        console.warn('⚠️ Notification sending failed for new offer:', notificationResult.error);
+        // Offer creation still succeeds even if notification fails
+      }
 
       return res.status(201).json({
         message: "Offer created successfully",
@@ -1279,59 +1398,672 @@ exports.updateExistingDraft = (req, res) => {
 };
 
 // -------------------------------------------------------------------
-// 6) UPDATE OFFER
+// 6) UPDATE OFFER WITH REAL-TIME COLLABORATION
 // -------------------------------------------------------------------
+
+// Track active editors for real-time collaboration
+const activeEditors = new Map(); // offerId -> Set of userId
+
+// Track offer edit sessions with timestamps
+const editSessions = new Map(); // offerId -> { userId, lastActivity, fields }
+
+// Helper to validate field-level permissions
+const validateFieldPermissions = (offer, userId, fieldName, userRole) => {
+  const restrictedFields = {
+    marketer: ['viewedByCreator', 'viewedByCreatorAt', 'creatorDraft'],
+    creator: ['viewedByMarketer', 'viewedByMarketerAt', 'marketerDraft']
+  };
+  
+  const isMarketer = String(offer.marketerId) === String(userId);
+  const isCreator = String(offer.creatorId) === String(userId);
+  
+  if (!isMarketer && !isCreator) {
+    return { allowed: false, reason: 'User not authorized for this offer' };
+  }
+  
+  const role = isMarketer ? 'marketer' : 'creator';
+  const restricted = restrictedFields[role] || [];
+  
+  if (restricted.includes(fieldName)) {
+    return { allowed: false, reason: `${role} cannot edit ${fieldName}` };
+  }
+  
+  return { allowed: true };
+};
+
+// Helper to create change history entry
+const createChangeHistory = (offer, userId, changes, userRole) => {
+  const changeEntry = {
+    timestamp: new Date(),
+    userId: userId,
+    userRole: userRole,
+    changes: changes,
+    version: (offer.editHistory?.length || 0) + 1
+  };
+  
+  if (!offer.editHistory) {
+    offer.editHistory = [];
+  }
+  
+  offer.editHistory.push(changeEntry);
+  
+  // Keep only last 50 changes to prevent document bloat
+  if (offer.editHistory.length > 50) {
+    offer.editHistory = offer.editHistory.slice(-50);
+  }
+  
+  return changeEntry;
+};
+
+// Enhanced update offer with real-time collaboration
 exports.updateOffer = async (req, res) => {
   try {
     const { offerId } = req.params;
-    const updates = req.body;
+    const { updates, sessionId, expectedVersion } = req.body;
+    const userId = req.user?._id || req.body.userId;
+    
+    if (!userId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
 
     const offer = await Offer.findById(offerId).populate([
-      { path: "creatorId", select: "deviceToken" },
-      { path: "marketerId", select: "deviceToken" },
+      { path: "creatorId", select: "deviceToken name email" },
+      { path: "marketerId", select: "deviceToken name email" },
     ]);
+    
     if (!offer) {
       return res.status(404).json({ error: "Offer not found" });
     }
 
-    // Only allow updates if in specific statuses
-    if (
-      ![
-        OFFER_STATUSES.DRAFT,
-        "Counter",
-        OFFER_STATUSES.SENT,
-        OFFER_STATUSES.REJECTED_COUNTERED,
-      ].includes(offer.status)
-    ) {
+    // Check if offer is in editable status
+    const editableStatuses = [
+      OFFER_STATUSES.DRAFT,
+      "Counter",
+      OFFER_STATUSES.SENT,
+      OFFER_STATUSES.REJECTED_COUNTERED,
+    ];
+    
+    if (!editableStatuses.includes(offer.status)) {
       return res.status(400).json({
         error: "Cannot update offer in current status",
+        currentStatus: offer.status
       });
     }
 
-    // Process attachments (ensure we're handling multiple files)
-    let attachments = [];
+    // Determine user role
+    const isMarketer = String(offer.marketerId._id) === String(userId);
+    const isCreator = String(offer.creatorId._id) === String(userId);
+    const userRole = isMarketer ? 'marketer' : isCreator ? 'creator' : 'unknown';
+    
+    if (userRole === 'unknown') {
+      return res.status(403).json({ error: "Not authorized to edit this offer" });
+    }
+
+    // Version conflict detection
+    const currentVersion = offer.editHistory?.length || 0;
+    if (expectedVersion && expectedVersion !== currentVersion) {
+      return res.status(409).json({
+        error: "Version conflict detected",
+        expectedVersion,
+        currentVersion,
+        message: "Someone else has modified this offer. Please refresh and try again."
+      });
+    }
+
+    // Track active editing session
+    const sessionKey = offerId;
+    if (!activeEditors.has(sessionKey)) {
+      activeEditors.set(sessionKey, new Set());
+    }
+    activeEditors.get(sessionKey).add(userId);
+    
+    // Update edit session timestamp
+    editSessions.set(`${sessionKey}:${userId}`, {
+      userId,
+      lastActivity: new Date(),
+      fields: Object.keys(updates || {}),
+      sessionId
+    });
+
+    // Validate field permissions and track changes
+    const validatedUpdates = {};
+    const changes = [];
+    const rejectedFields = [];
+    
+    for (const [fieldName, newValue] of Object.entries(updates || {})) {
+      const permission = validateFieldPermissions(offer, userId, fieldName, userRole);
+      
+      if (!permission.allowed) {
+        rejectedFields.push({ field: fieldName, reason: permission.reason });
+        continue;
+      }
+      
+      const oldValue = offer[fieldName];
+      if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+        validatedUpdates[fieldName] = newValue;
+        changes.push({
+          field: fieldName,
+          oldValue: oldValue,
+          newValue: newValue
+        });
+      }
+    }
+
+    // Process attachments if present
     if (req.files && req.files.attachments) {
-      // Handle both single file and array of files
       const files = Array.isArray(req.files.attachments)
         ? req.files.attachments
         : [req.files.attachments];
-
-      // Add attachments to update data
-      updates.attachments = attachments;
+      
+      // Handle file attachments (this would need multer middleware)
+      validatedUpdates.attachments = offer.attachments || [];
+      changes.push({
+        field: 'attachments',
+        oldValue: offer.attachments?.length || 0,
+        newValue: (offer.attachments?.length || 0) + files.length
+      });
     }
 
-    Object.assign(offer, updates);
-    const updated = await offer.save();
+    // Apply validated updates
+    if (Object.keys(validatedUpdates).length > 0) {
+      Object.assign(offer, validatedUpdates);
+      offer.updatedAt = new Date();
+      
+      // Create change history entry
+      const changeEntry = createChangeHistory(offer, userId, changes, userRole);
+      
+      // Save the updated offer
+      const updated = await offer.save();
+      
+      // Notify other active editors about the changes
+      const otherEditors = Array.from(activeEditors.get(sessionKey) || []).filter(id => id !== userId);
+      
+      if (otherEditors.length > 0) {
+        // In a real implementation, this would use WebSockets or SSE
+        console.log(`📝 Notifying ${otherEditors.length} other editors about changes to offer ${offerId}`);
+        
+        // Send notification to other party if they're not currently editing
+        const otherPartyId = isMarketer ? offer.creatorId._id : offer.marketerId._id;
+        if (!activeEditors.get(sessionKey)?.has(String(otherPartyId))) {
+          const notificationResult = await sendOfferNotification(updated, "offer_updated");
+          if (!notificationResult.success) {
+            console.warn('⚠️ Failed to notify other party about offer update:', notificationResult.error);
+          }
+        }
+      }
+      
+      return res.json({
+        success: true,
+        message: "Offer updated successfully",
+        offer: updated,
+        changeEntry,
+        version: currentVersion + 1,
+        rejectedFields: rejectedFields.length > 0 ? rejectedFields : undefined,
+        activeEditors: otherEditors.length,
+        editHistory: updated.editHistory?.slice(-5) // Return last 5 changes
+      });
+    } else {
+      return res.json({
+        success: false,
+        message: "No valid changes to apply",
+        rejectedFields,
+        version: currentVersion
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error updating offer:', error);
+    return res.status(500).json({ 
+      error: "Internal server error",
+      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
 
-    // Optionally notify the other user that an update occurred
-    // ...
-
+// -------------------------------------------------------------------
+// 6B) GET OFFER EDIT HISTORY
+// -------------------------------------------------------------------
+exports.getOfferEditHistory = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const { limit = 20, offset = 0 } = req.query;
+    const userId = req.user?._id || req.query.userId;
+    
+    const offer = await Offer.findById(offerId).populate([
+      { path: "creatorId", select: "name email" },
+      { path: "marketerId", select: "name email" },
+    ]);
+    
+    if (!offer) {
+      return res.status(404).json({ error: "Offer not found" });
+    }
+    
+    // Check user permissions
+    const isMarketer = String(offer.marketerId._id) === String(userId);
+    const isCreator = String(offer.creatorId._id) === String(userId);
+    
+    if (!isMarketer && !isCreator) {
+      return res.status(403).json({ error: "Not authorized to view edit history" });
+    }
+    
+    const editHistory = offer.editHistory || [];
+    const total = editHistory.length;
+    const paginatedHistory = editHistory
+      .reverse()
+      .slice(parseInt(offset), parseInt(offset) + parseInt(limit))
+      .map(entry => ({
+        ...entry,
+        userName: entry.userId === String(offer.marketerId._id) ? offer.marketerId.name : offer.creatorId.name,
+        userRole: entry.userRole
+      }));
+    
     return res.json({
-      message: "Offer updated successfully",
-      offer: updated,
+      editHistory: paginatedHistory,
+      pagination: {
+        total,
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+        hasMore: parseInt(offset) + parseInt(limit) < total
+      },
+      currentVersion: total
     });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    console.error('Error fetching edit history:', error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// -------------------------------------------------------------------
+// 6C) GET ACTIVE EDITORS
+// -------------------------------------------------------------------
+exports.getActiveEditors = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const userId = req.user?._id || req.query.userId;
+    
+    const offer = await Offer.findById(offerId).populate([
+      { path: "creatorId", select: "name" },
+      { path: "marketerId", select: "name" },
+    ]);
+    
+    if (!offer) {
+      return res.status(404).json({ error: "Offer not found" });
+    }
+    
+    // Check user permissions
+    const isMarketer = String(offer.marketerId._id) === String(userId);
+    const isCreator = String(offer.creatorId._id) === String(userId);
+    
+    if (!isMarketer && !isCreator) {
+      return res.status(403).json({ error: "Not authorized" });
+    }
+    
+    const sessionKey = offerId;
+    const activeUserIds = Array.from(activeEditors.get(sessionKey) || []);
+    
+    // Clean up stale sessions (inactive for more than 5 minutes)
+    const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
+    const activeSessions = [];
+    
+    for (const editorId of activeUserIds) {
+      const session = editSessions.get(`${sessionKey}:${editorId}`);
+      if (session && session.lastActivity > fiveMinutesAgo) {
+        const user = editorId === String(offer.marketerId._id) ? offer.marketerId : offer.creatorId;
+        activeSessions.push({
+          userId: editorId,
+          name: user.name,
+          role: editorId === String(offer.marketerId._id) ? 'marketer' : 'creator',
+          lastActivity: session.lastActivity,
+          editingFields: session.fields
+        });
+      } else {
+        // Remove stale session
+        activeEditors.get(sessionKey)?.delete(editorId);
+        editSessions.delete(`${sessionKey}:${editorId}`);
+      }
+    }
+    
+    return res.json({
+      activeEditors: activeSessions.filter(session => session.userId !== userId),
+      isCurrentlyEditing: activeSessions.some(session => session.userId === userId)
+    });
+  } catch (error) {
+    console.error('Error fetching active editors:', error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// -------------------------------------------------------------------
+// 6D) END EDITING SESSION
+// -------------------------------------------------------------------
+exports.endEditingSession = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const userId = req.user?._id || req.body.userId;
+    
+    if (!userId) {
+      return res.status(400).json({ error: "User ID required" });
+    }
+    
+    const sessionKey = offerId;
+    activeEditors.get(sessionKey)?.delete(userId);
+    editSessions.delete(`${sessionKey}:${userId}`);
+    
+    // Clean up empty editor sets
+    if (activeEditors.get(sessionKey)?.size === 0) {
+      activeEditors.delete(sessionKey);
+    }
+    
+    return res.json({ message: "Editing session ended" });
+  } catch (error) {
+    console.error('Error ending editing session:', error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// -------------------------------------------------------------------
+// 6E) OFFER NEGOTIATION COMPARISON & VISUAL DIFF
+// -------------------------------------------------------------------
+
+// Helper to calculate difference between two values
+const calculateDifference = (oldVal, newVal, fieldType = 'text') => {
+  if (oldVal === newVal) {
+    return { type: 'unchanged', oldVal, newVal, difference: null };
+  }
+  
+  switch (fieldType) {
+    case 'amount':
+      const diff = newVal - oldVal;
+      const percentChange = oldVal !== 0 ? ((diff / oldVal) * 100).toFixed(1) : 'N/A';
+      return {
+        type: diff > 0 ? 'increase' : 'decrease',
+        oldVal,
+        newVal,
+        difference: diff,
+        percentChange: `${diff > 0 ? '+' : ''}${percentChange}%`,
+        formatted: {
+          old: formatCurrency(oldVal),
+          new: formatCurrency(newVal),
+          diff: `${diff > 0 ? '+' : ''}${formatCurrency(Math.abs(diff))}`
+        }
+      };
+      
+    case 'date':
+      const oldDate = new Date(oldVal);
+      const newDate = new Date(newVal);
+      const daysDiff = Math.ceil((newDate - oldDate) / (1000 * 60 * 60 * 24));
+      return {
+        type: daysDiff > 0 ? 'later' : daysDiff < 0 ? 'earlier' : 'unchanged',
+        oldVal: formatDate(oldVal),
+        newVal: formatDate(newVal),
+        difference: `${daysDiff > 0 ? '+' : ''}${daysDiff} days`,
+        daysDiff
+      };
+      
+    case 'array':
+      const oldArray = Array.isArray(oldVal) ? oldVal : [];
+      const newArray = Array.isArray(newVal) ? newVal : [];
+      const added = newArray.filter(item => !oldArray.includes(item));
+      const removed = oldArray.filter(item => !newArray.includes(item));
+      return {
+        type: added.length > 0 || removed.length > 0 ? 'modified' : 'unchanged',
+        oldVal: oldArray,
+        newVal: newArray,
+        added,
+        removed,
+        summary: `${added.length} added, ${removed.length} removed`
+      };
+      
+    default:
+      return {
+        type: 'modified',
+        oldVal,
+        newVal,
+        difference: 'Content changed'
+      };
+  }
+};
+
+// Generate comprehensive negotiation comparison
+exports.getOfferNegotiationComparison = async (req, res) => {
+  try {
+    const { offerId } = req.params;
+    const { compareWith = 'latest' } = req.query; // 'latest', 'original', or specific counter index
+    const userId = req.user?._id || req.query.userId;
+    
+    const offer = await Offer.findById(offerId).populate([
+      { path: "creatorId", select: "name email" },
+      { path: "marketerId", select: "name email" },
+    ]);
+    
+    if (!offer) {
+      return res.status(404).json({ error: "Offer not found" });
+    }
+    
+    // Check user permissions
+    const isMarketer = String(offer.marketerId._id) === String(userId);
+    const isCreator = String(offer.creatorId._id) === String(userId);
+    
+    if (!isMarketer && !isCreator) {
+      return res.status(403).json({ error: "Not authorized to view offer comparison" });
+    }
+    
+    // Get original offer terms
+    const originalOffer = {
+      amount: offer.proposedAmount,
+      currency: offer.currency,
+      reviewDate: offer.desiredReviewDate,
+      postDate: offer.desiredPostDate,
+      deliverables: offer.deliverables || [],
+      description: offer.description || '',
+      notes: offer.notes || ''
+    };
+    
+    let comparisonTarget;
+    let comparisonLabel;
+    
+    if (!offer.counters || offer.counters.length === 0) {
+      return res.json({
+        hasCounters: false,
+        message: "No counter offers to compare",
+        originalOffer
+      });
+    }
+    
+    // Determine what to compare with
+    if (compareWith === 'latest') {
+      comparisonTarget = offer.counters[offer.counters.length - 1];
+      comparisonLabel = `Latest Counter Offer (${comparisonTarget.counterBy})`;
+    } else if (compareWith === 'original') {
+      comparisonTarget = originalOffer;
+      comparisonLabel = "Original Offer";
+    } else {
+      const counterIndex = parseInt(compareWith);
+      if (counterIndex >= 0 && counterIndex < offer.counters.length) {
+        comparisonTarget = offer.counters[counterIndex];
+        comparisonLabel = `Counter Offer #${counterIndex + 1} (${comparisonTarget.counterBy})`;
+      } else {
+        return res.status(400).json({ error: "Invalid counter offer index" });
+      }
+    }
+    
+    // Build comparison object
+    const currentTerms = compareWith === 'original' ? 
+      (offer.counters[offer.counters.length - 1] || originalOffer) : originalOffer;
+    
+    const comparison = {
+      amount: calculateDifference(
+        compareWith === 'original' ? originalOffer.amount : comparisonTarget.counterAmount || comparisonTarget.amount,
+        compareWith === 'original' ? comparisonTarget.counterAmount || comparisonTarget.amount : currentTerms.counterAmount || currentTerms.amount,
+        'amount'
+      ),
+      reviewDate: calculateDifference(
+        compareWith === 'original' ? originalOffer.reviewDate : comparisonTarget.counterReviewDate || comparisonTarget.reviewDate,
+        compareWith === 'original' ? comparisonTarget.counterReviewDate || comparisonTarget.reviewDate : currentTerms.counterReviewDate || currentTerms.reviewDate,
+        'date'
+      ),
+      postDate: calculateDifference(
+        compareWith === 'original' ? originalOffer.postDate : comparisonTarget.counterPostDate || comparisonTarget.postDate,
+        compareWith === 'original' ? comparisonTarget.counterPostDate || comparisonTarget.postDate : currentTerms.counterPostDate || currentTerms.postDate,
+        'date'
+      ),
+      deliverables: calculateDifference(
+        compareWith === 'original' ? originalOffer.deliverables : comparisonTarget.deliverables || originalOffer.deliverables,
+        compareWith === 'original' ? comparisonTarget.deliverables || originalOffer.deliverables : currentTerms.deliverables || originalOffer.deliverables,
+        'array'
+      ),
+      notes: calculateDifference(
+        compareWith === 'original' ? originalOffer.notes : comparisonTarget.notes || '',
+        compareWith === 'original' ? comparisonTarget.notes || '' : currentTerms.notes || '',
+        'text'
+      )
+    };
+    
+    // Calculate negotiation insights
+    const insights = {
+      totalCounters: offer.counters.length,
+      lastCounterBy: offer.counters[offer.counters.length - 1]?.counterBy,
+      amountTrend: offer.counters.map(c => c.counterAmount).slice(-3), // Last 3 amounts
+      negotiationDuration: offer.counters.length > 0 ? 
+        Math.ceil((new Date(offer.counters[offer.counters.length - 1].counterDate) - new Date(offer.createdAt)) / (1000 * 60 * 60 * 24)) : 0,
+      convergenceAnalysis: analyzeNegotiationConvergence(offer),
+      recommendedAction: generateNegotiationRecommendation(offer, isMarketer ? 'marketer' : 'creator')
+    };
+    
+    // Build negotiation timeline
+    const timeline = [
+      {
+        type: 'original',
+        timestamp: offer.createdAt,
+        actor: 'marketer',
+        actorName: offer.marketerId.name,
+        terms: originalOffer,
+        label: 'Original Offer'
+      },
+      ...offer.counters.map((counter, index) => ({
+        type: 'counter',
+        timestamp: counter.counterDate,
+        actor: counter.counterBy.toLowerCase(),
+        actorName: counter.counterBy === 'Marketer' ? offer.marketerId.name : offer.creatorId.name,
+        terms: {
+          amount: counter.counterAmount,
+          reviewDate: counter.counterReviewDate,
+          postDate: counter.counterPostDate,
+          deliverables: counter.deliverables,
+          notes: counter.notes
+        },
+        label: `Counter Offer #${index + 1}`,
+        index
+      }))
+    ];
+    
+    return res.json({
+      hasCounters: true,
+      comparison,
+      comparisonLabel,
+      timeline,
+      insights,
+      originalOffer,
+      latestTerms: currentTerms,
+      metadata: {
+        offerId: offer._id,
+        offerName: offer.offerName,
+        status: offer.status,
+        currency: offer.currency,
+        lastUpdated: offer.updatedAt
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error generating negotiation comparison:', error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+// Analyze negotiation convergence patterns
+const analyzeNegotiationConvergence = (offer) => {
+  if (!offer.counters || offer.counters.length < 2) {
+    return { pattern: 'insufficient_data', confidence: 0 };
+  }
+  
+  const amounts = [offer.proposedAmount, ...offer.counters.map(c => c.counterAmount)];
+  const differences = [];
+  
+  for (let i = 1; i < amounts.length; i++) {
+    differences.push(Math.abs(amounts[i] - amounts[i-1]));
+  }
+  
+  // Check if differences are decreasing (converging)
+  const isConverging = differences.length >= 2 && 
+    differences[differences.length - 1] < differences[differences.length - 2];
+  
+  const avgDifference = differences.reduce((sum, diff) => sum + diff, 0) / differences.length;
+  const latestDifference = differences[differences.length - 1];
+  
+  let pattern, confidence;
+  
+  if (isConverging && latestDifference < avgDifference * 0.5) {
+    pattern = 'converging_fast';
+    confidence = 0.8;
+  } else if (isConverging) {
+    pattern = 'converging_slow';
+    confidence = 0.6;
+  } else if (latestDifference > avgDifference * 1.5) {
+    pattern = 'diverging';
+    confidence = 0.7;
+  } else {
+    pattern = 'stable';
+    confidence = 0.5;
+  }
+  
+  return {
+    pattern,
+    confidence,
+    avgDifference: Math.round(avgDifference),
+    latestDifference: Math.round(latestDifference),
+    recommendation: getConvergenceRecommendation(pattern)
+  };
+};
+
+// Generate negotiation recommendation based on pattern
+const getConvergenceRecommendation = (pattern) => {
+  switch (pattern) {
+    case 'converging_fast':
+      return 'Negotiation is progressing well. Consider accepting or making a final offer.';
+    case 'converging_slow':
+      return 'Progress is being made. Continue with smaller incremental changes.';
+    case 'diverging':
+      return 'Terms are moving apart. Consider a different negotiation approach.';
+    case 'stable':
+      return 'Negotiation has reached a stable point. Consider alternative terms or incentives.';
+    default:
+      return 'More data needed to analyze negotiation pattern.';
+  }
+};
+
+// Generate role-specific negotiation recommendation
+const generateNegotiationRecommendation = (offer, userRole) => {
+  if (!offer.counters || offer.counters.length === 0) {
+    return userRole === 'marketer' ? 
+      'Wait for creator response to your offer.' :
+      'Review the offer terms and respond with acceptance or counter offer.';
+  }
+  
+  const lastCounter = offer.counters[offer.counters.length - 1];
+  const lastCounterBy = lastCounter.counterBy.toLowerCase();
+  
+  if (lastCounterBy === userRole) {
+    return 'Waiting for response to your counter offer.';
+  } else {
+    const convergence = analyzeNegotiationConvergence(offer);
+    
+    if (convergence.pattern === 'converging_fast') {
+      return 'Terms are converging quickly. Consider accepting or making a final counter.';
+    } else if (convergence.pattern === 'diverging') {
+      return 'Consider compromising on different terms or adding value to break the deadlock.';
+    } else {
+      return 'Review the latest counter offer and respond with your terms.';
+    }
   }
 };
 
@@ -1353,7 +2085,10 @@ exports.deleteOffer = async (req, res) => {
     offer.status = OFFER_STATUSES.DELETED;
     await offer.save();
 
-    await sendOfferNotification(offer, "offer_deleted");
+    const notificationResult = await sendOfferNotification(offer, "offer_deleted");
+    if (!notificationResult.success) {
+      console.warn('⚠️ Notification sending failed for deleted offer:', notificationResult.error);
+    }
 
     return res.json({ message: "Offer deleted successfully" });
   } catch (error) {
@@ -1481,7 +2216,10 @@ exports.sendOffer = (req, res) => {
       }
 
       // Send notification
-      await sendOfferNotification(offer, "new_offer");
+      const notificationResult = await sendOfferNotification(offer, "new_offer");
+      if (!notificationResult.success) {
+        console.warn('⚠️ Notification sending failed for sent offer:', notificationResult.error);
+      }
 
       return res.json({
         message: "Offer sent successfully",
@@ -1524,24 +2262,36 @@ exports.counterOffer = async (req, res) => {
     offer.viewedByCreator = false;
     offer.viewedByMarketer = false;
 
-    offer.counters.push({
+    // Enhanced counter offer data
+    const counterData = {
       counterBy,
-      counterAmount,
-      notes,
       counterDate: new Date(),
-      counterReviewDate,
-      counterPostDate,
-      offerName,
-      description,
-      deliverables,
-      attachments,
-    });
+      priority: req.body.priority || "medium"
+    };
+
+    // Only add fields that were provided
+    if (counterAmount) counterData.counterAmount = counterAmount;
+    if (notes) counterData.notes = notes;
+    if (counterReviewDate) counterData.counterReviewDate = counterReviewDate;
+    if (counterPostDate) counterData.counterPostDate = counterPostDate;
+    if (deliverables) counterData.deliverables = deliverables;
+    if (attachments) counterData.attachments = attachments;
+    
+    // Add expiration if specified
+    if (req.body.expiresIn) {
+      counterData.expiresAt = new Date(Date.now() + req.body.expiresIn * 24 * 60 * 60 * 1000);
+    }
+
+    offer.counters.push(counterData);
 
     // Mark as "Rejected-Countered" (or "Counter" if you prefer simpler naming)
     offer.status = "Rejected-Countered";
     await offer.save();
 
-    await sendOfferNotification(offer, "counter_offer");
+    const notificationResult = await sendOfferNotification(offer, "counter_offer");
+    if (!notificationResult.success) {
+      console.warn('⚠️ Notification sending failed for counter offer:', notificationResult.error);
+    }
 
     return res.json({
       message: "Counter offer sent (Rejected-Countered)",
@@ -1751,7 +2501,10 @@ exports.rejectOffer = async (req, res) => {
         ? offer.marketerId._id
         : offer.creatorId._id;
 
-    await sendOfferNotification(offer, "offer_rejected");
+    const notificationResult = await sendOfferNotification(offer, "offer_rejected");
+    if (!notificationResult.success) {
+      console.warn('⚠️ Notification sending failed for rejected offer:', notificationResult.error);
+    }
 
     return res.json({
       message: "Offer rejected",
@@ -1780,7 +2533,10 @@ exports.cancelOffer = async (req, res) => {
     offer.status = "Cancelled";
     await offer.save();
     // Send notification to both parties
-    await sendOfferNotification(offer, "offer_cancelled");
+    const notificationResult = await sendOfferNotification(offer, "offer_cancelled");
+    if (!notificationResult.success) {
+      console.warn('⚠️ Notification sending failed for cancelled offer:', notificationResult.error);
+    }
     return res.json({
       message: "Offer cancelled",
       offer,
@@ -1810,7 +2566,10 @@ exports.markOfferInReview = async (req, res) => {
     offer.status = "Offer in Review";
     await offer.save();
 
-    await sendOfferNotification(offer, "offer_in_review");
+    const notificationResult = await sendOfferNotification(offer, "offer_in_review");
+    if (!notificationResult.success) {
+      console.warn('⚠️ Notification sending failed for offer in review:', notificationResult.error);
+    }
 
     return res.json({
       message: "Offer marked as in review",

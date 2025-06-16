@@ -1,0 +1,481 @@
+name: Axees Platform CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop, staging ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+jobs:
+  test:
+    name: Test Suite
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+        mongodb-version: ['6.0', '7.0']
+
+    services:
+      mongodb:
+        image: mongo:${{ matrix.mongodb-version }}
+        env:
+          MONGO_INITDB_ROOT_USERNAME: root
+          MONGO_INITDB_ROOT_PASSWORD: password
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+
+    - name: Cache node modules
+      uses: actions/cache@v3
+      with:
+        path: ~/.npm
+        key: ${{ runner.os }}-node-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+        restore-keys: |
+          ${{ runner.os }}-node-${{ matrix.node-version }}-
+          ${{ runner.os }}-node-
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Lint code
+      run: npm run lint
+
+    - name: Check code formatting
+      run: npm run format:check
+
+    - name: Type checking
+      run: npm run typecheck
+
+    - name: Setup test environment
+      run: |
+        cp .env.example .env.test
+        echo "NODE_ENV=test" >> .env.test
+        echo "MONGODB_URI=mongodb://root:password@localhost:27017/axees-test?authSource=admin" >> .env.test
+        echo "REDIS_URL=redis://localhost:6379" >> .env.test
+        echo "JWT_SECRET=test-jwt-secret-for-ci" >> .env.test
+        echo "TWILIO_ACCOUNT_SID=test_twilio_sid" >> .env.test
+        echo "TWILIO_AUTH_TOKEN=test_twilio_token" >> .env.test
+        echo "STRIPE_SECRET_KEY=sk_test_mock_stripe_key" >> .env.test
+        echo "FIREBASE_PROJECT_ID=axees-test" >> .env.test
+        echo "MESSAGECENTRAL_API_KEY=test-key" >> .env.test
+
+    - name: Wait for services
+      run: |
+        timeout 60 bash -c 'until nc -z localhost 27017; do sleep 1; done'
+        timeout 60 bash -c 'until nc -z localhost 6379; do sleep 1; done'
+
+    - name: Run unit tests
+      run: npm run test:unit
+      env:
+        NODE_ENV: test
+        CI: true
+
+    - name: Run integration tests
+      run: npm run test:integration
+      env:
+        NODE_ENV: test
+        CI: true
+        MONGODB_URI: mongodb://root:password@localhost:27017/axees-test?authSource=admin
+        REDIS_URL: redis://localhost:6379
+
+    - name: Run security tests
+      run: npm run test:security
+      env:
+        NODE_ENV: test
+        CI: true
+
+    - name: Run performance tests
+      run: npm run test:performance
+      env:
+        NODE_ENV: test
+        CI: true
+      continue-on-error: true  # Performance tests might fail in CI environment
+
+    - name: Generate test coverage
+      run: npm run test:coverage
+      env:
+        NODE_ENV: test
+        CI: true
+
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage/lcov.info
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: false
+
+    - name: Generate Coverage Badge
+      uses: tj-actions/coverage-badge-js@v2
+      if: github.ref == 'refs/heads/main'
+      with:
+        output: coverage-badge.svg
+
+    - name: Verify Coverage Requirements
+      run: |
+        # Extract coverage percentages from Jest coverage summary
+        if [ -f "coverage/coverage-summary.json" ]; then
+          STATEMENTS=$(cat coverage/coverage-summary.json | jq -r '.total.statements.pct')
+          BRANCHES=$(cat coverage/coverage-summary.json | jq -r '.total.branches.pct')
+          FUNCTIONS=$(cat coverage/coverage-summary.json | jq -r '.total.functions.pct')
+          LINES=$(cat coverage/coverage-summary.json | jq -r '.total.lines.pct')
+        else
+          echo "❌ Coverage summary not found"
+          exit 1
+        fi
+
+        echo "📊 Coverage Summary:"
+        echo "Statements: ${STATEMENTS}%"
+        echo "Branches: ${BRANCHES}%"
+        echo "Functions: ${FUNCTIONS}%"
+        echo "Lines: ${LINES}%"
+
+        # Set coverage requirements (as specified in phase requirements)
+        MIN_STATEMENTS=80
+        MIN_BRANCHES=75
+        MIN_FUNCTIONS=80
+        MIN_LINES=80
+
+        # Check coverage requirements
+        if (( $(echo "${STATEMENTS} >= ${MIN_STATEMENTS}" | bc -l) )); then
+          echo "✅ Statements coverage (${STATEMENTS}%) meets requirement (${MIN_STATEMENTS}%)"
+        else
+          echo "❌ Statements coverage (${STATEMENTS}%) below requirement (${MIN_STATEMENTS}%)"
+          exit 1
+        fi
+
+        if (( $(echo "${BRANCHES} >= ${MIN_BRANCHES}" | bc -l) )); then
+          echo "✅ Branches coverage (${BRANCHES}%) meets requirement (${MIN_BRANCHES}%)"
+        else
+          echo "❌ Branches coverage (${BRANCHES}%) below requirement (${MIN_BRANCHES}%)"
+          exit 1
+        fi
+
+        if (( $(echo "${FUNCTIONS} >= ${MIN_FUNCTIONS}" | bc -l) )); then
+          echo "✅ Functions coverage (${FUNCTIONS}%) meets requirement (${MIN_FUNCTIONS}%)"
+        else
+          echo "❌ Functions coverage (${FUNCTIONS}%) below requirement (${MIN_FUNCTIONS}%)"
+          exit 1
+        fi
+
+        if (( $(echo "${LINES} >= ${MIN_LINES}" | bc -l) )); then
+          echo "✅ Lines coverage (${LINES}%) meets requirement (${MIN_LINES}%)"
+        else
+          echo "❌ Lines coverage (${LINES}%) below requirement (${MIN_LINES}%)"
+          exit 1
+        fi
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.node-version }}-${{ matrix.mongodb-version }}
+        path: |
+          coverage/
+          test-results.xml
+          performance-report.json
+
+    - name: Comment PR with test results
+      uses: actions/github-script@v6
+      if: github.event_name == 'pull_request'
+      with:
+        script: |
+          const fs = require('fs');
+          
+          // Read test results if available
+          let testSummary = '## 🧪 Test Results\n\n';
+          
+          try {
+            const coverageReport = JSON.parse(fs.readFileSync('coverage/coverage-summary.json', 'utf8'));
+            const totalCoverage = coverageReport.total;
+            
+            testSummary += `### Coverage Report\n`;
+            testSummary += `- **Lines**: ${totalCoverage.lines.pct}%\n`;
+            testSummary += `- **Functions**: ${totalCoverage.functions.pct}%\n`;
+            testSummary += `- **Branches**: ${totalCoverage.branches.pct}%\n`;
+            testSummary += `- **Statements**: ${totalCoverage.statements.pct}%\n\n`;
+          } catch (error) {
+            testSummary += '📊 Coverage report not available\n\n';
+          }
+          
+          testSummary += `### Environment\n`;
+          testSummary += `- **Node.js**: ${{ matrix.node-version }}\n`;
+          testSummary += `- **MongoDB**: ${{ matrix.mongodb-version }}\n`;
+          testSummary += `- **Runner**: ${process.env.RUNNER_OS}\n\n`;
+          
+          testSummary += `✅ All tests completed successfully!`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: testSummary
+          });
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run security audit
+      run: npm audit --audit-level=moderate
+
+    - name: Run Snyk security scan
+      uses: snyk/actions/node@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        args: --severity-threshold=high
+      continue-on-error: true
+
+    - name: Run CodeQL analysis
+      uses: github/codeql-action/init@v2
+      with:
+        languages: javascript
+
+    - name: Perform CodeQL analysis
+      uses: github/codeql-action/analyze@v2
+
+  quality-gate:
+    name: Quality Gate
+    runs-on: ubuntu-latest
+    needs: [test, security-scan]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run quality checks
+      run: |
+        npm run lint:report
+        npm run complexity:check
+        npm run duplication:check
+      continue-on-error: true
+
+    - name: SonarCloud Scan
+      uses: SonarSource/sonarcloud-github-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      continue-on-error: true
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: [test]
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Build application
+      run: npm run build
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: build-artifacts
+        path: |
+          dist/
+          build/
+        retention-days: 30
+
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [test, security-scan, quality-gate, build]
+    if: github.ref == 'refs/heads/develop' && github.event_name == 'push'
+    environment: staging
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-artifacts
+
+    - name: Deploy to AWS Elastic Beanstalk (Staging)
+      uses: einaregilsson/beanstalk-deploy@v21
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        application_name: axees-api-staging
+        environment_name: axees-api-staging-env
+        region: us-east-1
+        version_label: ${{ github.sha }}
+        deployment_package: deploy.zip
+
+    - name: Run smoke tests on staging
+      run: |
+        npm run test:smoke:staging
+      env:
+        STAGING_API_URL: ${{ secrets.STAGING_API_URL }}
+        STAGING_API_KEY: ${{ secrets.STAGING_API_KEY }}
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [test, security-scan, quality-gate, build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: build-artifacts
+
+    - name: Deploy to AWS Elastic Beanstalk (Production)
+      uses: einaregilsson/beanstalk-deploy@v21
+      with:
+        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        application_name: axees-api
+        environment_name: axees-api-env
+        region: us-east-1
+        version_label: ${{ github.sha }}
+        deployment_package: deploy.zip
+
+    - name: Run smoke tests on production
+      run: |
+        npm run test:smoke:production
+      env:
+        PRODUCTION_API_URL: ${{ secrets.PRODUCTION_API_URL }}
+        PRODUCTION_API_KEY: ${{ secrets.PRODUCTION_API_KEY }}
+
+    - name: Notify deployment success
+      uses: 8398a7/action-slack@v3
+      with:
+        status: success
+        channel: '#deployments'
+        text: '🚀 Axees API successfully deployed to production!'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+  post-deploy-tests:
+    name: Post-Deployment Tests
+    runs-on: ubuntu-latest
+    needs: [deploy-production]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20.x'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run end-to-end tests
+      run: npm run test:e2e:production
+      env:
+        E2E_BASE_URL: ${{ secrets.PRODUCTION_API_URL }}
+        E2E_API_KEY: ${{ secrets.PRODUCTION_API_KEY }}
+
+    - name: Run performance monitoring
+      run: npm run monitor:performance
+      env:
+        MONITORING_URL: ${{ secrets.PRODUCTION_API_URL }}
+        MONITORING_API_KEY: ${{ secrets.MONITORING_API_KEY }}
+
+    - name: Health check
+      run: |
+        curl -f ${{ secrets.PRODUCTION_API_URL }}/health || exit 1
+
+  notification:
+    name: Notification
+    runs-on: ubuntu-latest
+    needs: [test, security-scan, quality-gate, build]
+    if: always()
+    
+    steps:
+    - name: Notify on failure
+      if: failure()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: failure
+        channel: '#alerts'
+        text: '❌ Axees CI/CD pipeline failed!'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+    - name: Notify on success
+      if: success()
+      uses: 8398a7/action-slack@v3
+      with:
+        status: success
+        channel: '#ci-cd'
+        text: '✅ Axees CI/CD pipeline completed successfully!'
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

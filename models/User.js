@@ -175,14 +175,253 @@ const userSchema = new Schema({
   emailVerified: { type: Boolean, default: false },
   emailVerificationToken: { type: String },
   emailVerificationExpires: { type: Date },
+  // Profile completion tracking
+  profileCompletion: {
+    score: { type: Number, default: 0, min: 0, max: 100 },
+    completedSteps: [{ type: String }], // Array of completed step IDs
+    requiredFields: {
+      basic: {
+        completed: { type: Boolean, default: false },
+        fields: {
+          name: { type: Boolean, default: false },
+          email: { type: Boolean, default: false },
+          phone: { type: Boolean, default: false },
+          bio: { type: Boolean, default: false },
+          avatar: { type: Boolean, default: false }
+        }
+      },
+      roleSpecific: {
+        completed: { type: Boolean, default: false },
+        fields: { type: Schema.Types.Mixed, default: {} }
+      },
+      verification: {
+        completed: { type: Boolean, default: false },
+        fields: {
+          emailVerified: { type: Boolean, default: false },
+          phoneVerified: { type: Boolean, default: false }
+        }
+      },
+      financial: {
+        completed: { type: Boolean, default: false },
+        fields: {
+          stripeConnected: { type: Boolean, default: false },
+          paymentMethodAdded: { type: Boolean, default: false }
+        }
+      },
+      preferences: {
+        completed: { type: Boolean, default: false },
+        fields: {
+          settingsConfigured: { type: Boolean, default: false },
+          categoriesSelected: { type: Boolean, default: false }
+        }
+      }
+    },
+    lastCalculated: { type: Date, default: Date.now },
+    notifications: {
+      enabled: { type: Boolean, default: true },
+      lastSent: { type: Date },
+      frequency: { type: String, enum: ["daily", "weekly", "never"], default: "weekly" }
+    }
+  },
+  
+  // QR Code data for profile sharing
+  qrCodeData: {
+    lastGenerated: { type: Date },
+    purpose: { 
+      type: String, 
+      enum: ["profile", "connect", "contact"],
+      default: "profile"
+    },
+    expiresAt: { type: Date },
+    token: { type: String, select: false }, // Not returned by default for security
+    usageCount: { type: Number, default: 0 }
+  },
+  
+  // Ghost account fields
+  accountType: { 
+    type: String, 
+    enum: ['full', 'ghost'], 
+    default: 'full' 
+  },
+  isGhostAccount: { 
+    type: Boolean, 
+    default: false 
+  },
+  ghostAccountData: {
+    createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    createdVia: { type: String, enum: ['qr_code', 'direct_invite', 'other'] },
+    qrCodeId: String,
+    temporaryPassword: { type: String, select: false }, // Hidden by default for security
+    expiresAt: Date,
+    convertedAt: Date,
+    originalOffer: { type: mongoose.Schema.Types.ObjectId, ref: 'Offer' }
+  },
+  
   // Timestamps
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
   deletionReason: { type: String },
 });
 
+// Profile completion calculation method
+userSchema.methods.calculateProfileCompletion = function() {
+  const completion = this.profileCompletion || {};
+  const requiredFields = completion.requiredFields || {};
+  
+  // Initialize if not exists
+  if (!this.profileCompletion) {
+    this.profileCompletion = {
+      score: 0,
+      completedSteps: [],
+      requiredFields: {
+        basic: { completed: false, fields: {} },
+        roleSpecific: { completed: false, fields: {} },
+        verification: { completed: false, fields: {} },
+        financial: { completed: false, fields: {} },
+        preferences: { completed: false, fields: {} }
+      },
+      lastCalculated: new Date(),
+      notifications: {
+        enabled: true,
+        frequency: "weekly"
+      }
+    };
+  }
+
+  let totalScore = 0;
+  const weights = {
+    basic: 30,
+    roleSpecific: 25,
+    verification: 20,
+    financial: 15,
+    preferences: 10
+  };
+
+  // Basic information (30 points)
+  const basicFields = {
+    name: !!this.name,
+    email: !!this.email,
+    phone: !!this.phone,
+    bio: !!this.bio,
+    avatar: !!this.avatarUrl
+  };
+  
+  const basicCompleted = Object.values(basicFields).filter(Boolean).length;
+  const basicScore = (basicCompleted / Object.keys(basicFields).length) * weights.basic;
+  totalScore += basicScore;
+  
+  this.profileCompletion.requiredFields.basic = {
+    completed: basicCompleted === Object.keys(basicFields).length,
+    fields: basicFields
+  };
+
+  // Role-specific information (25 points)
+  let roleSpecificScore = 0;
+  let roleSpecificFields = {};
+  
+  if (this.userType === 'Creator') {
+    const creatorData = this.creatorData || {};
+    roleSpecificFields = {
+      handleName: !!creatorData.handleName,
+      categories: !!(creatorData.categories && creatorData.categories.length > 0),
+      platforms: !!(creatorData.platforms && creatorData.platforms.length > 0),
+      portfolio: !!(creatorData.portfolio && creatorData.portfolio.length > 0),
+      rates: !!(creatorData.rates && creatorData.rates.sponsoredPostRate)
+    };
+  } else if (this.userType === 'Marketer') {
+    const marketerData = this.marketerData || {};
+    roleSpecificFields = {
+      brandName: !!marketerData.brandName,
+      brandWebsite: !!marketerData.brandWebsite,
+      industry: !!marketerData.industry,
+      brandDescription: !!marketerData.brandDescription,
+      budget: !!marketerData.budget
+    };
+  }
+  
+  const roleSpecificCompleted = Object.values(roleSpecificFields).filter(Boolean).length;
+  if (Object.keys(roleSpecificFields).length > 0) {
+    roleSpecificScore = (roleSpecificCompleted / Object.keys(roleSpecificFields).length) * weights.roleSpecific;
+  }
+  totalScore += roleSpecificScore;
+  
+  this.profileCompletion.requiredFields.roleSpecific = {
+    completed: roleSpecificCompleted === Object.keys(roleSpecificFields).length,
+    fields: roleSpecificFields
+  };
+
+  // Verification (20 points)
+  const verificationFields = {
+    emailVerified: !!this.emailVerified,
+    phoneVerified: !!this.phone // Assuming phone presence means verified for now
+  };
+  
+  const verificationCompleted = Object.values(verificationFields).filter(Boolean).length;
+  const verificationScore = (verificationCompleted / Object.keys(verificationFields).length) * weights.verification;
+  totalScore += verificationScore;
+  
+  this.profileCompletion.requiredFields.verification = {
+    completed: verificationCompleted === Object.keys(verificationFields).length,
+    fields: verificationFields
+  };
+
+  // Financial setup (15 points)
+  const financialFields = {
+    stripeConnected: !!this.stripeConnectId,
+    paymentMethodAdded: !!(this.paymentMethods && this.paymentMethods.length > 0)
+  };
+  
+  const financialCompleted = Object.values(financialFields).filter(Boolean).length;
+  const financialScore = (financialCompleted / Object.keys(financialFields).length) * weights.financial;
+  totalScore += financialScore;
+  
+  this.profileCompletion.requiredFields.financial = {
+    completed: financialCompleted === Object.keys(financialFields).length,
+    fields: financialFields
+  };
+
+  // Preferences (10 points)
+  const preferencesFields = {
+    settingsConfigured: !!(this.settings && (
+      this.settings.notifications || this.settings.privacy
+    )),
+    categoriesSelected: !!(
+      (this.creatorData && this.creatorData.categories && this.creatorData.categories.length > 0) ||
+      (this.marketerData && this.marketerData.categories && this.marketerData.categories.length > 0)
+    )
+  };
+  
+  const preferencesCompleted = Object.values(preferencesFields).filter(Boolean).length;
+  const preferencesScore = (preferencesCompleted / Object.keys(preferencesFields).length) * weights.preferences;
+  totalScore += preferencesScore;
+  
+  this.profileCompletion.requiredFields.preferences = {
+    completed: preferencesCompleted === Object.keys(preferencesFields).length,
+    fields: preferencesFields
+  };
+
+  // Update score and timestamp
+  this.profileCompletion.score = Math.round(totalScore);
+  this.profileCompletion.lastCalculated = new Date();
+  
+  return this.profileCompletion.score;
+};
+
 userSchema.pre("save", function (next) {
   this.updatedAt = new Date();
+  
+  // Calculate profile completion if any relevant fields changed
+  const profileRelevantFields = [
+    'name', 'email', 'phone', 'bio', 'avatarUrl', 'emailVerified',
+    'stripeConnectId', 'paymentMethods', 'settings', 'creatorData', 'marketerData'
+  ];
+  
+  const hasProfileChanges = profileRelevantFields.some(field => this.isModified(field));
+  
+  if (hasProfileChanges || !this.profileCompletion) {
+    this.calculateProfileCompletion();
+  }
+  
   next();
 });
 

@@ -1461,26 +1461,29 @@ exports.reviewMilestoneSubmission = async (req, res) => {
     });
 
     if (status === "approved") {
-      milestone.status = "completed";
-      milestone.completedAt = new Date();
-      deal.status = DEAL_STATUSES.CONTENT_APPROVED;
-
-      const relatedTransaction = deal.paymentInfo.transactions.find(
-        (t) =>
-          t.milestoneId?.toString() === milestone.id.toString() &&
-          t.type === "milestone"
+      milestone.status = "approved";
+      milestone.approvedAt = new Date();
+      
+      // Set automatic release date if enabled
+      if (deal.paymentInfo?.automaticRelease?.enabled) {
+        const releaseDays = deal.paymentInfo.automaticRelease.defaultDays || 7;
+        milestone.autoReleaseDate = new Date(Date.now() + (releaseDays * 24 * 60 * 60 * 1000));
+        console.log(`📅 Set auto-release date for milestone "${milestone.name}" to ${milestone.autoReleaseDate}`);
+      }
+      
+      // Update deal status
+      const allMilestonesApproved = deal.milestones.every(m => 
+        m.id.toString() === milestone.id.toString() ? true : ['approved', 'completed'].includes(m.status)
       );
-    
-      await earnings.create({
-        user: deal.creatorId,
-        amount: milestone.amount,
-        deal: deal._id,
-        milestoneId: milestone.id,
-        paymentMethod: "escrow",
-        transactionId: relatedTransaction?.transactionId || null,
-        reference: `Milestone "${milestone.name}" approved and released`,
-        createdAt: new Date(),
-      });
+      
+      if (allMilestonesApproved) {
+        deal.status = DEAL_STATUSES.CONTENT_APPROVED;
+      } else {
+        deal.status = DEAL_STATUSES.IN_PROCESS;
+      }
+      
+      // Don't release payment immediately - wait for automatic release or manual trigger
+      // Payment will be released according to the automatic release schedule
 
     } else {
       milestone.status = "revision_required";
@@ -1499,11 +1502,19 @@ exports.reviewMilestoneSubmission = async (req, res) => {
     });
 
     if (status === "approved") {
+      const releaseMessage = milestone.autoReleaseDate ? 
+        `Your milestone '${milestone.name}' in deal '${deal.dealName}' was approved. Payment will be released on ${new Date(milestone.autoReleaseDate).toLocaleDateString()}.` :
+        `Your milestone '${milestone.name}' in deal '${deal.dealName}' was approved.`;
+      
       await notifyUser(
         deal.creatorId,
         "Milestone Approved",
-        `Your milestone '${milestone.name}' in deal '${deal.dealName}' was approved and payment released.`,
-        { dealId: deal._id.toString(), milestoneName: milestone.name }
+        releaseMessage,
+        { 
+          dealId: deal._id.toString(), 
+          milestoneName: milestone.name,
+          autoReleaseDate: milestone.autoReleaseDate 
+        }
       );
     } else {
       await notifyUser(

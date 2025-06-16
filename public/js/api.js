@@ -117,7 +117,7 @@ class AxeesAPI {
       if (this.retryConfig.retryableStatuses.includes(response.status) && 
           retryCount < this.retryConfig.maxRetries) {
         const delay = this.retryConfig.retryDelay * Math.pow(2, retryCount);
-        console.warn(`Request failed with status ${response.status}. Retrying in ${delay}ms...`);
+        // Request failed, retrying after delay
         
         await this.sleep(delay);
         return this.request(endpoint, options, retryCount + 1);
@@ -138,7 +138,7 @@ class AxeesAPI {
       if (retryCount < this.retryConfig.maxRetries && 
           error.name === 'TypeError' && error.message.includes('fetch')) {
         const delay = this.retryConfig.retryDelay * Math.pow(2, retryCount);
-        console.warn(`Network error. Retrying in ${delay}ms...`);
+        // Network error, retrying after delay
         
         await this.sleep(delay);
         return this.request(endpoint, options, retryCount + 1);
@@ -146,7 +146,7 @@ class AxeesAPI {
       
       // Clear loading state on error
       this.setLoading(endpoint, false);
-      console.error('API Error:', error);
+      // API request failed after all retries
       throw error;
     }
   }
@@ -154,10 +154,10 @@ class AxeesAPI {
   /**
    * Authentication APIs
    */
-  async login(email, password) {
+  async login(phone, password) {
     const response = await this.request('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ phone, password })
     });
     
     if (response.token) {
@@ -167,23 +167,57 @@ class AxeesAPI {
     return response;
   }
 
-  async register(userData) {
-    const response = await this.request('/auth/register', {
+  async startRegistration(phone, userType) {
+    const response = await this.request('/auth/register/start', {
       method: 'POST',
-      body: JSON.stringify(userData)
+      body: JSON.stringify({ phone, userType })
+    });
+    
+    return response;
+  }
+
+  async verifyOtp(phone, code, deviceToken = null) {
+    const response = await this.request('/auth/register/verify-otp', {
+      method: 'POST',
+      body: JSON.stringify({ phone, code, deviceToken })
     });
     
     if (response.token) {
       this.setToken(response.token);
     }
+    
+    return response;
+  }
+
+  async resendOtp(phone) {
+    const response = await this.request('/auth/resend-otp', {
+      method: 'POST',
+      body: JSON.stringify({ phone })
+    });
+    
+    return response;
+  }
+
+  async getProfile() {
+    const response = await this.request('/profile', {
+      method: 'GET'
+    });
     
     return response;
   }
 
   async logout() {
-    this.clearToken();
-    window.location.href = '/index.html';
+    try {
+      await this.request('/auth/logout', {
+        method: 'POST'
+      });
+    } catch (error) {
+      // Logout request failed, continuing with local cleanup
+    } finally {
+      this.removeToken();
+    }
   }
+
 
   /**
    * User Profile APIs

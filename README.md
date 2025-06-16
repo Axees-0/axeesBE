@@ -12,7 +12,7 @@ Axees is an influencer marketing platform connecting brands/marketers with conte
 - **Deal Execution**: Milestone-based project management
 - **AI-Powered Creator Discovery**: Advanced influencer search with competitive intelligence
 - **Security**: Comprehensive security measures against common vulnerabilities
-- **Frontend Integration**: Integrated demo frontend with API client, retry logic, and loading states
+- **Frontend Integration**: Complete frontend integration with centralized authentication, dynamic navigation, and OTP-based registration flow
 
 ## 📋 Prerequisites
 - Node.js 18.x or 20.x
@@ -63,9 +63,14 @@ The backend now includes an integrated demo frontend with a comprehensive API cl
 - **API Client**: Centralized API integration (`/public/js/api.js`)
   - Automatic retry logic with exponential backoff
   - Global loading state management
-  - JWT token handling
-  - Error handling and recovery
-- **Authentication**: Complete login/signup flow with JWT integration
+  - JWT token handling and automatic refresh
+  - Phone-based authentication with OTP verification
+- **Authentication System**: Complete phone/OTP registration and login flow
+  - AuthContext for centralized state management
+  - Auto-logout with token expiry warnings
+  - Protected route handling
+  - Multi-tab session synchronization
+- **Dynamic Navigation**: Role-based navigation with user dropdown
 - **Loading Indicators**: Visual feedback during API operations
 - **Demo Pages**: Fully styled demo pages showcasing platform features
 
@@ -79,9 +84,17 @@ Once the server is running, access the frontend at:
 ### API Client Usage
 ```javascript
 // The global API client is available in all pages
-const response = await axeesAPI.login(email, password);
-const offers = await axeesAPI.getOffers();
+const response = await axeesAPI.login(phone, password);
+const otpResponse = await axeesAPI.startRegistration(phone, 'influencer');
+await axeesAPI.verifyOtp(phone, code);
 const profile = await axeesAPI.getProfile();
+
+// Authentication state management
+authContext.subscribe((state) => {
+  if (state.isAuthenticated) {
+    console.log('User logged in:', state.user);
+  }
+});
 
 // Check loading state
 if (axeesAPI.isLoading()) {
