@@ -10,6 +10,7 @@ Axees is an influencer marketing platform connecting brands/marketers with conte
 - **Payment Integration**: Stripe integration with escrow payments
 - **Real-time Chat**: SSE-based messaging with file attachments
 - **Deal Execution**: Milestone-based project management
+- **AI-Powered Creator Discovery**: Advanced influencer search with competitive intelligence
 - **Security**: Comprehensive security measures against common vulnerabilities
 
 ## 📋 Prerequisites
@@ -94,8 +95,8 @@ npm run test:performance
 npm run test:coverage
 ```
 
-### Test Improvements Documentation
-See [TEST_IMPROVEMENTS_SUMMARY.md](TEST_IMPROVEMENTS_SUMMARY.md) for detailed information about recent test suite enhancements.
+### Test Documentation
+Comprehensive test documentation is available in `docs/testing/` including API test scenarios and testing achievements summary.
 
 ## 💳 Payment System
 
@@ -318,6 +319,11 @@ http://localhost:3000/api-docs
 - `POST /api/chats/:chatId/messages` - Send message
 - `GET /api/chats/:chatId/messages` - Get messages
 - `GET /api/chats/:chatId/stream` - SSE stream for real-time updates
+
+#### AI Creator Discovery
+- `GET /api/find` - AI-powered influencer search with advanced filtering
+- Supports 25+ filter parameters including demographics, engagement metrics, competitive analysis
+- Features: name/location search, fraud detection, audience overlap analysis, growth trend analysis
 
 #### Deals
 - `GET /api/marketer/deals` - List deals
