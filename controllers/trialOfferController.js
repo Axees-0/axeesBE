@@ -630,13 +630,13 @@ async function scheduleTrialReminders(offer) {
 
   // This would typically integrate with a job scheduler like Bull or Agenda
   // For now, we'll just log the schedule
-  console.log(`Trial reminders scheduled for offer ${offer._id}:`, reminderSchedule);
+  // Trial reminders scheduled successfully
 }
 
 // Background job to handle automatic trial conversions
 exports.processTrialConversions = async () => {
   try {
-    console.log('🔄 Processing automatic trial conversions...');
+    // Processing automatic trial conversions
 
     const now = new Date();
     
@@ -649,7 +649,7 @@ exports.processTrialConversions = async () => {
     .populate('marketerId', 'name email stripeCustomerId paymentMethods')
     .populate('creatorId', 'name email stripeConnectId');
 
-    console.log(`Found ${trialsToConvert.length} trials to auto-convert`);
+    // Found trials ready for auto-conversion
 
     for (const offer of trialsToConvert) {
       try {
@@ -659,11 +659,11 @@ exports.processTrialConversions = async () => {
           body: { conversionType: 'automatic' }
         }, {
           // Mock response object
-          json: (data) => console.log('Auto-conversion result:', data),
+          json: (data) => data,
           status: () => ({ json: () => {} })
         });
 
-        console.log(`✅ Auto-converted trial offer ${offer._id}`);
+        // Successfully auto-converted trial offer
 
       } catch (error) {
         console.error(`❌ Failed to auto-convert trial ${offer._id}:`, error);
