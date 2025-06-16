@@ -600,6 +600,8 @@
                 <li><a href="profile.html" class="nav-link">Profile</a></li>
             </ul>
             <div class="nav-actions">
+                <!-- Wallet widget will be inserted here by wallet.js -->
+                <div class="user-nav"></div>
                 <div class="user-avatar" onclick="window.location.href='profile.html'">JD</div>
             </div>
         </div>
@@ -1078,12 +1080,21 @@
         };
     </script>
     
+    <!-- Stripe Payment Integration -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
     <!-- API Integration Scripts -->
     <script src="/js/api.js"></script>
     <script src="/js/auth-context.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/navigation.js"></script>
     <script src="/js/loading-indicator.js"></script>
+    
+    <!-- Payment Components -->
+    <script src="/js/payment-modal.js"></script>
+    <script src="/js/wallet.js"></script>
+    
+    <!-- Offer Management -->
     <script src="/js/offer-creation.js"></script>
     <script src="/js/offer-negotiation.js"></script>
     <script src="/js/offer-collaboration.js"></script>

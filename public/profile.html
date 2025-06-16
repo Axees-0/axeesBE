@@ -652,6 +652,8 @@
                 <li><a href="profile.html" class="nav-link active">Profile</a></li>
             </ul>
             <div class="nav-actions">
+                <!-- Wallet widget will be inserted here by wallet.js -->
+                <div class="user-nav"></div>
                 <div class="user-avatar">JD</div>
             </div>
         </div>
@@ -939,6 +941,9 @@
                         </div>
 
                         <div class="content-body">
+                            <!-- Payment Methods Management Interface Container -->
+                            <div id="paymentMethodsContainer"></div>
+                            
                             <div class="form-section">
                                 <h3 class="section-title">Payment Information</h3>
                                 <div class="form-grid">
@@ -1196,11 +1201,19 @@
         };
     </script>
     
+    <!-- Stripe Payment Integration -->
+    <script src="https://js.stripe.com/v3/"></script>
+    
     <!-- API Integration Scripts -->
     <script src="/js/api.js"></script>
     <script src="/js/auth-context.js"></script>
     <script src="/js/auth.js"></script>
     <script src="/js/navigation.js"></script>
     <script src="/js/loading-indicator.js"></script>
+    
+    <!-- Payment Components -->
+    <script src="/js/payment-modal.js"></script>
+    <script src="/js/wallet.js"></script>
+    <script src="/js/payment-methods.js"></script>
 </body>
 </html>

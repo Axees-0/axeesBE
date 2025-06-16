@@ -117,8 +117,6 @@ class AxeesAPI {
       if (this.retryConfig.retryableStatuses.includes(response.status) && 
           retryCount < this.retryConfig.maxRetries) {
         const delay = this.retryConfig.retryDelay * Math.pow(2, retryCount);
-        // Request failed, retrying after delay
-        
         await this.sleep(delay);
         return this.request(endpoint, options, retryCount + 1);
       }
@@ -138,15 +136,12 @@ class AxeesAPI {
       if (retryCount < this.retryConfig.maxRetries && 
           error.name === 'TypeError' && error.message.includes('fetch')) {
         const delay = this.retryConfig.retryDelay * Math.pow(2, retryCount);
-        // Network error, retrying after delay
-        
         await this.sleep(delay);
         return this.request(endpoint, options, retryCount + 1);
       }
       
       // Clear loading state on error
       this.setLoading(endpoint, false);
-      // API request failed after all retries
       throw error;
     }
   }
@@ -214,7 +209,7 @@ class AxeesAPI {
     } catch (error) {
       // Logout request failed, continuing with local cleanup
     } finally {
-      this.removeToken();
+      this.clearToken();
     }
   }
 
@@ -467,6 +462,22 @@ class AxeesAPI {
     return this.request(`/negotiation/${offerId}/comments/${commentId}`, {
       method: 'DELETE'
     });
+  }
+
+  // Wallet API methods
+  async getWalletBalance() {
+    return this.request('/payments/earnings/summary');
+  }
+
+  async fundWallet(data) {
+    return this.request('/payments/fund-wallet', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    });
+  }
+
+  async getTransactionHistory() {
+    return this.request('/payments/transactions');
   }
 
   async updateOfferComment(offerId, commentId, comment) {

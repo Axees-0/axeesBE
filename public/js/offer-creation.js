@@ -383,6 +383,174 @@ class OfferCreationManager {
             margin: 10px;
           }
         }
+        
+        /* Trial Offer and Pricing Styles */
+        .offer-type-badge {
+          margin-top: 8px;
+          padding: 12px;
+          border-radius: 8px;
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          font-size: 14px;
+        }
+        
+        .offer-type-badge.trial {
+          background: linear-gradient(135deg, #fef3c7, #f59e0b);
+          border: 1px solid #d97706;
+        }
+        
+        .offer-type-badge.premium {
+          background: linear-gradient(135deg, #ddd6fe, #8b5cf6);
+          border: 1px solid #7c3aed;
+        }
+        
+        .offer-type-badge.standard {
+          background: linear-gradient(135deg, #e5e7eb, #6b7280);
+          border: 1px solid #4b5563;
+        }
+        
+        .badge-icon {
+          font-size: 18px;
+          flex-shrink: 0;
+        }
+        
+        .badge-content strong {
+          display: block;
+          margin-bottom: 4px;
+          color: #1f2937;
+        }
+        
+        .badge-content p {
+          margin: 0;
+          color: #374151;
+          line-height: 1.4;
+        }
+        
+        .pricing-breakdown {
+          margin-top: 20px;
+          border: 1px solid #e5e7eb;
+          border-radius: 8px;
+          overflow: hidden;
+        }
+        
+        .pricing-card h4 {
+          margin: 0 0 16px 0;
+          padding: 16px 16px 0;
+          color: #1f2937;
+          font-size: 16px;
+          font-weight: 600;
+        }
+        
+        .pricing-row {
+          padding: 0 16px 16px;
+        }
+        
+        .pricing-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 8px 0;
+          border-bottom: 1px solid #f3f4f6;
+        }
+        
+        .pricing-item:last-child {
+          border-bottom: none;
+        }
+        
+        .pricing-item.highlight {
+          background: #fef3c7;
+          margin: 0 -16px;
+          padding: 8px 16px;
+          border-bottom: 1px solid #f59e0b;
+        }
+        
+        .pricing-item.total {
+          font-weight: 600;
+          font-size: 16px;
+          color: #059669;
+          margin-top: 8px;
+          padding-top: 12px;
+          border-top: 2px solid #d1fae5;
+        }
+        
+        .pricing-label {
+          color: #374151;
+        }
+        
+        .pricing-value {
+          font-weight: 600;
+          color: #1f2937;
+        }
+        
+        .pricing-divider {
+          height: 1px;
+          background: #e5e7eb;
+          margin: 8px 0;
+        }
+        
+        .trial-info {
+          background: #f9fafb;
+          padding: 16px;
+          border-top: 1px solid #e5e7eb;
+        }
+        
+        .trial-timeline {
+          display: flex;
+          gap: 16px;
+          justify-content: space-between;
+        }
+        
+        .timeline-item {
+          flex: 1;
+          text-align: center;
+        }
+        
+        .timeline-step {
+          display: inline-block;
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: #3b82f6;
+          color: white;
+          font-size: 12px;
+          font-weight: 600;
+          line-height: 24px;
+          margin-bottom: 8px;
+        }
+        
+        .timeline-content strong {
+          display: block;
+          font-size: 12px;
+          font-weight: 600;
+          color: #1f2937;
+          margin-bottom: 4px;
+        }
+        
+        .timeline-content p {
+          margin: 0;
+          font-size: 11px;
+          color: #6b7280;
+          line-height: 1.3;
+        }
+        
+        @media (max-width: 768px) {
+          .trial-timeline {
+            flex-direction: column;
+            gap: 12px;
+          }
+          
+          .timeline-item {
+            display: flex;
+            align-items: center;
+            text-align: left;
+            gap: 12px;
+          }
+          
+          .timeline-step {
+            margin-bottom: 0;
+          }
+        }
       `;
       document.head.appendChild(styles);
     }
@@ -505,18 +673,28 @@ class OfferCreationManager {
           
           <div class="form-group">
             <label for="offerType">Offer Type</label>
-            <select id="offerType">
+            <select id="offerType" onchange="offerCreationManager.handleOfferTypeChange()">
               <option value="standard">Standard Offer</option>
               <option value="trial">$1 Trial Offer</option>
               <option value="premium">Premium Collaboration</option>
             </select>
+            <div class="offer-type-info" id="offerTypeInfo"></div>
           </div>
         </div>
         
         <div class="form-group">
           <label for="proposedAmount">Proposed Amount (USD) *</label>
-          <input type="number" id="proposedAmount" placeholder="500" min="1" step="0.01" required>
+          <input type="number" id="proposedAmount" placeholder="500" min="1" step="0.01" required onchange="offerCreationManager.updatePricingBreakdown()">
           <div class="validation-error" id="proposedAmountError"></div>
+        </div>
+        
+        <div class="pricing-breakdown" id="pricingBreakdown" style="display: none;">
+          <div class="pricing-card">
+            <h4>📋 Pricing Breakdown</h4>
+            <div class="pricing-details" id="pricingDetails">
+              <!-- Pricing breakdown will be inserted here -->
+            </div>
+          </div>
         </div>
       </div>
     `;
@@ -1387,6 +1565,141 @@ class OfferCreationManager {
         }
       `;
       document.head.appendChild(styles);
+    }
+  }
+
+  /**
+   * Handle offer type change
+   */
+  handleOfferTypeChange() {
+    const offerType = document.getElementById('offerType')?.value;
+    const offerTypeInfo = document.getElementById('offerTypeInfo');
+    
+    if (!offerTypeInfo) return;
+
+    switch(offerType) {
+      case 'trial':
+        offerTypeInfo.innerHTML = `
+          <div class="offer-type-badge trial">
+            <span class="badge-icon">💫</span>
+            <div class="badge-content">
+              <strong>$1 Trial Offer</strong>
+              <p>Low-risk collaboration starter. Automatically converts to full amount after 7 days.</p>
+            </div>
+          </div>
+        `;
+        break;
+      case 'premium':
+        offerTypeInfo.innerHTML = `
+          <div class="offer-type-badge premium">
+            <span class="badge-icon">⭐</span>
+            <div class="badge-content">
+              <strong>Premium Collaboration</strong>
+              <p>High-value partnership with extended deliverables and priority support.</p>
+            </div>
+          </div>
+        `;
+        break;
+      default:
+        offerTypeInfo.innerHTML = `
+          <div class="offer-type-badge standard">
+            <span class="badge-icon">📋</span>
+            <div class="badge-content">
+              <strong>Standard Offer</strong>
+              <p>Regular collaboration offer with standard terms and timeline.</p>
+            </div>
+          </div>
+        `;
+    }
+    
+    this.updatePricingBreakdown();
+  }
+
+  /**
+   * Update pricing breakdown based on offer type and amount
+   */
+  updatePricingBreakdown() {
+    const offerType = document.getElementById('offerType')?.value;
+    const proposedAmount = parseFloat(document.getElementById('proposedAmount')?.value) || 0;
+    const pricingBreakdown = document.getElementById('pricingBreakdown');
+    const pricingDetails = document.getElementById('pricingDetails');
+    
+    if (!pricingBreakdown || !pricingDetails || proposedAmount <= 0) {
+      if (pricingBreakdown) pricingBreakdown.style.display = 'none';
+      return;
+    }
+
+    if (offerType === 'trial') {
+      pricingBreakdown.style.display = 'block';
+      pricingDetails.innerHTML = `
+        <div class="pricing-row trial-pricing">
+          <div class="pricing-item highlight">
+            <span class="pricing-label">Trial Amount</span>
+            <span class="pricing-value">$1.00</span>
+          </div>
+          <div class="pricing-item">
+            <span class="pricing-label">Full Amount (after trial)</span>
+            <span class="pricing-value">$${proposedAmount.toFixed(2)}</span>
+          </div>
+          <div class="pricing-item">
+            <span class="pricing-label">Trial Duration</span>
+            <span class="pricing-value">7 days</span>
+          </div>
+          <div class="pricing-item">
+            <span class="pricing-label">Platform Fee (10%)</span>
+            <span class="pricing-value">$${(proposedAmount * 0.1).toFixed(2)}</span>
+          </div>
+          <div class="pricing-divider"></div>
+          <div class="pricing-item total">
+            <span class="pricing-label">Creator Receives (after conversion)</span>
+            <span class="pricing-value">$${(proposedAmount * 0.9).toFixed(2)}</span>
+          </div>
+        </div>
+        <div class="trial-info">
+          <div class="trial-timeline">
+            <div class="timeline-item">
+              <span class="timeline-step">1</span>
+              <div class="timeline-content">
+                <strong>Trial Starts</strong>
+                <p>Creator begins work for $1</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-step">2</span>
+              <div class="timeline-content">
+                <strong>Day 7</strong>
+                <p>Automatic conversion to full amount</p>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <span class="timeline-step">3</span>
+              <div class="timeline-content">
+                <strong>Payment Release</strong>
+                <p>Creator receives payment upon completion</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    } else {
+      pricingBreakdown.style.display = 'block';
+      pricingDetails.innerHTML = `
+        <div class="pricing-row standard-pricing">
+          <div class="pricing-item">
+            <span class="pricing-label">Offer Amount</span>
+            <span class="pricing-value">$${proposedAmount.toFixed(2)}</span>
+          </div>
+          <div class="pricing-item">
+            <span class="pricing-label">Platform Fee (10%)</span>
+            <span class="pricing-value">$${(proposedAmount * 0.1).toFixed(2)}</span>
+          </div>
+          <div class="pricing-divider"></div>
+          <div class="pricing-item total">
+            <span class="pricing-label">Creator Receives</span>
+            <span class="pricing-value">$${(proposedAmount * 0.9).toFixed(2)}</span>
+          </div>
+        </div>
+      `;
     }
   }
 

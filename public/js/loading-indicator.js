@@ -123,10 +123,6 @@ class LoadingIndicator {
       this.hide();
     }
     
-    // Log loading activity for debugging
-    if (window.axeesDebug) {
-      // Loading state updated for endpoint
-    }
   }
 
   show() {
