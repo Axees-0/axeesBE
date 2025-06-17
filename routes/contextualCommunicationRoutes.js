@@ -537,4 +537,191 @@ router.post('/mark-read', authenticate, markMessagesAsRead);
  */
 router.get('/suggestions', authenticate, getCommunicationSuggestions);
 
+// Add missing endpoints for frontend integration
+router.post('/suggestions', async (req, res) => {
+  try {
+    const { context, contextData } = req.body;
+    
+    // Generate contextual suggestions based on current context
+    const suggestions = await generateContextualSuggestions(context, contextData);
+    
+    res.json({
+      success: true,
+      suggestions: suggestions || []
+    });
+  } catch (error) {
+    console.error('Error generating contextual suggestions:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate suggestions'
+    });
+  }
+});
+
+router.get('/milestones/upcoming', async (req, res) => {
+  try {
+    const userId = req.user?.id || req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID required' });
+    }
+
+    // Get upcoming milestones for the user
+    const Deal = require('../models/deal');
+    const upcomingMilestones = await Deal.find({
+      $or: [
+        { creatorId: userId },
+        { marketerId: userId }
+      ],
+      'milestones.deadline': {
+        $gte: new Date(),
+        $lte: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // Next 7 days
+      },
+      status: { $in: ['active', 'in_progress'] }
+    }).populate('milestones');
+
+    const milestones = [];
+    upcomingMilestones.forEach(deal => {
+      deal.milestones.forEach(milestone => {
+        const deadline = new Date(milestone.deadline);
+        const now = new Date();
+        if (deadline > now && deadline <= new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)) {
+          milestones.push({
+            _id: milestone._id,
+            title: milestone.title,
+            deadline: milestone.deadline,
+            dealId: deal._id,
+            dealTitle: deal.title
+          });
+        }
+      });
+    });
+
+    res.json({
+      success: true,
+      data: milestones
+    });
+  } catch (error) {
+    console.error('Error fetching upcoming milestones:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch upcoming milestones'
+    });
+  }
+});
+
+router.get('/payments/upcoming', async (req, res) => {
+  try {
+    const userId = req.user?.id || req.query.userId;
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID required' });
+    }
+
+    // Get upcoming payments for the user
+    const Deal = require('../models/deal');
+    const upcomingPayments = await Deal.find({
+      $or: [
+        { creatorId: userId },
+        { marketerId: userId }
+      ],
+      'milestones.paymentScheduled': {
+        $gte: new Date(),
+        $lte: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000) // Next 3 days
+      },
+      status: { $in: ['active', 'in_progress'] }
+    });
+
+    const payments = [];
+    upcomingPayments.forEach(deal => {
+      deal.milestones.forEach(milestone => {
+        if (milestone.paymentScheduled) {
+          const paymentDate = new Date(milestone.paymentScheduled);
+          const now = new Date();
+          if (paymentDate > now && paymentDate <= new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)) {
+            payments.push({
+              _id: milestone._id,
+              amount: milestone.payment,
+              scheduledDate: milestone.paymentScheduled,
+              dealId: deal._id,
+              dealTitle: deal.title
+            });
+          }
+        }
+      });
+    });
+
+    res.json({
+      success: true,
+      data: payments
+    });
+  } catch (error) {
+    console.error('Error fetching upcoming payments:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch upcoming payments'
+    });
+  }
+});
+
+// Helper function for generating contextual suggestions
+async function generateContextualSuggestions(context, contextData) {
+  const suggestions = [];
+  
+  switch (context) {
+    case 'offer':
+      suggestions.push({
+        type: 'tip',
+        title: 'Optimize Your Offer',
+        message: 'Add more details about deliverables to increase acceptance rate',
+        action: 'Edit Offer'
+      });
+      break;
+      
+    case 'deal':
+      suggestions.push({
+        type: 'reminder',
+        title: 'Update Progress',
+        message: 'Keep your client updated on milestone progress',
+        action: 'Send Update'
+      });
+      break;
+      
+    case 'dashboard':
+      suggestions.push({
+        type: 'insight',
+        title: 'Performance Tip',
+        message: 'Your response rate is below average. Try responding within 2 hours',
+        action: 'View Stats'
+      });
+      break;
+      
+    case 'marketplace':
+      suggestions.push({
+        type: 'tip',
+        title: 'Search Tip',
+        message: 'Use filters to find deals that match your skills',
+        action: 'Show Filters'
+      });
+      break;
+      
+    case 'profile':
+      suggestions.push({
+        type: 'reminder',
+        title: 'Complete Your Profile',
+        message: 'Add portfolio samples to increase visibility by 40%',
+        action: 'Add Portfolio'
+      });
+      break;
+      
+    default:
+      suggestions.push({
+        type: 'general',
+        title: 'Welcome',
+        message: 'Everything looks good! Keep up the great work.',
+        action: null
+      });
+  }
+  
+  return suggestions;
+}
+
 module.exports = router;

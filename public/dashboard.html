@@ -906,6 +906,27 @@
     <script src="/js/profile-completion-widget.js"></script>
     <script src="/js/verification-badges.js"></script>
     
+    <!-- Real-time Features (Phase 7) -->
+    <script src="/js/chat-bubble.js"></script>
+    <script src="/js/notification-system.js"></script>
+    <script src="/js/contextual-communication.js"></script>
+    
+    <!-- Service Worker Registration -->
+    <script>
+        // Register service worker for push notifications and offline functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch((error) => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+    
     <script>
         // Initialize calendar widget on dashboard
         window.addEventListener('load', function() {
