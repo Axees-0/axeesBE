@@ -271,6 +271,12 @@ class DealManager {
                 💰
               </button>
             ` : ''}
+            <button class="btn-icon" data-qr-action="generate-deal" data-deal-id="${deal._id}" title="Generate QR Code">
+              📱
+            </button>
+            <button class="btn-icon" data-agreement-action="view-deal" data-deal-id="${deal._id}" title="View Agreement">
+              📋
+            </button>
             <button class="btn-icon" onclick="window.dealManager.showMenu('${deal._id}', event)" title="More Options">
               ⋮
             </button>

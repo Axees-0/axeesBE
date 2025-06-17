@@ -697,6 +697,7 @@
                         <li><a href="#profile" class="profile-menu-link active" onclick="showSection('profile')">👤 Profile Information</a></li>
                         <li><a href="#social" class="profile-menu-link" onclick="showSection('social')">📱 Social Accounts</a></li>
                         <li><a href="#verification" class="profile-menu-link" onclick="showSection('verification')">✅ Verification</a></li>
+                        <li><a href="#qr-sharing" class="profile-menu-link" onclick="showSection('qr-sharing')">📱 QR Code Sharing</a></li>
                         <li><a href="#settings" class="profile-menu-link" onclick="showSection('settings')">⚙️ Account Settings</a></li>
                         <li><a href="#billing" class="profile-menu-link" onclick="showSection('billing')">💳 Billing & Payments</a></li>
                     </ul>
@@ -853,6 +854,82 @@
                         <div class="action-buttons">
                             <button class="btn btn-secondary" onclick="requestVerification()">Request New Verification</button>
                             <button class="btn btn-primary" onclick="refreshVerification()">Refresh Status</button>
+                        </div>
+                    </div>
+
+                    <!-- QR Code Sharing Section -->
+                    <div id="qr-sharing-section" class="content-section" style="display: none;">
+                        <div class="content-header">
+                            <h1 class="content-title">QR Code Sharing</h1>
+                            <p class="content-subtitle">Generate and manage QR codes for your profile and deals</p>
+                        </div>
+
+                        <div class="content-body">
+                            <div class="form-section">
+                                <h3 class="section-title">Profile QR Code</h3>
+                                <p style="color: var(--text-secondary); margin-bottom: var(--space-4);">
+                                    Share your profile instantly with brands and other creators using QR codes.
+                                </p>
+                                
+                                <div style="display: flex; gap: var(--space-4); margin-bottom: var(--space-6);">
+                                    <button class="btn btn-primary" data-qr-action="generate-profile">
+                                        📱 Generate Profile QR
+                                    </button>
+                                    <button class="btn btn-secondary" data-qr-action="scan">
+                                        📷 Scan QR Code
+                                    </button>
+                                </div>
+
+                                <div id="qr-profile-display" style="display: none; padding: var(--space-4); background: var(--gray-50); border-radius: var(--radius-lg); text-align: center;">
+                                    <!-- QR code will be displayed here -->
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3 class="section-title">QR Code History</h3>
+                                <p style="color: var(--text-secondary); margin-bottom: var(--space-4);">
+                                    View and manage your previously generated QR codes.
+                                </p>
+                                
+                                <div id="qr-history-display">
+                                    <!-- QR history will be loaded here -->
+                                    <div style="text-align: center; padding: var(--space-8); color: var(--text-muted);">
+                                        <div style="font-size: var(--text-lg); margin-bottom: var(--space-2);">📱</div>
+                                        <p>Loading QR code history...</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3 class="section-title">QR Code Settings</h3>
+                                <div class="settings-item">
+                                    <div class="settings-info">
+                                        <h4>Auto-generate QR for new deals</h4>
+                                        <p>Automatically create QR codes when you accept new collaborations</p>
+                                    </div>
+                                    <div class="toggle-switch" onclick="toggleSetting('auto-qr-deals')">
+                                        <div class="toggle-knob"></div>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <div class="settings-info">
+                                        <h4>Include QR in portfolio</h4>
+                                        <p>Display your profile QR code in your public portfolio</p>
+                                    </div>
+                                    <div class="toggle-switch active" onclick="toggleSetting('qr-in-portfolio')">
+                                        <div class="toggle-knob"></div>
+                                    </div>
+                                </div>
+                                <div class="settings-item">
+                                    <div class="settings-info">
+                                        <h4>QR code tracking</h4>
+                                        <p>Track when your QR codes are scanned for analytics</p>
+                                    </div>
+                                    <div class="toggle-switch active" onclick="toggleSetting('qr-tracking')">
+                                        <div class="toggle-knob"></div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1220,5 +1297,9 @@
     <script src="/js/chat-bubble.js"></script>
     <script src="/js/notification-system.js"></script>
     <script src="/js/contextual-communication.js"></script>
+    
+    <!-- Phase 8: Advanced Features -->
+    <script src="/js/qr-code-manager.js"></script>
+    <script src="/js/agreement-display.js"></script>
 </body>
 </html>

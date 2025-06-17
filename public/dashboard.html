@@ -557,6 +557,55 @@
             color: var(--text-secondary);
         }
 
+        /* QR Code Tools */
+        .qr-tools-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: var(--space-3);
+        }
+
+        .qr-tool-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3);
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: left;
+        }
+
+        .qr-tool-btn:hover {
+            background: var(--gray-100);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .qr-tool-icon {
+            font-size: var(--text-xl);
+            flex-shrink: 0;
+        }
+
+        .qr-tool-text h4 {
+            margin: 0 0 var(--space-1) 0;
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+        }
+
+        .qr-tool-text p {
+            margin: 0;
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+        }
+
+        .btn-sm {
+            padding: var(--space-1) var(--space-2);
+            font-size: var(--text-sm);
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .nav-menu {
@@ -597,6 +646,7 @@
                 <li><a href="marketplace.html" class="nav-link">Marketplace</a></li>
                 <li><a href="brands.html" class="nav-link">For Brands</a></li>
                 <li><a href="analytics.html" class="nav-link">Analytics</a></li>
+                <li><a href="admin.html" class="nav-link admin-only" style="display: none;">Admin</a></li>
                 <li><a href="profile.html" class="nav-link">Profile</a></li>
             </ul>
             <div class="nav-actions">
@@ -756,6 +806,10 @@
                                 <div class="deal-amount">$2,500</div>
                             </div>
                             <div class="deal-status active">Active</div>
+                            <div class="deal-actions" style="margin-top: var(--space-2); display: flex; gap: var(--space-2);">
+                                <button class="btn btn-sm btn-secondary" data-qr-action="generate-deal" data-deal-id="sample-deal-1">Generate QR</button>
+                                <button class="btn btn-sm btn-primary" data-agreement-action="view-deal" data-deal-id="sample-deal-1">View Agreement</button>
+                            </div>
                         </div>
 
                         <div class="deal-card">
@@ -767,6 +821,10 @@
                                 <div class="deal-amount">$1,800</div>
                             </div>
                             <div class="deal-status pending">Pending Review</div>
+                            <div class="deal-actions" style="margin-top: var(--space-2); display: flex; gap: var(--space-2);">
+                                <button class="btn btn-sm btn-secondary" data-qr-action="generate-deal" data-deal-id="sample-deal-2">Generate QR</button>
+                                <button class="btn btn-sm btn-primary" data-agreement-action="view-deal" data-deal-id="sample-deal-2">View Agreement</button>
+                            </div>
                         </div>
 
                         <div class="deal-card">
@@ -778,6 +836,10 @@
                                 <div class="deal-amount">$3,200</div>
                             </div>
                             <div class="deal-status completed">Completed</div>
+                            <div class="deal-actions" style="margin-top: var(--space-2); display: flex; gap: var(--space-2);">
+                                <button class="btn btn-sm btn-secondary" data-qr-action="generate-deal" data-deal-id="sample-deal-3">Generate QR</button>
+                                <button class="btn btn-sm btn-primary" data-agreement-action="view-deal" data-deal-id="sample-deal-3">View Agreement</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -796,6 +858,69 @@
                 </div>
             </div>
 
+            <!-- QR Code History Section -->
+            <div class="dashboard-grid">
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">QR Code Activity</h3>
+                        <button class="btn btn-secondary" data-qr-action="generate-profile">Generate New QR</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="qr-history">
+                            <!-- QR history will be loaded here -->
+                            <div class="loading-placeholder">
+                                <div style="text-align: center; padding: var(--space-8);">
+                                    <div style="font-size: var(--text-lg); margin-bottom: var(--space-2);">📱</div>
+                                    <div>Loading QR code history...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- QR Quick Actions -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">QR Code Tools</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="qr-tools-grid">
+                            <button class="qr-tool-btn" data-qr-action="generate-profile">
+                                <div class="qr-tool-icon">👤</div>
+                                <div class="qr-tool-text">
+                                    <h4>Profile QR</h4>
+                                    <p>Share your profile</p>
+                                </div>
+                            </button>
+                            
+                            <button class="qr-tool-btn" data-qr-action="scan">
+                                <div class="qr-tool-icon">📷</div>
+                                <div class="qr-tool-text">
+                                    <h4>Scan Code</h4>
+                                    <p>Connect via QR</p>
+                                </div>
+                            </button>
+                            
+                            <button class="qr-tool-btn" onclick="alert('Bulk QR generation for selected deals coming soon!')">
+                                <div class="qr-tool-icon">📋</div>
+                                <div class="qr-tool-text">
+                                    <h4>Bulk Generate</h4>
+                                    <p>Multiple deal QRs</p>
+                                </div>
+                            </button>
+                            
+                            <button class="qr-tool-btn" onclick="window.location.href='/profile.html#qr-settings'">
+                                <div class="qr-tool-icon">⚙️</div>
+                                <div class="qr-tool-text">
+                                    <h4>QR Settings</h4>
+                                    <p>Manage preferences</p>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Quick Actions -->
             <div class="quick-actions">
                 <div class="action-card" onclick="window.location.href='marketplace.html'">
@@ -808,6 +933,18 @@
                     <div class="action-icon">📸</div>
                     <h4 class="action-title">Create Content</h4>
                     <p class="action-description">Upload and manage your content</p>
+                </div>
+
+                <div class="action-card" data-qr-action="generate-profile">
+                    <div class="action-icon">📱</div>
+                    <h4 class="action-title">Generate QR Code</h4>
+                    <p class="action-description">Share your profile with QR codes</p>
+                </div>
+
+                <div class="action-card" data-qr-action="scan">
+                    <div class="action-icon">🔍</div>
+                    <h4 class="action-title">Scan QR Code</h4>
+                    <p class="action-description">Connect via QR code scanning</p>
                 </div>
 
                 <div class="action-card" onclick="window.location.href='analytics.html'">
@@ -911,6 +1048,10 @@
     <script src="/js/notification-system.js"></script>
     <script src="/js/contextual-communication.js"></script>
     
+    <!-- Phase 8: Advanced Features -->
+    <script src="/js/qr-code-manager.js"></script>
+    <script src="/js/agreement-display.js"></script>
+    
     <!-- Service Worker Registration -->
     <script>
         // Register service worker for push notifications and offline functionality
@@ -936,6 +1077,14 @@
                     showEvents: true,
                     eventSource: 'milestones'
                 });
+            }
+            
+            // Show admin link for admin users
+            if (window.authManager && window.authManager.user && window.authManager.user.role === 'admin') {
+                const adminLink = document.querySelector('.admin-only');
+                if (adminLink) {
+                    adminLink.style.display = 'block';
+                }
             }
         });
     </script>

@@ -754,6 +754,28 @@
             margin-left: var(--space-2);
         }
 
+        /* Deal Actions */
+        .deal-actions {
+            display: flex;
+            gap: var(--space-2);
+            padding: var(--space-3);
+            border-top: 1px solid var(--gray-200);
+            background: var(--gray-50);
+            border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+            margin: 0 -var(--space-4) -var(--space-4) -var(--space-4);
+        }
+
+        .deal-actions .btn {
+            flex: 1;
+            justify-content: center;
+            margin: 0;
+        }
+
+        .btn-sm {
+            padding: var(--space-1) var(--space-2);
+            font-size: var(--text-sm);
+        }
+
         /* Loading and Error States */
         .loading-state,
         .error-state {
@@ -1258,6 +1280,17 @@
                         <div class="deadline-label">Application Deadline</div>
                     </div>
                 </div>
+                <div class="deal-actions">
+                    <button class="btn btn-sm btn-secondary" data-qr-action="generate-deal" data-deal-id="${deal.id}" onclick="event.stopPropagation()">
+                        📱 QR Code
+                    </button>
+                    <button class="btn btn-sm btn-secondary" data-agreement-action="view-offer" data-offer-id="${deal.id}" onclick="event.stopPropagation()">
+                        📋 View Terms
+                    </button>
+                    <button class="btn btn-sm btn-primary" onclick="event.stopPropagation(); openDealModal(deal)">
+                        Apply Now
+                    </button>
+                </div>
             `;
             
             card.addEventListener('click', () => openDealModal(deal));
@@ -1462,6 +1495,10 @@
     <script src="/js/chat-bubble.js"></script>
     <script src="/js/notification-system.js"></script>
     <script src="/js/contextual-communication.js"></script>
+    
+    <!-- Phase 8: Advanced Features -->
+    <script src="/js/qr-code-manager.js"></script>
+    <script src="/js/agreement-display.js"></script>
     
     <script>
         // Show create deal button for marketers only
