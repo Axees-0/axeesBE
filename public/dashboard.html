@@ -664,6 +664,11 @@
 
             <!-- Dashboard Grid -->
             <div class="dashboard-grid">
+                <!-- Profile Completion Widget -->
+                <div id="profile-completion-dashboard-widget" data-profile-widget="main">
+                    <!-- Profile completion widget will be rendered here -->
+                </div>
+
                 <!-- Performance Chart -->
                 <div class="dashboard-card">
                     <div class="card-header">
@@ -732,12 +737,14 @@
                 </div>
             </div>
 
-            <!-- Active Deals -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h3 class="card-title">Active Collaborations</h3>
-                    <button class="btn btn-secondary" onclick="window.location.href='marketplace.html'">Browse More</button>
-                </div>
+            <!-- Dashboard Grid Row 2 -->
+            <div class="dashboard-grid">
+                <!-- Active Deals -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Active Collaborations</h3>
+                        <button class="btn btn-secondary" onclick="window.location.href='marketplace.html'">Browse More</button>
+                    </div>
                 <div class="card-body">
                     <div class="deals-grid">
                         <div class="deal-card">
@@ -774,6 +781,19 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- Calendar Widget -->
+                <div class="dashboard-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Upcoming Deadlines</h3>
+                        <button class="btn btn-secondary" onclick="window.calendarWidget.toggleView()">Month View</button>
+                    </div>
+                    <div class="card-body">
+                        <div id="dashboard-calendar" style="min-height: 300px;">
+                            <!-- Calendar will be rendered here -->
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Quick Actions -->
@@ -806,70 +826,6 @@
     </main>
 
     <script>
-        // Animate stats on page load
-        window.addEventListener('load', function() {
-            animateStats();
-            initializeChartPlaceholder();
-        });
-
-        function animateStats() {
-            const stats = [
-                { element: 'earningsValue', target: 12450, prefix: '$', suffix: '' },
-                { element: 'followersValue', target: 156000, prefix: '', suffix: 'K' },
-                { element: 'engagementValue', target: 8.4, prefix: '', suffix: '%' },
-                { element: 'dealsValue', target: 7, prefix: '', suffix: '' }
-            ];
-
-            stats.forEach((stat, index) => {
-                setTimeout(() => {
-                    animateValue(stat.element, stat.target, stat.prefix, stat.suffix);
-                }, index * 200);
-            });
-        }
-
-        function animateValue(elementId, target, prefix, suffix) {
-            const element = document.getElementById(elementId);
-            let current = 0;
-            const increment = target / 50;
-            const isDecimal = target % 1 !== 0;
-            
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                
-                let displayValue = isDecimal ? current.toFixed(1) : Math.floor(current);
-                
-                if (suffix === 'K' && target >= 1000) {
-                    displayValue = (current / 1000).toFixed(1);
-                }
-                
-                element.textContent = prefix + displayValue + suffix;
-            }, 30);
-        }
-
-        function initializeChartPlaceholder() {
-            const chartContainer = document.getElementById('performanceChart');
-            
-            // Create a simple animated chart placeholder
-            chartContainer.innerHTML = `
-                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; flex-direction: column;">
-                    <div style="width: 80%; height: 60%; background: linear-gradient(45deg, var(--primary-color), var(--secondary-color)); border-radius: var(--radius-lg); opacity: 0.1; position: relative; overflow: hidden;">
-                        <div style="position: absolute; bottom: 0; left: 10%; width: 15%; height: 40%; background: var(--primary-color); opacity: 0.7; border-radius: 4px 4px 0 0;"></div>
-                        <div style="position: absolute; bottom: 0; left: 30%; width: 15%; height: 65%; background: var(--secondary-color); opacity: 0.7; border-radius: 4px 4px 0 0;"></div>
-                        <div style="position: absolute; bottom: 0; left: 50%; width: 15%; height: 50%; background: var(--primary-color); opacity: 0.7; border-radius: 4px 4px 0 0;"></div>
-                        <div style="position: absolute; bottom: 0; left: 70%; width: 15%; height: 80%; background: var(--secondary-color); opacity: 0.7; border-radius: 4px 4px 0 0;"></div>
-                    </div>
-                    <div style="margin-top: var(--space-4); text-align: center; color: var(--text-secondary);">
-                        <div style="font-weight: var(--font-semibold); margin-bottom: var(--space-1);">Performance Trending Up! 📈</div>
-                        <div style="font-size: var(--text-sm);">Interactive charts powered by Chart.js</div>
-                    </div>
-                </div>
-            `;
-        }
-
         function createContent() {
             alert('Content creation feature would open:\n\n• Media upload interface\n• Campaign content builder\n• AI-powered optimization suggestions\n• Content calendar management');
         }
@@ -884,17 +840,6 @@
                 this.style.transform = 'translateY(0)';
             });
         });
-
-        // Save dashboard state to localStorage
-        const dashboardState = {
-            lastVisit: new Date().toISOString(),
-            totalEarnings: 12450,
-            totalFollowers: 156000,
-            engagementRate: 8.4,
-            activeDeals: 7
-        };
-
-        localStorage.setItem('axees_dashboard', JSON.stringify(dashboardState));
 
         // Add notification system
         function showNotification(message, type = 'info') {
@@ -934,11 +879,6 @@
                 }, 300);
             }, 3000);
         }
-
-        // Show welcome notification
-        setTimeout(() => {
-            showNotification('Welcome back! You have 3 new collaboration opportunities.', 'success');
-        }, 1000);
     </script>
     
     <!-- Stripe Payment Integration -->
@@ -954,5 +894,29 @@
     <!-- Payment Components -->
     <script src="/js/payment-modal.js"></script>
     <script src="/js/wallet.js"></script>
+    
+    <!-- Dashboard Component -->
+    <script src="/js/dashboard.js"></script>
+    
+    <!-- Calendar Widget -->
+    <script src="/js/calendar-widget.js"></script>
+    
+    <!-- Profile Completion System -->
+    <script src="/js/profile-completion-wizard.js"></script>
+    <script src="/js/profile-completion-widget.js"></script>
+    <script src="/js/verification-badges.js"></script>
+    
+    <script>
+        // Initialize calendar widget on dashboard
+        window.addEventListener('load', function() {
+            if (window.CalendarWidget) {
+                window.calendarWidget = new CalendarWidget('dashboard-calendar', {
+                    mini: true,
+                    showEvents: true,
+                    eventSource: 'milestones'
+                });
+            }
+        });
+    </script>
 </body>
 </html>

@@ -16,7 +16,7 @@ class OfferCreationManager {
     this.initialize();
   }
 
-  initialize() {
+  async initialize() {
     // Check if user is authenticated marketer
     if (!window.authContext || !window.authContext.isAuthenticated) {
       return;
@@ -561,7 +561,13 @@ class OfferCreationManager {
   /**
    * Show the offer creation form modal
    */
-  showOfferForm() {
+  async showOfferForm() {
+    // Check profile completion before allowing offer creation
+    if (window.profileCompletionWidget && window.profileCompletionWidget.isProfileBlocked('create_offer')) {
+      window.profileCompletionWidget.showBlockingMessage('create_offer');
+      return;
+    }
+
     this.resetForm();
     const modal = this.createFormModal();
     document.body.appendChild(modal);

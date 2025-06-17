@@ -510,13 +510,50 @@ class AxeesAPI {
   }
 
   async getDealDashboard() {
-    return this.request('/deals/dashboard');
+    return this.request('/deal-dashboard');
   }
 
   async updateMilestones(dealId, milestones) {
-    return this.request(`/deals/${dealId}/milestones`, {
+    return this.request(`/marketer/deals/${dealId}/milestones`, {
       method: 'PUT',
       body: JSON.stringify({ milestones })
+    });
+  }
+
+  async getMilestones(dealId) {
+    return this.request(`/marketer/deals/${dealId}/milestones`);
+  }
+
+  async createMilestone(dealId, milestoneData) {
+    return this.request(`/marketer/deals/${dealId}/milestones`, {
+      method: 'POST',
+      body: JSON.stringify(milestoneData)
+    });
+  }
+
+  async updateMilestone(dealId, milestoneId, updates) {
+    return this.request(`/marketer/deals/${dealId}/milestones/${milestoneId}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates)
+    });
+  }
+
+  async deleteMilestone(dealId, milestoneId) {
+    return this.request(`/marketer/deals/${dealId}/milestones/${milestoneId}`, {
+      method: 'DELETE'
+    });
+  }
+
+  async completeMilestone(dealId, milestoneId, proofData = {}) {
+    return this.request(`/deals/${dealId}/milestones/${milestoneId}/complete`, {
+      method: 'POST',
+      body: JSON.stringify(proofData)
+    });
+  }
+
+  async releaseMilestonePayment(dealId, milestoneId) {
+    return this.request(`/deals/${dealId}/milestones/${milestoneId}/release-payment`, {
+      method: 'POST'
     });
   }
 
@@ -576,6 +613,26 @@ class AxeesAPI {
     return this.request('/calendar/events');
   }
 
+  async createCalendarEvent(eventData) {
+    return this.request('/calendar/events', {
+      method: 'POST',
+      body: JSON.stringify(eventData)
+    });
+  }
+
+  async updateCalendarEvent(eventId, eventData) {
+    return this.request(`/calendar/events/${eventId}`, {
+      method: 'PUT',
+      body: JSON.stringify(eventData)
+    });
+  }
+
+  async deleteCalendarEvent(eventId) {
+    return this.request(`/calendar/events/${eventId}`, {
+      method: 'DELETE'
+    });
+  }
+
   /**
    * Search/Discovery APIs
    */
@@ -600,6 +657,31 @@ class AxeesAPI {
     return this.request('/qrcode/scan', {
       method: 'POST',
       body: JSON.stringify({ qrData })
+    });
+  }
+
+  /**
+   * Payment Release APIs
+   */
+  async processPaymentRelease(paymentData) {
+    return this.request('/milestone-payments/release', {
+      method: 'POST',
+      body: JSON.stringify(paymentData)
+    });
+  }
+
+  async getPaymentHistory(dealId, milestoneId) {
+    return this.request(`/milestone-payments/${dealId}/${milestoneId}/history`);
+  }
+
+  async getAutomaticReleaseSchedule(dealId) {
+    return this.request(`/auto-releases/${dealId}/schedule`);
+  }
+
+  async updateReleaseSettings(dealId, settings) {
+    return this.request(`/auto-releases/${dealId}/settings`, {
+      method: 'PUT',
+      body: JSON.stringify(settings)
     });
   }
 

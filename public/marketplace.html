@@ -556,6 +556,226 @@
             50% { opacity: 0.5; }
         }
 
+        /* Milestone Preview */
+        .milestone-preview {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            margin-top: var(--space-3);
+            padding: var(--space-3);
+            background: var(--gray-50);
+            border-radius: var(--radius-md);
+        }
+
+        .milestone-icon {
+            font-size: var(--text-lg);
+        }
+
+        .milestone-text {
+            font-size: var(--text-sm);
+            color: var(--text-secondary);
+            margin-right: auto;
+        }
+
+        .milestone-progress {
+            flex: 1;
+            max-width: 100px;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--gray-200);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            transition: width 0.3s ease;
+        }
+
+        /* Deal Detail Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: var(--radius-xl);
+            max-width: 800px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            padding: var(--space-6);
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: var(--space-6);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .deal-detail-header {
+            margin-bottom: var(--space-8);
+        }
+
+        .brand-section {
+            display: flex;
+            gap: var(--space-4);
+            align-items: center;
+        }
+
+        .brand-logo-large {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--radius-xl);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: var(--text-2xl);
+            font-weight: var(--font-bold);
+        }
+
+        .brand-details h3 {
+            margin: 0 0 var(--space-2) 0;
+            font-size: var(--text-2xl);
+        }
+
+        .deal-detail-section {
+            margin-bottom: var(--space-6);
+        }
+
+        .deal-detail-section h4 {
+            margin: 0 0 var(--space-3) 0;
+            color: var(--text-primary);
+        }
+
+        .requirements-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .requirements-list li {
+            padding: var(--space-2) 0;
+            padding-left: var(--space-6);
+            position: relative;
+        }
+
+        .requirements-list li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: var(--font-bold);
+        }
+
+        .payment-details {
+            background: var(--gray-50);
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+        }
+
+        .payment-item {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-2) 0;
+        }
+
+        .deal-detail-actions {
+            display: flex;
+            gap: var(--space-3);
+            justify-content: flex-end;
+            margin-top: var(--space-6);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .status-badge.active {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .status-badge.pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .status-badge.completed {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--primary-color);
+        }
+
+        .own-deal-badge {
+            background: var(--primary-color);
+            color: white;
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+        }
+
+        .trial-badge {
+            background: var(--secondary-color);
+            color: white;
+            padding: var(--space-1) var(--space-2);
+            border-radius: var(--radius-md);
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            margin-left: var(--space-2);
+        }
+
+        /* Loading and Error States */
+        .loading-state,
+        .error-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: var(--space-16) var(--space-6);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-200);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto var(--space-4);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .nav-menu {
@@ -580,6 +800,133 @@
                 gap: var(--space-4);
                 align-items: flex-start;
             }
+
+            .modal-content {
+                margin: 0;
+                height: 100%;
+                max-width: 100%;
+                border-radius: 0;
+            }
+
+            .brand-section {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Payment Status Indicators */
+        .payment-status-indicators {
+            display: flex;
+            gap: 4px;
+            margin-top: 8px;
+            align-items: center;
+        }
+
+        .payment-status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            position: relative;
+            cursor: help;
+        }
+
+        .payment-status-indicator.status-pending {
+            background: var(--gray-300);
+            border: 1px solid var(--gray-400);
+        }
+
+        .payment-status-indicator.status-in-progress {
+            background: #f59e0b;
+            border: 1px solid #d97706;
+            animation: pulse-progress 2s infinite;
+        }
+
+        .payment-status-indicator.status-ready {
+            background: #10b981;
+            border: 1px solid #059669;
+            animation: pulse-ready 2s infinite;
+        }
+
+        .payment-status-indicator.status-released {
+            background: #6366f1;
+            border: 1px solid var(--primary-dark);
+        }
+
+        .payment-status-indicator.status-paid {
+            background: #059669;
+            border: 1px solid #047857;
+            box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2);
+        }
+
+        .payment-status-indicator.status-disputed {
+            background: #ef4444;
+            border: 1px solid #dc2626;
+            animation: pulse-alert 1.5s infinite;
+        }
+
+        .payment-status-indicator.status-held {
+            background: #f59e0b;
+            border: 1px solid #d97706;
+            animation: pulse-warning 2s infinite;
+        }
+
+        @keyframes pulse-progress {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @keyframes pulse-ready {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.3);
+            }
+        }
+
+        @keyframes pulse-alert {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.3);
+            }
+            50% { 
+                transform: scale(1.2);
+                box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5);
+            }
+        }
+
+        @keyframes pulse-warning {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Enhanced milestone preview */
+        .milestone-preview {
+            background: var(--gray-50);
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+            margin: 12px 0;
+        }
+
+        .milestone-progress {
+            margin-top: 8px;
+        }
+
+        .progress-bar {
+            background: var(--gray-200);
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 4px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            height: 100%;
+            transition: width 0.3s ease;
         }
     </style>
 </head>
@@ -612,7 +959,12 @@
         <div class="container">
             <!-- Page Header -->
             <div class="page-header">
-                <h1 class="page-title">Deal Marketplace</h1>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--space-2);">
+                    <h1 class="page-title" style="margin: 0;">Deal Marketplace</h1>
+                    <button class="btn btn-primary" id="create-deal-btn" style="display: none;" onclick="window.dealCreationManager.open()">
+                        <span style="margin-right: 8px;">+</span> Create New Deal
+                    </button>
+                </div>
                 <p class="page-subtitle">Discover amazing collaboration opportunities with top brands</p>
             </div>
 
@@ -1098,5 +1450,24 @@
     <script src="/js/offer-creation.js"></script>
     <script src="/js/offer-negotiation.js"></script>
     <script src="/js/offer-collaboration.js"></script>
+    
+    <!-- Deal Management -->
+    <script src="/js/marketplace.js"></script>
+    <script src="/js/deal-creation.js"></script>
+    <script src="/js/milestone-manager.js"></script>
+    <script src="/js/milestone-timeline.js"></script>
+    <script src="/js/calendar-widget.js"></script>
+    
+    <script>
+        // Show create deal button for marketers only
+        window.addEventListener('load', function() {
+            if (window.authContext && window.authContext.isAuthenticated && window.authContext.user.userType === 'Marketer') {
+                const createDealBtn = document.getElementById('create-deal-btn');
+                if (createDealBtn) {
+                    createDealBtn.style.display = 'inline-flex';
+                }
+            }
+        });
+    </script>
 </body>
 </html>

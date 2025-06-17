@@ -12,11 +12,13 @@ Axees is an influencer marketing platform connecting brands/marketers with conte
 - **Deal Execution**: Milestone-based project management
 - **AI-Powered Creator Discovery**: Advanced influencer search with competitive intelligence
 - **Security**: Comprehensive security measures against common vulnerabilities
-- **Frontend Integration**: Complete frontend-backend integration with Phase 1-4 implementations
+- **Frontend Integration**: Complete frontend-backend integration with Phase 1-6 implementations
   - Phase 1: Infrastructure setup and API integration
   - Phase 2: Authentication system with JWT and OTP verification
   - Phase 3: Core features - offer creation, real-time collaboration, and negotiation with comments
   - Phase 4: Payment system - Complete Stripe integration with wallet, payment methods, and trial offers
+  - Phase 5: Deal management - Milestone tracking, calendar integration, ARR metrics, and payment release controls
+  - Phase 6: Profile & Documentation - Profile completion, file uploads, proof submission workflow with automated payment triggers
 
 ## 📋 Prerequisites
 - Node.js 18.x or 20.x
@@ -400,6 +402,17 @@ http://localhost:3000/api-docs
 - `GET /api/marketer/deals/:id` - Get deal details
 - `POST /api/marketer/deals/:id/milestones` - Add milestone
 - `POST /api/marketer/deals/:id/milestones/:milestoneId/fund` - Fund milestone
+
+#### Profile & Documentation (Phase 6)
+- `GET /api/profile-completion/status` - Get profile completion status
+- `POST /api/profile-completion/calculate` - Calculate profile completion metrics
+- `POST /api/uploads` - Upload files with progress tracking
+- `POST /api/uploads/chunk` - Upload large files in chunks
+- `GET /api/uploads/:id` - Get upload details
+- `POST /api/proof-submissions` - Submit proof for milestone
+- `GET /api/proof-submissions` - List proof submissions
+- `GET /api/proof-submissions/:id` - Get proof submission details
+- `POST /api/proof-submissions/:id/review` - Review proof submission (approve/reject)
 
 ## 🏗️ Project Structure
 ```

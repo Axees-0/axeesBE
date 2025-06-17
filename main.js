@@ -55,6 +55,7 @@
    const offerCollaborationRoutes = require('./routes/offerCollaborationRoutes');
    const disputeResolutionRoutes = require('./routes/disputeResolutionRoutes');
    const utilityRoutes = require('./routes/utilityRoutes');
+  const uploadRoutes = require('./routes/uploadRoutes');
    
    /* cron job */
    require('./cron/activationReminders');
@@ -168,6 +169,7 @@ mongoose
    app.use('/api/offers', manualAuth, offerCollaborationRoutes);
    app.use('/api/deals', manualAuth, disputeResolutionRoutes);
    app.use('/api/utils', utilityRoutes);
+  app.use('/api/uploads', uploadRoutes);
    
    app.use('/api/chats',              chatRoutes);
    
