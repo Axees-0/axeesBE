@@ -1,0 +1,90 @@
+/* AddNewMethodCreator.css */
+.container {
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+  }
+  
+  .webContainer {
+    max-width: 1280px;
+    margin: 0 auto;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .headerTitle {
+    font-size: 24px;
+    font-weight: 600;
+    color: #000;
+  }
+  
+  .content {
+    flex: 1;
+  }
+  
+  .section {
+    margin-bottom: 32px;
+  }
+  
+  .sectionTitle {
+    font-size: 24px;
+    font-weight: 500;
+    color: #000;
+    margin-bottom: 24px;
+  }
+  
+  .formGroup {
+    margin-bottom: 16px;
+  }
+  
+  .formRow {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .label {
+    font-size: 14px;
+    color: #6c6c6c;
+    margin-bottom: 8px;
+  }
+  
+  .inputContainer {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: 1px solid #e2d0fb;
+    border-radius: 8px;
+    padding: 16px;
+    height: 58px;
+  }
+  
+  .input {
+    flex: 1;
+    font-size: 16px;
+    color: #000;
+  }
+  
+  .addButton {
+    background-color: #430b92;
+    border-radius: 8px;
+    height: 58px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px;
+    color: white;
+    font-size: 18px;
+    font-weight: 500;
+  }
+  
+  .webButton {
+    width: 100%;
+    align-self: center;
+  }
+  

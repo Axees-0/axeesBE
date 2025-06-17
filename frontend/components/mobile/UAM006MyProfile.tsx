@@ -1,0 +1,1397 @@
+import * as React from "react";
+import { Image } from "expo-image";
+import {
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  useWindowDimensions,
+  Platform,
+  Pressable,
+  ActivityIndicator,
+  Modal,
+  Dimensions,
+  Linking,
+  Clipboard,
+} from "react-native";
+import {
+  Gap,
+  FontFamily,
+  Color,
+  Padding,
+  Border,
+  FontSize,
+} from "../../GlobalStyles";
+import { router } from "expo-router";
+import MakeOfferModal from "@/components/ProfileMakeOfferModal";
+import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { useLocalSearchParams } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { StatusBar } from "expo-status-bar";
+import Arrowleft02 from "../../assets/arrowleft02.svg";
+import Unlink04 from "../../assets/unlink04.svg";
+import Qrcode from "../../assets/qr-code.svg";
+import Link01 from "../../assets/linksquare01.svg";
+import { useAuth } from "@/contexts/AuthContext";
+import QRCode from "react-native-qrcode-svg";
+import Feather from "@expo/vector-icons/build/Feather";
+import QrCode from "@/assets/qr-code.svg";
+import Toast from "react-native-toast-message";
+import WebBottomTabs from "../WebBottomTabs";
+
+const BREAKPOINTS = {
+  TABLET: 768,
+  DESKTOP: 1280,
+  MOBILE: 540,
+};
+
+const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api";
+
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
+const { width, height } = Dimensions.get("window");
+
+export default function AxeesMockup3() {
+  const windowSize = useWindowDimensions();
+  const isWeb = Platform.OS === "web";
+  const isWideScreen = windowSize.width >= BREAKPOINTS.TABLET;
+  const isMobile = windowSize.width < BREAKPOINTS.TABLET;
+  const [isOfferModalVisible, setIsOfferModalVisible] = useState(false);
+  const { user } = useAuth();
+  const [selectedPlatformIndex, setSelectedPlatformIndex] = useState<
+    number | null
+  >(null);
+  const [isQRModalVisible, setQRModalVisible] = useState(false);
+  // Fetch profile data from backend
+  const { data: profile, isLoading } = useQuery({
+    queryKey: ["profile", user?._id],
+    queryFn: async () => {
+      if (!user?._id) return null;
+      const response = await api.get(`/users/${user?._id}`);
+      return response.data;
+    },
+    enabled: !!user?._id,
+  });
+
+  const getInfluencerTier = (
+    totalFollowers: number
+  ): { tier: string; color: string } => {
+    if (totalFollowers >= 10000000) {
+      return { tier: "Star", color: "#F7D51A" }; // yellow
+    } else if (totalFollowers >= 1000000) {
+      return { tier: "Mega", color: "#FF0000" }; // red
+    } else if (totalFollowers >= 100000) {
+      return { tier: "Macro", color: "#F79F1A" }; // orange
+    } else if (totalFollowers >= 10000) {
+      return { tier: "Micro", color: "#1A8FF7" }; // blue
+    } else {
+      return { tier: "Nano", color: "#1AF75D" }; // green
+    }
+  };
+
+  const selectPlatform = (index: number) => {
+    setSelectedPlatformIndex(index);
+  };
+  // Helper function to get platform-specific stats
+  const getDisplayStats = () => {
+    if (selectedPlatformIndex === null) {
+      return {
+        followers: dataBasedOnType?.totalFollowers || 0,
+        listedEvents: Math.floor(Math.random() * 1000),
+        combinedViews: Math.floor(Math.random() * 1000),
+        offers: Math.floor(Math.random() * 1000),
+        deals: Math.floor(Math.random() * 1000),
+      };
+    }
+    const platformData = dataBasedOnType?.platforms[selectedPlatformIndex];
+    return {
+      followers: platformData?.followersCount || 0,
+      listedEvents: Math.floor(Math.random() * 1000),
+      combinedViews: Math.floor(Math.random() * 1000),
+      offers: Math.floor(Math.random() * 1000),
+      deals: Math.floor(Math.random() * 1000),
+    };
+  };
+
+  // Get the correct data based on user type
+  const displayProfile = profile?.user || {};
+  const dataBasedOnType =
+    profile?.user?.userType === "Creator"
+      ? profile?.user?.creatorData
+      : profile?.user?.marketerData;
+
+  useEffect(() => {
+    if (dataBasedOnType?.platforms && dataBasedOnType.platforms.length > 0) {
+      setSelectedPlatformIndex(0);
+    }
+  }, [dataBasedOnType]);
+  // Show loading state
+  if (isLoading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View
+          style={[
+            styles.container,
+            { justifyContent: "center", alignItems: "center" },
+          ]}
+        >
+          <ActivityIndicator size="large" color="#430B92" />
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  return (
+    <>
+      <SafeAreaView style={[styles.container]}>
+        <StatusBar style="dark" />
+        <View style={styles.header}>
+          <Pressable onPress={() => router.push("/")} style={styles.backButton}>
+            <Arrowleft02 width={24} height={24} />
+          </Pressable>
+          <Text style={styles.headerTitle}>
+            My {displayProfile.userType} Profile
+          </Text>
+
+          <TouchableOpacity onPress={() => router.push("/UAM03Settings")}>
+            <Feather name="settings" size={24} color="black" />
+          </TouchableOpacity>
+        </View>
+
+        <ScrollView style={styles.content}>
+          <View style={styles.coverImageContainer}>
+            <Image
+              source={require("../../assets/cover.png")}
+              style={styles.coverImage}
+              contentFit="cover"
+            />
+            <View style={styles.coverOverlay}>
+              <View style={styles.coverOverlayRow}>
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  <TouchableOpacity
+                    style={styles.qrContainer}
+                    onPress={() => setQRModalVisible(true)}
+                  >
+                    <QrCode width={20} height={20} />
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={styles.shareContainer}
+                    onPress={() => {
+                      Clipboard.setString(
+                        `${window.location.origin}/profile/${user?._id}`
+                      );
+
+                      Toast.show({
+                        text1: "Link copied to clipboard",
+                        type: "success",
+                      });
+                    }}
+                  >
+                    <Image
+                      source={require("@/assets/copy-01.png")}
+                      style={{
+                        width: 20,
+                        height: 20,
+                      }}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                {displayProfile.buythis && (
+                  <Pressable
+                    onPress={() => {
+                      if (Platform.OS === "web") {
+                        window.open(displayProfile.buythis, "_blank");
+                      }
+                    }}
+                    style={styles.buythisContainer}
+                  >
+                    <Unlink04 width={20} height={20} />
+                    <Text style={styles.buythisText}>buythis</Text>
+                  </Pressable>
+                )}
+              </View>
+            </View>
+          </View>
+
+          <View
+            style={[
+              styles.mainContent,
+              isWeb && isWideScreen && styles.webContainer,
+            ]}
+          >
+            <View style={[styles.profileContainer]}>
+              <View style={styles.profileImageContainer}>
+                <Image
+                  source={{
+                    uri: displayProfile?.avatarUrl?.includes("http")
+                      ? displayProfile?.avatarUrl
+                      : process.env.EXPO_PUBLIC_BACKEND_URL +
+                        displayProfile?.avatarUrl,
+                  }}
+                  placeholder={require("@/assets/empty-image.png")}
+                  style={styles.profileImage}
+                  contentFit="cover"
+                />
+              </View>
+
+              <View style={[styles.profileInfo]}>
+                <View style={[styles.nameSection]}>
+                  <Text
+                    style={[styles.name, !isWideScreen && { fontSize: 16 }]}
+                  >
+                    {displayProfile.name}
+                  </Text>
+                  <Text
+                    style={[styles.username, !isWideScreen && { fontSize: 10 }]}
+                  >
+                    {displayProfile.userName?.includes("@")
+                      ? displayProfile.userName
+                      : `@${displayProfile.userName}`}
+                  </Text>
+                </View>
+
+                <View style={styles.categoryContainer}>
+                  <View style={styles.categoryBadge}>
+                    <Text
+                      style={[
+                        styles.categoryText,
+                        {
+                          color: getInfluencerTier(
+                            dataBasedOnType?.totalFollowers || 0
+                          ).color,
+                        },
+                      ]}
+                    >
+                      {
+                        getInfluencerTier(dataBasedOnType?.totalFollowers || 0)
+                          .tier
+                      }
+                    </Text>
+                  </View>
+                  <TouchableOpacity
+                    style={styles.categoryUnlink}
+                    onPress={() => {
+                      Clipboard.setString(
+                        `${window.location.origin}/profile/${user?._id}`
+                      );
+
+                      Toast.show({
+                        text1: "Link copied to clipboard",
+                        type: "success",
+                      });
+                    }}
+                  >
+                    <Unlink04 width={20} height={20} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+
+            <View style={styles.categoriesContainer}>
+              {dataBasedOnType?.categories?.map((category, index) => (
+                <View key={index} style={styles.categoryTag}>
+                  <Text style={styles.categoryTagText}>{category}</Text>
+                </View>
+              ))}
+            </View>
+
+            <View style={styles.socialIconsContainer}>
+              {dataBasedOnType?.platforms?.map((platform, index) => (
+                <React.Fragment key={index}>
+                  <TouchableOpacity
+                    style={{
+                      paddingBottom: 5,
+                      borderBottomWidth:
+                        selectedPlatformIndex === index ? 1 : 0,
+                      borderColor:
+                        selectedPlatformIndex === index
+                          ? "#430B92"
+                          : "transparent",
+                    }}
+                    onPress={() => selectPlatform(index)}
+                  >
+                    <Image
+                      source={getPlatformIcon(platform.platform)}
+                      style={{ width: 24, height: 24 }}
+                      contentFit="contain"
+                    />
+                  </TouchableOpacity>
+                  <View style={styles.statDivider} />
+                </React.Fragment>
+              ))}
+            </View>
+
+            <View style={styles.statsContainer}>
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Total Followers</Text>
+                <Text style={styles.statValue}>
+                  {formatNumber(getDisplayStats().followers)}
+                </Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Listed Events</Text>
+                <Text style={styles.statValue}>
+                  {formatNumber(getDisplayStats().listedEvents)}
+                </Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Combined Views</Text>
+                <Text style={styles.statValue}>
+                  {formatNumber(getDisplayStats().combinedViews)}
+                </Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Offers</Text>
+                <Text style={styles.statValue}>
+                  {formatNumber(getDisplayStats().offers)}
+                </Text>
+              </View>
+              <View style={styles.statDivider} />
+              <View style={styles.statItem}>
+                <Text style={styles.statLabel}>Deals</Text>
+                <Text style={styles.statValue}>
+                  {formatNumber(getDisplayStats().deals)}
+                </Text>
+              </View>
+            </View>
+
+            <Text style={styles.bio}>{displayProfile.bio}</Text>
+
+            <View style={styles.actionButtons}>
+              <Pressable
+                style={styles.mediaPackageButton}
+                onPress={() => {
+                  if (
+                    dataBasedOnType?.portfolio.length > 0 &&
+                    dataBasedOnType?.portfolio[0]?.mediaUrl
+                  ) {
+                    Linking.openURL(
+                      process.env.EXPO_PUBLIC_BACKEND_URL +
+                        dataBasedOnType?.portfolio[0]?.mediaUrl
+                    );
+                  } else {
+                    Toast.show({
+                      text1: "No media package available",
+                      type: "error",
+                    });
+                  }
+                }}
+              >
+                <Image
+                  source={require("../../assets/share-icon.png")}
+                  style={{ width: 24, height: 24 }}
+                  contentFit="contain"
+                />
+                <Text style={styles.mediaPackageText}>Media Package</Text>
+              </Pressable>
+              <Pressable
+                style={styles.makeOfferButton}
+                onPress={() => router.push("/UAM02EditCreatorProfile")}
+              >
+                <Text style={styles.makeOfferText}>Edit Profile</Text>
+              </Pressable>
+            </View>
+
+            <View style={styles.socialStats}>
+              <Text style={styles.sectionTitle}>Social Links</Text>
+
+              <View
+                style={[
+                  styles.socialPlatforms,
+                  isWeb && isWideScreen && styles.webSocialPlatforms,
+                ]}
+              >
+                {dataBasedOnType?.platforms?.map((platform) => (
+                  <View key={platform.platform} style={[styles.platformStats]}>
+                    <View style={styles.platformIconWrapper}>
+                      <Image
+                        source={getPlatformIcon(platform.platform)}
+                        style={{ width: 30, height: 30 }}
+                        contentFit="contain"
+                      />
+                      <View style={styles.platformCountWrapper}>
+                        <Text style={styles.platformCount}>
+                          {formatNumber(platform.followersCount)}
+                        </Text>
+                      </View>
+                    </View>
+
+                    <Pressable
+                      style={styles.viewButton}
+                      onPress={() => {
+                        if (Platform.OS === "web") {
+                          // generate a link with platform name and user
+                          // instagram: https://www.instagram.com/username
+                          // youtube: https://www.youtube.com/@username
+                          // tiktok: https://www.tiktok.com/@username
+                          // facebook: https://www.facebook.com/username
+                          // twitter: https://www.twitter.com/username
+                          // twitch: https://www.twitch.tv/username
+
+                          switch (platform.platform) {
+                            case "instagram":
+                              window.open(
+                                `https://www.instagram.com/${platform.handle}`,
+                                "_blank"
+                              );
+                              break;
+                            case "youtube":
+                              window.open(
+                                `https://www.youtube.com/@${platform.handle}`,
+                                "_blank"
+                              );
+                              break;
+                            case "tiktok":
+                              window.open(
+                                `https://www.tiktok.com/@${platform.handle}`,
+                                "_blank"
+                              );
+                              break;
+                            case "facebook":
+                              window.open(
+                                `https://www.facebook.com/${platform.handle}`,
+                                "_blank"
+                              );
+                              break;
+                            case "twitter":
+                              window.open(
+                                `https://www.twitter.com/${platform.handle}`,
+                                "_blank"
+                              );
+                              break;
+                            case "twitch":
+                              window.open(
+                                `https://www.twitch.tv/${platform.handle}`,
+                                "_blank"
+                              );
+                              break;
+                            default:
+                              break;
+                          }
+                        }
+                      }}
+                    >
+                      <Text style={styles.viewButtonText}>View</Text>
+                      <Link01 width={24} height={24} />
+                    </Pressable>
+                  </View>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.achievements}>
+              <Text style={styles.sectionTitle}>Achievements</Text>
+              {dataBasedOnType?.achievements
+                ?.split("\n")
+                .map((achievement, index) => (
+                  <View key={index}>
+                    <Text key={index} style={styles.achievementText}>
+                      • {achievement}
+                    </Text>
+                  </View>
+                ))}
+            </View>
+
+            <View style={styles.businessVentures}>
+              <Text style={styles.sectionTitle}>Business Ventures</Text>
+              {dataBasedOnType?.businessVentures
+                ?.split("\n")
+                .map((venture, index) => (
+                  <View key={index}>
+                    <Text key={index} style={styles.ventureText}>
+                      • {venture}
+                    </Text>
+                  </View>
+                ))}
+            </View>
+          </View>
+        </ScrollView>
+
+        <Modal
+          transparent={true}
+          visible={isQRModalVisible}
+          onRequestClose={() => setQRModalVisible(false)}
+        >
+          <Pressable
+            onPress={() => setQRModalVisible(false)}
+            style={styles.modalOverlay}
+          >
+            <View style={styles.modalContent}>
+              <QRCode
+                value={`${window.location.origin}/profile/${user?._id}`}
+                size={200}
+              />
+
+              <Text style={styles.modalUsername}>
+                {displayProfile.userName || displayProfile.brandName}
+              </Text>
+
+              <View style={{ flexDirection: "column", gap: 10 }}>
+                <Text style={styles.modalOr}>or</Text>
+                <Pressable
+                  onPress={() => {
+                    const userAgent =
+                      navigator.userAgent || navigator.vendor || window.opera;
+                    if (
+                      userAgent?.includes("iPhone") ||
+                      userAgent?.includes("iPad") ||
+                      (userAgent?.includes("iPod") && !window?.MSStream)
+                    ) {
+                      Linking.openURL(
+                        `sms:&body=${window.location.origin}/profile/${user?._id}`
+                      );
+                    } else {
+                      Linking.openURL(
+                        `sms:?body=${window.location.origin}/profile/${user?._id}`
+                      );
+                    }
+                  }}
+                >
+                  <Image
+                    source={require("@/assets/share-08.png")}
+                    style={{ width: 32, height: 32 }}
+                  />
+                </Pressable>
+              </View>
+            </View>
+          </Pressable>
+        </Modal>
+
+        <MakeOfferModal
+          visible={isOfferModalVisible}
+          onClose={() => setIsOfferModalVisible(false)}
+        />
+      </SafeAreaView>
+      {/* <WebBottomTabs /> */}
+    </>
+  );
+}
+
+function formatNumber(num: number): string {
+  if (!num) return "0";
+  if (num >= 1000000000) {
+    return (num / 1000000000).toFixed(1) + "B";
+  }
+  if (num >= 1000000) {
+    return (num / 1000000).toFixed(1) + "M";
+  }
+  if (num >= 1000) {
+    return (num / 1000).toFixed(1) + "K";
+  }
+  return num.toString();
+}
+
+function getPlatformIcon(platform: string) {
+  switch (platform.toLowerCase()) {
+    case "instagram":
+      return require("../../assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
+    case "youtube":
+      return require("../../assets/pngclipartyoutubeplaybuttoncomputericonsyoutubeyoutubelogoanglerectanglethumbnail-13.png");
+    case "tiktok":
+      return require("../../assets/tiktok-icon.png");
+    case "facebook":
+      return require("../../assets/facebook-icon.png");
+    case "twitter":
+      return require("../../assets/1707226109newtwitterlogopng-1.png");
+    case "twitch":
+      return require("../../assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
+
+    default:
+      return require("@/assets/letter-s.png");
+  }
+}
+
+const styles = StyleSheet.create({
+  parentFlexBox: {
+    gap: Gap.gap_md,
+    flexDirection: "row",
+  },
+  shareContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F0E7FD",
+    padding: 8,
+    borderRadius: 100,
+    gap: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    backgroundColor: "#FFFFFF",
+    padding: width * 0.05,
+    borderRadius: 16,
+    alignItems: "center",
+  },
+  modalUsername: {
+    marginTop: height * 0.02,
+
+    color: "#430B92",
+  },
+  modalOr: {
+    marginVertical: height * 0.02,
+
+    color: "#6C6C6C",
+  },
+  shareIconButton: {
+    backgroundColor: "#430B92",
+    padding: width * 0.03,
+    borderRadius: 50,
+  },
+
+  kTypo: {
+    fontFamily: FontFamily.inter,
+  },
+  wrapperBorder: {
+    borderColor: Color.cSK430B92500,
+    borderWidth: 1,
+    borderStyle: "solid",
+  },
+  wrapperParentSpaceBlock: {
+    paddingVertical: Padding.p_xs,
+    paddingHorizontal: Padding.p_5xl,
+    borderRadius: Border.br_xs,
+  },
+  joinTypo: {
+    color: Color.white,
+    textAlign: "center",
+    fontFamily: FontFamily.inter,
+  },
+  ctasPosition: {
+    width: 1116,
+    marginLeft: -558,
+    justifyContent: "space-between",
+    alignItems: "center",
+    flexDirection: "row",
+    left: "50%",
+    position: "absolute",
+  },
+  proTypo: {
+    fontWeight: "600",
+    fontSize: FontSize.size_base,
+    textAlign: "center",
+    fontFamily: FontFamily.inter,
+  },
+  bioTypo: {
+    textAlign: "left",
+    color: Color.cSK430B92950,
+    fontFamily: FontFamily.inter,
+  },
+  proWrapperSpaceBlock: {
+    backgroundColor: Color.cSK430B9250,
+    paddingVertical: Padding.p_7xs,
+    paddingHorizontal: Padding.p_xs,
+    borderRadius: Border.br_5xs,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  contractsWrapperFlexBox: {
+    borderRadius: Border.br_81xl,
+    backgroundColor: Color.cSK430B9250,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  mTypo: {
+    fontWeight: "700",
+    textAlign: "left",
+    fontSize: FontSize.size_13xl,
+    color: Color.cSK430B92950,
+    fontFamily: FontFamily.inter,
+  },
+  parentPosition: {
+    marginLeft: -558,
+    position: "absolute",
+    left: "50%",
+  },
+  parentBorder: {
+    borderWidth: 1,
+    borderStyle: "solid",
+  },
+  wrapperLayout: {
+    paddingVertical: Padding.p_base,
+    paddingHorizontal: Padding.p_29xl,
+    height: 79,
+    width: 350,
+    justifyContent: "center",
+    borderRadius: Border.br_xs,
+    alignItems: "center",
+    marginBottom: 100,
+    flexDirection: "row",
+  },
+  icon: {
+    top: 0,
+    left: 0,
+    width: 139,
+    height: 60,
+    position: "absolute",
+  },
+  wrapper: {
+    width: 162,
+    height: 60,
+  },
+  search01Icon: {},
+  searchCategoryTags: {
+    opacity: 0.5,
+    color: Color.cSK430B92950,
+    textAlign: "center",
+    fontFamily: FontFamily.inter,
+    fontSize: FontSize.size_lg,
+  },
+  search01Parent: {
+    backgroundColor: Color.buttonSelectable,
+    borderColor: Color.colorPlum,
+    paddingVertical: Padding.p_xs,
+    paddingHorizontal: Padding.p_5xl,
+    borderRadius: Border.br_xs,
+    borderWidth: 1,
+    borderStyle: "solid",
+    flex: 1,
+  },
+  signIn: {
+    color: Color.cSK430B92500,
+    textAlign: "center",
+    fontFamily: FontFamily.inter,
+    fontSize: FontSize.size_lg,
+  },
+  signInWrapper: {
+    paddingVertical: Padding.p_xs,
+    paddingHorizontal: Padding.p_5xl,
+    borderRadius: Border.br_xs,
+    flexDirection: "row",
+  },
+  join: {
+    fontSize: FontSize.size_lg,
+  },
+  joinWrapper: {
+    backgroundColor: Color.cSK430B92500,
+    flexDirection: "row",
+  },
+  frameGroup: {
+    paddingLeft: Padding.p_5xl,
+    gap: Gap.gap_3xs,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  frameParent: {
+    marginLeft: -640,
+    top: 20,
+    width: 1280,
+    paddingVertical: 0,
+    paddingHorizontal: Padding.p_13xl,
+    justifyContent: "space-between",
+    left: "50%",
+    alignItems: "center",
+    flexDirection: "row",
+    position: "absolute",
+  },
+  frameChild: {
+    borderRadius: Border.br_6xl_2,
+    width: 248,
+    height: 248,
+  },
+  food: {
+    color: Color.colorLimegreen_100,
+  },
+  foodWrapper: {
+    backgroundColor: Color.colorLimegreen_200,
+    paddingVertical: Padding.p_7xs,
+    paddingHorizontal: Padding.p_xs,
+    borderRadius: Border.br_5xs,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  frameWrapper: {
+    alignSelf: "stretch",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  jordanRivers: {
+    fontSize: FontSize.size_13xl,
+    color: Color.cSK430B92950,
+    fontFamily: FontFamily.inter,
+  },
+  jordanrivers: {
+    fontSize: FontSize.size_5xl,
+    opacity: 0.5,
+  },
+  jordanRiversParent: {
+    gap: Gap.gap_4xs,
+    alignSelf: "stretch",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  pro: {
+    color: Color.cSK430B92500,
+  },
+  availableParent: {
+    gap: Gap.gap_4xs,
+  },
+  frameParent3: {
+    alignItems: "center",
+  },
+  frameParent2: {
+    gap: Gap.gap_2xs,
+    alignSelf: "stretch",
+  },
+  frameParent1: {
+    gap: Gap.gap_2xl,
+    alignSelf: "stretch",
+  },
+  shareProfileParent: {
+    gap: Gap.gap_md,
+    flexDirection: "row",
+    paddingVertical: Padding.p_xs,
+    paddingHorizontal: Padding.p_5xl,
+    borderRadius: Border.br_xs,
+    width: "fit-content",
+  },
+  frameView: {
+    width: 415,
+    gap: Gap.gap_5xl,
+  },
+  rectangleParent: {
+    gap: Gap.gap_4xl,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  pngClipartInstagramLogoIcoIcon: {
+    height: 37,
+    width: 37,
+  },
+  k: {
+    color: Color.cSK430B92950,
+    textAlign: "center",
+    fontFamily: FontFamily.inter,
+    fontSize: FontSize.size_lg,
+  },
+  pngClipartInstagramLogoIcoParent: {
+    paddingRight: Padding.p_xs,
+    gap: Gap.gap_4xs,
+    alignSelf: "stretch",
+  },
+  frameWrapper1: {
+    width: 99,
+    justifyContent: "center",
+  },
+  transparentTiktokLogoBlackIcon: {
+    height: 38,
+    width: 37,
+  },
+  frameWrapper2: {
+    width: 103,
+    justifyContent: "center",
+  },
+  frameParent5: {
+    justifyContent: "flex-end",
+    gap: Gap.gap_6xl,
+  },
+  m: {
+    alignSelf: "stretch",
+  },
+  totalFollowers: {
+    fontSize: FontSize.size_5xl,
+    opacity: 0.5,
+    color: Color.cSK430B92950,
+    textAlign: "center",
+    fontFamily: FontFamily.inter,
+  },
+  mParent: {
+    gap: Gap.gap_4xs,
+  },
+  profileViews: {
+    fontSize: FontSize.size_5xl,
+    alignSelf: "stretch",
+    opacity: 0.5,
+    color: Color.cSK430B92950,
+    textAlign: "center",
+    fontFamily: FontFamily.inter,
+  },
+  frameParent6: {
+    gap: Gap.gap_3xl,
+    justifyContent: "center",
+  },
+  frameParent4: {
+    gap: Gap.gap_5xl,
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  frameContainer: {
+    top: 165,
+  },
+  bio: {
+    fontSize: FontSize.size_13xl,
+    alignSelf: "stretch",
+  },
+  meetJordanRivers: {
+    alignSelf: "stretch",
+    opacity: 0.5,
+    fontSize: FontSize.size_lg,
+  },
+  bioParent: {
+    top: 435,
+    width: 962,
+    gap: Gap.gap_2xl,
+  },
+  contractsWrapper: {
+    padding: Padding.p_base,
+    width: "fit-content",
+  },
+  frameParent8: {
+    borderRadius: Border.br_5xl,
+    borderColor: Color.cSK430B92100,
+    width: 274,
+    paddingVertical: Padding.p_5xl,
+    gap: Gap.gap_3xl,
+    paddingHorizontal: Padding.p_13xl,
+  },
+  frameParent7: {
+    gap: Gap.gap_sm,
+    alignSelf: "stretch",
+    alignItems: "center",
+    flexDirection: "row",
+  },
+  activityParent: {
+    top: 577,
+    width: 563,
+    gap: Gap.gap_3xl,
+  },
+  addToFavorites: {
+    fontSize: FontSize.size_5xl,
+    color: Color.cSK430B92500,
+    textAlign: "center",
+    fontFamily: FontFamily.inter,
+  },
+  addToFavoritesWrapper: {
+    borderColor: Color.cSK430B92500,
+    borderWidth: 1,
+    borderStyle: "solid",
+  },
+  createOffer: {
+    fontWeight: "500",
+    fontSize: FontSize.size_5xl,
+  },
+  createOfferWrapper: {
+    backgroundColor: Color.cSK430B92500,
+  },
+  ctas: {
+    top: 931,
+  },
+  axeesMockup5: {
+    backgroundColor: Color.white,
+    width: "100%",
+
+    flex: 1,
+  },
+
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+  content: {
+    flex: 1,
+  },
+  webContainer: {
+    maxWidth: BREAKPOINTS.DESKTOP,
+    marginHorizontal: "auto",
+    width: "100%",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    maxWidth: BREAKPOINTS.DESKTOP,
+    marginHorizontal: "auto",
+    width: "100%",
+  },
+  backButton: {
+    padding: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#000000",
+    textAlign: "center",
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  placeholder: {},
+  coverImageContainer: {
+    position: "relative",
+    height: 200,
+  },
+  coverImage: {
+    width: "100%",
+    height: "100%",
+  },
+  coverOverlay: {
+    position: "absolute",
+    top: 16,
+    left: 16,
+    right: 16,
+  },
+  coverOverlayRow: {
+    flexDirection: "row",
+    gap: 8,
+    justifyContent: "space-between",
+    maxWidth: BREAKPOINTS.DESKTOP,
+    marginHorizontal: "auto",
+    width: "100%",
+  },
+  qrContainer: {
+    backgroundColor: "#F0E7FD",
+    padding: 8,
+    borderRadius: 100,
+  },
+  buythisContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F0E7FD",
+    padding: 8,
+    borderRadius: 100,
+    gap: 8,
+  },
+  buythisText: {
+    color: "#430B92",
+    fontSize: 14,
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  mainContent: {
+    padding: 20,
+  },
+
+  profileImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 25,
+  },
+
+  categoryText: {
+    color: "#F79F1A",
+    fontSize: 14,
+    maxWidth: "100%",
+
+    fontFamily: Platform.select({
+      ios: "rOGLyonsType",
+      android: "rOGLyonsType",
+      default: "rOGLyonsType",
+    }),
+  },
+  categoryUnlink: {
+    backgroundColor: "#F0E7FD",
+    paddingHorizontal: 10,
+    paddingVertical: 2,
+    borderRadius: 100,
+  },
+  categoriesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  categoryTag: {
+    backgroundColor: "#F0E7FD",
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+  },
+  categoryTagText: {
+    color: "#430B92",
+    fontSize: 12,
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  socialIconsContainer: {
+    flexDirection: "row",
+    gap: 4,
+    marginTop: 16,
+    alignItems: "center",
+  },
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 24,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: "#E2E2E2",
+  },
+  statItem: {
+    alignItems: "center",
+  },
+  statLabel: {
+    fontSize: 12,
+    color: "#6C6C6C",
+    marginBottom: 4,
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  statValue: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000000",
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  statDivider: {
+    width: 1,
+    height: 24,
+    backgroundColor: "#E2E2E2",
+  },
+  bio: {
+    fontSize: 14,
+    color: "#6C6C6C",
+    lineHeight: 20,
+    marginTop: 16,
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  actionButtons: {
+    flexDirection: "row",
+    gap: 12,
+    marginTop: 24,
+  },
+  mediaPackageButton: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    height: 48,
+    borderWidth: 1,
+    borderColor: "#430B92",
+    borderRadius: 8,
+  },
+  mediaPackageText: {
+    color: "#430B92",
+    fontSize: 16,
+    fontWeight: "500",
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  makeOfferButton: {
+    flex: 1,
+    backgroundColor: "#430B92",
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 8,
+  },
+  makeOfferText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "500",
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  socialStats: {
+    marginTop: 32,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#000000",
+    marginBottom: 16,
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  socialPlatforms: {
+    gap: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 6,
+    borderRadius: 12,
+  },
+  webSocialPlatforms: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+  },
+  platformStats: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 16,
+    borderRadius: 12,
+    gap: Gap.gap_sm,
+  },
+  platformCount: {
+    fontSize: 16,
+    fontWeight: "500",
+    color: "#000000",
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  platformIconWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  platformCountWrapper: {
+    backgroundColor: "#F6F5F9",
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderTopRightRadius: 100,
+    borderBottomRightRadius: 100,
+    marginLeft: -8,
+    zIndex: -1,
+  },
+  viewButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+  },
+  viewButtonText: {
+    color: "#430B92",
+    fontSize: 14,
+    fontWeight: "500",
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  achievements: {
+    marginTop: 32,
+  },
+  achievementText: {
+    fontSize: 14,
+    color: "#6C6C6C",
+    lineHeight: 24,
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  businessVentures: {
+    marginTop: 32,
+    marginBottom: 32,
+  },
+  ventureText: {
+    fontSize: 14,
+    color: "#6C6C6C",
+    lineHeight: 24,
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+  profileContainer: {
+    padding: 20,
+    flexDirection: "row",
+    position: "relative",
+    minHeight: 80,
+    marginTop: -25,
+    alignItems: "flex-start",
+  },
+
+  profileImageContainer: {
+    width: 125,
+    height: 125,
+    borderRadius: 25,
+    overflow: "hidden",
+    marginTop: -70,
+  },
+
+  profileInfo: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+  },
+
+  nameSection: {
+    flex: 1,
+    marginRight: 16,
+  },
+
+  name: {
+    fontSize: 24,
+    fontWeight: "600",
+    color: "#000000",
+    marginBottom: 4,
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+
+  username: {
+    fontSize: 16,
+    color: "#6C6C6C",
+    fontFamily: Platform.select({
+      ios: "SF Pro Display",
+      android: "Roboto",
+      default: "System",
+    }),
+  },
+
+  categoryContainer: {
+    flexDirection: "column",
+    alignItems: "flex-end",
+    gap: 8,
+  },
+
+  categoryBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
+    borderRadius: 16,
+  },
+});
