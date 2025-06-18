@@ -1,5 +1,16 @@
 # Axees Backend API
 
+## ⚠️ IMPORTANT BRANCHES
+
+### 🔒 Protected Branch: `vanilla-frontend-complete-backup`
+**DO NOT DELETE** - Contains complete vanilla JS frontend implementation
+- See [VANILLA-FRONTEND-README.md](./VANILLA-FRONTEND-README.md) for details
+- Tagged as: `vanilla-frontend-safe`
+- Commit: `5fe68094`
+- Full working vanilla JS frontend in `/public/`
+
+---
+
 ## Overview
 Axees is an influencer marketing platform connecting brands/marketers with content creators. This backend API powers the platform with features including user authentication, offer management, payment processing, real-time chat, and deal execution workflows.
 
