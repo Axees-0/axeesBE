@@ -1,94 +1,46 @@
-import { useEffect } from 'react';
-import { Platform } from 'react-native';
+import React from 'react';
+import Head from 'expo-router/head';
 
-export function useWebSEO(options: {
+interface WebSEOProps {
   title?: string;
   description?: string;
   keywords?: string;
   ogImage?: string;
-  ogUrl?: string;
-}) {
-  useEffect(() => {
-    if (Platform.OS !== 'web') return;
-
-    // Update page title
-    if (options.title) {
-      document.title = `${options.title} | Axees`;
-    }
-
-    // Update or create meta tags
-    const updateMetaTag = (name: string, content: string, property?: boolean) => {
-      const attr = property ? 'property' : 'name';
-      let meta = document.querySelector(`meta[${attr}="${name}"]`) as HTMLMetaElement;
-      
-      if (!meta) {
-        meta = document.createElement('meta');
-        meta.setAttribute(attr, name);
-        document.head.appendChild(meta);
-      }
-      
-      meta.content = content;
-    };
-
-    // Standard meta tags
-    if (options.description) {
-      updateMetaTag('description', options.description);
-    }
-    
-    if (options.keywords) {
-      updateMetaTag('keywords', options.keywords);
-    }
-
-    // Open Graph tags
-    if (options.title) {
-      updateMetaTag('og:title', options.title, true);
-    }
-    
-    if (options.description) {
-      updateMetaTag('og:description', options.description, true);
-    }
-    
-    if (options.ogImage) {
-      updateMetaTag('og:image', options.ogImage, true);
-    }
-    
-    if (options.ogUrl) {
-      updateMetaTag('og:url', options.ogUrl, true);
-    }
-
-    // Twitter Card tags
-    updateMetaTag('twitter:card', 'summary_large_image');
-    if (options.title) {
-      updateMetaTag('twitter:title', options.title);
-    }
-    if (options.description) {
-      updateMetaTag('twitter:description', options.description);
-    }
-    if (options.ogImage) {
-      updateMetaTag('twitter:image', options.ogImage);
-    }
-
-    // Cleanup function
-    return () => {
-      // Reset to default title when component unmounts
-      document.title = 'Axees - Connect Creators & Brands';
-    };
-  }, [options.title, options.description, options.keywords, options.ogImage, options.ogUrl]);
+  canonical?: string;
 }
 
-// Export a component version for use in screens
-export function WebSEO(props: {
-  title?: string;
-  description?: string;
-  keywords?: string;
-  ogImage?: string;
-  ogUrl?: string;
-}) {
-  useWebSEO(props);
-  return null;
-}
-
-// Default export to satisfy Expo Router (this is a utility file, not a route)
-export default function WebSEOPage() {
-  return null;
+export function WebSEO({ 
+  title = "Axees - Creator & Brand Partnership Platform",
+  description = "Connect creators with brands for authentic partnerships. Discover opportunities, manage campaigns, and grow your influence on Axees.",
+  keywords = "creator partnerships, brand deals, influencer marketing, content creation, social media",
+  ogImage = "/og-image.png",
+  canonical
+}: WebSEOProps) {
+  return (
+    <Head>
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      <meta name="keywords" content={keywords} />
+      <meta name="viewport" content="width=device-width, initial-scale=1" />
+      
+      {/* Open Graph */}
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:image" content={ogImage} />
+      <meta property="og:type" content="website" />
+      
+      {/* Twitter */}
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+      <meta name="twitter:image" content={ogImage} />
+      
+      {/* Canonical URL */}
+      {canonical && <link rel="canonical" href={canonical} />}
+      
+      {/* Favicon */}
+      <link rel="icon" href="/favicon.ico" />
+      <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    </Head>
+  );
 }

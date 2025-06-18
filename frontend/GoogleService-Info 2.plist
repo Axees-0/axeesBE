@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyD4fhZ8-Bh8ad8H_8rZb4pQ2u_0yO3wv84</string>
+	<key>GCM_SENDER_ID</key>
+	<string>476514630244</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>io.freshify.axees</string>
+	<key>PROJECT_ID</key>
+	<string>axees-983ac</string>
+	<key>STORAGE_BUCKET</key>
+	<string>axees-983ac.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:476514630244:ios:1c84bf3f38e0edcbc4bd71</string>
+</dict>
+</plist>

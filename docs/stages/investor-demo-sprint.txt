@@ -1,0 +1,173 @@
+- Axees Investor Demo Sprint - 10 Day Plan
+  - Day 1-2: Setup & Gutting Phase
+    - Repository Setup
+      - Clone repo to axees-investor-demo
+      - Create new branch demo-only
+      - Add .env.demo with EXPO_PUBLIC_DEMO_MODE=true
+    - Create Demo Infrastructure
+      - Create demo/ folder structure
+      - Create DemoMode.ts for feature flags
+      - Create DemoData.ts for mock data
+      - Create DemoAPI.ts for fake responses
+    - Delete Unnecessary Code
+      - Remove 80% of screens (keep only 3 flows)
+      - Delete all file upload components
+      - Remove payment webviews
+      - Delete error handling code
+      - Remove platform-specific code
+      - Delete 90% of modals
+      - Remove all resubmission flows
+      - Delete terms/legal modals
+  - Day 3-4: Mock Infrastructure Build
+    - Build Demo Data Service
+      - Create perfect marketer profile data
+      - Add 3 polished offer examples
+      - Generate 15 high-quality creator profiles
+      - Design impressive analytics data
+    - Implement Demo API
+      - Mock all authentication calls
+      - Create instant success responses
+      - Add realistic delays (1-2 seconds)
+      - Remove all error cases
+    - Auto-Login System
+      - Skip login screen in demo mode
+      - Auto-populate user session
+      - Set default demo user type
+      - Remove auth checks from navigation
+  - Day 5-6: Flow Polish Phase
+    - Marketer Flow (Create Offer)
+      - Simplify offer creation form
+      - Pre-fill with impressive data
+      - Mock file upload with progress bar
+      - Fake payment instant success
+      - Add smooth success animation
+    - Creator Flow (Apply to Deal)
+      - Show curated deal list
+      - Instant application process
+      - Skip document uploads
+      - Auto-approve applications
+      - Beautiful confirmation screen
+    - Analytics Dashboard
+      - Hardcode impressive metrics
+      - Show growth charts (static)
+      - Display $45K+ earnings
+      - Add 89% success rate
+      - Create "wow" moment visuals
+  - Day 7-8: Testing & Timing
+    - Device Testing
+      - Test on iPhone
+      - Test on Android
+      - Test on tablet
+      - Verify web version
+    - Performance Optimization
+      - Ensure < 3 second load time
+      - Remove janky animations
+      - Optimize image loading
+      - Eliminate layout shifts
+    - Flow Timing
+      - Time each complete flow
+      - Aim for 30-60 seconds per flow
+      - Identify and remove delays
+      - Practice golden path
+  - Day 9-10: Final Polish
+    - Demo Script Creation
+      - Write exact click sequence
+      - Document talking points
+      - Note transition moments
+      - Prepare backup plans
+    - Add Polish Details
+      - Subtle success animations
+      - Smooth page transitions
+      - Loading state skeletons
+      - Professional empty states
+    - Deployment
+      - Deploy to demo-specific URL
+      - Test in production environment
+      - Create backup local version
+      - Prepare offline fallback
+- Three Core Demo Flows
+  - Flow 1: Brand Creates Offer (Supply Side)
+    - Start at Marketer Dashboard
+    - Click "Create New Offer"
+    - Show pre-filled form
+    - Mock upload with progress
+    - Instant payment success
+    - Show offer live immediately
+  - Flow 2: Creator Discovers & Applies (Demand Side)
+    - Start at Creator Deals page
+    - Browse curated opportunities
+    - Click on perfect match deal
+    - One-click application
+    - Instant approval notification
+    - Show earnings update
+  - Flow 3: Success & Analytics (The Outcome)
+    - Navigate to Dashboard
+    - Display total earnings $45,600
+    - Show growth chart trending up
+    - Click through to detailed analytics
+    - Highlight 47 completed deals
+    - End with future potential
+- Critical Success Factors
+  - Technical Requirements
+    - Every click must work perfectly
+    - Load time under 3 seconds
+    - No error states visible
+    - Smooth animations throughout
+  - Data Story
+    - $45K in creator earnings
+    - 89% deal success rate
+    - 156K follower reach
+    - 8.7% engagement rate
+  - User Experience
+    - Intuitive navigation
+    - Clear value proposition
+    - Professional design
+    - Mobile responsive
+- Demo Script Outline
+  - Act 1: The Problem (30 seconds)
+    - Login as brand manager
+    - Show empty campaign state
+    - Express need for quality creators
+    - Highlight market fragmentation
+  - Act 2: The Solution (60 seconds)
+    - Create compelling offer
+    - Watch creators apply in real-time
+    - Review creator profiles
+    - Accept perfect match
+    - Show seamless workflow
+  - Act 3: The Result (30 seconds)
+    - Display success metrics
+    - Show earnings dashboard
+    - Highlight platform growth
+    - Tease scaling potential
+- Risk Mitigation
+  - Technical Safeguards
+    - No live API calls
+    - All data hardcoded
+    - Offline capability
+    - No external dependencies
+  - Presentation Backup
+    - Screenshots ready
+    - Video recording backup
+    - Local server option
+    - Practice without internet
+- Monday Morning Checklist
+  - Git Operations
+    - git clone [repo] axees-investor-demo
+    - cd axees-investor-demo
+    - git checkout -b demo-only
+  - File Structure Setup
+    - mkdir -p demo
+    - touch demo/DemoMode.ts
+    - touch demo/DemoData.ts
+    - touch demo/DemoAPI.ts
+    - touch .env.demo
+  - Initial Configuration
+    - echo "EXPO_PUBLIC_DEMO_MODE=true" > .env.demo
+    - npm install
+    - Test base configuration
+  - Start Deletion Process
+    - List all screens to remove
+    - Delete unused components
+    - Remove unnecessary dependencies
+    - Clean up imports

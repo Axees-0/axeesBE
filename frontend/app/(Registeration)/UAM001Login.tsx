@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   Text,
   StyleSheet,
@@ -34,19 +34,19 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAuthRateLimiter } from "@/utils/AuthRateLimiter";
 import { showErrorToast } from "@/utils/errorHandler";
 import { metrics } from "@/utils/metrics";
-const BREAKPOINTS = {
-  TABLET: 768,
-  DESKTOP: 1280,
-  MOBILE: 550,
-};
+
+// Demo Mode Imports
+import { DEMO_MODE, DemoConfig, DemoUsers, demoLog } from "@/demo/DemoMode";
+import { DemoAPI } from "@/demo/DemoAPI";
+import { BREAKPOINTS, isMobile, isWideScreen } from "@/constants/breakpoints";
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/auth";
 
 export default function Login() {
   const window = useWindowDimensions();
   const isWeb = Platform.OS === "web";
-  const isWideScreen = window.width >= BREAKPOINTS.TABLET;
-  const isMobile = window.width < BREAKPOINTS.TABLET;
+  const isWide = isWideScreen(window.width);
+  const isMobileDevice = isMobile(window.width);
   const { updateUser } = useAuth();
   const [cca2, setCca2] = useState<CountryCode>("US");
   const [country, setCountry] = useState<Country>();
@@ -66,8 +66,50 @@ export default function Login() {
     password: "",
   });
 
+  // Demo Mode Auto-Login Effect
+  useEffect(() => {
+    if (DEMO_MODE && DemoConfig.autoLogin) {
+      demoLog('Auto-login enabled, redirecting to dashboard');
+      
+      // Get demo user based on config
+      const demoUser = DemoUsers[DemoConfig.autoLoginAs as keyof typeof DemoUsers];
+      
+      // Simulate fast login process for demo performance
+      setTimeout(() => {
+        updateUser({
+          ...demoUser,
+          token: 'demo-token-12345',
+        });
+        
+        // Redirect to dashboard
+        router.push('/(tabs)');
+      }, 500); // Reduced delay for better demo performance
+      
+      return;
+    }
+  }, []);
+
+  // Early return if demo mode
+  if (DEMO_MODE && DemoConfig.autoLogin) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.content}>
+          <Logo width={200} height={60} />
+          <Text style={styles.demoText}>Demo Mode - Auto Login...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   const loginMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      // Use demo API in demo mode
+      if (DEMO_MODE) {
+        demoLog('Using demo login API');
+        return await DemoAPI.auth.login(data.phone, data.password);
+      }
+      
+      // Normal login flow
       const deviceToken = await AsyncStorage.getItem("deviceToken");
       const response = await axios.post(`${API_URL}/login`, {
         ...data,
@@ -137,14 +179,17 @@ export default function Login() {
   });
 
   const handleLogin = () => {
-    // Check rate limiting
-    const rateLimiter = getAuthRateLimiter();
-    const rateLimitCheck = rateLimiter.checkAttempt(formData.phone);
-    
-    if (!rateLimitCheck.allowed) {
-      setError(rateLimitCheck.message || 'Too many login attempts');
-      showErrorToast(new Error(rateLimitCheck.message || 'Too many login attempts'));
-      return;
+    // Skip rate limiting in demo mode
+    if (!DEMO_MODE) {
+      // Check rate limiting for normal mode
+      const rateLimiter = getAuthRateLimiter();
+      const rateLimitCheck = rateLimiter.checkAttempt(formData.phone);
+      
+      if (!rateLimitCheck.allowed) {
+        setError(rateLimitCheck.message || 'Too many login attempts');
+        showErrorToast(new Error(rateLimitCheck.message || 'Too many login attempts'));
+        return;
+      }
     }
     
     loginMutation.mutate(formData);
@@ -159,11 +204,11 @@ export default function Login() {
       <View
         style={[
           styles.contentContainer,
-          isWeb && isWideScreen && styles.webContentContainer,
+          isWeb && isWide && styles.webContentContainer,
         ]}
       >
         <View
-          style={[styles.content, isWeb && isWideScreen && styles.webContent]}
+          style={[styles.content, isWeb && isWide && styles.webContent]}
         >
           <Text style={styles.welcomeText}>Welcome Back!</Text>
           <Text style={styles.subtitleText}>
@@ -244,7 +289,7 @@ export default function Login() {
           <Pressable
             style={[
               styles.loginButton,
-              isWeb && isWideScreen && styles.webContinueButton,
+              isWeb && isWide && styles.webContinueButton,
             ]}
             onPress={handleLogin}
             disabled={loginMutation.isPending}
@@ -400,5 +445,12 @@ const styles = StyleSheet.create({
   },
   resendTextPurple: {
     color: "#430B92",
+  },
+  demoText: {
+    fontSize: 16,
+    color: "#430B92",
+    textAlign: "center",
+    marginTop: 20,
+    fontFamily: "interMedium",
   },
 });

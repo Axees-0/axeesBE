@@ -1,245 +1,145 @@
-import React from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  SafeAreaView,
-  Platform,
-  useWindowDimensions,
-  FlatList,
-  Image,
-  Pressable,
-} from "react-native";
-import { StatusBar } from "expo-status-bar";
-import Navbar from "@/components/web/navbar";
+import { DEMO_MODE } from "@/demo/DemoMode";
+import { DemoData } from "@/demo/DemoData";
+import { Fragment } from "react";
+import { Platform, useWindowDimensions, ScrollView, View, Text, StyleSheet } from "react-native";
 import { WebSEO } from "../web-seo";
+import { Color } from "@/GlobalStyles";
 
 const BREAKPOINTS = {
-  TABLET: 768,
-  DESKTOP: 1280,
+  mobile: 768,
 };
 
-type Notification = {
-  id: string;
-  type: "message" | "post" | "delivery" | "follow";
-  title: string;
-  subtitle: string;
-  time: string;
-  avatar?: string;
-  unread?: boolean;
-};
-
-const MOCK_NOTIFICATIONS: Notification[] = [
-  {
-    id: "1",
-    type: "message",
-    title: "Robert Lescure",
-    subtitle:
-      "Message : Ok, pense à apporter l'attestation au cas où, je suis ...",
-    time: "1h20",
-    avatar: require("../../assets/rectangle-5.png"),
-    unread: true,
-  },
-  {
-    id: "2",
-    type: "post",
-    title: "Neurchi d'oss 117",
-    subtitle:
-      'La page à publié un nouveau post : "Quand tu dois inventer une nouvelle..."',
-    time: "3h44",
-  },
-  {
-    id: "3",
-    type: "delivery",
-    title: "Nike Store",
-    subtitle:
-      "Livraison : Bonjour, votre paire de air max requin à double rotors va arriver...",
-    time: "5h",
-    avatar: require("../../assets/rectangle-5.png"),
-  },
-  {
-    id: "4",
-    type: "follow",
-    title: "Samantha Lopette",
-    subtitle: "à commencé à vous suivre",
-    time: "7h",
-    avatar: require("../../assets/rectangle-5.png"),
-    unread: true,
-  },
-];
-
-const NotificationItem = ({ item }: { item: Notification }) => (
-  <Pressable style={styles.notificationItem}>
-    <View style={styles.notificationContent}>
-      {item.unread && <View style={styles.unreadDot} />}
-      {item.avatar && <Image source={item.avatar} style={styles.avatar} />}
-      <View style={styles.textContent}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.subtitle} numberOfLines={2}>
-          {item.subtitle}
-        </Text>
-      </View>
-    </View>
-    <Text style={styles.time}>{item.time}</Text>
-  </Pressable>
-);
-
-export default function NotificationsScreen() {
+const NotificationsPage = () => {
   const window = useWindowDimensions();
   const isWeb = Platform.OS === "web";
-  const isWideScreen = window.width >= BREAKPOINTS.TABLET;
+  const isMobileScreen = window.width <= BREAKPOINTS.mobile;
+
+  // Demo content for notifications
+  const renderDemoNotifications = () => (
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Notifications</Text>
+      <Text style={styles.subtitle}>Stay updated on your campaigns</Text>
+      
+      <View style={styles.notificationsList}>
+        {DemoData.notifications.map((notification) => (
+          <View key={notification.id} style={[
+            styles.notificationItem,
+            notification.unread && styles.unreadNotification
+          ]}>
+            <View style={[styles.typeIndicator, { backgroundColor: getTypeColor(notification.type) }]} />
+            <View style={styles.notificationContent}>
+              <Text style={styles.notificationText}>{notification.message}</Text>
+              <Text style={styles.timestamp}>{notification.time}</Text>
+            </View>
+            {notification.unread && <View style={styles.unreadDot} />}
+          </View>
+        ))}
+        
+        {/* Additional demo notifications */}
+        <View style={styles.notificationItem}>
+          <View style={[styles.typeIndicator, { backgroundColor: '#28a745' }]} />
+          <View style={styles.notificationContent}>
+            <Text style={styles.notificationText}>Your Summer Collection offer has 5 new applications</Text>
+            <Text style={styles.timestamp}>30 minutes ago</Text>
+          </View>
+        </View>
+        
+        <View style={styles.notificationItem}>
+          <View style={[styles.typeIndicator, { backgroundColor: '#007bff' }]} />
+          <View style={styles.notificationContent}>
+            <Text style={styles.notificationText}>Sofia Rodriguez completed wellness campaign milestone</Text>
+            <Text style={styles.timestamp}>2 hours ago</Text>
+          </View>
+        </View>
+      </View>
+    </ScrollView>
+  );
 
   return (
     <>
       <WebSEO 
-        title="Notifications" 
-        description="Stay updated with your latest activities, offers, and campaign updates on Axees." 
-        keywords="notifications, updates, alerts, campaign updates, offers"
+        title="Notifications - Axees"
+        description="Stay updated with real-time notifications about your campaigns, applications, and partnerships on Axees."
+        keywords="notifications, updates, campaigns, brand partnerships, creator alerts"
       />
-      <SafeAreaView
-        style={[styles.container, isWeb && isWideScreen && styles.webContainer]}
-      >
-        {/* <Navbar pageTitle="Notifications" /> */}
-        <StatusBar style="auto" />
-
-      {/* <View style={styles.header}>
-        <Text style={styles.headerTitle}>Notifications</Text>
-        {isWeb && isWideScreen && (
-          <View style={styles.unreadCount}>
-            <Text style={styles.unreadCountText}>2</Text>
-          </View>
-        )}
-      </View> */}
-
-      <FlatList
-        data={MOCK_NOTIFICATIONS}
-        renderItem={({ item }) => <NotificationItem item={item} />}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={styles.separator} />}
-      />
-    </SafeAreaView>
+      {renderDemoNotifications()}
     </>
   );
-}
+};
+
+const getTypeColor = (type: string) => {
+  switch (type) {
+    case 'application': return '#17a2b8';
+    case 'milestone': return '#28a745';
+    case 'payment': return '#ffc107';
+    default: return '#6c757d';
+  }
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-  webContainer: {
-    maxWidth: BREAKPOINTS.DESKTOP,
-    marginHorizontal: "auto",
-    width: "100%",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingHorizontal: 20,
-    paddingTop: Platform.OS === "ios" ? 12 : 20,
-    paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: "rgba(0, 0, 0, 0.1)",
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "600",
-    color: "#1F2937",
-    fontFamily: Platform.select({
-      ios: "sFProDisplaySemibold",
-      android: "interSemiBold",
-      default: "interSemiBold",
-    }),
-  },
-  unreadCount: {
-    position: "absolute",
-    right: 20,
-    top: "50%",
-    transform: [{ translateY: -10 }],
-    backgroundColor: "#EF4444",
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  unreadCountText: {
-    color: "#FFFFFF",
-    fontSize: 12,
-    fontWeight: "600",
-    fontFamily: Platform.select({
-      ios: "sFProDisplaySemibold",
-      android: "interSemiBold",
-      default: "interSemiBold",
-    }),
-  },
-  listContent: {
+    backgroundColor: '#f8f9fa',
     padding: 20,
   },
+  title: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Color.cSK430B92500,
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#666',
+    marginBottom: 24,
+  },
+  notificationsList: {
+    gap: 12,
+  },
   notificationItem: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    paddingVertical: 12,
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  unreadNotification: {
+    borderLeftWidth: 4,
+    borderLeftColor: Color.cSK430B92500,
+  },
+  typeIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 6,
+    marginRight: 12,
   },
   notificationContent: {
-    flexDirection: "row",
-    alignItems: "center",
     flex: 1,
-    marginRight: 12,
+  },
+  notificationText: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 4,
+    lineHeight: 20,
+  },
+  timestamp: {
+    fontSize: 12,
+    color: '#999',
   },
   unreadDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: "#EF4444",
-    marginRight: 12,
-  },
-  avatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    marginRight: 12,
-  },
-  textContent: {
-    flex: 1,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#1F2937",
-    marginBottom: 4,
-    fontFamily: Platform.select({
-      ios: "sFProDisplaySemibold",
-      android: "interSemiBold",
-      default: "interSemiBold",
-    }),
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#6B7280",
-    lineHeight: 20,
-    fontFamily: Platform.select({
-      ios: "sFPro",
-      android: "interRegular",
-      default: "interRegular",
-    }),
-  },
-  time: {
-    fontSize: 12,
-    color: "#9CA3AF",
-    fontFamily: Platform.select({
-      ios: "sFPro",
-      android: "interRegular",
-      default: "interRegular",
-    }),
-  },
-  separator: {
-    height: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    marginVertical: 8,
+    backgroundColor: Color.cSK430B92500,
+    marginLeft: 8,
+    marginTop: 6,
   },
 });
+
+export default NotificationsPage;

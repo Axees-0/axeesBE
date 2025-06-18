@@ -24,6 +24,13 @@ import { usePayment } from "@/contexts/PaymentContext";
 import { format } from "date-fns";
 import ProfileInfo from "@/components/ProfileInfo";
 import Navbar from "@/components/web/navbar";
+
+// Demo Mode Imports
+import { DEMO_MODE, DemoConfig, demoLog } from "@/demo/DemoMode";
+import { DemoAPI } from "@/demo/DemoAPI";
+import { DemoData } from "@/demo/DemoData";
+import { DemoPolish } from "@/utils/demoPolish";
+
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/marketer/offers";
 
 const BREAKPOINTS = {
@@ -50,10 +57,39 @@ export default function CreatorOfferDetails() {
     },
   });
 
-  // Fetch offer details
+  // Fetch offer details - Use demo data in demo mode
   const { data, isLoading } = useQuery({
     queryKey: ["offer", offerId],
     queryFn: async () => {
+      if (DEMO_MODE) {
+        demoLog('Using demo offer data for creator');
+        // Return demo offer data that matches what marketers create
+        return {
+          offer: {
+            _id: offerId || 'demo-offer-1',
+            offerName: 'Summer Collection Launch 2024',
+            proposedAmount: 5000,
+            description: 'Showcase our vibrant summer collection with authentic lifestyle content. Looking for creators who embody confidence and style. Create 3-5 posts featuring our latest designs in natural, everyday settings.',
+            deliverables: ['instagram', 'tiktok'],
+            desiredReviewDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+            desiredPostDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+            notes: 'Please ensure all content aligns with our brand guidelines. We\'re looking for high-quality, authentic content that resonates with our target audience.',
+            status: 'Sent',
+            attachments: [
+              { fileName: 'summer-collection-brief.pdf', fileUrl: '#' },
+              { fileName: 'brand-guidelines.pdf', fileUrl: '#' },
+              { fileName: 'product-images.zip', fileUrl: '#' }
+            ],
+            marketerId: {
+              _id: 'demo-marketer-1',
+              userName: '@fashionnova',
+              avatarUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face'
+            },
+            viewedByCreator: false
+          }
+        };
+      }
+      
       const response = await axios.get(`${API_URL}/${offerId}`, {
         params: {
           userId: user?._id,
@@ -94,15 +130,72 @@ export default function CreatorOfferDetails() {
   const dataBasedOnRole =
     user?.userType === "Creator" ? offer?.marketerId : offer?.creatorId;
 
-  // Accept Offer
+  // Accept Offer - Enhanced for demo with polish
   const acceptMutation = useMutation({
     mutationFn: async () => {
+      if (DEMO_MODE) {
+        demoLog('Accepting offer in demo mode with enhanced polish');
+        
+        // Show progressive loading with polish
+        const loadingState = DemoPolish.createLoadingState('Accepting $5,000 offer', 1200);
+        
+        // Simulate instant acceptance with enhanced feedback
+        await new Promise(resolve => setTimeout(resolve, 1200));
+        
+        loadingState.clear();
+        
+        return {
+          offer: {
+            _id: offerId,
+            offerName: 'Summer Collection Launch 2024',
+            proposedAmount: 5000
+          },
+          deal: {
+            dealNumber: 'DL-2024-001',
+            _id: 'demo-deal-1'
+          },
+          paymentNeeded: false // Skip payment in demo
+        };
+      }
+      
       const response = await axios.post(`${API_URL}/${offerId}/accept`, {
         userId: user?._id,
       });
       return response.data;
     },
     onSuccess: (data) => {
+      if (DEMO_MODE) {
+        // Enhanced success feedback with polish
+        DemoPolish.showConfetti();
+        
+        // Enhanced success toast
+        const enhancedToast = DemoPolish.showEnhancedToast(
+          'success',
+          'Deal Accepted! 🎉',
+          '$5,000 secured! Payment guaranteed within 24 hours.',
+          4000
+        );
+        
+        // Show success animation on accept button
+        DemoPolish.showSuccessAnimation('accept-offer-button');
+        
+        // Brief delay before navigation for polish
+        setTimeout(() => {
+          // Enhanced page transition
+          DemoPolish.enhancePageTransition('offer-details', 'accept-success');
+          
+          router.push({
+            pathname: "/UOM14OfferAcceptSuccess",
+            params: {
+              offerName: data.offer.offerName,
+              dealNumber: data.deal.dealNumber,
+            },
+          });
+        }, 1500);
+        
+        return;
+      }
+      
       router.push("/UOM08MarketerDealHistoryList");
 
       if (data.paymentNeeded && user?._id === data.deal.payer) {
@@ -139,26 +232,37 @@ export default function CreatorOfferDetails() {
     });
   };
 
-  // Accept
+  // Accept - Simplified for demo
   const handleAccept = async () => {
     try {
+      if (DEMO_MODE) {
+        demoLog('Handling offer acceptance in demo mode');
+      }
+      
       const result = await acceptMutation.mutateAsync();
-      router.push({
-        pathname: "/UOM14OfferAcceptSuccess",
-        params: {
-          offerName: result.offer.offerName,
-          dealNumber: result.deal.dealNumber,
-        },
-      });
-      // setPaymentDetails({
-      //   amount: result.offer.proposedAmount, // The amount to charge
-      //   offerId: offerId as string,
-      //   creatorId: result.offer.creatorId,
-      //   marketerId: result.offer.marketerId,
-      // });
-      // setShowPaymentModal(true);
+      
+      if (!DEMO_MODE) {
+        router.push({
+          pathname: "/UOM14OfferAcceptSuccess",
+          params: {
+            offerName: result.offer.offerName,
+            dealNumber: result.deal.dealNumber,
+          },
+        });
+      }
+      // Demo mode navigation handled in mutation onSuccess
     } catch (error) {
       console.error("Error accepting offer:", error);
+      if (DEMO_MODE) {
+        // Even if there's an error in demo, show success
+        router.push({
+          pathname: "/UOM14OfferAcceptSuccess",
+          params: {
+            offerName: 'Summer Collection Launch 2024',
+            dealNumber: 'DL-2024-001',
+          },
+        });
+      }
     }
   };
 
@@ -485,42 +589,67 @@ export default function CreatorOfferDetails() {
                           styles.acceptButton,
                           isMobile && { maxWidth: "100%" },
                         ]}
-                        onPress={handleAccept}
+                        onPress={DEMO_MODE 
+                          ? DemoPolish.enhanceButtonPress(handleAccept, 'accept-offer-button')
+                          : handleAccept
+                        }
                         disabled={acceptMutation.isPending}
+                        nativeID="accept-offer-button"
                       >
                         {acceptMutation.isPending ? (
-                          <ActivityIndicator size="small" color="#FFFFFF" />
+                          <>
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                            {DEMO_MODE && (
+                              <Text style={[styles.acceptButtonText, { marginLeft: 8 }]}>
+                                Securing your $5,000...
+                              </Text>
+                            )}
+                          </>
                         ) : (
-                          <Text style={styles.acceptButtonText}>Accept</Text>
+                          <Text style={styles.acceptButtonText}>
+                            {DEMO_MODE ? "Accept $5,000 Offer" : "Accept"}
+                          </Text>
                         )}
                       </Pressable>
 
-                      <Pressable
-                        style={[
-                          styles.counterButton,
-                          isMobile && { maxWidth: "100%" },
-                        ]}
-                        onPress={handleCounter}
-                      >
-                        <Text style={styles.counterButtonText}>
-                          Reject and Counter Offer
-                        </Text>
-                      </Pressable>
+                      {!DEMO_MODE && (
+                        <Pressable
+                          style={[
+                            styles.counterButton,
+                            isMobile && { maxWidth: "100%" },
+                          ]}
+                          onPress={handleCounter}
+                        >
+                          <Text style={styles.counterButtonText}>
+                            Reject and Counter Offer
+                          </Text>
+                        </Pressable>
+                      )}
 
-                      <Pressable
-                        style={[
-                          styles.rejectButton,
-                          isMobile && { maxWidth: "100%" },
-                        ]}
-                        onPress={handleReject}
-                        disabled={rejectMutation.isPending}
-                      >
-                        {rejectMutation.isPending ? (
-                          <ActivityIndicator size="small" color="#FFFFFF" />
-                        ) : (
-                          <Text style={styles.rejectButtonText}>Reject</Text>
-                        )}
-                      </Pressable>
+                      {!DEMO_MODE && (
+                        <Pressable
+                          style={[
+                            styles.rejectButton,
+                            isMobile && { maxWidth: "100%" },
+                          ]}
+                          onPress={handleReject}
+                          disabled={rejectMutation.isPending}
+                        >
+                          {rejectMutation.isPending ? (
+                            <ActivityIndicator size="small" color="#FFFFFF" />
+                          ) : (
+                            <Text style={styles.rejectButtonText}>Reject</Text>
+                          )}
+                        </Pressable>
+                      )}
+                      
+                      {DEMO_MODE && (
+                        <View style={styles.demoNoteContainer}>
+                          <Text style={styles.demoNoteText}>
+                            💰 Great rate! This brand has 98% payment success
+                          </Text>
+                        </View>
+                      )}
                     </>
                   )}
                 </View>
@@ -755,6 +884,21 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
     fontSize: 16,
     fontWeight: "500",
+  },
+  demoNoteContainer: {
+    backgroundColor: "#E8F5E8",
+    borderRadius: 8,
+    padding: 12,
+    flex: 1,
+    maxWidth: "60%",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  demoNoteText: {
+    fontSize: 14,
+    color: "#2E7D32",
+    fontWeight: "500",
+    textAlign: "center",
   },
 });
 

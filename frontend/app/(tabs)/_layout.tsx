@@ -4,15 +4,16 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Tabs } from "expo-router";
+import { router, Slot, Tabs, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect } from "react";
-import { Platform, useWindowDimensions } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useEffect, lazy, Suspense } from "react";
+import { Platform, StyleSheet, useWindowDimensions, View, ActivityIndicator, Text } from "react-native";
 
+import Logo from "@/assets/Logo.svg";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { TabButton } from "@/components/TabButton";
 import { Indicator } from "@/components/Indicator";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Import tab icons
 import Discoveryiconlypro from "../../assets/discovery--iconly-pro.svg";
@@ -36,6 +37,9 @@ export default function TabLayout() {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const isWeb = Platform.OS === "web";
   const isWideScreen = width > 1280;
+  const currentPath = usePathname();
+  const isMobile = width <= 768;
+
 
   return (
     <>
@@ -59,9 +63,7 @@ export default function TabLayout() {
             minWidth: 1280,
             justifyContent: "center",
             alignItems: "center",
-            display: TABS.some((tab) => tab.name === route.name)
-              ? "flex"
-              : "none",
+            display: TABS.some((tab) => tab.name === route.name) ? "flex" : "none"
           },
           headerShown: false,
         })}

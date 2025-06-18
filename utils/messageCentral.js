@@ -13,10 +13,21 @@ async function getMessageCentralToken() {
         return cachedToken;
     }
 
+    // Check if credentials are configured
+    const { MESSAGECENTRAL_CUSTOMER_ID, MESSAGECENTRAL_EMAIL, MESSAGECENTRAL_KEY, MESSAGECENTRAL_SCOPE } = process.env;
+    
+    // If any credential is missing or has placeholder value, return mock token
+    if (!MESSAGECENTRAL_CUSTOMER_ID || !MESSAGECENTRAL_EMAIL || !MESSAGECENTRAL_KEY || !MESSAGECENTRAL_SCOPE ||
+        MESSAGECENTRAL_CUSTOMER_ID.includes('your_') || MESSAGECENTRAL_EMAIL.includes('your_') || 
+        MESSAGECENTRAL_KEY.includes('your_') || MESSAGECENTRAL_SCOPE.includes('your_')) {
+        console.log('🚫 MessageCentral credentials not configured - using mock mode');
+        const mockToken = 'mock-token-development-mode';
+        tokenCache.set("messageCentralToken", mockToken);
+        return mockToken;
+    }
+
     // Otherwise, fetch a new token from MessageCentral
     const baseUrl = 'https://cpaas.messagecentral.com';
-    const { MESSAGECENTRAL_CUSTOMER_ID, MESSAGECENTRAL_EMAIL, MESSAGECENTRAL_KEY, MESSAGECENTRAL_SCOPE } = process.env;
-
     const url = `${baseUrl}/auth/v1/authentication/token?customerId=${MESSAGECENTRAL_CUSTOMER_ID}&key=${MESSAGECENTRAL_KEY}&scope=${MESSAGECENTRAL_SCOPE}&country=1&email=${MESSAGECENTRAL_EMAIL}`;
 
     const response = await axios.get(url, {
@@ -47,11 +58,17 @@ async function sendOtp(fullPhone) {
     // 2) Get your authToken from MessageCentral using our cached method
     const authToken = await getMessageCentralToken();
 
+    // If using mock token, return mock verification ID
+    if (authToken === 'mock-token-development-mode') {
+        console.log('📱 Mock SMS OTP sent to:', fullPhone);
+        const mockVerificationId = `mock-verification-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        return mockVerificationId;
+    }
+
     // 3) Build the request URL:
     // e.g. https://cpaas.messagecentral.com/verification/v3/send?countryCode=92&flowType=SMS&mobileNumber=3449332512
     const baseUrl = 'https://cpaas.messagecentral.com';
     const url = `${baseUrl}/verification/v3/send?countryCode=${countryCode}&flowType=SMS&mobileNumber=${localNumber}`;
-
 
     // 4) Fire the request
     const headers = { authToken };
@@ -69,6 +86,19 @@ async function sendOtp(fullPhone) {
 async function verifyOtp(verificationId, code) {
     // Get the authToken from cache (or fetch a new one)
     const authToken = await getMessageCentralToken();
+
+    // If using mock token, simulate OTP verification
+    if (authToken === 'mock-token-development-mode') {
+        console.log('🔑 Mock OTP verification for:', verificationId, 'with code:', code);
+        // Accept any 6-digit code for mock mode, or specific test codes
+        if (code === '123456' || code === '000000' || /^\d{6}$/.test(code)) {
+            console.log('✅ Mock OTP verification successful');
+            return true;
+        } else {
+            throw new Error('Mock OTP verification failed - use 6-digit code like 123456');
+        }
+    }
+
     const baseUrl = 'https://cpaas.messagecentral.com';
 
     // Build URL for OTP verification

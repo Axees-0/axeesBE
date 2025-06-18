@@ -107,6 +107,19 @@ const handleServerError = (res, error, operation) => {
 
 exports.startRegistration = async (req, res) => {
   try {
+    // 🔍 DEBUG: Log all request details to trace the source
+    console.log('🔥 REGISTRATION CALL DEBUG:');
+    console.log('   📱 Phone:', req.body.phone);
+    console.log('   👤 UserType:', req.body.userType);
+    console.log('   🌍 User-Agent:', req.headers['user-agent']);
+    console.log('   🔗 Referer:', req.headers['referer']);
+    console.log('   🏠 Origin:', req.headers['origin']);
+    console.log('   📍 IP:', req.ip || req.connection.remoteAddress);
+    console.log('   📋 All Headers:', JSON.stringify(req.headers, null, 2));
+    console.log('   ⏰ Timestamp:', new Date().toISOString());
+    console.log('   🔍 Stack trace:');
+    console.trace();
+    
     const { phone, userType } = req.body;
     if (!phone) {
       return errorResponse(res, "Please provide phone number", 400);

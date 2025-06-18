@@ -1,0 +1,103 @@
+# Demo Screen Analysis - What to Keep vs Delete
+
+## KEEP - Essential for 3 Demo Flows (8 screens max)
+
+### Core Infrastructure (3 screens)
+- frontend/app/_layout.tsx (Root layout)
+- frontend/app/(tabs)/_layout.tsx (Tab navigation)
+- frontend/app/(Registeration)/UAM001Login.tsx (Simplified login)
+
+### Flow 1: Brand Creates Offer (2 screens)
+- frontend/app/(tabs)/index.tsx (Marketer Dashboard)
+- frontend/app/UOM02MarketerOfferDetail.tsx (Create Offer - SIMPLIFY)
+
+### Flow 2: Creator Discovers & Applies (2 screens)  
+- frontend/app/(tabs)/deals.tsx (Browse Deals)
+- frontend/app/UOM10CreatorOfferDetails.tsx (Apply to Deal - SIMPLIFY)
+
+### Flow 3: Success & Analytics (1 screen)
+- frontend/app/UOM003MarketerSuccessMessage.tsx (Success message)
+
+## DELETE - All These Complex Screens
+
+### File Upload Related (DELETE ALL)
+- UOM13CreatorUploadProof.tsx (Complex upload system)
+- All file preview modals
+- Document picker components
+
+### Payment Related (DELETE ALL)  
+- UOM03MarketerPreviewAndPay.tsx
+- Payment webview components
+- Stripe integration screens
+
+### Complex Workflows (DELETE ALL)
+- UOM05MarketerOfferCounter.tsx
+- UOM06MarketerOfferCounterEdit.tsx
+- UOM11CreatorOfferCounterEdit.tsx
+- OfferNegotiationPage.tsx
+- UOM15OfferRejectMessage.tsx
+
+### History & Lists (DELETE ALL)
+- UOM07MarketerOfferHistoryList.tsx
+- UOM08MarketerDealHistoryList.tsx
+- UOM09MarketerDraftHistoryList.tsx
+- UOM13CreatorDealHistoryList.tsx
+
+### Complex Deal Management (DELETE ALL)
+- UOM09MarketerDealDetail.tsx
+- UOM12CreatorDealDetails.tsx
+- DealDashboardPage.tsx
+
+### Profile & Settings (DELETE ALL)
+- frontend/app/(tabs)/profile.tsx
+- Profile editing screens
+- Settings screens
+
+### Communication (DELETE ALL)
+- frontend/app/(tabs)/messages.tsx
+- frontend/app/(tabs)/messages.web.tsx
+- frontend/app/(tabs)/notifications.tsx
+- frontend/app/(tabs)/notifications.web.tsx
+
+### Registration (KEEP SIMPLIFIED)
+- KEEP: UAM001Login.tsx (simplified)
+- DELETE: All other registration screens
+
+### Error Handling (DELETE ALL)
+- UOM003MarketerErrorMessage.tsx
+- All error pages
+
+## SIMPLIFICATION TASKS
+
+### UOM02MarketerOfferDetail.tsx
+- Remove file upload sections
+- Remove payment integration
+- Pre-fill all forms with demo data
+- Remove error handling
+- Mock all API calls
+
+### UOM10CreatorOfferDetails.tsx  
+- Remove file upload requirements
+- Remove complex application process
+- Make application instant
+- Remove error states
+
+### (tabs)/index.tsx (Dashboard)
+- Remove real API calls
+- Hardcode impressive metrics
+- Remove complex widgets
+- Focus on key numbers
+
+### (tabs)/deals.tsx
+- Show only curated demo deals
+- Remove search/filter complexity
+- Remove pagination
+- Show perfect data
+
+## ACTION PLAN
+
+1. Move essential screens to demo-safe versions
+2. Delete all complex screens
+3. Simplify remaining screens
+4. Add demo mode checks
+5. Mock all data
