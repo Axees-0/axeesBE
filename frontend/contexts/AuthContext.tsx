@@ -42,6 +42,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuthStatus = async () => {
     try {
+      // Check for demo mode auto-login
+      if (process.env.EXPO_PUBLIC_DEMO_MODE === 'true') {
+        const demoUser = process.env.EXPO_PUBLIC_AUTO_LOGIN_USER || 'marketer';
+        const demoUserData: User = {
+          id: 'demo-marketer-001',
+          email: 'sarah@techstyle.com',
+          name: 'Sarah Martinez',
+          userType: 'marketer',
+          isEmailVerified: true,
+        };
+        setToken('demo-token');
+        setUser(demoUserData);
+        setIsLoading(false);
+        return;
+      }
+
       const storedToken = await AsyncStorage.getItem('axees_token');
       const storedUser = await AsyncStorage.getItem('axees_user');
 

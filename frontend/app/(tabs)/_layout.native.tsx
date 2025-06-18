@@ -4,7 +4,7 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Tabs } from "expo-router";
+import { router, Tabs, usePathname } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
 import { Platform, useWindowDimensions } from "react-native";
@@ -22,11 +22,11 @@ import Notification02 from "../../assets/notification02.svg";
 import User from "../../assets/user.svg";
 
 const TABS = [
-  { name: "index", icon: Discoveryiconlypro, label: "Explore" },
-  { name: "deals", icon: Hotprice, label: "Deals/Offers" },
-  { name: "messages", icon: Message01, label: "Messages" },
-  { name: "notifications", icon: Notification02, label: "Notifications" },
-  { name: "profile", icon: User, label: "Profile" },
+  { name: "index", icon: Discoveryiconlypro, label: "Explore", route: "/" },
+  { name: "deals", icon: Hotprice, label: "Deals/Offers", route: "/deals" },
+  { name: "messages", icon: Message01, label: "Messages", route: "/messages" },
+  { name: "notifications", icon: Notification02, label: "Notifications", route: "/notifications" },
+  { name: "profile", icon: User, label: "Profile", route: "/profile" },
 ];
 
 export default function TabLayout() {
@@ -36,6 +36,21 @@ export default function TabLayout() {
   const [activeIndex, setActiveIndex] = React.useState(0);
   const isWeb = Platform.OS === "web";
   const isWideScreen = width > 1280;
+  const currentPath = usePathname();
+
+  // Sync activeIndex with current path
+  React.useEffect(() => {
+    const currentTabIndex = TABS.findIndex(tab => tab.route === currentPath);
+    if (currentTabIndex !== -1 && currentTabIndex !== activeIndex) {
+      setActiveIndex(currentTabIndex);
+    }
+  }, [currentPath, activeIndex]);
+
+  const handleTabPress = (index: number) => {
+    const tab = TABS[index];
+    setActiveIndex(index);
+    router.push(tab.route);
+  };
 
   return (
     <>
@@ -82,7 +97,7 @@ export default function TabLayout() {
                   }
                   label={tab.label}
                   isActive={index === activeIndex}
-                  onPress={() => setActiveIndex(index)}
+                  onPress={() => handleTabPress(index)}
                 />
               ),
             }}

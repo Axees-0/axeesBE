@@ -1,35 +1,474 @@
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  SafeAreaView,
+  Platform,
+  useWindowDimensions,
+  TouchableOpacity,
+} from "react-native";
 import Mobile from "@/components/mobile/UOM08MarketerDealHistoryList";
 import Web from "@/components/web/UOM08MarketerDealHistoryList";
 import WebBottomTabs from "@/components/WebBottomTabs";
 import CuratedDeals from "@/demo/CuratedDeals";
-import { DEMO_MODE } from "@/demo/DemoMode";
-import { Fragment } from "react";
-import { Platform, useWindowDimensions } from "react-native";
+import { DEMO_MODE, demoLog } from "@/demo/DemoMode";
+import { DemoData } from "@/demo/DemoData";
+import { useAuth } from "@/contexts/AuthContext";
+import Navbar from "@/components/web/navbar";
+import { BREAKPOINTS, isMobile, isWideScreen } from "@/constants/breakpoints";
+import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/performance";
 import { WebSEO } from "../web-seo";
 
-const BREAKPOINTS = {
-  mobile: 768,
-};
-
 const UOM08MarketerDealHistoryList = () => {
-  const window = useWindowDimensions();
+  const { width } = useWindowDimensions();
+  const { user } = useAuth();
   const isWeb = Platform.OS === "web";
-  const isMobileScreen = window.width <= BREAKPOINTS.mobile;
+  const isWide = isWideScreen(width);
+  const isMobileDevice = isMobile(width);
+  const isMobileScreen = width <= 768;
+  
+  const [activeTab, setActiveTab] = useState('deals');
+  const [isLoading, setIsLoading] = useState(true);
+  const [chartsReady, setChartsReady] = useState(false);
 
-  // Show curated deals in demo mode
+  // Demo analytics data
+  const [analyticsData] = useState({
+    totalEarnings: 45600,
+    thisMonth: 12800,
+    totalDeals: 47,
+    activeDeals: 12,
+    successRate: 89,
+    avgDealValue: 2710,
+    topPerformingPlatform: "Instagram",
+    platformBreakdown: {
+      instagram: 65,
+      tiktok: 25,
+      youtube: 10,
+    },
+    monthlyGrowth: [
+      { month: "Jan", earnings: 8900 },
+      { month: "Feb", earnings: 12400 },
+      { month: "Mar", earnings: 15800 },
+      { month: "Apr", earnings: 18200 },
+      { month: "May", earnings: 22600 },
+      { month: "Jun", earnings: 12800 },
+    ],
+    recentDeals: [
+      { brand: "Fashion Nova", amount: 5000, status: "Completed", platform: "Instagram" },
+      { brand: "Nike", amount: 8500, status: "In Progress", platform: "TikTok" },
+      { brand: "Samsung", amount: 3200, status: "Completed", platform: "YouTube" },
+    ]
+  });
+
+  useEffect(() => {
+    if (DEMO_MODE) {
+      demoLog('Loading deals & analytics dashboard with impressive demo data');
+      
+      // Start performance measurement
+      const flowTimer = DemoPerformance.measureDemoFlow('deals-analytics-dashboard');
+      flowTimer.start();
+      
+      // Initialize demo optimizations
+      DemoPerformance.initializeDemo();
+      
+      // Simulate fast loading for demo
+      setTimeout(() => {
+        setIsLoading(false);
+        
+        // Defer chart rendering for smooth experience
+        DemoPerformance.optimizeAnalyticsDashboard().then(() => {
+          setChartsReady(true);
+          flowTimer.end();
+        });
+      }, 800); // Fast load for demo
+    }
+  }, []);
+
+  const MetricCard = ({ title, value, subtitle, trend }: any) => (
+    <View style={[styles.metricCard, isWide && styles.metricCardWide]}>
+      <Text style={styles.metricTitle}>{title}</Text>
+      <Text style={styles.metricValue}>{value}</Text>
+      {subtitle && <Text style={styles.metricSubtitle}>{subtitle}</Text>}
+      {trend && (
+        <View style={styles.trendContainer}>
+          <Text style={[styles.trendText, trend > 0 ? styles.trendPositive : styles.trendNegative]}>
+            {trend > 0 ? '↗️' : '↘️'} {Math.abs(trend)}%
+          </Text>
+        </View>
+      )}
+    </View>
+  );
+
+  const PlatformBar = ({ platform, percentage }: any) => (
+    <View style={styles.platformRow}>
+      <Text style={styles.platformName}>{platform}</Text>
+      <View style={styles.progressBar}>
+        <View style={[styles.progressFill, { width: `${percentage}%` }]} />
+      </View>
+      <Text style={styles.platformPercentage}>{percentage}%</Text>
+    </View>
+  );
+
+  const renderDealsTab = () => {
+    if (!DEMO_MODE) {
+      return isMobileScreen ? <Mobile /> : <Web />;
+    }
+    
+    // Demo offers data
+    const demoOffers = [
+      {
+        id: 'OFF-123456',
+        creator: 'Emma Thompson',
+        creatorHandle: '@emmastyle',
+        offerType: 'Social Media Post',
+        amount: 500,
+        status: 'Pending Response',
+        submittedDate: '2024-06-18',
+        platform: 'Instagram',
+        deliveryDays: 3,
+      },
+      {
+        id: 'OFF-789012',
+        creator: 'Marcus Johnson',
+        creatorHandle: '@techmarc',
+        offerType: 'Product Review Video',
+        amount: 1200,
+        status: 'Accepted',
+        submittedDate: '2024-06-17',
+        platform: 'YouTube',
+        deliveryDays: 7,
+      },
+      {
+        id: 'OFF-345678',
+        creator: 'Sofia Rodriguez',
+        creatorHandle: '@sofiafit',
+        offerType: 'Custom Campaign',
+        amount: 800,
+        status: 'In Progress',
+        submittedDate: '2024-06-15',
+        platform: 'Instagram',
+        deliveryDays: 5,
+      },
+      {
+        id: 'OFF-901234',
+        creator: 'Jake Miller',
+        creatorHandle: '@jakeeats',
+        offerType: 'Instagram Story Series',
+        amount: 750,
+        status: 'Completed',
+        submittedDate: '2024-06-10',
+        platform: 'Instagram',
+        deliveryDays: 5,
+      },
+    ];
+
+    const getStatusColor = (status: string) => {
+      switch (status) {
+        case 'Pending Response': return '#FFA726';
+        case 'Accepted': return '#66BB6A';
+        case 'In Progress': return '#42A5F5';
+        case 'Completed': return '#4CAF50';
+        case 'Declined': return '#EF5350';
+        default: return '#757575';
+      }
+    };
+
+    const getStatusTextColor = (status: string) => {
+      switch (status) {
+        case 'Pending Response': return '#FF8F00';
+        case 'Accepted': return '#388E3C';
+        case 'In Progress': return '#1976D2';
+        case 'Completed': return '#2E7D32';
+        case 'Declined': return '#C62828';
+        default: return '#424242';
+      }
+    };
+
+    return (
+      <View style={[styles.content, isWide && styles.wideContent]}>
+        {/* Summary Cards */}
+        <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
+          <MetricCard
+            title="Total Offers"
+            value={demoOffers.length}
+            subtitle="All time"
+          />
+          <MetricCard
+            title="Pending"
+            value={demoOffers.filter(o => o.status === 'Pending Response').length}
+            subtitle="Awaiting response"
+          />
+          <MetricCard
+            title="Active"
+            value={demoOffers.filter(o => ['Accepted', 'In Progress'].includes(o.status)).length}
+            subtitle="In progress"
+          />
+          <MetricCard
+            title="Success Rate"
+            value="85%"
+            subtitle="Acceptance rate"
+            trend={12}
+          />
+        </View>
+
+        {/* Offers List */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Your Offers</Text>
+          <View style={styles.offersContainer}>
+            {demoOffers.map((offer, index) => (
+              <TouchableOpacity key={offer.id} style={styles.offerCard}>
+                <View style={styles.offerHeader}>
+                  <View style={styles.offerMainInfo}>
+                    <Text style={styles.offerTitle}>{offer.offerType}</Text>
+                    <Text style={styles.offerCreator}>to {offer.creator} ({offer.creatorHandle})</Text>
+                    <Text style={styles.offerPlatform}>{offer.platform} • {offer.deliveryDays} days delivery</Text>
+                  </View>
+                  <View style={styles.offerActions}>
+                    <Text style={styles.offerAmount}>${offer.amount.toLocaleString()}</Text>
+                    <View style={[styles.offerStatus, { backgroundColor: getStatusColor(offer.status) + '20' }]}>
+                      <Text style={[styles.offerStatusText, { color: getStatusTextColor(offer.status) }]}>
+                        {offer.status}
+                      </Text>
+                    </View>
+                  </View>
+                </View>
+                
+                <View style={styles.offerFooter}>
+                  <Text style={styles.offerDate}>
+                    Submitted: {new Date(offer.submittedDate).toLocaleDateString()}
+                  </Text>
+                  <Text style={styles.offerNumber}>#{offer.id}</Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Recent Activity */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Recent Activity</Text>
+          <View style={styles.activityContainer}>
+            <View style={styles.activityItem}>
+              <View style={styles.activityIcon}>
+                <Text style={styles.activityEmoji}>✅</Text>
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Offer Accepted</Text>
+                <Text style={styles.activityDescription}>Marcus Johnson accepted your product review offer</Text>
+                <Text style={styles.activityTime}>2 hours ago</Text>
+              </View>
+            </View>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIcon}>
+                <Text style={styles.activityEmoji}>📄</Text>
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>New Offer Submitted</Text>
+                <Text style={styles.activityDescription}>Sent Instagram post offer to Emma Thompson</Text>
+                <Text style={styles.activityTime}>1 day ago</Text>
+              </View>
+            </View>
+            
+            <View style={styles.activityItem}>
+              <View style={styles.activityIcon}>
+                <Text style={styles.activityEmoji}>🎉</Text>
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>Campaign Completed</Text>
+                <Text style={styles.activityDescription}>Jake Miller completed Instagram story series</Text>
+                <Text style={styles.activityTime}>3 days ago</Text>
+              </View>
+            </View>
+          </View>
+        </View>
+
+        {/* Action Button */}
+        <View style={styles.actionSection}>
+          <TouchableOpacity 
+            style={styles.exploreButton}
+            onPress={() => {
+              // Navigate to explore page to create new offers
+            }}
+          >
+            <Text style={styles.exploreButtonText}>Explore More Creators</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+    );
+  };
+
+  const renderAnalyticsTab = () => (
+    <View style={[styles.content, isWide && styles.wideContent]}>
+      {/* Key Metrics Row */}
+      <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
+        <MetricCard
+          title="Total Earnings"
+          value={`$${analyticsData.totalEarnings.toLocaleString()}`}
+          subtitle="All time"
+          trend={24}
+        />
+        <MetricCard
+          title="This Month"
+          value={`$${analyticsData.thisMonth.toLocaleString()}`}
+          subtitle="June 2024"
+          trend={18}
+        />
+        <MetricCard
+          title="Success Rate"
+          value={`${analyticsData.successRate}%`}
+          subtitle="Deal completion"
+          trend={5}
+        />
+      </View>
+
+      {/* Secondary Metrics */}
+      <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
+        <MetricCard
+          title="Total Deals"
+          value={analyticsData.totalDeals}
+          subtitle="Completed campaigns"
+        />
+        <MetricCard
+          title="Active Deals"
+          value={analyticsData.activeDeals}
+          subtitle="In progress"
+        />
+        <MetricCard
+          title="Avg Deal Value"
+          value={`$${analyticsData.avgDealValue}`}
+          subtitle="Per campaign"
+        />
+      </View>
+
+      {/* Monthly Growth Chart */}
+      <View style={styles.chartSection}>
+        <Text style={styles.sectionTitle}>Monthly Earnings Growth</Text>
+        <View style={[styles.chartContainer, LayoutStability.createStableContainer(200)]}>
+          {isLoading ? (
+            <View style={styles.chartLoadingContainer}>
+              <View style={styles.loadingShimmer} />
+              <Text style={styles.loadingText}>Loading growth data...</Text>
+            </View>
+          ) : chartsReady ? (
+            analyticsData.monthlyGrowth.map((month, index) => {
+              const maxEarnings = Math.max(...analyticsData.monthlyGrowth.map(m => m.earnings));
+              const height = (month.earnings / maxEarnings) * 120;
+              
+              return (
+                <View key={month.month} style={styles.chartBar}>
+                  <View style={[styles.bar, { height }]} />
+                  <Text style={styles.barLabel}>{month.month}</Text>
+                  <Text style={styles.barValue}>${(month.earnings / 1000).toFixed(1)}K</Text>
+                </View>
+              );
+            })
+          ) : (
+            <View style={styles.chartSkeletonContainer}>
+              {Array.from({ length: 6 }).map((_, index) => (
+                <View key={index} style={styles.chartBarSkeleton}>
+                  <View style={styles.barSkeleton} />
+                  <View style={styles.barLabelSkeleton} />
+                </View>
+              ))}
+            </View>
+          )}
+        </View>
+      </View>
+
+      {/* Platform Performance */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Platform Performance</Text>
+        <View style={styles.platformBreakdown}>
+          <PlatformBar platform="Instagram" percentage={analyticsData.platformBreakdown.instagram} />
+          <PlatformBar platform="TikTok" percentage={analyticsData.platformBreakdown.tiktok} />
+          <PlatformBar platform="YouTube" percentage={analyticsData.platformBreakdown.youtube} />
+        </View>
+      </View>
+
+      {/* Recent Deals */}
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Recent Deals</Text>
+        <View style={styles.dealsContainer}>
+          {analyticsData.recentDeals.map((deal, index) => (
+            <View key={index} style={styles.dealCard}>
+              <View style={styles.dealInfo}>
+                <Text style={styles.dealBrand}>{deal.brand}</Text>
+                <Text style={styles.dealPlatform}>{deal.platform}</Text>
+              </View>
+              <View style={styles.dealAmount}>
+                <Text style={styles.dealPrice}>${deal.amount.toLocaleString()}</Text>
+                <View style={[
+                  styles.dealStatus,
+                  deal.status === 'Completed' ? styles.statusCompleted : styles.statusProgress
+                ]}>
+                  <Text style={[
+                    styles.statusText,
+                    deal.status === 'Completed' ? styles.statusTextCompleted : styles.statusTextProgress
+                  ]}>
+                    {deal.status}
+                  </Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+      </View>
+
+      {/* Footer Highlight */}
+      <View style={styles.highlightSection}>
+        <Text style={styles.highlightTitle}>🚀 Growing Fast!</Text>
+        <Text style={styles.highlightText}>
+          You're in the top 5% of creators on Axees with a 89% success rate and $45.6K total earnings!
+        </Text>
+      </View>
+    </View>
+  );
+
   if (DEMO_MODE) {
     return (
       <>
         <WebSEO 
-          title="High-Value Creator Opportunities"
-          description="Discover premium brand deals and high-value partnerships. Curated opportunities for top creators."
-          keywords="creator deals, brand partnerships, influencer opportunities, high value offers"
+          title="Deals & Analytics - Axees"
+          description="Manage your deals and track performance analytics. High-value creator opportunities and business insights."
+          keywords="creator deals, brand partnerships, influencer opportunities, analytics, performance tracking"
         />
-        <CuratedDeals />
+        <Navbar pageTitle="Deals & Analytics" />
+        <SafeAreaView style={styles.container}>
+          <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+            {/* Tab Header */}
+            <View style={styles.tabHeader}>
+              <View style={styles.tabContainer}>
+                <TouchableOpacity
+                  style={[styles.tab, activeTab === 'deals' && styles.activeTab]}
+                  onPress={() => setActiveTab('deals')}
+                >
+                  <Text style={[styles.tabText, activeTab === 'deals' && styles.activeTabText]}>
+                    Deals & Offers
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.tab, activeTab === 'analytics' && styles.activeTab]}
+                  onPress={() => setActiveTab('analytics')}
+                >
+                  <Text style={[styles.tabText, activeTab === 'analytics' && styles.activeTabText]}>
+                    Analytics
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            {/* Tab Content */}
+            {activeTab === 'deals' ? renderDealsTab() : renderAnalyticsTab()}
+          </ScrollView>
+        </SafeAreaView>
       </>
     );
   }
 
+  // Non-demo mode behavior
   if (isMobileScreen) {
     return (
       <>
@@ -51,9 +490,431 @@ const UOM08MarketerDealHistoryList = () => {
         keywords="deals, offers, brand deals, influencer marketing, partnerships"
       />
       <Web />
-      {/* {isWeb && <WebBottomTabs activeIndex={1} />} */}
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+  },
+  scrollView: {
+    flex: 1,
+  },
+  tabHeader: {
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2D0FB",
+    paddingHorizontal: 20,
+    paddingTop: 10,
+  },
+  tabContainer: {
+    flexDirection: "row",
+    backgroundColor: "#F8F9FD",
+    borderRadius: 12,
+    padding: 4,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  activeTab: {
+    backgroundColor: "#430B92",
+  },
+  tabText: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#6C6C6C",
+  },
+  activeTabText: {
+    color: "#FFFFFF",
+  },
+  content: {
+    padding: 20,
+  },
+  wideContent: {
+    marginHorizontal: "10%",
+  },
+  metricsRow: {
+    flexDirection: "row",
+    gap: 16,
+    marginBottom: 20,
+  },
+  metricsColumn: {
+    flexDirection: "column",
+  },
+  metricCard: {
+    flex: 1,
+    backgroundColor: "#F8F9FD",
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#E2D0FB",
+    minHeight: 100,
+  },
+  metricCardWide: {
+    minHeight: 120,
+  },
+  metricTitle: {
+    fontSize: 14,
+    color: "#6C6C6C",
+    marginBottom: 8,
+  },
+  metricValue: {
+    fontSize: Platform.OS === "web" ? 24 : 20,
+    fontWeight: "700",
+    color: "#430B92",
+    marginBottom: 4,
+  },
+  metricSubtitle: {
+    fontSize: 12,
+    color: "#6C6C6C",
+  },
+  trendContainer: {
+    marginTop: 8,
+  },
+  trendText: {
+    fontSize: 12,
+    fontWeight: "600",
+  },
+  trendPositive: {
+    color: "#22C55E",
+  },
+  trendNegative: {
+    color: "#EF4444",
+  },
+  chartSection: {
+    marginVertical: 30,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#000000",
+    marginBottom: 20,
+  },
+  chartContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    backgroundColor: "#F8F9FD",
+    borderRadius: 16,
+    padding: Platform.OS === "web" ? 20 : 16,
+    height: Platform.OS === "web" ? 200 : 180,
+    overflow: "hidden",
+  },
+  chartBar: {
+    alignItems: "center",
+    flex: 1,
+  },
+  bar: {
+    backgroundColor: "#430B92",
+    width: Platform.OS === "web" ? 30 : 24,
+    borderRadius: 4,
+    marginBottom: 8,
+    minHeight: 20,
+  },
+  barLabel: {
+    fontSize: 12,
+    color: "#6C6C6C",
+    marginBottom: 4,
+  },
+  barValue: {
+    fontSize: 11,
+    color: "#430B92",
+    fontWeight: "600",
+  },
+  section: {
+    marginBottom: 30,
+  },
+  platformBreakdown: {
+    backgroundColor: "#F8F9FD",
+    borderRadius: 16,
+    padding: 20,
+  },
+  platformRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  platformName: {
+    fontSize: 14,
+    color: "#000000",
+    fontWeight: "500",
+    width: 80,
+  },
+  progressBar: {
+    flex: 1,
+    height: 8,
+    backgroundColor: "#E2D0FB",
+    borderRadius: 4,
+    marginHorizontal: 12,
+  },
+  progressFill: {
+    height: "100%",
+    backgroundColor: "#430B92",
+    borderRadius: 4,
+  },
+  platformPercentage: {
+    fontSize: 14,
+    color: "#430B92",
+    fontWeight: "600",
+    width: 40,
+    textAlign: "right",
+  },
+  dealsContainer: {
+    gap: 12,
+  },
+  dealCard: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#F8F9FD",
+    borderRadius: 12,
+    padding: 16,
+  },
+  dealInfo: {
+    flex: 1,
+  },
+  dealBrand: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000000",
+    marginBottom: 4,
+  },
+  dealPlatform: {
+    fontSize: 12,
+    color: "#6C6C6C",
+  },
+  dealAmount: {
+    alignItems: "flex-end",
+  },
+  dealPrice: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#430B92",
+    marginBottom: 4,
+  },
+  dealStatus: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  statusCompleted: {
+    backgroundColor: "#DCFCE7",
+  },
+  statusProgress: {
+    backgroundColor: "#FEF3C7",
+  },
+  statusText: {
+    fontSize: 10,
+    fontWeight: "600",
+  },
+  statusTextCompleted: {
+    color: "#15803D",
+  },
+  statusTextProgress: {
+    color: "#B45309",
+  },
+  highlightSection: {
+    backgroundColor: "#430B92",
+    borderRadius: 16,
+    padding: 24,
+    marginTop: 20,
+    alignItems: "center",
+  },
+  highlightTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#FFFFFF",
+    marginBottom: 8,
+  },
+  highlightText: {
+    fontSize: 14,
+    color: "#FFFFFF",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  // Loading and skeleton styles
+  chartLoadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 40,
+  },
+  loadingShimmer: {
+    width: "80%",
+    height: 80,
+    backgroundColor: "#E2D0FB",
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: "#6C6C6C",
+    fontStyle: "italic",
+  },
+  chartSkeletonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
+    flex: 1,
+    paddingHorizontal: 10,
+  },
+  chartBarSkeleton: {
+    alignItems: "center",
+    flex: 1,
+  },
+  barSkeleton: {
+    backgroundColor: "#E2D0FB",
+    width: Platform.OS === "web" ? 30 : 24,
+    height: 60,
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  barLabelSkeleton: {
+    backgroundColor: "#E2D0FB",
+    width: 20,
+    height: 12,
+    borderRadius: 2,
+    marginTop: 4,
+  },
+  
+  // Offers Management Styles
+  offersContainer: {
+    gap: 12,
+  },
+  offerCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E2D0FB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  offerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  offerMainInfo: {
+    flex: 1,
+    marginRight: 16,
+  },
+  offerTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#430B92',
+    marginBottom: 4,
+  },
+  offerCreator: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 2,
+  },
+  offerPlatform: {
+    fontSize: 12,
+    color: '#999',
+  },
+  offerActions: {
+    alignItems: 'flex-end',
+  },
+  offerAmount: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#430B92',
+    marginBottom: 6,
+  },
+  offerStatus: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  offerStatusText: {
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  offerFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: '#F0F0F0',
+  },
+  offerDate: {
+    fontSize: 12,
+    color: '#666',
+  },
+  offerNumber: {
+    fontSize: 12,
+    color: '#999',
+    fontFamily: 'monospace',
+  },
+  
+  // Activity Styles
+  activityContainer: {
+    gap: 16,
+  },
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  activityIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#F8F9FD',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  activityEmoji: {
+    fontSize: 16,
+  },
+  activityContent: {
+    flex: 1,
+  },
+  activityTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#430B92',
+    marginBottom: 2,
+  },
+  activityDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  activityTime: {
+    fontSize: 12,
+    color: '#999',
+  },
+  
+  // Action Button Styles
+  actionSection: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  exploreButton: {
+    backgroundColor: '#430B92',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 8,
+  },
+  exploreButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+});
 
 export default UOM08MarketerDealHistoryList;

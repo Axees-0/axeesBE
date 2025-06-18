@@ -165,14 +165,15 @@ export default function RootLayout() {
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
-          <WebFeatures />
-          <Stack
-            screenOptions={{ headerShown: false }}
-            initialRouteName="(tabs)"
-          >
-            <Stack.Screen name="(tabs)" />
-          </Stack>
-          <StatusBar style="auto" />
+          <WebFeatures>
+            <Stack
+              screenOptions={{ headerShown: false }}
+              initialRouteName="(tabs)"
+            >
+              <Stack.Screen name="(tabs)" />
+            </Stack>
+            <StatusBar style="auto" />
+          </WebFeatures>
         </ThemeProvider>
       </AuthProvider>
       <Toast position="top" />

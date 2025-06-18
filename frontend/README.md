@@ -23,6 +23,14 @@ npm run perf
 
 ## 🔧 Key Features
 
+### Creator Collaboration Platform
+- **Complete Offer System**: End-to-end offer creation and management
+- **Pre-Made Templates**: 6 curated offer templates for different campaign types
+- **Custom Offer Builder**: Comprehensive form with deliverable management
+- **Payment Processing**: Escrow system with fee calculations and preview
+- **Deal Management**: Real-time offer tracking and status updates
+- **Creator Discovery**: Enhanced profile pages with offer creation
+
 ### Performance Optimizations
 - Lazy loading with React.lazy() and Suspense
 - Webpack bundle splitting (vendor, React, common chunks)
@@ -61,6 +69,22 @@ EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=your-storage-bucket
 EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
 EXPO_PUBLIC_FIREBASE_APP_ID=your-app-id
 ```
+
+## 🎯 Using the Offer System
+
+### Creating Offers
+1. Navigate to any creator profile: `/profile/creator-001`
+2. Click **"Create Offer"** button
+3. Choose **"Pre-Made Offers"** or **"Custom Offer"**
+4. Configure offer details and pricing
+5. Review in payment preview
+6. Submit offer and track in Deals tab
+
+### Managing Offers
+- **View All Offers**: Go to Deals tab → "Deals & Offers" section
+- **Track Status**: Monitor Pending, Accepted, In Progress, Completed
+- **Activity Feed**: See recent offer updates and creator responses
+- **Success Metrics**: View acceptance rates and total offers
 
 ## 🛠️ Development Tools
 

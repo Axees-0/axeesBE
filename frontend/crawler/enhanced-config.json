@@ -1,0 +1,166 @@
+{
+  "baseUrl": "http://localhost:8081",
+  "timing": {
+    "pageLoad": 5000,
+    "navigation": 2000,
+    "interaction": 1000,
+    "apiCall": 3000
+  },
+  "pages": [
+    {
+      "name": "Explore",
+      "path": "/",
+      "expectedContent": [
+        "Explore Creators & Influencers",
+        "Emma Thompson",
+        "Marcus Johnson",
+        "Sofia Rodriguez"
+      ],
+      "interactions": [
+        {
+          "type": "click",
+          "selector": "[role=\"tablist\"] > div:nth-child(2)",
+          "description": "Click Deals tab",
+          "expectedResult": "Navigation to deals page"
+        }
+      ]
+    },
+    {
+      "name": "Deals",
+      "path": "/deals",
+      "expectedContent": [
+        "Deals",
+        "Summer Collection Launch 2024",
+        "5,000",
+        "TechStyle Brand"
+      ],
+      "interactions": [
+        {
+          "type": "click",
+          "selector": "[role=\"tablist\"] > div:nth-child(3)",
+          "description": "Navigate to Messages",
+          "expectedResult": "Messages page loads"
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "path": "/messages",
+      "expectedContent": [
+        "Messages",
+        "TechStyle Brand",
+        "Emma Thompson",
+        "summer collection"
+      ],
+      "interactions": [
+        {
+          "type": "click",
+          "selector": "[role=\"tablist\"] > div:nth-child(4)",
+          "description": "Navigate to Notifications",
+          "expectedResult": "Notifications page loads"
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "path": "/notifications",
+      "expectedContent": [
+        "Notifications",
+        "Emma Thompson applied",
+        "Marcus Johnson completed"
+      ],
+      "interactions": [
+        {
+          "type": "click",
+          "selector": "[role=\"tablist\"] > div:nth-child(5)",
+          "description": "Navigate to Profile",
+          "expectedResult": "Profile page loads"
+        }
+      ]
+    },
+    {
+      "name": "Profile",
+      "path": "/profile",
+      "expectedContent": [
+        "Profile",
+        "Sarah Martinez",
+        "45,600",
+        "89%"
+      ],
+      "interactions": [
+        {
+          "type": "click",
+          "selector": "[role=\"tablist\"] > div:nth-child(1)",
+          "description": "Navigate back to Explore",
+          "expectedResult": "Explore page loads"
+        }
+      ]
+    }
+  ],
+  "validation": {
+    "forbiddenContent": [
+      "Please standby while our system finds Influencers",
+      "Error",
+      "undefined",
+      "null",
+      "404",
+      "Network Error"
+    ],
+    "performance": {
+      "maxLoadTime": 5000,
+      "maxInteractionTime": 2000
+    },
+    "requiredElements": [
+      "#root",
+      "[role=\"tablist\"]",
+      "[role=\"tab\"]"
+    ]
+  },
+  "discoveredElements": {
+    "Explore": [
+      {
+        "type": "a",
+        "role": "tab",
+        "selector": ".css-view-175oi2r",
+        "text": "⏷\n⏷\nanalytics",
+        "testable": true
+      }
+    ],
+    "Deals": [
+      {
+        "type": "a",
+        "role": "tab",
+        "selector": ".css-view-175oi2r",
+        "text": "⏷\n⏷\nanalytics",
+        "testable": true
+      }
+    ],
+    "Messages": [
+      {
+        "type": "a",
+        "role": "tab",
+        "selector": ".css-view-175oi2r",
+        "text": "⏷\n⏷\nanalytics",
+        "testable": true
+      }
+    ],
+    "Notifications": [
+      {
+        "type": "a",
+        "role": "tab",
+        "selector": ".css-view-175oi2r",
+        "text": "⏷\n⏷\nanalytics",
+        "testable": true
+      }
+    ],
+    "Profile": [
+      {
+        "type": "a",
+        "role": "tab",
+        "selector": ".css-view-175oi2r",
+        "text": "⏷\n⏷\nanalytics",
+        "testable": true
+      }
+    ]
+  }
+}

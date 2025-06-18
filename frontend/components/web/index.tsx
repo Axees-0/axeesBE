@@ -34,6 +34,8 @@ import Navbar from "./navbar";
 import React from "react";
 /* …the other imports stay unchanged … */
 import MainScene from "@/assets/main-scene.gif";   // ➊ new
+import { DEMO_MODE } from "@/demo/DemoMode";
+import { DemoData } from "@/demo/DemoData";
 
 
 /* …imports stay exactly the same … */
@@ -283,6 +285,15 @@ const {
 
   /* first page = DB only */
   queryFn : async ({ pageParam = null }) => {
+    // Return demo data in demo mode
+    if (DEMO_MODE) {
+      return {
+        items: DemoData.creators,
+        nextCursor: null,
+        total: DemoData.creators.length
+      } as FindPage;
+    }
+    
     const params: Record<string, any> = {
    limit : 12,
    cursor: pageParam || undefined,
@@ -319,6 +330,14 @@ const {
 } = useMutation<AIPage>({
   /* ① call the same /find endpoint */
   mutationFn: async () => {
+    // Return demo data in demo mode
+    if (DEMO_MODE) {
+      return {
+        items: DemoData.creators,
+        nextCursor: null
+      };
+    }
+    
     const { data } = await axios.get<AIPage>(`${API_URL}/find`, {
       params: {
         limit : 12,
@@ -504,9 +523,21 @@ const isAIRequestActive =
     const favNow = isFav(usr._id);
 
     return (
-      <View
+      <Pressable
         key={usr._id}
-        style={[styles.rectangleParent, styles.parentFlexBox1]}
+        style={({ pressed, hovered }) => [
+          styles.rectangleParent, 
+          styles.parentFlexBox1,
+          pressed && styles.cardPressed,
+          Platform.OS === 'web' && hovered && styles.cardHovered,
+        ]}
+        onPress={() => {
+          if (Platform.OS === 'web') {
+            window.open(`/profile/${usr._id}`, '_blank', 'noopener,noreferrer');
+          } else {
+            router.push(`/profile/${usr._id}`);
+          }
+        }}
       >
         <Image
           style={styles.frameChild}
@@ -632,7 +663,8 @@ const isAIRequestActive =
         <View style={[styles.frameParent3, styles.frameFlexBox]}>
          <TouchableOpacity
             style={[styles.joinWrapper, styles.parentSpaceBlock]}
-            onPress={() => {
+            onPress={(e) => {
+              e.stopPropagation?.();
               if (Platform.OS === 'web') {
                 window.open(`/profile/${usr._id}`, '_blank', 'noopener,noreferrer');
               } else {
@@ -645,7 +677,8 @@ const isAIRequestActive =
 
           <TouchableOpacity
             style={[styles.shareParent, styles.shareParentBorder]}
-            onPress={() => {
+            onPress={(e) => {
+              e.stopPropagation?.();
               setIsShareModalVisible(true);
               requestNotificationPermission();
               if (typeof window !== "undefined") {
@@ -683,7 +716,10 @@ const isAIRequestActive =
 
 <Pressable
   hitSlop={10}
-  onPress={() => toggleFavorite.mutate(usr._id)}
+  onPress={(e) => {
+    e.stopPropagation?.();
+    toggleFavorite.mutate(usr._id);
+  }}
   style={{ position: 'absolute', top: 10, right: 10 }}
 >
   <Image
@@ -697,7 +733,7 @@ const isAIRequestActive =
 </Pressable>
 
 
-      </View>
+      </Pressable>
     );
   };
 
@@ -1259,6 +1295,21 @@ skeletonFooter: {
     minWidth  : 300,
 
     marginBottom : 20,
+  },
+  cardPressed: {
+    opacity: 0.95,
+    transform: [{ scale: 0.98 }],
+  },
+  cardHovered: {
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    transform: [{ translateY: -2 }],
   },
   twitterIconTransparent11: {
     height: 37,

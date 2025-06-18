@@ -36,6 +36,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNotifications } from "@/hooks/useNotifications";
 
 import WebBottomTabs from "../WebBottomTabs";
+import { DEMO_MODE } from "@/demo/DemoMode";
+import { DemoData } from "@/demo/DemoData";
 
 
 
@@ -227,6 +229,7 @@ export default function UFM01ResultsScreen() {
   // —— UI state ——
   const [search, setSearch] = useState("");
   const [submitted, setSubmitted] = useState("");
+  const [showClearButton, setShowClearButton] = useState(false);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [sort, setSort] = useState<Sort>("none");
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -306,6 +309,15 @@ const AIBanner = ({ showSecond }: { showSecond: boolean }) => {
       initialPageParam: null, // ✅ Add this line
       queryKey: ["find", tags.join(",")],
       queryFn: async ({ pageParam = null }) => {
+        // Return demo data in demo mode
+        if (DEMO_MODE) {
+          return {
+            items: DemoData.creators,
+            nextCursor: null,
+            total: DemoData.creators.length
+          };
+        }
+        
         const params: any = {
           limit: 12,
           cursor: pageParam || undefined,
@@ -331,6 +343,14 @@ const {
 } = useMutation<AIPage>({
   /* always hit /find with ai=1 */
   mutationFn: async () => {
+    // Return demo data in demo mode
+    if (DEMO_MODE) {
+      return {
+        items: DemoData.creators,
+        nextCursor: null
+      };
+    }
+    
     const { data } = await axios.get<AIPage>(`${API_URL}/find`, {
       params: {
         limit: 12,
@@ -477,7 +497,19 @@ const chipTags = useMemo(() => {
     const avg = calcAvgPrice(item.creatorData?.platforms);    
 
     return (
-      <View style={styles.card}>
+      <Pressable 
+        style={({ pressed }) => [
+          styles.card,
+          pressed && styles.cardPressed
+        ]}
+        onPress={() => {
+          if (Platform.OS === "web") {
+            window.open(`/profile/${item._id}`, "_blank");
+          } else {
+            router.push(`/profile/${item._id}`);
+          }
+        }}
+      >
         <Image
             style={styles.cardImg}
             contentFit="cover"
@@ -488,7 +520,10 @@ const chipTags = useMemo(() => {
           <Pressable
             style={styles.iconHeart}
             hitSlop={10}
-            onPress={() => toggleFav.mutate(item._id)}
+            onPress={(e) => {
+              e.stopPropagation?.();
+              toggleFav.mutate(item._id);
+            }}
           >
             <Image
               style={styles.icon20}
@@ -498,7 +533,8 @@ const chipTags = useMemo(() => {
           <Pressable
             style={styles.iconShare}
             hitSlop={10}
-            onPress={() => {
+            onPress={(e) => {
+              e.stopPropagation?.();
               requestNotificationPermission();
               if (Platform.OS === "web") {
                 navigator.share?.({
@@ -582,12 +618,20 @@ const chipTags = useMemo(() => {
             </Text>
           </View>
           <View style={styles.btnRow}>
-            <Pressable style={styles.removeBtn}>
+            <Pressable 
+              style={styles.removeBtn}
+              onPress={(e) => {
+                e.stopPropagation?.();
+                // Demo: Show removed feedback
+                console.log('Remove creator from list');
+              }}
+            >
               <Text style={styles.btnTxt1}>Remove</Text>
             </Pressable>
             <Pressable
               style={styles.viewBtn}
-              onPress={() => {
+              onPress={(e) => {
+                e.stopPropagation?.();
                 if (Platform.OS === "web") {
                   window.open(`/profile/${item._id}`, "_blank");
                 } else {
@@ -599,7 +643,7 @@ const chipTags = useMemo(() => {
             </Pressable>
           </View>
         </View>
-      </View>
+      </Pressable>
     );
   };
 
@@ -632,7 +676,10 @@ const chipTags = useMemo(() => {
           <Search01 width={18} height={18} />
           <TextInput
             value={search}
-            onChangeText={setSearch}
+            onChangeText={(text) => {
+              setSearch(text);
+              setShowClearButton(text.length > 0);
+            }}
             onSubmitEditing={() => {
               setSelectedTag(null);
               setSubmitted(search.trim());
@@ -642,6 +689,19 @@ const chipTags = useMemo(() => {
             placeholder="Search creators…"
             placeholderTextColor="#888"
           />
+          {showClearButton && (
+            <Pressable
+              onPress={() => {
+                setSearch("");
+                setSubmitted("");
+                setSelectedTag(null);
+                setShowClearButton(false);
+              }}
+              style={styles.clearButton}
+            >
+              <Text style={styles.clearButtonText}>×</Text>
+            </Pressable>
+          )}
         </View>
 
         {/* chips */}
@@ -754,6 +814,20 @@ const makeStyles = (w: number) => {
       color: "#0b0218",
       paddingVertical: 0,
       opacity: 0.5,
+    },
+    clearButton: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      backgroundColor: '#ddd',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    clearButtonText: {
+      color: '#666',
+      fontSize: 16,
+      fontWeight: 'bold',
+      lineHeight: 16,
     },
    chipRow: {
       width: "98%",
@@ -890,9 +964,21 @@ chipTxtActive: {
     card: {
       width: CARD_W,
       backgroundColor: "#fff",
-
+      borderRadius: 12,
       marginBottom: 20,
       overflow: "hidden",
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.1,
+      shadowRadius: 4,
+      elevation: 3,
+    },
+    cardPressed: {
+      opacity: 0.95,
+      transform: [{ scale: 0.98 }],
     },
     cardImg: { width: "100%", height: 190, borderRadius: 12, marginBottom: 8 },
     icons: {

@@ -313,6 +313,20 @@ const styles = StyleSheet.create({
     fontSize: FontSize.size_base_2,
     color: Color.cSK430B92950,
   },
+  clearButton: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#ddd',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  clearButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: 'bold',
+    lineHeight: 16,
+  },
 
   /* —— right —— */
   right: {
