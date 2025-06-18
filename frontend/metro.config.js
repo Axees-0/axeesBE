@@ -5,7 +5,7 @@ const { resolve }          = require('metro-resolver');   // ← NEW
 
 module.exports = (() => {
   const projectRoot  = __dirname;
-  const monorepoRoot = findWorkspaceRoot(projectRoot);
+  const monorepoRoot = findWorkspaceRoot(projectRoot) || projectRoot;
 
   const config                 = getDefaultConfig(projectRoot);
   const { transformer, resolver } = config;
@@ -26,12 +26,12 @@ module.exports = (() => {
     sourceExts: [...resolver.sourceExts, 'svg'],
     nodeModulesPaths: [
       path.join(projectRoot, 'node_modules'),
-      path.join(monorepoRoot, 'node_modules'),
+      ...(monorepoRoot !== projectRoot ? [path.join(monorepoRoot, 'node_modules')] : []),
     ],
     extraNodeModules: {
       ...(resolver.extraNodeModules || {}),
       /* use react‑native‑web for the core package */
-      'react-native': path.join(monorepoRoot, 'node_modules', 'react-native-web'),
+      'react-native': path.join(projectRoot, 'node_modules', 'react-native-web'),
       /* stub the native Stripe SDK */
       '@stripe/stripe-react-native': path.join(projectRoot, 'web-shims/stripe-react-native.js'),
       // ➜ Stub native Firebase packages on web

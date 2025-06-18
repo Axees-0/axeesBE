@@ -647,12 +647,7 @@ const styles = StyleSheet.create({
     }),
   },
   socialPlatforms: {
-    gap: 12,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-    elevation: 6,
+    gap: 12,    elevation: 6,
     borderRadius: 12,
   },
   webSocialPlatforms: {

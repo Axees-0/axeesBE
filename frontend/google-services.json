@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "476514630244",
+    "project_id": "axees-983ac",
+    "storage_bucket": "axees-983ac.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:476514630244:android:e7553e33688502afc4bd71",
+        "android_client_info": {
+          "package_name": "io.freshify.axees"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwWOSkiq-SRfHbRhiGa7pboigfZo_RjRE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

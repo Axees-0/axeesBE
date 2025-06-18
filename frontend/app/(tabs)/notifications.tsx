@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import Navbar from "@/components/web/navbar";
+import { WebSEO } from "../web-seo";
 
 const BREAKPOINTS = {
   TABLET: 768,
@@ -89,11 +90,17 @@ export default function NotificationsScreen() {
   const isWideScreen = window.width >= BREAKPOINTS.TABLET;
 
   return (
-    <SafeAreaView
-      style={[styles.container, isWeb && isWideScreen && styles.webContainer]}
-    >
-      {/* <Navbar pageTitle="Notifications" /> */}
-      <StatusBar style="auto" />
+    <>
+      <WebSEO 
+        title="Notifications" 
+        description="Stay updated with your latest activities, offers, and campaign updates on Axees." 
+        keywords="notifications, updates, alerts, campaign updates, offers"
+      />
+      <SafeAreaView
+        style={[styles.container, isWeb && isWideScreen && styles.webContainer]}
+      >
+        {/* <Navbar pageTitle="Notifications" /> */}
+        <StatusBar style="auto" />
 
       {/* <View style={styles.header}>
         <Text style={styles.headerTitle}>Notifications</Text>
@@ -113,6 +120,7 @@ export default function NotificationsScreen() {
         ItemSeparatorComponent={() => <View style={styles.separator} />}
       />
     </SafeAreaView>
+    </>
   );
 }
 

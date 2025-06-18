@@ -11,17 +11,34 @@ import "react-native-reanimated";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Toast, { BaseToast } from "react-native-toast-message";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import messaging from "@react-native-firebase/messaging";
-import notifee, { EventType } from "@notifee/react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { showNotification } from "@/NotificationController";
 import { Platform } from "react-native";
+
+// Only import native modules on non-web platforms
+let messaging: any = null;
+let notifee: any = null;
+let EventType: any = null;
+let showNotification: any = null;
+
+if (Platform.OS !== "web") {
+  messaging = require("@react-native-firebase/messaging").default;
+  const notifeeModule = require("@notifee/react-native");
+  notifee = notifeeModule.default;
+  EventType = notifeeModule.EventType;
+  showNotification = require("@/NotificationController").showNotification;
+}
 import { AuthProvider } from "@/contexts/AuthContext";
+import { WebFeatures } from "./web-features";
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 const queryClient = new QueryClient();
 
 async function requestUserPermission() {
+  if (Platform.OS === "web" || !messaging) {
+    console.log("🌐 Web platform: Skipping Firebase messaging setup");
+    return;
+  }
+  
   const authStatus = await messaging().requestPermission();
   const enabled =
     authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -36,6 +53,10 @@ async function requestUserPermission() {
 }
 
 async function getToken() {
+  if (Platform.OS === "web" || !messaging) {
+    return;
+  }
+  
   if (Platform.OS === "ios") {
     const apnsToken = await messaging().getAPNSToken();
     console.log("🚀 APNs Token:", apnsToken);
@@ -46,7 +67,7 @@ async function getToken() {
   }
 }
 
-if (Platform.OS !== "web") {
+if (Platform.OS !== "web" && messaging && showNotification) {
   messaging().setBackgroundMessageHandler(async (remoteMessage) => {
     // Get the stored navigation params if they exist
     const pendingParams = await AsyncStorage.getItem("pendingNavigationParams");
@@ -86,6 +107,10 @@ export default function RootLayout() {
   }, [loaded, error]);
 
   useEffect(() => {
+    if (Platform.OS === "web" || !messaging || !showNotification) {
+      return;
+    }
+    
     const unsubscribeMessaging = messaging().onMessage(
       async (remoteMessage: any) => {
         try {
@@ -100,6 +125,10 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
+    if (Platform.OS === "web" || !notifee || !EventType) {
+      return;
+    }
+    
     return notifee.onForegroundEvent(async ({ type, detail }) => {
       switch (type) {
         case EventType.DISMISSED:
@@ -136,6 +165,7 @@ export default function RootLayout() {
         <ThemeProvider
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
+          <WebFeatures />
           <Stack
             screenOptions={{ headerShown: false }}
             initialRouteName="(tabs)"

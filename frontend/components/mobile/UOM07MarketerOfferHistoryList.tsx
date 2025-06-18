@@ -542,14 +542,7 @@ const styles = StyleSheet.create({
     borderColor: "#E2E2E2",
     borderRadius: 4,
     zIndex: 999,
-    minWidth: 160,
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    minWidth: 160,    shadowRadius: 3.84,
     elevation: 5,
   },
   dropdownItem: {

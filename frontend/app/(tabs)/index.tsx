@@ -15,6 +15,7 @@ import { Fragment, useState } from "react";
 
 import Mobile from "@/components/mobile";
 import Web from "@/components/web";
+import { WebSEO } from "../web-seo";
 import WebBottomTabs from "@/components/WebBottomTabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { Color } from "@/GlobalStyles";
@@ -33,6 +34,11 @@ const UFM01ResultsScreen = () => {
   if (isMobileScreen) {
     return (
       <Fragment>
+        <WebSEO 
+          title="Explore Creators & Influencers"
+          description="Discover and connect with top creators and influencers on Axees. Find the perfect match for your brand campaigns."
+          keywords="influencers, creators, brand partnerships, marketing, campaigns"
+        />
         <Mobile />
         {/* {isWeb && user?._id && <WebBottomTabs activeIndex={0} />} */}
         {/* {!user?._id && (
@@ -49,7 +55,16 @@ const UFM01ResultsScreen = () => {
     );
   }
 
-  return <Web />;
+  return (
+    <>
+      <WebSEO 
+        title="Explore Creators & Influencers"
+        description="Discover and connect with top creators and influencers on Axees. Find the perfect match for your brand campaigns."
+        keywords="influencers, creators, brand partnerships, marketing, campaigns"
+      />
+      <Web />
+    </>
+  );
 };
 
 const styles = StyleSheet.create({

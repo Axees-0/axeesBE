@@ -21,6 +21,7 @@ import { Picker } from "emoji-mart-native";
 import { Audio } from "expo-av";
 import { useAuth } from "@/contexts/AuthContext";
 import WebBottomTabs from "@/components/WebBottomTabs";
+import { WebSEO } from "../web-seo";
 
 interface ChatRoomPreview {
   id: string;
@@ -205,6 +206,11 @@ export default function MessagesScreen() {
 
   return (
     <>
+      <WebSEO 
+        title="Messages" 
+        description="Connect and communicate with creators and brands. Manage your conversations and collaborations on Axees." 
+        keywords="messages, chat, communication, collaboration, influencer messaging"
+      />
       <SafeAreaView style={styles.container}>
         <StatusBar style="auto" />
         <View style={[styles.content, isWide && styles.webContent]}>
@@ -294,7 +300,6 @@ export default function MessagesScreen() {
           )}
         </View>
       </SafeAreaView>
-   */}
     </>
   );
 }

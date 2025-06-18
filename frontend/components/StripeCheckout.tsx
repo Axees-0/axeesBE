@@ -235,6 +235,7 @@ export default function StripeCheckout({
     }
   };
 
+  useEffect(() => {
     // Don't automatically create checkout session
     // Wait for user to select payment method
     setLoading(false);

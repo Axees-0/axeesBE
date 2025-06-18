@@ -24,12 +24,13 @@ import data from "@emoji-mart/data";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessages } from "@/hooks/messagesContext";
 import { validateMessage } from "@/utils/contentFilter";
+import { showErrorToast, handleAsyncError, validateNetworkConnection } from "@/utils/errorHandler";
 import { Image } from "expo-image";
 import { router } from "expo-router";
 import { Feather } from "@expo/vector-icons";
 import ProfileInfo from "@/components/ProfileInfo";
 import * as Progress from "react-native-progress";
-import Navbar from "@/components/web/navbar";
+import Header from "@/components/Header";
 import { Color, FontFamily, FontSize } from "@/GlobalStyles";
 import Search01 from "@/assets/search01.svg";
 import { ActivityIndicator } from "react-native";
@@ -117,9 +118,12 @@ export default function MessagesWeb() {
 
   const handleSearch = async () => {
     if (!searchQuery.trim()) return;
+    
+    if (!validateNetworkConnection()) return;
 
     setIsSearching(true);
-    try {
+    
+    const searchOperation = async () => {
       // Search both messages and chats in parallel
       const [messagesRes, chatsRes] = await Promise.all([
         fetch(
@@ -135,6 +139,10 @@ export default function MessagesWeb() {
           )}&userId=${MY_ID}`
         ),
       ]);
+
+      if (!messagesRes.ok || !chatsRes.ok) {
+        throw new Error('Search request failed');
+      }
 
       const [messageResults, chatResults] = await Promise.all([
         messagesRes.json(),
@@ -154,11 +162,15 @@ export default function MessagesWeb() {
       });
 
       setFilteredChats(filteredChats);
-
       setSearchResults(messageResults);
       setSearchChatResults(chatResults);
+    };
+
+    try {
+      await searchOperation();
     } catch (error) {
       console.error("Search failed:", error);
+      showErrorToast(error, "Search failed. Please try again.");
     } finally {
       setIsSearching(false);
     }
@@ -266,22 +278,24 @@ export default function MessagesWeb() {
     const urlRegex = /(https?:\/\/[^\s]+)/g;
     const parts = text.split(urlRegex);
 
-    return parts.map((part, i) => {
-      if (part.match(urlRegex)) {
-        return (
-          <Pressable
-            key={i}
-            onPress={() => Linking.openURL(part)}
-            style={{ marginBottom: 4 }}
-          >
-            <Text style={{ color: "#3B82F6", textDecorationLine: "underline" }}>
-              {part}
-            </Text>
-          </Pressable>
-        );
-      }
-      return <Text key={i}>{part}</Text>;
-    });
+    return (
+      <Text>
+        {parts.map((part, i) => {
+          if (part.match(urlRegex)) {
+            return (
+              <Text
+                key={i}
+                style={{ color: "#3B82F6", textDecorationLine: "underline" }}
+                onPress={() => Linking.openURL(part)}
+              >
+                {part}
+              </Text>
+            );
+          }
+          return part;
+        })}
+      </Text>
+    );
   };
 
   useEffect(() => {
@@ -666,12 +680,12 @@ export default function MessagesWeb() {
         <View style={styles.chatInfo}>
           <View style={styles.chatHeader}>
             <Text style={styles.chatName} numberOfLines={1}>
-              {item.offerName ? `${item.peerName}` : item.peerName}
+              {(item.offerName && item.peerName) ? `${item.peerName}` : (item.peerName || "Unknown")}
             </Text>
           </View>
           <Text style={styles.lastMessage} numberOfLines={1}>
             {item.lastMessage ||
-              (item.offerDescription
+              (item.offerDescription && item.offerName && item.offerType
                 ? `${item.offerName} (${item.offerType})`
                 : "No messages yet")}
           </Text>
@@ -888,7 +902,7 @@ export default function MessagesWeb() {
 const peerAvatar = getUserAvatar(selectedChat?.peerId || '');
   return (
     <>
-      <Navbar pageTitle="Messages" />
+      <Header pageTitle="Messages" />
       <SafeAreaView style={{ flex: 1, marginHorizontal: 40 }}>
         <StatusBar style="auto" />
         <View style={{ flexDirection: "row", flex: 1, gap: 24, marginTop: 14 }}>
@@ -1058,18 +1072,19 @@ const peerAvatar = getUserAvatar(selectedChat?.peerId || '');
                                 isMobile && { fontSize: 16 },
                               ]}
                             >
-                              {getReceiverName()}
-                              {selectedChat.offerType && (
-                          <Text
-                            style={[
-                              styles.chatSubtitle,
-                              isMobile && { fontSize: 14 },
-                            ]}
-                          >
-                            {" "}
-                            • {selectedChat.offerType}
-                          </Text>
-                        )}
+                              <Text>
+                                {getReceiverName()}
+                                {selectedChat.offerType && (
+                                  <Text
+                                    style={[
+                                      styles.chatSubtitle,
+                                      isMobile && { fontSize: 14 },
+                                    ]}
+                                  >
+                                    {" • "}{selectedChat.offerType}
+                                  </Text>
+                                )}
+                              </Text>
                             </Text>
                             {/* <Text style={styles.userName}>
                               @{getUserName(selectedChat?.peerId || "")}
@@ -1099,10 +1114,7 @@ const peerAvatar = getUserAvatar(selectedChat?.peerId || '');
                               numberOfLines={2}
                           >
                             {selectedChat.offerDescription || ""}
-                            {selectedChat.offerDescription &&
-                            selectedChat.offerNotes
-                              ? " • "
-                              : ""}
+                            {selectedChat.offerDescription && selectedChat.offerNotes ? " • " : ""}
                             {selectedChat.offerNotes || ""}
                           </Text>
                         </Pressable>
@@ -1286,7 +1298,7 @@ const peerAvatar = getUserAvatar(selectedChat?.peerId || '');
                                       marginTop: 4,
                                     }}
                                   >
-                                    Uploading {key.split("-")[0]} ({progress}%)
+                                    Uploading {key.includes("-") ? key.split("-")[0] : key} ({progress}%)
                                   </Text>
                                 </View>
                               )
@@ -1362,11 +1374,7 @@ const styles = StyleSheet.create({
   //   right: 16,
   //   zIndex: 1000,
   //   elevation: 1000, // For Android
-  //   shadowColor: '#000',
-  //   shadowOffset: { width: 0, height: 2 },
-  //   shadowOpacity: 0.25,
-  //   shadowRadius: 4,
-  // },
+  //     //     //     //     // },
   placeholder: {},
   chatListContainer: {
     width: "100%",
@@ -1449,10 +1457,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: 8,
     padding: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
+    boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
     elevation: 3,
     zIndex: 100,
   },

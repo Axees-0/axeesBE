@@ -2591,11 +2591,7 @@ const styles = StyleSheet.create({
     borderColor: "#ECECEC",
     borderRadius: 8,
     paddingVertical: 6,
-    // Add shadow for iOS
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    // Add shadow for iOS    shadowRadius: 3.84,
     // Add elevation for Android
     elevation: 80,
     zIndex: 10999, // set a high zIndex so it overlays other components

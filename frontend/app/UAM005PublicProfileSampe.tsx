@@ -801,16 +801,7 @@ const styles = StyleSheet.create({
     height: 38,
     width: 37,
   },
-  otherPlatformsParent: {
-    shadowColor: "rgba(146, 146, 146, 0.25)",
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowRadius: 30,
-    elevation: 30,
-    shadowOpacity: 1,
-    paddingHorizontal: Padding.p_lg,
+  otherPlatformsParent: {    elevation: 30,    paddingHorizontal: Padding.p_lg,
     paddingVertical: Padding.p_xs,
     gap: Gap.gap_3xl,
     borderRadius: Border.br_xs,

@@ -1,0 +1,105 @@
+- Production Blockers - Pragmatic Senior Engineer Approach
+  - Day 1: Performance Deep Dive (4 hours)
+    - Install webpack-bundle-analyzer
+      - Run: npm install --save-dev webpack-bundle-analyzer
+    - Create performance audit script (perf-check.js)
+      - Measure DOM ready time
+      - Measure full load time
+      - Calculate unused JavaScript percentage
+      - Identify bottlenecks with Puppeteer
+    - Implement immediate performance fixes
+      - Add lazy loading to routes
+        - Convert static imports to dynamic imports
+        - Wrap screens in React.lazy()
+        - Add Suspense boundaries
+      - Configure bundle splitting
+        - Split vendor chunks
+        - Separate node_modules
+        - Configure webpack optimization
+    - Measure performance improvements
+      - Run audit before and after changes
+      - Document load time reduction
+      - Target < 3 second load time
+  - Day 1: Navigation Fix (2 hours)
+    - Debug navigation issues
+      - Create NavigationDebugger component
+      - Log all router operations
+      - Identify race conditions
+      - Track navigation call stack
+    - Simplify AuthGuard implementation
+      - Remove multiple fallback methods
+      - Use single Redirect component
+      - Eliminate setTimeout workarounds
+      - Implement clean loading states
+    - Test navigation reliability
+      - Test protected route redirects
+      - Test authenticated user flow
+      - Verify no mounting errors
+      - Confirm single navigation method works
+  - Day 2: Add Sentry Error Tracking (30 minutes)
+    - Install Sentry React Native SDK
+      - Run: npm install @sentry/react-native
+    - Configure Sentry initialization
+      - Set production DSN only
+      - Configure environment detection
+      - Add error filtering for known issues
+    - Wrap root component with Sentry
+      - Export Sentry.wrap(RootLayout)
+      - Test error capture
+      - Verify production errors are tracked
+  - Day 2: Basic Auth Security (2 hours)
+    - Implement rate limiting
+      - Create AuthRateLimiter class
+      - Track login attempts per identifier
+      - Implement exponential backoff
+      - Clean old attempts after 15 minutes
+    - Add rate limit to login handler
+      - Check canAttempt before login
+      - Show user-friendly error messages
+      - Reset on successful login
+      - Track failed attempts
+    - Test security measures
+      - Verify rate limiting works
+      - Test exponential backoff timing
+      - Ensure legitimate users aren't blocked
+  - Week 1 Checklist
+    - Monday: Performance Focus
+      - Run comprehensive performance audit
+      - Implement code splitting strategies
+      - Remove unused dependencies
+      - Profile bundle size
+    - Tuesday: Navigation Stability
+      - Simplify AuthGuard to single method
+      - Add navigation debugging tools
+      - Test on slow 3G network
+      - Fix any race conditions
+    - Wednesday: Monitoring & Security
+      - Complete Sentry integration
+      - Implement auth rate limiting
+      - Add basic metrics tracking
+      - Create quick metrics dashboard
+    - Thursday: Performance Optimization
+      - Apply performance fixes from audit
+      - Document successful optimizations
+      - Create troubleshooting runbook
+      - Prepare deployment checklist
+    - Friday: Staging Deployment
+      - Deploy to staging environment
+      - Monitor real user metrics
+      - Collect performance data
+      - Plan next sprint priorities
+  - Monitoring & Metrics
+    - Create quick metrics dashboard
+      - Track page load times
+      - Monitor JavaScript errors
+      - Count auth failures
+      - Log route changes
+    - Set up continuous monitoring
+      - Console logging in development
+      - Analytics integration for production
+      - 10-second interval metrics updates
+    - Define success criteria
+      - Load time under 3 seconds
+      - Zero navigation errors
+      - Auth failures tracked
+      - All errors visible in Sentry

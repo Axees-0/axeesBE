@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Console for React Native App</title>
+    <style>
+        body { font-family: monospace; padding: 20px; background: #f0f0f0; }
+        .error { color: red; background: #ffe6e6; padding: 10px; margin: 5px 0; border-left: 4px solid red; }
+        .log { color: blue; background: #e6f3ff; padding: 5px; margin: 2px 0; }
+        .warn { color: orange; background: #fff3e6; padding: 5px; margin: 2px 0; }
+        .info { color: green; background: #e6ffe6; padding: 5px; margin: 2px 0; }
+        iframe { border: 1px solid #ccc; margin-top: 20px; }
+        #console { max-height: 400px; overflow-y: scroll; background: white; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h2>🔍 React Native App Debug Console</h2>
+    <div id="status">Loading app...</div>
+    
+    <h3>📱 App (in iframe):</h3>
+    <iframe id="appFrame" src="http://localhost:8081" width="100%" height="600"></iframe>
+    
+    <h3>📝 Console Output:</h3>
+    <div id="console"></div>
+    
+    <script>
+        const consoleDiv = document.getElementById('console');
+        const statusDiv = document.getElementById('status');
+        const iframe = document.getElementById('appFrame');
+        
+        // Function to log messages to our debug console
+        function logToConsole(message, type = 'log') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = `<strong>[${timestamp}]</strong> ${message}`;
+            consoleDiv.appendChild(div);
+            consoleDiv.scrollTop = consoleDiv.scrollHeight;
+        }
+        
+        // Capture global errors
+        window.addEventListener('error', (e) => {
+            logToConsole(`❌ Global Error: ${e.message} at ${e.filename}:${e.lineno}`, 'error');
+        });
+        
+        // Capture unhandled promise rejections
+        window.addEventListener('unhandledrejection', (e) => {
+            logToConsole(`❌ Unhandled Promise Rejection: ${e.reason}`, 'error');
+        });
+        
+        // Override console methods to capture logs
+        const originalConsole = {
+            log: console.log,
+            error: console.error,
+            warn: console.warn,
+            info: console.info
+        };
+        
+        console.log = function(...args) {
+            logToConsole(args.join(' '), 'log');
+            originalConsole.log.apply(console, args);
+        };
+        
+        console.error = function(...args) {
+            logToConsole(args.join(' '), 'error');
+            originalConsole.error.apply(console, args);
+        };
+        
+        console.warn = function(...args) {
+            logToConsole(args.join(' '), 'warn');
+            originalConsole.warn.apply(console, args);
+        };
+        
+        console.info = function(...args) {
+            logToConsole(args.join(' '), 'info');
+            originalConsole.info.apply(console, args);
+        };
+        
+        // Monitor iframe loading
+        iframe.onload = () => {
+            statusDiv.innerHTML = '✅ App iframe loaded successfully';
+            logToConsole('✅ App iframe loaded', 'info');
+            
+            // Try to access iframe console (may be blocked by CORS)
+            try {
+                const iframeWindow = iframe.contentWindow;
+                if (iframeWindow) {
+                    // Override iframe console methods
+                    const iframeConsole = iframeWindow.console;
+                    if (iframeConsole) {
+                        const originalIframeConsole = {
+                            log: iframeConsole.log,
+                            error: iframeConsole.error,
+                            warn: iframeConsole.warn,
+                            info: iframeConsole.info
+                        };
+                        
+                        iframeConsole.log = function(...args) {
+                            logToConsole(`[IFRAME] ${args.join(' ')}`, 'log');
+                            originalIframeConsole.log.apply(iframeConsole, args);
+                        };
+                        
+                        iframeConsole.error = function(...args) {
+                            logToConsole(`[IFRAME] ❌ ${args.join(' ')}`, 'error');
+                            originalIframeConsole.error.apply(iframeConsole, args);
+                        };
+                        
+                        iframeConsole.warn = function(...args) {
+                            logToConsole(`[IFRAME] ⚠️ ${args.join(' ')}`, 'warn');
+                            originalIframeConsole.warn.apply(iframeConsole, args);
+                        };
+                        
+                        iframeConsole.info = function(...args) {
+                            logToConsole(`[IFRAME] ℹ️ ${args.join(' ')}`, 'info');
+                            originalIframeConsole.info.apply(iframeConsole, args);
+                        };
+                    }
+                }
+            } catch (e) {
+                logToConsole(`⚠️ Cannot access iframe console due to CORS: ${e.message}`, 'warn');
+            }
+        };
+        
+        iframe.onerror = (e) => {
+            statusDiv.innerHTML = '❌ App iframe failed to load';
+            logToConsole(`❌ Iframe load error: ${e}`, 'error');
+        };
+        
+        // Initial log
+        logToConsole('🚀 Debug console initialized', 'info');
+    </script>
+</body>
+</html>

@@ -31,6 +31,9 @@ import CountryPicker, {
 import { Feather } from "@expo/vector-icons";
 import CustomBackButton from "@/components/CustomBackButton";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getAuthRateLimiter } from "@/utils/AuthRateLimiter";
+import { showErrorToast } from "@/utils/errorHandler";
+import { metrics } from "@/utils/metrics";
 const BREAKPOINTS = {
   TABLET: 768,
   DESKTOP: 1280,
@@ -73,6 +76,10 @@ export default function Login() {
       return response.data;
     },
     onSuccess: (data) => {
+      // Reset rate limit on successful login
+      const rateLimiter = getAuthRateLimiter();
+      rateLimiter.resetAttempts(formData.phone);
+      
       // Store auth token/user data
       updateUser({ ...data.user, token: data.token });
       // Check for redirect route in session storage
@@ -87,6 +94,14 @@ export default function Login() {
       }
     },
     onError: (error: any) => {
+      // Record failed login attempt
+      const rateLimiter = getAuthRateLimiter();
+      rateLimiter.recordFailedAttempt(formData.phone);
+      
+      // Track auth failure in metrics
+      const reason = error.response?.data?.message || error.message || 'Unknown error';
+      metrics.trackAuthFailure(reason, formData.phone);
+      
       updateUser({
         ...error.response.data.user,
         token: error.response.data.token,
@@ -122,6 +137,16 @@ export default function Login() {
   });
 
   const handleLogin = () => {
+    // Check rate limiting
+    const rateLimiter = getAuthRateLimiter();
+    const rateLimitCheck = rateLimiter.checkAttempt(formData.phone);
+    
+    if (!rateLimitCheck.allowed) {
+      setError(rateLimitCheck.message || 'Too many login attempts');
+      showErrorToast(new Error(rateLimitCheck.message || 'Too many login attempts'));
+      return;
+    }
+    
     loginMutation.mutate(formData);
   };
 

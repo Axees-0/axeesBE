@@ -757,14 +757,7 @@ const styles = StyleSheet.create({
     height: "80%",
     maxHeight: 650,
     borderRadius: 16,
-    overflow: "hidden",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    overflow: "hidden",    shadowRadius: 3.84,
     elevation: 5,
   },
   placeholderText: {

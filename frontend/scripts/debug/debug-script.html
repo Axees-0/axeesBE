@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error Capture</title>
+</head>
+<body>
+    <h3>React Native App Error Capture</h3>
+    <div id="status">Loading...</div>
+    <div id="errors"></div>
+    
+    <script>
+        const errorDiv = document.getElementById('errors');
+        const statusDiv = document.getElementById('status');
+        
+        // Capture errors from the iframe
+        window.addEventListener('error', (e) => {
+            errorDiv.innerHTML += `<p><strong>Error:</strong> ${e.message}<br>
+                                   <strong>File:</strong> ${e.filename}<br>
+                                   <strong>Line:</strong> ${e.lineno}</p>`;
+        });
+        
+        // Try to load the React Native app in iframe
+        const iframe = document.createElement('iframe');
+        iframe.src = 'http://localhost:3000';
+        iframe.style.width = '100%';
+        iframe.style.height = '500px';
+        iframe.onload = () => {
+            statusDiv.textContent = 'App loaded in iframe';
+            
+            // Try to access console logs (limited by same-origin policy)
+            setTimeout(() => {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    statusDiv.textContent += ' - Can access iframe content';
+                } catch (e) {
+                    statusDiv.textContent += ' - Cannot access iframe content due to CORS';
+                }
+            }, 2000);
+        };
+        
+        iframe.onerror = (e) => {
+            errorDiv.innerHTML += `<p><strong>Iframe Error:</strong> ${e}</p>`;
+        };
+        
+        document.body.appendChild(iframe);
+    </script>
+</body>
+</html>

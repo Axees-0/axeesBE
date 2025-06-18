@@ -106,11 +106,7 @@ const styles = StyleSheet.create({
     width: "50%",
     backgroundColor: "#FFFFFF",
     borderRadius: 8,
-    padding: 20,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    padding: 20,    elevation: 2,
   },
   placeholderText: {
     fontSize: 16,
