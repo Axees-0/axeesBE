@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Color } from '@/GlobalStyles';
+import { router } from 'expo-router';
 
 const Web = () => {
   return (
@@ -27,7 +28,10 @@ const Web = () => {
         
         <View style={styles.creatorsGrid}>
           {/* Creator 1 */}
-          <View style={styles.creatorCard}>
+          <TouchableOpacity 
+            style={styles.creatorCard}
+            onPress={() => router.push('/profile/creator-001')}
+          >
             <View style={styles.creatorAvatar}>
               <Text style={styles.avatarText}>ET</Text>
             </View>
@@ -39,10 +43,13 @@ const Web = () => {
               <Text style={styles.tag}>Fashion</Text>
               <Text style={styles.tag}>Lifestyle</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           
           {/* Creator 2 */}
-          <View style={styles.creatorCard}>
+          <TouchableOpacity 
+            style={styles.creatorCard}
+            onPress={() => router.push('/profile/creator-002')}
+          >
             <View style={styles.creatorAvatar}>
               <Text style={styles.avatarText}>MJ</Text>
             </View>
@@ -54,10 +61,13 @@ const Web = () => {
               <Text style={styles.tag}>Technology</Text>
               <Text style={styles.tag}>Reviews</Text>
             </View>
-          </View>
+          </TouchableOpacity>
           
           {/* Creator 3 */}
-          <View style={styles.creatorCard}>
+          <TouchableOpacity 
+            style={styles.creatorCard}
+            onPress={() => router.push('/profile/creator-003')}
+          >
             <View style={styles.creatorAvatar}>
               <Text style={styles.avatarText}>SR</Text>
             </View>
@@ -69,7 +79,7 @@ const Web = () => {
               <Text style={styles.tag}>Fitness</Text>
               <Text style={styles.tag}>Health</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>

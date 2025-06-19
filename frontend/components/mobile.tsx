@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { Color } from '@/GlobalStyles';
+import { router } from 'expo-router';
 
 const Mobile = () => {
   return (
@@ -17,23 +18,32 @@ const Mobile = () => {
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Featured Creators</Text>
         
-        <View style={styles.creatorCard}>
+        <TouchableOpacity 
+          style={styles.creatorCard}
+          onPress={() => router.push('/profile/creator-001')}
+        >
           <Text style={styles.creatorName}>Emma Thompson</Text>
           <Text style={styles.creatorStats}>@emmastyle • 156K followers</Text>
           <Text style={styles.creatorBio}>Fashion & Lifestyle Creator</Text>
-        </View>
+        </TouchableOpacity>
         
-        <View style={styles.creatorCard}>
+        <TouchableOpacity 
+          style={styles.creatorCard}
+          onPress={() => router.push('/profile/creator-002')}
+        >
           <Text style={styles.creatorName}>Marcus Johnson</Text>
           <Text style={styles.creatorStats}>@techmarc • 234K followers</Text>
           <Text style={styles.creatorBio}>Tech Reviewer & Smart Home Expert</Text>
-        </View>
+        </TouchableOpacity>
         
-        <View style={styles.creatorCard}>
+        <TouchableOpacity 
+          style={styles.creatorCard}
+          onPress={() => router.push('/profile/creator-003')}
+        >
           <Text style={styles.creatorName}>Sofia Rodriguez</Text>
           <Text style={styles.creatorStats}>@sofiafit • 189K followers</Text>
           <Text style={styles.creatorBio}>Fitness Coach & Wellness Advocate</Text>
-        </View>
+        </TouchableOpacity>
       </View>
       
       <View style={styles.section}>
