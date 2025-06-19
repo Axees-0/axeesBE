@@ -171,14 +171,14 @@ const ProfilePage = () => {
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionButton}
-                  onPress={() => Alert.alert('Edit Profile', 'This would open profile editing')}
+                  onPress={() => router.push('/profile/edit')}
                 >
                   <Text style={styles.actionIcon}>✏️</Text>
                   <Text style={styles.actionText}>Edit Profile</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionButton}
-                  onPress={() => Alert.alert('Media Kit', 'This would show your media kit')}
+                  onPress={() => router.push('/profile/mediakit')}
                 >
                   <Text style={styles.actionIcon}>📊</Text>
                   <Text style={styles.actionText}>Media Kit</Text>
@@ -188,7 +188,7 @@ const ProfilePage = () => {
               <>
                 <TouchableOpacity 
                   style={styles.actionButton}
-                  onPress={() => router.push('/(tabs)/explore')}
+                  onPress={() => router.push('/(tabs)')}
                 >
                   <Text style={styles.actionIcon}>🔍</Text>
                   <Text style={styles.actionText}>Find Creators</Text>
@@ -202,7 +202,7 @@ const ProfilePage = () => {
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionButton}
-                  onPress={() => Alert.alert('Analytics', 'This would show campaign analytics')}
+                  onPress={() => router.push('/analytics')}
                 >
                   <Text style={styles.actionIcon}>📈</Text>
                   <Text style={styles.actionText}>Analytics</Text>
@@ -248,19 +248,31 @@ const ProfilePage = () => {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Settings</Text>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity 
+            style={styles.settingRow}
+            onPress={() => router.push('/settings/notifications')}
+          >
             <Text style={styles.settingLabel}>Notification Preferences</Text>
             <Text style={styles.settingArrow}>›</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity 
+            style={styles.settingRow}
+            onPress={() => router.push('/settings/privacy')}
+          >
             <Text style={styles.settingLabel}>Privacy Settings</Text>
             <Text style={styles.settingArrow}>›</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity 
+            style={styles.settingRow}
+            onPress={() => router.push('/settings/security')}
+          >
             <Text style={styles.settingLabel}>Account Security</Text>
             <Text style={styles.settingArrow}>›</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.settingRow}>
+          <TouchableOpacity 
+            style={styles.settingRow}
+            onPress={() => router.push('/settings/help')}
+          >
             <Text style={styles.settingLabel}>Help & Support</Text>
             <Text style={styles.settingArrow}>›</Text>
           </TouchableOpacity>

@@ -267,7 +267,15 @@ const UOM08MarketerDealHistoryList = () => {
           <Text style={styles.sectionTitle}>Your Offers</Text>
           <View style={styles.offersContainer}>
             {demoOffers.map((offer, index) => (
-              <TouchableOpacity key={offer.id} style={styles.offerCard} data-testid="deal-card">
+              <TouchableOpacity 
+                key={offer.id} 
+                style={({ pressed }) => [
+                  styles.offerCard,
+                  pressed && styles.offerCardPressed
+                ]} 
+                data-testid="deal-card"
+                onPress={() => router.push(`/deals/${offer.id}`)}
+              >
                 <View style={styles.offerHeader}>
                   <View style={styles.offerMainInfo}>
                     <Text style={styles.offerTitle}>{offer.offerType}</Text>
@@ -892,6 +900,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+  },
+  offerCardPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
+    backgroundColor: '#F8F4FF',
   },
   offerHeader: {
     flexDirection: 'row',

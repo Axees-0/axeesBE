@@ -64,11 +64,45 @@ const DealDetailPage: React.FC = () => {
   const [selectedMilestone, setSelectedMilestone] = useState<string | null>(null);
   const { user } = useAuth();
 
+  // Demo deal data mapping
+  const getDealData = (dealId: string) => {
+    const dealMappings: { [key: string]: Partial<Deal> } = {
+      'OFF-123456': {
+        offerTitle: 'Social Media Post Campaign',
+        creator: { id: 'creator-001', name: 'Emma Thompson', handle: '@emmastyle' },
+        totalAmount: 500,
+        platform: 'Instagram',
+      },
+      'OFF-789012': {
+        offerTitle: 'YouTube Video Review',
+        creator: { id: 'creator-002', name: 'Marcus Johnson', handle: '@techmarc' },
+        totalAmount: 1200,
+        platform: 'YouTube',
+      },
+      'OFF-345678': {
+        offerTitle: 'Custom Fitness Campaign',
+        creator: { id: 'creator-003', name: 'Sofia Rodriguez', handle: '@sofiafit' },
+        totalAmount: 800,
+        platform: 'Instagram',
+      },
+      'OFF-901234': {
+        offerTitle: 'Instagram Story Series',
+        creator: { id: 'creator-004', name: 'Jake Miller', handle: '@jakeeats' },
+        totalAmount: 750,
+        platform: 'Instagram',
+      },
+    };
+    
+    return dealMappings[dealId] || dealMappings['OFF-123456']; // fallback
+  };
+
+  const dealData = getDealData(id as string);
+
   // Demo deal data
   const deal: Deal = useMemo(() => ({
     id: id as string,
-    offerTitle: 'Instagram Post Campaign - Summer Collection',
-    creator: {
+    offerTitle: dealData.offerTitle || 'Instagram Post Campaign - Summer Collection',
+    creator: dealData.creator || {
       id: 'creator-001',
       name: 'Emma Thompson',
       handle: '@emmastyle',
@@ -78,9 +112,9 @@ const DealDetailPage: React.FC = () => {
       name: 'Sarah Martinez',
       company: 'TechStyle Brand',
     },
-    totalAmount: 1500,
+    totalAmount: dealData.totalAmount || 1500,
     status: 'active',
-    platform: 'Instagram',
+    platform: dealData.platform || 'Instagram',
     createdAt: '2024-06-18',
     milestones: [
       {

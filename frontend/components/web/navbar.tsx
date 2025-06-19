@@ -36,7 +36,7 @@
    ——————————————————————————————————————————————————————— */
    const TABS = [
      { name: "/", label: "Explore" },
-     { name: "UOM07MarketerOfferHistoryList", label: "Deals/Offers" },
+     { name: "/deals", label: "Deals/Offers" },
      { name: "messages", label: "Messages" },
      { name: "notifications", label: "Notifications" },
    ];
@@ -126,7 +126,7 @@
                   onSubmitSearch();                      // your existing search trigger
                   inputRef.current?.blur();              // explicitly remove focus
                 }}
-                placeholder="Search category tags (Fashion, DIY, Spiritual)"
+                placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
                 placeholderTextColor={Color.cSK430B92950}
                 style={styles.searchInput}
               />
@@ -145,7 +145,7 @@
                  </TouchableOpacity>
                  <TouchableOpacity
                    style={styles.joinBtn}
-                   onPress={() => router.push("/URM01CreateAccount")}
+                   onPress={() => router.push("/register")}
                  >
                    <Text style={styles.joinTxt}>Join</Text>
                  </TouchableOpacity>
