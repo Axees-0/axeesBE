@@ -44,3 +44,6 @@ export function WebSEO({
     </Head>
   );
 }
+
+// Default export required for Expo Router
+export default WebSEO;

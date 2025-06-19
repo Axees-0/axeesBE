@@ -10,3 +10,6 @@ export function WebFeatures({ children }: WebFeaturesProps) {
   // For now, this is just a passthrough component
   return <>{children}</>;
 }
+
+// Default export required for Expo Router
+export default WebFeatures;
