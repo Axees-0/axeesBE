@@ -31,7 +31,7 @@ const UOM08MarketerDealHistoryList = () => {
   const isMobileDevice = isMobile(width);
   const isMobileScreen = width <= 768;
   
-  const [activeTab, setActiveTab] = useState('deals');
+  // const [activeTab, setActiveTab] = useState('deals');
   const [isLoading, setIsLoading] = useState(true);
   const [chartsReady, setChartsReady] = useState(false);
 
@@ -488,37 +488,15 @@ const UOM08MarketerDealHistoryList = () => {
     return (
       <>
         <WebSEO 
-          title="Deals & Analytics - Axees"
-          description="Manage your deals and track performance analytics. High-value creator opportunities and business insights."
-          keywords="creator deals, brand partnerships, influencer opportunities, analytics, performance tracking"
+          title="Deals & Offers - Axees"
+          description="Manage your deals and offers. High-value creator opportunities and brand partnerships."
+          keywords="creator deals, brand partnerships, influencer opportunities, offers"
         />
-        <Navbar pageTitle="Deals & Analytics" />
+        <Navbar pageTitle="Deals & Offers" />
         <SafeAreaView style={styles.container}>
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-            {/* Tab Header */}
-            <View style={styles.tabHeader}>
-              <View style={styles.tabContainer}>
-                <TouchableOpacity
-                  style={[styles.tab, activeTab === 'deals' && styles.activeTab]}
-                  onPress={() => setActiveTab('deals')}
-                >
-                  <Text style={[styles.tabText, activeTab === 'deals' && styles.activeTabText]}>
-                    Deals & Offers
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.tab, activeTab === 'analytics' && styles.activeTab]}
-                  onPress={() => setActiveTab('analytics')}
-                >
-                  <Text style={[styles.tabText, activeTab === 'analytics' && styles.activeTabText]}>
-                    Analytics
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
-            {/* Tab Content */}
-            {activeTab === 'deals' ? renderDealsTab() : renderAnalyticsTab()}
+            {/* Content */}
+            {renderDealsTab()}
           </ScrollView>
         </SafeAreaView>
       </>

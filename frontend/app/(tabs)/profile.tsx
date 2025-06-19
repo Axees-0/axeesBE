@@ -202,13 +202,6 @@ const ProfilePage = () => {
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.actionButton}
-                  onPress={() => router.push('/analytics')}
-                >
-                  <Text style={styles.actionIcon}>📈</Text>
-                  <Text style={styles.actionText}>Analytics</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={styles.actionButton}
                   onPress={() => router.push('/payments/marketer')}
                 >
                   <Text style={styles.actionIcon}>💳</Text>
