@@ -3,105 +3,49 @@ import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Pressa
 import { Image } from 'expo-image';
 import { Color } from '@/GlobalStyles';
 import { router } from 'expo-router';
+import { DemoData } from '@/demo/DemoData';
 
 const Web = () => {
-  // Creator data
-  const creators = [
-    {
-      id: 'creator-001',
-      name: 'Emma Thompson',
-      handle: '@emmastyle',
-      stats: '156K followers • 8.9% engagement',
-      bio: 'Fashion & Lifestyle Creator | Sustainable Fashion Advocate',
-      tags: ['Fashion', 'Lifestyle'],
-      avatar: 'ET',
-      avatarUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face',
-      location: 'Los Angeles'
-    },
-    {
-      id: 'creator-002', 
-      name: 'Marcus Johnson',
-      handle: '@techmarc',
-      stats: '234K followers • 7.2% engagement',
-      bio: 'Tech Reviewer | Smart Home Enthusiast | Future Tech Explorer',
-      tags: ['Technology', 'Reviews'],
-      avatar: 'MJ',
-      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-      location: 'New York'
-    },
-    {
-      id: 'creator-003',
-      name: 'Sofia Rodriguez', 
-      handle: '@sofiafit',
-      stats: '189K followers • 9.8% engagement',
-      bio: 'Certified Personal Trainer | Nutrition Coach | Wellness Advocate',
-      tags: ['Fitness', 'Health'],
-      avatar: 'SR',
-      avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
-      location: 'Miami'
-    },
-    {
-      id: 'creator-004',
-      name: 'Alex Chen',
-      handle: '@alexeats',
-      stats: '298K followers • 12.1% engagement',
-      bio: 'Food Blogger | Restaurant Reviews | Culinary Adventures',
-      tags: ['Food', 'Lifestyle'],
-      avatar: 'AC',
-      avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-      location: 'San Francisco'
-    },
-    {
-      id: 'creator-005',
-      name: 'Zoe Williams',
-      handle: '@zoetravel',
-      stats: '421K followers • 9.3% engagement',
-      bio: 'Travel Influencer | Adventure Seeker | Cultural Explorer',
-      tags: ['Travel', 'Adventure'],
-      avatar: 'ZW',
-      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
-      location: 'Seattle'
-    },
-    {
-      id: 'creator-006',
-      name: 'David Kim',
-      handle: '@davidfit',
-      stats: '167K followers • 11.8% engagement',
-      bio: 'Fitness Coach | Nutrition Expert | Transformation Specialist',
-      tags: ['Fitness', 'Health'],
-      avatar: 'DK',
-      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-      location: 'Austin'
-    },
-    {
-      id: 'creator-007',
-      name: 'Maya Patel',
-      handle: '@mayabeauty',
-      stats: '523K followers • 8.7% engagement',
-      bio: 'Beauty Guru | Makeup Artist | Skincare Enthusiast',
-      tags: ['Beauty', 'Lifestyle'],
-      avatar: 'MP',
-      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
-      location: 'Chicago'
-    },
-    {
-      id: 'creator-008',
-      name: 'Jake Miller',
-      handle: '@jaketech',
-      stats: '289K followers • 10.4% engagement',
-      bio: 'Tech YouTuber | Gadget Reviews | Gaming Content Creator',
-      tags: ['Technology', 'Gaming'],
-      avatar: 'JM',
-      avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face',
-      location: 'Portland'
-    }
-  ];
+  // Creator data - Using DemoData.creators with mapped structure for explore page
+  const creators = DemoData.creators.map(creator => {
+    // Calculate total followers and average engagement for stats display
+    const totalFollowers = creator.creatorData?.totalFollowers || 0;
+    const avgEngagement = creator.creatorData?.platforms?.reduce((acc, p) => acc + (p.engagement || 0), 0) / (creator.creatorData?.platforms?.length || 1);
+    
+    // Format follower count
+    const formatNumber = (num: number) => {
+      if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+      if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+      return num.toString();
+    };
+    
+    // Extract avatar initials from name
+    const getInitials = (name: string) => {
+      const parts = name.split(' ');
+      return parts.map(part => part[0]).join('').substring(0, 2).toUpperCase();
+    };
+    
+    return {
+      id: creator._id,
+      name: creator.name,
+      handle: creator.userName,
+      stats: `${formatNumber(totalFollowers)} followers • ${avgEngagement.toFixed(1)}% engagement`,
+      bio: creator.bio,
+      tags: creator.creatorData?.categories || ['Creator'],
+      avatar: getInitials(creator.name),
+      avatarUrl: creator.avatarUrl,
+      location: creator.location
+    };
+  });
 
   const [searchText, setSearchText] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [filteredCreators, setFilteredCreators] = useState(creators);
 
-  const availableFilters = ['Fashion', 'Technology', 'Fitness', 'Lifestyle', 'Food', 'Travel', 'Adventure', 'Beauty', 'Gaming', 'Health'];
+  // Extract unique categories from DemoData.creators for filters
+  const availableFilters = Array.from(new Set(
+    DemoData.creators.flatMap(creator => creator.creatorData?.categories || [])
+  )).sort();
 
   const toggleFilter = (filter: string) => {
     const newFilters = selectedFilters.includes(filter)

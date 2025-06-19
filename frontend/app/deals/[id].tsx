@@ -118,32 +118,36 @@ const DealDetailPage: React.FC = () => {
       name: 'Sarah Martinez',
       company: 'TechStyle Brand',
     },
-    totalAmount: dealData.totalAmount || 1500,
+    totalAmount: dealData.totalAmount || 1700,
     status: 'active',
     platform: dealData.platform || 'Instagram',
     createdAt: '2024-06-18',
     milestones: [
       {
         id: 'milestone-1',
-        title: 'Content Creation',
-        description: 'Create Instagram post showcasing summer collection with professional photos',
-        amount: 750,
-        status: 'in_progress',
+        title: 'Content Creation Setup',
+        description: 'Plan content strategy and create initial draft concepts',
+        amount: 500,
+        status: 'pending',
         dueDate: '2024-06-25',
-        deliverables: ['Instagram post draft', 'High-quality photos', 'Caption with hashtags'],
-        workSubmitted: {
-          content: 'Here\'s the draft post for the summer collection! I\'ve included 3 different photo options and caption variations.',
-          submittedAt: '2024-06-20',
-          files: ['post_draft_1.jpg', 'post_draft_2.jpg', 'caption_options.txt']
-        }
+        deliverables: ['Content strategy document', 'Initial photo concepts', 'Caption drafts'],
       },
       {
         id: 'milestone-2',
-        title: 'Content Publishing',
-        description: 'Publish approved content and provide posting proof',
+        title: 'Content Creation',
+        description: 'Create Instagram post showcasing summer collection with professional photos',
         amount: 750,
         status: 'pending',
         dueDate: '2024-06-28',
+        deliverables: ['Instagram post draft', 'High-quality photos', 'Caption with hashtags'],
+      },
+      {
+        id: 'milestone-3',
+        title: 'Content Publishing',
+        description: 'Publish approved content and provide posting proof',
+        amount: 450,
+        status: 'pending',
+        dueDate: '2024-07-02',
         deliverables: ['Published Instagram post', 'Screenshots of post', 'Performance metrics after 24h'],
       }
     ]
@@ -176,83 +180,121 @@ const DealDetailPage: React.FC = () => {
   };
 
   const handleMilestoneAction = (milestoneId: string, action: string) => {
+    console.log('handleMilestoneAction called:', milestoneId, action);
     const milestone = deal.milestones.find(m => m.id === milestoneId);
-    if (!milestone) return;
+    if (!milestone) {
+      console.log('Milestone not found:', milestoneId);
+      return;
+    }
 
     switch (action) {
       case 'fund':
-        Alert.alert(
-          'Fund Milestone', 
-          `Fund ${milestone.title} for $${milestone.amount}?`,
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { 
-              text: 'Fund', 
-              onPress: async () => {
-                // Update milestone status (FUND_MILESTONE -> MilestoneFunded)
-                setMilestoneStatuses(prev => ({
-                  ...prev,
-                  [milestoneId]: 'funded'
-                }));
-                
-                // Send notification to creator (NOTIFY_C)
-                await notificationService.notifyCreator(deal.creator.id, {
-                  type: 'deal',
-                  title: 'Milestone Funded!',
-                  message: `${deal.marketer.name} funded the milestone "${milestone.title}" ($${milestone.amount})`,
-                  actionType: 'view_deal',
-                  actionParams: { dealId: deal.id }
-                });
-                
-                Alert.alert(
-                  'Success', 
-                  'Milestone funded successfully! The creator has been notified and can start working.',
-                  [
-                    {
-                      text: 'Open Chat',
-                      onPress: () => {
-                        const otherParty = user?.userType === 'creator' ? deal.marketer : deal.creator;
-                        const chatId = `chat-${deal.id}`;
-                        
-                        router.push({
-                          pathname: '/chat/[id]',
-                          params: {
-                            id: chatId,
-                            dealId: deal.id,
-                            otherUserId: otherParty.id,
-                            otherUserName: otherParty.name,
-                          }
-                        });
-                      }
-                    },
-                    { text: 'OK' }
-                  ]
-                );
+        // Use web-compatible confirmation
+        const isWeb = Platform.OS === 'web';
+        const confirmed = isWeb 
+          ? window.confirm(`Fund ${milestone.title} for $${milestone.amount}?`)
+          : true; // Will show Alert.alert for mobile
+        
+        if (!confirmed && isWeb) return;
+        
+        if (!isWeb) {
+          Alert.alert(
+            'Fund Milestone', 
+            `Fund ${milestone.title} for $${milestone.amount}?`,
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { 
+                text: 'Fund', 
+                onPress: () => handleFunding(milestoneId, milestone)
               }
-            }
-          ]
-        );
-        break;
-      case 'approve':
-        Alert.alert('Approve Work', `Approve submitted work for ${milestone.title}?`);
-        break;
-      case 'request_revision':
-        Alert.alert('Request Revision', 'Please provide feedback for revisions needed.');
-        break;
-      case 'submit_work':
-        router.push({
-          pathname: '/deals/submit',
-          params: { dealId: deal.id, milestoneId }
-        });
-        break;
-      case 'upload_proof':
-        router.push({
-          pathname: '/deals/proof',
-          params: { dealId: deal.id, milestoneId }
-        });
+            ]
+          );
+        } else {
+          handleFunding(milestoneId, milestone);
+        }
         break;
       default:
         console.log('Unknown action:', action);
+    }
+  };
+
+  const handleFunding = async (milestoneId: string, milestone: Milestone) => {
+    try {
+      // Update milestone status (FUND_MILESTONE -> MilestoneFunded)
+      setMilestoneStatuses(prev => ({
+        ...prev,
+        [milestoneId]: 'funded'
+      }));
+      
+      // Send notification to creator (NOTIFY_C) - with error handling
+      try {
+        await notificationService.notifyCreator(deal.creator.id, {
+          type: 'deal',
+          title: 'Milestone Funded!',
+          message: `${deal.marketer.name} funded the milestone "${milestone.title}" ($${milestone.amount})`,
+          actionType: 'view_deal',
+          actionParams: { dealId: deal.id }
+        });
+      } catch (notifError) {
+        console.log('Notification error (non-critical):', notifError);
+      }
+      
+      // Use web-compatible success message
+      const isWeb = Platform.OS === 'web';
+      if (isWeb) {
+        const openChat = window.confirm('Milestone funded successfully! The creator has been notified and can start working.\n\nOpen chat?');
+        if (openChat) {
+          const otherParty = user?.userType === 'creator' ? deal.marketer : deal.creator;
+          const chatId = `chat-${deal.id}`;
+          
+          router.push({
+            pathname: '/chat/[id]',
+            params: {
+              id: chatId,
+              dealId: deal.id,
+              otherUserId: otherParty.id,
+              otherUserName: otherParty.name,
+            }
+          });
+        }
+      } else {
+        Alert.alert(
+          'Success', 
+          'Milestone funded successfully! The creator has been notified and can start working.',
+          [
+            {
+              text: 'Open Chat',
+              onPress: () => {
+                const otherParty = user?.userType === 'creator' ? deal.marketer : deal.creator;
+                const chatId = `chat-${deal.id}`;
+                
+                router.push({
+                  pathname: '/chat/[id]',
+                  params: {
+                    id: chatId,
+                    dealId: deal.id,
+                    otherUserId: otherParty.id,
+                    otherUserName: otherParty.name,
+                  }
+                });
+              }
+            },
+            { text: 'OK' }
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('Error funding milestone:', error);
+      const isWeb = Platform.OS === 'web';
+      if (isWeb) {
+        window.alert('Failed to fund milestone. Please try again.');
+      } else {
+        Alert.alert(
+          'Error',
+          'Failed to fund milestone. Please try again.',
+          [{ text: 'OK' }]
+        );
+      }
     }
   };
 
@@ -306,7 +348,12 @@ const DealDetailPage: React.FC = () => {
         {getMilestoneStatus(milestone) === 'pending' && (
           <TouchableOpacity 
             style={styles.actionButton}
-            onPress={() => handleMilestoneAction(milestone.id, 'fund')}
+            onPress={() => {
+              console.log('🚀 Fund button pressed for milestone:', milestone.id);
+              console.log('🔍 Milestone status:', getMilestoneStatus(milestone));
+              console.log('🎯 About to call handleMilestoneAction');
+              handleMilestoneAction(milestone.id, 'fund');
+            }}
           >
             <Text style={styles.actionButtonText}>Fund Milestone</Text>
           </TouchableOpacity>
