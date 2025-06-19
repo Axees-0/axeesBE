@@ -100,9 +100,49 @@ const OfferReviewPage: React.FC = () => {
   });
 
   const handleOfferAction = (action: string) => {
+    const isWeb = Platform.OS === 'web';
+    
     switch (action) {
       case 'accept':
-        Alert.alert(
+        if (isWeb) {
+          const confirmed = window.confirm(
+            `Accept this ${offer.offerType} offer from ${offer.marketer.company} for $${offer.amount}?\n\nThis will create an active deal and you'll need to complete the deliverables within ${offer.deliveryDays} days.`
+          );
+          if (confirmed) {
+            const newChatId = `chat-${Date.now()}`;
+            const newDealId = `DEAL-${Date.now()}`;
+            
+            // Send notification
+            notificationService.notifyMarketer('sarah-001', {
+              type: 'deal',
+              title: 'Offer Accepted!',
+              message: `${user?.name || 'Creator'} accepted your offer for ${offer.offerType}`,
+              actionType: 'view_deal',
+              actionParams: { dealId: newDealId }
+            }).catch(console.error);
+            
+            const setupMilestones = window.confirm(
+              'Offer Accepted! Now let\'s set up milestones for this deal to ensure smooth delivery and payment.\n\nSetup milestones now?'
+            );
+            
+            if (setupMilestones) {
+              router.replace({
+                pathname: '/milestones/setup',
+                params: { 
+                  dealId: newDealId,
+                  totalAmount: offer.amount.toString(),
+                  offerTitle: offer.offerType
+                }
+              });
+            } else {
+              router.replace({
+                pathname: '/deals/[id]',
+                params: { id: newDealId }
+              });
+            }
+          }
+        } else {
+          Alert.alert(
           'Accept Offer',
           `Accept this ${offer.offerType} offer from ${offer.marketer.company} for $${offer.amount}?\n\nThis will create an active deal and you'll need to complete the deliverables within ${offer.deliveryDays} days.`,
           [
@@ -152,9 +192,28 @@ const OfferReviewPage: React.FC = () => {
             }
           ]
         );
+        }
         break;
       case 'reject':
-        Alert.alert(
+        if (isWeb) {
+          const confirmed = window.confirm(
+            `Are you sure you want to decline this offer from ${offer.marketer.company}?\n\nThis action cannot be undone.`
+          );
+          if (confirmed) {
+            // Send notification
+            notificationService.notifyMarketer('sarah-001', {
+              type: 'offer',
+              title: 'Offer Declined',
+              message: `${user?.name || 'Creator'} declined your offer for ${offer.offerType}`,
+              actionType: 'view_offer',
+              actionParams: { offerId: offer.id }
+            }).catch(console.error);
+            
+            window.alert('Offer Declined. The marketer has been notified of your decision.');
+            router.replace('/(tabs)/deals');
+          }
+        } else {
+          Alert.alert(
           'Decline Offer',
           `Are you sure you want to decline this offer from ${offer.marketer.company}?\n\nThis action cannot be undone.`,
           [
@@ -186,6 +245,7 @@ const OfferReviewPage: React.FC = () => {
             }
           ]
         );
+        }
         break;
       case 'counter':
         router.push({

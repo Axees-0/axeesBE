@@ -1,6 +1,6 @@
 import { DEMO_MODE } from "@/demo/DemoMode";
 import { DemoData } from "@/demo/DemoData";
-import React from "react";
+import React, { useState } from "react";
 import { Platform, useWindowDimensions, ScrollView, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { WebSEO } from "../web-seo";
 import { Color } from "@/GlobalStyles";
@@ -18,7 +18,7 @@ const MessagesPage = () => {
   const { user } = useAuth();
   
   // Demo chat data - including auto-created chats from deals
-  const chats = [
+  const [chats, setChats] = useState([
     {
       id: 'chat-DEAL-001',
       otherUserId: 'sarah-001',
@@ -68,7 +68,7 @@ const MessagesPage = () => {
       dealId: 'DEAL-004',
       dealTitle: 'Summer Collection Promo',
     },
-  ];
+  ]);
   
   const formatTime = (date: Date) => {
     const now = new Date();
@@ -89,6 +89,13 @@ const MessagesPage = () => {
   };
   
   const handleChatPress = (chat: any) => {
+    // Mark as read when clicked
+    setChats(prevChats => 
+      prevChats.map(c => 
+        c.id === chat.id ? { ...c, unreadCount: 0 } : c
+      )
+    );
+    
     router.push({
       pathname: '/chat/[id]',
       params: {

@@ -101,7 +101,8 @@
                      <Text
                        style={[
                          styles.tabLabel,
-                         path.endsWith(t.name) && styles.activeTab,
+                         ((t.name === "/" && (path === "/" || path === "/index")) ||
+                          (t.name !== "/" && (path.includes(`/${t.name}`) || path === `/(tabs)/${t.name}`))) && styles.activeTab,
                        ]}
                      >
                        {t.label}

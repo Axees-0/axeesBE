@@ -98,9 +98,35 @@ const HandleCounterOfferPage: React.FC = () => {
   });
 
   const handleAction = (action: 'accept' | 'reject' | 'negotiate') => {
+    const isWeb = Platform.OS === 'web';
+    
     switch (action) {
       case 'accept':
-        Alert.alert(
+        if (isWeb) {
+          const confirmed = window.confirm(`Accept the counter offer from ${counterOffer.creator.name} for $${counterOffer.counterOffer.amount}?`);
+          if (confirmed) {
+            // Send notification and navigate
+            notificationService.notifyCreator(counterOffer.creator.id, {
+              type: 'deal',
+              title: 'Counter Offer Accepted!',
+              message: `${user?.name || user?.company || 'Marketer'} accepted your counter offer for ${counterOffer.originalOffer.offerType}`,
+              actionType: 'view_deal',
+              actionParams: { dealId: `DEAL-${Date.now()}` }
+            }).catch(console.error);
+            
+            window.alert('Counter Offer Accepted! Let\'s set up milestones for this deal.');
+            router.replace({
+              pathname: '/milestones/setup',
+              params: { 
+                dealId: `DEAL-${Date.now()}`,
+                totalAmount: counterOffer.counterOffer.amount.toString(),
+                offerTitle: counterOffer.originalOffer.offerType,
+                creatorName: counterOffer.creator.name
+              }
+            });
+          }
+        } else {
+          Alert.alert(
           'Accept Counter Offer',
           `Accept the counter offer from ${counterOffer.creator.name} for $${counterOffer.counterOffer.amount}?`,
           [
@@ -139,10 +165,27 @@ const HandleCounterOfferPage: React.FC = () => {
             }
           ]
         );
+        }
         break;
         
       case 'reject':
-        Alert.alert(
+        if (isWeb) {
+          const confirmed = window.confirm('Are you sure you want to reject this counter offer?');
+          if (confirmed) {
+            // Send notification
+            notificationService.notifyCreator(counterOffer.creator.id, {
+              type: 'offer',
+              title: 'Counter Offer Declined',
+              message: `${user?.name || user?.company || 'Marketer'} declined your counter offer for ${counterOffer.originalOffer.offerType}`,
+              actionType: 'view_offer',
+              actionParams: { offerId: counterOffer.originalOfferId }
+            }).catch(console.error);
+            
+            window.alert('Counter Offer Rejected. The creator has been notified.');
+            router.back();
+          }
+        } else {
+          Alert.alert(
           'Reject Counter Offer',
           'Are you sure you want to reject this counter offer?',
           [
@@ -171,10 +214,39 @@ const HandleCounterOfferPage: React.FC = () => {
             }
           ]
         );
+        }
         break;
         
       case 'negotiate':
-        Alert.alert(
+        if (isWeb) {
+          const choice = window.confirm('Continue negotiation?\n\nClick OK to open chat, or Cancel to make a counter offer.');
+          if (choice) {
+            // Open chat
+            notificationService.notifyCreator(counterOffer.creator.id, {
+              type: 'message',
+              title: 'Negotiation Continues',
+              message: `${user?.name || user?.company || 'Marketer'} wants to discuss your counter offer`,
+              actionType: 'open_chat',
+              actionParams: { chatId: `chat-${counterOffer.originalOfferId}` }
+            }).catch(console.error);
+            
+            router.push({
+              pathname: '/chat/[id]',
+              params: { id: `chat-${counterOffer.originalOfferId}` }
+            });
+          } else {
+            // Make counter offer
+            router.push({
+              pathname: '/offers/counter',
+              params: { 
+                originalOfferId: counterOffer.originalOfferId,
+                creatorId: counterOffer.creator.id,
+                previousAmount: counterOffer.counterOffer.amount.toString()
+              }
+            });
+          }
+        } else {
+          Alert.alert(
           'Continue Negotiation',
           'How would you like to proceed?',
           [
@@ -214,6 +286,7 @@ const HandleCounterOfferPage: React.FC = () => {
             }
           ]
         );
+        }
         break;
     }
   };
