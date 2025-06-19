@@ -11,6 +11,7 @@ import {
   SafeAreaView,
   TextInput,
   Alert,
+  Modal,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -50,6 +51,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
   const [activeTab, setActiveTab] = useState<'about' | 'portfolio' | 'rates'>('about');
   const [isContactModalVisible, setIsContactModalVisible] = useState(false);
   const [contactMessage, setContactMessage] = useState('');
+  const [contactSubject, setContactSubject] = useState('Collaboration Opportunity');
   const [isFavorited, setIsFavorited] = useState(false);
   const [isOfferModalVisible, setIsOfferModalVisible] = useState(false);
 
@@ -78,85 +80,37 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
     return num.toString();
   };
 
-  // Contact Modal Component
-  const ContactModal = () => (
-    <View style={styles.modalOverlay}>
-      <View style={styles.modalContainer}>
-        <Text style={styles.modalTitle}>Contact {creator.name}</Text>
-        <Text style={styles.modalDescription}>
-          Send a message to discuss collaboration opportunities
-        </Text>
-        
-        <View style={styles.modalForm}>
-          <Text style={styles.inputLabel}>Subject</Text>
-          <View style={styles.input}>
-            <Text style={styles.inputPlaceholder}>Collaboration Opportunity</Text>
-          </View>
-          
-          <Text style={styles.inputLabel}>Message</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder={`Hi ${creator.name}, I'm interested in working with you...`}
-            placeholderTextColor="#999"
-            value={contactMessage}
-            onChangeText={setContactMessage}
-            multiline
-            numberOfLines={4}
-            textAlignVertical="top"
-          />
-        </View>
-
-        <View style={styles.modalActions}>
-          <TouchableOpacity 
-            style={styles.modalCancelBtn}
-            onPress={() => setIsContactModalVisible(false)}
-          >
-            <Text style={styles.modalCancelText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.modalSendBtn}
-            onPress={() => {
-              if (!contactMessage.trim()) {
-                Alert.alert('Message Required', 'Please enter a message before sending.');
-                return;
-              }
-              
-              // Create chat ID for this conversation
-              const chatId = `chat-${id}-${Date.now()}`;
-              
-              // Close modal first
-              setIsContactModalVisible(false);
-              setContactMessage('');
-              
-              // Show success and navigate to chat
-              Alert.alert(
-                'Message Sent!',
-                `Your message has been sent to ${creator.name}. You can continue the conversation in chat.`,
-                [
-                  {
-                    text: 'Open Chat',
-                    onPress: () => {
-                      router.push({
-                        pathname: '/chat/[id]',
-                        params: { 
-                          id: chatId,
-                          otherUserId: creator.id,
-                          otherUserName: creator.name
-                        }
-                      });
-                    }
-                  },
-                  { text: 'OK' }
-                ]
-              );
-            }}
-          >
-            <Text style={styles.modalSendText}>Send Message</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  );
+  // Simple working contact form - no fancy stuff
+  const handleSendMessage = () => {
+    const subject = (document.getElementById('contact-subject') as HTMLInputElement)?.value || 'Collaboration Opportunity';
+    const message = (document.getElementById('contact-message') as HTMLTextAreaElement)?.value || '';
+    
+    if (!message.trim()) {
+      window.alert('Please enter a message before sending.');
+      return;
+    }
+    
+    // Create chat ID for this conversation
+    const chatId = `chat-${id}-${Date.now()}`;
+    
+    // Close modal
+    setIsContactModalVisible(false);
+    
+    // Show success and navigate to chat
+    const openChat = window.confirm(
+      `Your message has been sent to ${creator.name}. You can continue the conversation in chat.\n\nOpen chat now?`
+    );
+    if (openChat) {
+      router.push({
+        pathname: '/chat/[id]',
+        params: { 
+          id: chatId,
+          otherUserId: creator._id,
+          otherUserName: creator.name
+        }
+      });
+    }
+  };
 
   // Offer Modal Component
   const OfferModal = () => (
@@ -490,7 +444,10 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
               <View style={styles.actionButtons}>
                 <TouchableOpacity 
                   style={styles.contactButton}
-                  onPress={() => setIsContactModalVisible(true)}
+                  onPress={() => {
+                    console.log('📞 Contact button pressed, opening modal');
+                    setIsContactModalVisible(true);
+                  }}
                 >
                   <Message width={20} height={20} />
                   <Text style={styles.contactText}>Contact</Text>
@@ -525,8 +482,96 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
           {renderTabContent()}
         </ScrollView>
 
-        {/* Contact Modal */}
-        {isContactModalVisible && <ContactModal />}
+        {/* Contact Modal - Simple HTML for web */}
+        {isContactModalVisible && isWeb && (
+          <div style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 9999
+          }}>
+            <div style={{
+              backgroundColor: 'white',
+              padding: '24px',
+              borderRadius: '12px',
+              width: '90%',
+              maxWidth: '400px'
+            }}>
+              <h2 style={{ marginBottom: '8px' }}>Contact {creator.name}</h2>
+              <p style={{ marginBottom: '20px', color: '#666' }}>
+                Send a message to discuss collaboration opportunities
+              </p>
+              
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '6px', fontWeight: 500 }}>Subject</label>
+                <input
+                  id="contact-subject"
+                  type="text"
+                  defaultValue="Collaboration Opportunity"
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid #ddd',
+                    fontSize: '14px'
+                  }}
+                />
+                
+                <label style={{ display: 'block', marginTop: '16px', marginBottom: '6px', fontWeight: 500 }}>Message</label>
+                <textarea
+                  id="contact-message"
+                  rows={4}
+                  placeholder={`Hi ${creator.name}, I'm interested in working with you...`}
+                  style={{
+                    width: '100%',
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid #ddd',
+                    fontSize: '14px',
+                    resize: 'vertical'
+                  }}
+                />
+              </div>
+              
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => setIsContactModalVisible(false)}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: '1px solid #ddd',
+                    backgroundColor: 'white',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendMessage}
+                  style={{
+                    flex: 1,
+                    padding: '12px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: Color.cSK430B92500,
+                    color: 'white',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  Send Message
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* Offer Modal */}
         {isOfferModalVisible && <OfferModal />}
@@ -892,15 +937,10 @@ const styles = StyleSheet.create({
   
   // Modal styles
   modalOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000,
   },
   modalContainer: {
     backgroundColor: 'white',
@@ -937,10 +977,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
+    backgroundColor: '#fff',
+    color: '#333',
+    outlineStyle: 'none', // Remove web focus outline
   },
   textArea: {
     height: 80,
     textAlignVertical: 'top',
+    paddingTop: 12,
   },
   inputPlaceholder: {
     color: '#999',
