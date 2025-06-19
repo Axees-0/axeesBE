@@ -9,6 +9,7 @@ import {
   useWindowDimensions,
   TouchableOpacity,
 } from "react-native";
+import { useRouter } from "expo-router";
 import Mobile from "@/components/mobile/UOM08MarketerDealHistoryList";
 import Web from "@/components/web/UOM08MarketerDealHistoryList";
 import WebBottomTabs from "@/components/WebBottomTabs";
@@ -16,6 +17,7 @@ import CuratedDeals from "@/demo/CuratedDeals";
 import { DEMO_MODE, demoLog } from "@/demo/DemoMode";
 import { DemoData } from "@/demo/DemoData";
 import { useAuth } from "@/contexts/AuthContext";
+import CreatorDealsView from "@/components/CreatorDealsView";
 import Navbar from "@/components/web/navbar";
 import { BREAKPOINTS, isMobile, isWideScreen } from "@/constants/breakpoints";
 import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/performance";
@@ -24,6 +26,7 @@ import { WebSEO } from "../web-seo";
 const UOM08MarketerDealHistoryList = () => {
   const { width } = useWindowDimensions();
   const { user } = useAuth();
+  const router = useRouter();
   const isWeb = Platform.OS === "web";
   const isWide = isWideScreen(width);
   const isMobileDevice = isMobile(width);
@@ -61,6 +64,19 @@ const UOM08MarketerDealHistoryList = () => {
       { brand: "Samsung", amount: 3200, status: "Completed", platform: "YouTube" },
     ]
   });
+
+  // Demo counter-offers for marketers
+  const [counterOffers] = useState([
+    {
+      id: 'counter-001',
+      creatorName: 'Emma Thompson',
+      offerType: 'Instagram Post Campaign',
+      originalAmount: 1500,
+      counterAmount: 1800,
+      status: 'pending',
+      submittedDate: new Date(Date.now() - 7200000), // 2 hours ago
+    }
+  ]);
 
   useEffect(() => {
     if (DEMO_MODE) {
@@ -116,7 +132,19 @@ const UOM08MarketerDealHistoryList = () => {
       return isMobileScreen ? <Mobile /> : <Web />;
     }
     
-    // Demo offers data
+    // Check user role to determine which view to show
+    const userRole = user?.role || 'marketer'; // Default to marketer for backward compatibility
+    
+    // If user is a creator, show the creator deals view
+    if (userRole === 'creator') {
+      return (
+        <View style={[styles.content, isWide && styles.wideContent]}>
+          <CreatorDealsView userRole="creator" />
+        </View>
+      );
+    }
+    
+    // Marketer view (existing demo offers data)
     const demoOffers = [
       {
         id: 'OFF-123456',
@@ -213,12 +241,34 @@ const UOM08MarketerDealHistoryList = () => {
           />
         </View>
 
+        {/* Counter Offers Alert */}
+        {counterOffers.length > 0 && (
+          <TouchableOpacity 
+            style={styles.counterOfferAlert}
+            onPress={() => router.push('/offers/handle-counter')}
+          >
+            <View style={styles.counterOfferContent}>
+              <Text style={styles.counterOfferIcon}>🔔</Text>
+              <View style={styles.counterOfferInfo}>
+                <Text style={styles.counterOfferTitle}>Counter Offer Received</Text>
+                <Text style={styles.counterOfferText}>
+                  {counterOffers[0].creatorName} sent a counter offer for {counterOffers[0].offerType}
+                </Text>
+                <Text style={styles.counterOfferAmount}>
+                  ${counterOffers[0].originalAmount} → ${counterOffers[0].counterAmount}
+                </Text>
+              </View>
+            </View>
+            <Text style={styles.counterOfferAction}>Review →</Text>
+          </TouchableOpacity>
+        )}
+
         {/* Offers List */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Your Offers</Text>
           <View style={styles.offersContainer}>
             {demoOffers.map((offer, index) => (
-              <TouchableOpacity key={offer.id} style={styles.offerCard}>
+              <TouchableOpacity key={offer.id} style={styles.offerCard} data-testid="deal-card">
                 <View style={styles.offerHeader}>
                   <View style={styles.offerMainInfo}>
                     <Text style={styles.offerTitle}>{offer.offerType}</Text>
@@ -501,6 +551,51 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  counterOfferAlert: {
+    backgroundColor: '#FFF7ED',
+    borderWidth: 1,
+    borderColor: '#FED7AA',
+    borderRadius: 12,
+    padding: 16,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  counterOfferContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  counterOfferIcon: {
+    fontSize: 24,
+    marginRight: 12,
+  },
+  counterOfferInfo: {
+    flex: 1,
+  },
+  counterOfferTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#EA580C',
+    marginBottom: 2,
+  },
+  counterOfferText: {
+    fontSize: 14,
+    color: '#92400E',
+    marginBottom: 4,
+  },
+  counterOfferAmount: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#92400E',
+  },
+  counterOfferAction: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#EA580C',
   },
   tabHeader: {
     backgroundColor: "#FFFFFF",

@@ -5,7 +5,7 @@
     "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon-2.png",
+    "icon": "./assets/icon.png",
     "scheme": "axees",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
@@ -16,7 +16,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon-2.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#430B92"
       },
       "package": "io.freshify.axees",
@@ -30,7 +30,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/icon-2.png"
+      "favicon": "./assets/icon.png"
     },
     "plugins": [
       "expo-router",

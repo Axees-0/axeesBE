@@ -43,7 +43,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const checkAuthStatus = async () => {
     try {
       // Check for demo mode auto-login
-      if (process.env.EXPO_PUBLIC_DEMO_MODE === 'true') {
+      if (process.env.EXPO_PUBLIC_DEMO_MODE === 'true' && process.env.EXPO_PUBLIC_AUTO_LOGIN === 'true') {
         const demoUser = process.env.EXPO_PUBLIC_AUTO_LOGIN_USER || 'marketer';
         const demoUserData: User = {
           id: 'demo-marketer-001',
