@@ -24,10 +24,10 @@ import User from "../../assets/user.svg";
 
 const TABS = [
   { name: "index", icon: Discoveryiconlypro, label: "Explore", route: "/" },
-  { name: "deals", icon: Hotprice, label: "Deals/Offers", route: "/deals" },
-  { name: "messages", icon: Message01, label: "Messages", route: "/messages" },
-  { name: "notifications", icon: Notification02, label: "Notifications", route: "/notifications" },
-  { name: "profile", icon: User, label: "Profile", route: "/profile" },
+  { name: "deals", icon: Hotprice, label: "Deals/Offers", route: "/(tabs)/deals" },
+  { name: "messages", icon: Message01, label: "Messages", route: "/(tabs)/messages" },
+  { name: "notifications", icon: Notification02, label: "Notifications", route: "/(tabs)/notifications" },
+  { name: "profile", icon: User, label: "Profile", route: "/(tabs)/profile" },
 ];
 
 export default function TabLayout() {
@@ -42,9 +42,24 @@ export default function TabLayout() {
 
   // Sync activeIndex with current path
   React.useEffect(() => {
-    const currentTabIndex = TABS.findIndex(tab => tab.route === currentPath);
-    if (currentTabIndex !== -1 && currentTabIndex !== activeIndex) {
-      setActiveIndex(currentTabIndex);
+    let matchedIndex = -1;
+    
+    // Check for exact match first
+    if (currentPath === "/" || currentPath === "/(tabs)") {
+      matchedIndex = 0; // Explore tab
+    } else {
+      // Check other tabs
+      const currentTabIndex = TABS.findIndex(tab => 
+        currentPath === tab.route || 
+        currentPath === `/(tabs)/${tab.name}`
+      );
+      if (currentTabIndex !== -1) {
+        matchedIndex = currentTabIndex;
+      }
+    }
+    
+    if (matchedIndex !== -1 && matchedIndex !== activeIndex) {
+      setActiveIndex(matchedIndex);
     }
   }, [currentPath, activeIndex]);
 

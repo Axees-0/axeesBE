@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Filter Functionality Test</title>
+    <style>
+        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+        .test-panel { 
+            position: fixed; 
+            top: 20px; 
+            right: 20px; 
+            background: white; 
+            border: 2px solid #333; 
+            padding: 15px; 
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 300px;
+        }
+        .test-item { 
+            margin: 8px 0; 
+            padding: 8px; 
+            background: #f5f5f5; 
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        iframe { width: 100%; height: 90vh; border: 1px solid #ccc; }
+        button { 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            padding: 8px 12px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px; 
+        }
+        .status { font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="test-panel">
+        <div class="status">🔍 Filter Test Panel</div>
+        <div id="status">Loading...</div>
+        
+        <h4>Test Steps:</h4>
+        <div class="test-item">
+            1. ✅ Page loads
+        </div>
+        <div class="test-item">
+            2. 🔍 Click "Fashion" filter in sidebar
+        </div>
+        <div class="test-item">
+            3. 🎯 Should show only Emma Thompson
+        </div>
+        <div class="test-item">
+            4. 🔍 Click "Technology" filter
+        </div>
+        <div class="test-item">
+            5. 🎯 Should show Emma + Marcus
+        </div>
+        <div class="test-item">
+            6. 🧹 Click "Clear All Filters"
+        </div>
+        <div class="test-item">
+            7. 🎯 Should show all creators
+        </div>
+        
+        <button onclick="refreshTest()">Refresh Test</button>
+        <button onclick="testComplete()">Mark Complete</button>
+    </div>
+    
+    <iframe id="app" src="http://localhost:8081"></iframe>
+    
+    <script>
+        function refreshTest() {
+            document.getElementById('app').src = document.getElementById('app').src;
+            document.getElementById('status').textContent = 'Test refreshed - try the steps above';
+        }
+        
+        function testComplete() {
+            document.getElementById('status').innerHTML = '<span style="color: green;">✅ Filter functionality verified!</span>';
+        }
+        
+        // Set initial status
+        document.getElementById('status').textContent = 'Ready to test - follow steps in order';
+    </script>
+</body>
+</html>

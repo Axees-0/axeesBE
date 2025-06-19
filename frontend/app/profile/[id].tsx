@@ -9,6 +9,8 @@ import {
   Platform,
   useWindowDimensions,
   SafeAreaView,
+  TextInput,
+  Alert,
 } from 'react-native';
 import { Image } from 'expo-image';
 import { useLocalSearchParams, router } from 'expo-router';
@@ -47,6 +49,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
   // State
   const [activeTab, setActiveTab] = useState<'about' | 'portfolio' | 'rates'>('about');
   const [isContactModalVisible, setIsContactModalVisible] = useState(false);
+  const [contactMessage, setContactMessage] = useState('');
   const [isFavorited, setIsFavorited] = useState(false);
   const [isOfferModalVisible, setIsOfferModalVisible] = useState(false);
 
@@ -91,9 +94,16 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
           </View>
           
           <Text style={styles.inputLabel}>Message</Text>
-          <View style={[styles.input, styles.textArea]}>
-            <Text style={styles.inputPlaceholder}>Hi {creator.name}, I'm interested in working with you...</Text>
-          </View>
+          <TextInput
+            style={[styles.input, styles.textArea]}
+            placeholder={`Hi ${creator.name}, I'm interested in working with you...`}
+            placeholderTextColor="#999"
+            value={contactMessage}
+            onChangeText={setContactMessage}
+            multiline
+            numberOfLines={4}
+            textAlignVertical="top"
+          />
         </View>
 
         <View style={styles.modalActions}>
@@ -106,8 +116,39 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
           <TouchableOpacity 
             style={styles.modalSendBtn}
             onPress={() => {
+              if (!contactMessage.trim()) {
+                Alert.alert('Message Required', 'Please enter a message before sending.');
+                return;
+              }
+              
+              // Create chat ID for this conversation
+              const chatId = `chat-${id}-${Date.now()}`;
+              
+              // Close modal first
               setIsContactModalVisible(false);
-              // Show success feedback
+              setContactMessage('');
+              
+              // Show success and navigate to chat
+              Alert.alert(
+                'Message Sent!',
+                `Your message has been sent to ${creator.name}. You can continue the conversation in chat.`,
+                [
+                  {
+                    text: 'Open Chat',
+                    onPress: () => {
+                      router.push({
+                        pathname: '/chat/[id]',
+                        params: { 
+                          id: chatId,
+                          otherUserId: creator.id,
+                          otherUserName: creator.name
+                        }
+                      });
+                    }
+                  },
+                  { text: 'OK' }
+                ]
+              );
             }}
           >
             <Text style={styles.modalSendText}>Send Message</Text>

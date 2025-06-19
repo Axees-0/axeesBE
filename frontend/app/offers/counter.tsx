@@ -15,6 +15,8 @@ import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
+import { notificationService } from '@/services/notificationService';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -30,6 +32,7 @@ interface CounterOfferData {
 const CounterOfferPage: React.FC = () => {
   const { offerId } = useLocalSearchParams();
   const isWeb = Platform.OS === 'web';
+  const { user } = useAuth();
   
   const [counterData, setCounterData] = useState<CounterOfferData>({
     amount: '1800',
@@ -129,14 +132,23 @@ const CounterOfferPage: React.FC = () => {
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Send Counter Offer', 
-          onPress: () => {
+          onPress: async () => {
+            // Send notification to marketer (NOTIFY_M)
+            await notificationService.notifyMarketer('sarah-001', {
+              type: 'offer',
+              title: 'New Counter Offer Received',
+              message: `${user?.name || 'Creator'} sent a counter offer for ${originalOffer.offerType} - $${counterData.amount}`,
+              actionType: 'view_counter',
+              actionParams: { counterId: `counter-${Date.now()}`, offerId: originalOffer.id }
+            });
+            
             Alert.alert(
               'Counter Offer Sent!',
               'Your counter offer has been sent to the marketer. They will review and respond within 24-48 hours. You\'ll receive a notification when they respond.',
               [
                 { 
                   text: 'Back to Deals', 
-                  onPress: () => router.replace('/deals')
+                  onPress: () => router.replace('/(tabs)/deals')
                 }
               ]
             );
@@ -147,7 +159,23 @@ const CounterOfferPage: React.FC = () => {
   };
 
   const handleSaveDraft = () => {
-    Alert.alert('Draft Saved', 'Your counter offer has been saved as a draft. You can continue editing it later.');
+    // In a real app, this would save to backend
+    const draftId = `draft-${Date.now()}`;
+    
+    Alert.alert(
+      'Draft Saved',
+      'Your counter offer has been saved as a draft. You can continue editing it later from your deals page.',
+      [
+        {
+          text: 'Continue Editing',
+          style: 'cancel'
+        },
+        {
+          text: 'Go to Deals',
+          onPress: () => router.replace('/(tabs)/deals')
+        }
+      ]
+    );
   };
 
   return (

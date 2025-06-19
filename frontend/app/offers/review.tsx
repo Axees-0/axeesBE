@@ -178,7 +178,7 @@ const OfferReviewPage: React.FC = () => {
                   [
                     { 
                       text: 'Back to Deals', 
-                      onPress: () => router.replace('/deals')
+                      onPress: () => router.replace('/(tabs)/deals')
                     }
                   ]
                 );

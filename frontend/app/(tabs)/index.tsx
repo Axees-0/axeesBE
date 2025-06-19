@@ -13,8 +13,8 @@ import {
 
 import { Fragment, useState } from "react";
 
-import Mobile from "@/components/mobile";
-import Web from "@/components/web";
+import Mobile from "@/components/mobile/index";
+import Web from "@/components/web-static-old";
 import { WebSEO } from "../web-seo";
 import { useAuth } from "@/contexts/AuthContext";
 import { Color } from "@/GlobalStyles";
@@ -26,33 +26,9 @@ const BREAKPOINTS = {
 };
 const UFM01ResultsScreen = () => {
   const { width } = useWindowDimensions();
-  const { user, isLoading } = useAuth();
+  // const { user, isLoading } = useAuth();
   const isMobileScreen = width <= BREAKPOINTS.tablet;
   const isWeb = Platform.OS === "web";
-
-  if (isMobileScreen) {
-    return (
-      <Fragment>
-        <WebSEO 
-          title="Explore Creators & Influencers"
-          description="Discover and connect with top creators and influencers on Axees. Find the perfect match for your brand campaigns."
-          keywords="influencers, creators, brand partnerships, marketing, campaigns"
-        />
-        <Mobile />
-        {/* {isWeb && user?._id && <WebBottomTabs activeIndex={0} />} */}
-        {/* {!user?._id && (
-          <TouchableOpacity
-            style={styles.container}
-            onPress={() => {
-              router.push("/URM01CreateAccount");
-            }}
-          >
-            <Text style={styles.text}>Get Started</Text>
-          </TouchableOpacity>
-        )} */}
-      </Fragment>
-    );
-  }
 
   return (
     <>

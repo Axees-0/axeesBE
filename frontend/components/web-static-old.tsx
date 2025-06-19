@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Pressable } from 'react-native';
+import { Image } from 'expo-image';
 import { Color } from '@/GlobalStyles';
 import { router } from 'expo-router';
 
@@ -14,6 +15,7 @@ const Web = () => {
       bio: 'Fashion & Lifestyle Creator | Sustainable Fashion Advocate',
       tags: ['Fashion', 'Lifestyle'],
       avatar: 'ET',
+      avatarUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b47c?w=150&h=150&fit=crop&crop=face',
       location: 'Los Angeles'
     },
     {
@@ -24,6 +26,7 @@ const Web = () => {
       bio: 'Tech Reviewer | Smart Home Enthusiast | Future Tech Explorer',
       tags: ['Technology', 'Reviews'],
       avatar: 'MJ',
+      avatarUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
       location: 'New York'
     },
     {
@@ -34,7 +37,63 @@ const Web = () => {
       bio: 'Certified Personal Trainer | Nutrition Coach | Wellness Advocate',
       tags: ['Fitness', 'Health'],
       avatar: 'SR',
+      avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
       location: 'Miami'
+    },
+    {
+      id: 'creator-004',
+      name: 'Alex Chen',
+      handle: '@alexeats',
+      stats: '298K followers • 12.1% engagement',
+      bio: 'Food Blogger | Restaurant Reviews | Culinary Adventures',
+      tags: ['Food', 'Lifestyle'],
+      avatar: 'AC',
+      avatarUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+      location: 'San Francisco'
+    },
+    {
+      id: 'creator-005',
+      name: 'Zoe Williams',
+      handle: '@zoetravel',
+      stats: '421K followers • 9.3% engagement',
+      bio: 'Travel Influencer | Adventure Seeker | Cultural Explorer',
+      tags: ['Travel', 'Adventure'],
+      avatar: 'ZW',
+      avatarUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
+      location: 'Seattle'
+    },
+    {
+      id: 'creator-006',
+      name: 'David Kim',
+      handle: '@davidfit',
+      stats: '167K followers • 11.8% engagement',
+      bio: 'Fitness Coach | Nutrition Expert | Transformation Specialist',
+      tags: ['Fitness', 'Health'],
+      avatar: 'DK',
+      avatarUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+      location: 'Austin'
+    },
+    {
+      id: 'creator-007',
+      name: 'Maya Patel',
+      handle: '@mayabeauty',
+      stats: '523K followers • 8.7% engagement',
+      bio: 'Beauty Guru | Makeup Artist | Skincare Enthusiast',
+      tags: ['Beauty', 'Lifestyle'],
+      avatar: 'MP',
+      avatarUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
+      location: 'Chicago'
+    },
+    {
+      id: 'creator-008',
+      name: 'Jake Miller',
+      handle: '@jaketech',
+      stats: '289K followers • 10.4% engagement',
+      bio: 'Tech YouTuber | Gadget Reviews | Gaming Content Creator',
+      tags: ['Technology', 'Gaming'],
+      avatar: 'JM',
+      avatarUrl: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face',
+      location: 'Portland'
     }
   ];
 
@@ -42,7 +101,7 @@ const Web = () => {
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [filteredCreators, setFilteredCreators] = useState(creators);
 
-  const availableFilters = ['Fashion', 'Technology', 'Fitness', 'Lifestyle'];
+  const availableFilters = ['Fashion', 'Technology', 'Fitness', 'Lifestyle', 'Food', 'Travel', 'Adventure', 'Beauty', 'Gaming', 'Health'];
 
   const toggleFilter = (filter: string) => {
     const newFilters = selectedFilters.includes(filter)
@@ -165,9 +224,12 @@ const Web = () => {
               style={styles.creatorCard}
               onPress={() => router.push(`/profile/${creator.id}`)}
             >
-              <View style={styles.creatorAvatar}>
-                <Text style={styles.avatarText}>{creator.avatar}</Text>
-              </View>
+              <Image
+                style={styles.creatorAvatar}
+                source={creator.avatarUrl || require("@/assets/empty-image.png")}
+                placeholder={require("@/assets/empty-image.png")}
+                contentFit="cover"
+              />
               <Text style={styles.creatorName}>{creator.name}</Text>
               <Text style={styles.creatorHandle}>{creator.handle}</Text>
               <Text style={styles.creatorStats}>{creator.stats}</Text>
@@ -350,15 +412,9 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: Color.cSK430B92500,
-    justifyContent: 'center',
-    alignItems: 'center',
     marginBottom: 16,
-  },
-  avatarText: {
-    color: 'white',
-    fontSize: 24,
-    fontWeight: 'bold',
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
   },
   creatorName: {
     fontSize: 20,

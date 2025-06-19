@@ -39,6 +39,7 @@ const ProofUploadPage: React.FC = () => {
   });
 
   const [uploadedScreenshots, setUploadedScreenshots] = useState<string[]>([]);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Demo milestone data
   const milestone = {
@@ -237,21 +238,78 @@ const ProofUploadPage: React.FC = () => {
               </TouchableOpacity>
 
               {uploadedScreenshots.length > 0 && (
+                <View style={styles.proofSummary}>
+                  <Text style={styles.proofSummaryText}>
+                    {uploadedScreenshots.length} proof{uploadedScreenshots.length !== 1 ? 's' : ''} uploaded
+                  </Text>
+                  <Text style={styles.proofSummaryHint}>
+                    Tap thumbnails to preview engagement metrics
+                  </Text>
+                </View>
+              )}
+
+              {uploadedScreenshots.length > 0 && (
                 <View style={styles.screenshotsContainer}>
-                  {uploadedScreenshots.map((fileName, index) => (
-                    <View key={index} style={styles.screenshotItem}>
-                      <View style={styles.screenshotPreview}>
-                        <Text style={styles.screenshotIcon}>📱</Text>
-                        <Text style={styles.screenshotName}>{fileName}</Text>
+                  <View style={styles.screenshotsGrid}>
+                    {uploadedScreenshots.map((fileName, index) => (
+                      <View key={index} style={styles.screenshotThumbnail}>
+                        <TouchableOpacity 
+                          style={styles.screenshotImageWrapper}
+                          onPress={() => {
+                            // Enhanced demo: Show engagement metrics based on screenshot type
+                            let message = `Viewing: ${fileName}\n\n`;
+                            
+                            if (fileName.includes('post')) {
+                              message += '📊 Engagement Metrics:\n';
+                              message += '❤️ Likes: 2,847\n';
+                              message += '💬 Comments: 134\n';
+                              message += '🔄 Shares: 89\n';
+                              message += '👁️ Reach: 15,234';
+                            } else if (fileName.includes('story')) {
+                              message += '📊 Story Metrics:\n';
+                              message += '👁️ Views: 4,521\n';
+                              message += '⬆️ Link Clicks: 234\n';
+                              message += '💬 Replies: 67';
+                            } else if (fileName.includes('analytics')) {
+                              message += '📈 Performance:\n';
+                              message += '📊 Engagement Rate: 8.7%\n';
+                              message += '📈 Above Average by: +3.2%\n';
+                              message += '🎯 Target Audience Reached: 89%';
+                            }
+                            
+                            Alert.alert('Proof Preview', message);
+                          }}
+                        >
+                          {/* Demo: Show different icons based on screenshot type */}
+                          <View style={styles.placeholderImage}>
+                            <Text style={styles.placeholderIcon}>
+                              {fileName.includes('post') ? '📱' : 
+                               fileName.includes('story') ? '📖' :
+                               fileName.includes('analytics') ? '📊' :
+                               fileName.includes('engagement') ? '💬' :
+                               fileName.includes('comments') ? '💭' : '📷'}
+                            </Text>
+                            <Text style={styles.placeholderText}>
+                              {fileName.includes('post') ? 'Post' : 
+                               fileName.includes('story') ? 'Story' :
+                               fileName.includes('analytics') ? 'Analytics' :
+                               fileName.includes('engagement') ? 'Metrics' :
+                               fileName.includes('comments') ? 'Comments' : 'Preview'}
+                            </Text>
+                          </View>
+                        </TouchableOpacity>
+                        <TouchableOpacity 
+                          onPress={() => handleRemoveScreenshot(fileName)}
+                          style={styles.thumbnailRemoveButton}
+                        >
+                          <Text style={styles.removeButtonText}>×</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.thumbnailFileName} numberOfLines={1}>
+                          {fileName}
+                        </Text>
                       </View>
-                      <TouchableOpacity 
-                        onPress={() => handleRemoveScreenshot(fileName)}
-                        style={styles.removeButton}
-                      >
-                        <Text style={styles.removeButtonText}>×</Text>
-                      </TouchableOpacity>
-                    </View>
-                  ))}
+                    ))}
+                  </View>
                 </View>
               )}
             </View>
@@ -575,6 +633,77 @@ const styles = StyleSheet.create({
   },
   disabledButtonText: {
     color: '#999',
+  },
+  // Visual gallery styles
+  screenshotsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 8,
+  },
+  screenshotThumbnail: {
+    width: Platform.OS === 'web' ? 150 : 100,
+    alignItems: 'center',
+  },
+  screenshotImageWrapper: {
+    width: Platform.OS === 'web' ? 150 : 100,
+    height: Platform.OS === 'web' ? 150 : 100,
+    borderRadius: 8,
+    overflow: 'hidden',
+    backgroundColor: '#f0f0f0',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    position: 'relative',
+  },
+  placeholderImage: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f8f9fa',
+  },
+  placeholderIcon: {
+    fontSize: 32,
+    marginBottom: 4,
+  },
+  placeholderText: {
+    fontSize: 12,
+    color: '#666',
+  },
+  thumbnailRemoveButton: {
+    position: 'absolute',
+    top: 4,
+    right: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: 'rgba(220, 53, 69, 0.9)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  thumbnailFileName: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 4,
+    textAlign: 'center',
+    width: '100%',
+  },
+  proofSummary: {
+    backgroundColor: '#E8F5E9',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 12,
+    marginBottom: 8,
+  },
+  proofSummaryText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#2E7D32',
+    marginBottom: 4,
+  },
+  proofSummaryHint: {
+    fontSize: 12,
+    color: '#388E3C',
   },
 });
 

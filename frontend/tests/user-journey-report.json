@@ -1,0 +1,110 @@
+{
+  "timestamp": "2025-06-19T01:11:38.873Z",
+  "journeys": {
+    "Marketer: Complete Offer Flow": {
+      "name": "Marketer: Complete Offer Flow",
+      "totalSteps": 5,
+      "passedSteps": 5,
+      "failedSteps": 0,
+      "steps": {
+        "marketer-login": {
+          "success": true,
+          "message": "Screen exists with all 4 required elements"
+        },
+        "marketer-dashboard": {
+          "success": true,
+          "message": "Navigation from Marketer Login properly configured"
+        },
+        "creator-profile": {
+          "success": true,
+          "message": "Navigation from View Dashboard properly configured"
+        },
+        "create-offer": {
+          "success": true,
+          "message": "All 4 data transformations present"
+        },
+        "send-offer": {
+          "success": true,
+          "message": "All 2 integration triggers configured"
+        }
+      },
+      "flowIntegrity": true
+    },
+    "Creator: Accept Offer Flow": {
+      "name": "Creator: Accept Offer Flow",
+      "totalSteps": 4,
+      "passedSteps": 4,
+      "failedSteps": 0,
+      "steps": {
+        "creator-notification": {
+          "success": true,
+          "message": "Screen exists with all 3 required elements"
+        },
+        "review-offer": {
+          "success": true,
+          "message": "Navigation from Receive Notification properly configured"
+        },
+        "accept-offer": {
+          "success": true,
+          "message": "All 3 integration triggers configured"
+        },
+        "chat-created": {
+          "success": true,
+          "message": "Navigation from Accept Offer properly configured"
+        }
+      },
+      "flowIntegrity": true
+    },
+    "End-to-End Deal Flow": {
+      "name": "End-to-End Deal Flow",
+      "totalSteps": 4,
+      "passedSteps": 4,
+      "failedSteps": 0,
+      "steps": {
+        "deal-active": {
+          "success": true,
+          "message": "Screen exists with all 3 required elements"
+        },
+        "fund-milestone": {
+          "success": true,
+          "message": "All 3 integration triggers configured"
+        },
+        "work-submission": {
+          "success": true,
+          "message": "Navigation from Fund Milestone properly configured"
+        },
+        "payment-release": {
+          "success": true,
+          "message": "Navigation from Submit Work properly configured"
+        }
+      },
+      "flowIntegrity": true
+    },
+    "Counter-Offer Negotiation": {
+      "name": "Counter-Offer Negotiation",
+      "totalSteps": 3,
+      "passedSteps": 3,
+      "failedSteps": 0,
+      "steps": {
+        "create-counter": {
+          "success": true,
+          "message": "Screen exists with all 4 required elements"
+        },
+        "marketer-notified": {
+          "success": true,
+          "message": "Screen exists with all 3 required elements"
+        },
+        "handle-counter": {
+          "success": true,
+          "message": "Navigation from Marketer Receives Alert properly configured"
+        }
+      },
+      "flowIntegrity": true
+    }
+  },
+  "summary": {
+    "totalJourneys": 4,
+    "passedJourneys": 4,
+    "failedJourneys": 0
+  }
+}

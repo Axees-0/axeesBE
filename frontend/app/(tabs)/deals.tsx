@@ -347,7 +347,7 @@ const UOM08MarketerDealHistoryList = () => {
           <TouchableOpacity 
             style={styles.exploreButton}
             onPress={() => {
-              // Navigate to explore page to create new offers
+              router.push('/(tabs)');
             }}
           >
             <Text style={styles.exploreButtonText}>Explore More Creators</Text>

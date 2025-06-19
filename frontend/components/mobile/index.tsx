@@ -307,14 +307,34 @@ const AIBanner = ({ showSecond }: { showSecond: boolean }) => {
   const { data, isLoading, isFetchingNextPage, fetchNextPage, hasNextPage } =
     useInfiniteQuery({
       initialPageParam: null, // ✅ Add this line
-      queryKey: ["find", tags.join(",")],
+      queryKey: ["find", tags.join(","), submitted],
       queryFn: async ({ pageParam = null }) => {
         // Return demo data in demo mode
         if (DEMO_MODE) {
+          let filteredCreators = DemoData.creators;
+          
+          // Filter by name, location, or category if search term exists
+          if (submitted) {
+            const searchLower = submitted.toLowerCase();
+            filteredCreators = DemoData.creators.filter(creator => {
+              // Check name
+              if (creator.name.toLowerCase().includes(searchLower)) return true;
+              // Check location
+              if (creator.location && creator.location.toLowerCase().includes(searchLower)) return true;
+              // Check username
+              if (creator.userName && creator.userName.toLowerCase().includes(searchLower)) return true;
+              // Check categories
+              if (creator.creatorData?.categories?.some(cat => 
+                cat.toLowerCase().includes(searchLower)
+              )) return true;
+              return false;
+            });
+          }
+          
           return {
-            items: DemoData.creators,
+            items: filteredCreators,
             nextCursor: null,
-            total: DemoData.creators.length
+            total: filteredCreators.length
           };
         }
         
@@ -689,7 +709,7 @@ const chipTags = useMemo(() => {
             }}
             returnKeyType="search"
             style={styles.searchInput}
-            placeholder="Search creators…"
+            placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
             placeholderTextColor="#888"
           />
           {showClearButton && (

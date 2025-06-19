@@ -10,9 +10,11 @@ import {
   ActivityIndicator,
   Dimensions,
   Platform,
-  ViewStyle
+  ViewStyle,
+  TextInput
 } from "react-native";
 import Arrowdown01 from "@/assets/arrowdown01.svg";
+import Search01 from "@/assets/search01.svg";
 import Zap from "@/assets/zap.svg";
 
 import {
@@ -281,16 +283,36 @@ const {
   error,
 } = useInfiniteQuery<FindPage, Error, FindPage, [string, string, string?]>({
   /* unique cache-key for this search */
-  queryKey: ['find', normalizedTags.join(','), user?._id],
+  queryKey: ['find', normalizedTags.join(','), submittedSearch, user?._id],
 
   /* first page = DB only */
   queryFn : async ({ pageParam = null }) => {
     // Return demo data in demo mode
     if (DEMO_MODE) {
+      let filteredCreators = DemoData.creators;
+      
+      // Filter by name, location, or category if search term exists
+      if (submittedSearch) {
+        const searchLower = submittedSearch.toLowerCase();
+        filteredCreators = DemoData.creators.filter(creator => {
+          // Check name
+          if (creator.name.toLowerCase().includes(searchLower)) return true;
+          // Check location
+          if (creator.location && creator.location.toLowerCase().includes(searchLower)) return true;
+          // Check username
+          if (creator.userName && creator.userName.toLowerCase().includes(searchLower)) return true;
+          // Check categories
+          if (creator.creatorData?.categories?.some(cat => 
+            cat.toLowerCase().includes(searchLower)
+          )) return true;
+          return false;
+        });
+      }
+      
       return {
-        items: DemoData.creators,
+        items: filteredCreators,
         nextCursor: null,
-        total: DemoData.creators.length
+        total: filteredCreators.length
       } as FindPage;
     }
     
@@ -551,45 +573,43 @@ const isAIRequestActive =
         />
 
         <View style={styles.frameParent2}>
-          <View style={[styles.jordanRiversParent, styles.parentFlexBox]}>
-            <Text style={[styles.jordanRivers, styles.categoryTypo]}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.jordanRivers}>
               {usr.name || "No Name"}
             </Text>
-            <View
-              style={[styles.availableParent, styles.foodWrapperSpaceBlock]}
-            >
-              <Text style={[styles.available, styles.foodTypo]}>
-                {usr.isActive ? "Available" : "Available"}
+            <View style={styles.availableParent}>
+              <Text style={styles.available}>
+                Available
               </Text>
-              <Zap width={24} height={24} />
+              <Zap width={16} height={16} color="#10b981" />
             </View>
           </View>
-          <View style={[styles.followersParent, styles.parentFlexBox]}>
-            <Text style={[styles.searchCategoryTags, styles.categoryTypo]}>
-              Followers
-            </Text>
-            {/* Suppose we show totalFollowers if user is a Creator */}
-            <Text style={[styles.m, styles.mTypo]}>
-              {usr.creatorData?.totalFollowers
-                ? usr.creatorData.totalFollowers >= 1000000
-                  ? `${(usr.creatorData.totalFollowers / 1000000).toFixed(1)}M`
-                  : usr.creatorData.totalFollowers >= 1000
-                  ? `${(usr.creatorData.totalFollowers / 1000).toFixed(1)}K`
-                  : usr.creatorData.totalFollowers
-                : 0}
-            </Text>
-          </View>
-          <View style={[styles.followersParent, styles.parentFlexBox]}>
-            <Text style={[styles.searchCategoryTags, styles.categoryTypo]}>
-              Avg Price.
-            </Text>
-            <Text style={[styles.m, styles.mTypo]}>
-  {calculateAverageOfferPrice(usr.creatorData?.platforms).toLocaleString("en-US", {
-    style: "currency",
-    currency: "USD",
-  })}
-</Text>
-
+          <View style={styles.statsContainer}>
+            <View style={styles.statItem}>
+              <Text style={styles.searchCategoryTags}>
+                Followers
+              </Text>
+              <Text style={styles.m}>
+                {usr.creatorData?.totalFollowers
+                  ? usr.creatorData.totalFollowers >= 1000000
+                    ? `${(usr.creatorData.totalFollowers / 1000000).toFixed(1)}M`
+                    : usr.creatorData.totalFollowers >= 1000
+                    ? `${(usr.creatorData.totalFollowers / 1000).toFixed(1)}K`
+                    : usr.creatorData.totalFollowers
+                  : "0"}
+              </Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={styles.searchCategoryTags}>
+                Avg Price
+              </Text>
+              <Text style={styles.m}>
+                {calculateAverageOfferPrice(usr.creatorData?.platforms).toLocaleString("en-US", {
+                  style: "currency",
+                  currency: "USD",
+                })}
+              </Text>
+            </View>
           </View>
           <View style={styles.twitterIconTransparent1Parent}>
             {usr.creatorData?.platforms?.map((platform: any) => (
@@ -620,7 +640,7 @@ const isAIRequestActive =
                       styles.iconPosition1,
                     ]}
                     contentFit="contain"
-                    source={require("@/assets/transparenttiktoklogoblackandwhitelogotiktokappminimaminimalistblackandwhitetiktokapp1711004158896-12.png")}
+                    source={require("@/assets/transparenttiktoklogoblackandwhitelogotiktokappminimaminimalistblackandwhitetiktokapp1711004158896-12 copy.png")}
                   />
                 )}
                 {(platform.platform == "instagram" || platform.platform == "Instagram") && (
@@ -630,7 +650,7 @@ const isAIRequestActive =
                       styles.iconPosition1,
                     ]}
                     contentFit="contain"
-                    source={require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-12.png")}
+                    source={require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-12 copy.png")}
                   />
                 )}
 
@@ -660,9 +680,9 @@ const isAIRequestActive =
           </View>
         </View>
 
-        <View style={[styles.frameParent3, styles.frameFlexBox]}>
+        <View style={styles.cardActions}>
          <TouchableOpacity
-            style={[styles.joinWrapper, styles.parentSpaceBlock]}
+            style={styles.primaryButton}
             onPress={(e) => {
               e.stopPropagation?.();
               if (Platform.OS === 'web') {
@@ -672,11 +692,11 @@ const isAIRequestActive =
               }
             }}
           >
-            <Text style={[styles.join, styles.categoryTypo]}>View Profile</Text>
+            <Text style={styles.primaryButtonText}>View Profile</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.shareParent, styles.shareParentBorder]}
+            style={styles.secondaryButton}
             onPress={(e) => {
               e.stopPropagation?.();
               setIsShareModalVisible(true);
@@ -686,28 +706,16 @@ const isAIRequestActive =
               }
             }}
           >
-            <Text style={[styles.signIn, styles.signInClr]}>Share</Text>
             <Image
               source={require("@/assets/share-08.png")}
-              style={{ width: 24, height: 24 }}
+              style={{ width: 18, height: 18, tintColor: "#64748b" }}
             />
           </TouchableOpacity>
         </View>
-        <View
-          style={[
-            { flexDirection: "row", gap: 10, marginBottom: 20 },
-            styles.foodWrapper,
-          ]}
-        >
-          {categories?.map((cat: string) => (
-            <View
-              key={cat}
-              style={[
-                styles.foodWrapperSpaceBlock,
-                { backgroundColor: Color.colorLimegreen_200 },
-              ]}
-            >
-              <Text style={[styles.food, styles.mTypo]}>{cat}</Text>
+        <View style={styles.categoriesContainer}>
+          {categories?.slice(0, 3).map((cat: string) => (
+            <View key={cat} style={styles.foodWrapper}>
+              <Text style={styles.food}>{cat}</Text>
             </View>
           ))}
         </View>
@@ -720,14 +728,14 @@ const isAIRequestActive =
     e.stopPropagation?.();
     toggleFavorite.mutate(usr._id);
   }}
-  style={{ position: 'absolute', top: 10, right: 10 }}
+  style={styles.favoriteButton}
 >
   <Image
-    style={{ width: 24, height: 24 }}
+    style={styles.favoriteIcon}
     source={
       favNow
-        ? require('@/assets/heart-red.png')   // filled heart
-        : require('@/assets/icons.png')       // empty heart / outline
+        ? require('@/assets/heart-red.png')
+        : require('@/assets/icons.png')
     }
   />
 </Pressable>
@@ -769,73 +777,103 @@ const isAIRequestActive =
   );
 
 
-const renderListHeader = hasItems ? () => (
+const renderListHeader = () => (
   <View style={{ width: '100%', marginBottom: 20 }}>
+    
+    {/* Search input for better visibility */}
+    <View style={styles.inlineSearchContainer}>
+      <View style={styles.inlineSearchBar}>
+        <Search01 width={20} height={20} color={Color.cSK430B92950} />
+        <TextInput
+          value={searchText}
+          onChangeText={setSearchText}
+          onSubmitEditing={onSubmitSearch}
+          placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
+          placeholderTextColor={Color.cSK430B92950}
+          style={styles.inlineSearchInput}
+          returnKeyType="search"
+        />
+        {searchText.length > 0 && (
+          <Pressable 
+            onPress={() => {
+              setSearchText("");
+              setSubmittedSearch("");
+              setSelectedTag(null);
+            }}
+            style={styles.clearButton}
+          >
+            <Text style={styles.clearButtonText}>×</Text>
+          </Pressable>
+        )}
+      </View>
+    </View>
 
     {/* tag chips row */}
     {renderTagChips()}
-    {/* row: heading + filter */}
-    <View
-      style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 25,
-        marginBottom: 10,
-      }}
-    >
-      <Text
+    
+    {/* Only show heading and filter when there are items */}
+    {hasItems && (
+      <View
         style={{
-          fontFamily : FontFamily.inter,
-          fontSize   : FontSize.size_5xl,
-          fontWeight : '600',
-          color      : Color.cSK430B92950,
-        }}
-      >
-        Search Results
-      </Text>
-
-      {/* tiny pseudo-dropdown */}
-      <Pressable
-        onPress={() =>
-          setSortOrder(o =>
-            o === 'hi-low'
-              ? 'low-hi'
-              : o === 'low-hi'
-              ? 'none'
-              : 'hi-low')
-        }
-        style={{
-          flexDirection     : 'row',
-          alignItems        : 'center',
-          borderWidth       : 1,
-          borderColor       : Color.cSK430B92500,
-          borderRadius      : 8,
-          paddingVertical   : 6,
-          paddingHorizontal : 12,
-          gap               : 6,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          paddingHorizontal: 25,
+          marginBottom: 10,
         }}
       >
         <Text
           style={{
             fontFamily : FontFamily.inter,
-            fontSize   : FontSize.size_sm,
-            color      : Color.cSK430B92500,
+            fontSize   : FontSize.size_5xl,
+            fontWeight : '600',
+            color      : Color.cSK430B92950,
           }}
         >
-          {sortOrder === 'none'
-            ? 'Sort by'
-            : sortOrder === 'hi-low'
-            ? 'Highest → Lowest'
-            : 'Lowest → Highest'}
+          Search Results
         </Text>
-        <Arrowdown01 width={14} height={14} />
-      </Pressable>
-    </View>
 
+        {/* tiny pseudo-dropdown */}
+        <Pressable
+          onPress={() =>
+            setSortOrder(o =>
+              o === 'hi-low'
+                ? 'low-hi'
+                : o === 'low-hi'
+                ? 'none'
+                : 'hi-low')
+          }
+          style={{
+            flexDirection     : 'row',
+            alignItems        : 'center',
+            borderWidth       : 1,
+            borderColor       : Color.cSK430B92500,
+            borderRadius      : 8,
+            paddingVertical   : 6,
+            paddingHorizontal : 12,
+            gap               : 6,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily : FontFamily.inter,
+              fontSize   : FontSize.size_sm,
+              color      : Color.cSK430B92500,
+            }}
+          >
+            {sortOrder === 'none'
+              ? 'Sort by'
+              : sortOrder === 'hi-low'
+              ? 'Highest → Lowest'
+              : 'Lowest → Highest'}
+          </Text>
+          <Arrowdown01 width={14} height={14} />
+        </Pressable>
+      </View>
+    )}
     
   </View>
-) : null;
+);
 
 
 const isLoadingFirstPage =
@@ -890,6 +928,7 @@ const renderEmpty = () => {
       <View style={{ flex: 1 }}>
         
         <View style={[styles.axeesMockup2 as ViewStyle, { paddingHorizontal: "0%" }]}>
+          
           <FlatList
             data={sortedData}
             extraData={sortOrder}
@@ -902,12 +941,17 @@ const renderEmpty = () => {
             columnWrapperStyle={{
               flexDirection: 'row',
               flexWrap    : 'wrap',
-              gap         : CARD_GAP,        // your card marginBottom is 20
-              paddingHorizontal: 40,
-              /* <-- add this line again */
-              justifyContent: 'space-between',
+              gap         : CARD_GAP,
+              paddingHorizontal: 20,
+              justifyContent: 'flex-start',
+              alignItems: 'flex-start',
             }}
-            contentContainerStyle={{ paddingBottom: 150, paddingHorizontal: "10%" }}
+            contentContainerStyle={{ 
+              paddingBottom: 80, 
+              paddingTop: 20,
+              paddingHorizontal: 20,
+              flexGrow: 1,
+            }}
             scrollEnabled={true}
             style={{ flexGrow: 1, width: "100%" }}
             onEndReached={() => {
@@ -1134,9 +1178,10 @@ skeletonFooter: {
     height: 60,
   },
   searchCategoryTags: {
-    opacity: 0.5,
-    color: Color.cSK430B92950,
-    fontSize: FontSize.size_lg,
+    color: "#64748b",
+    fontSize: 14,
+    fontFamily: FontFamily.inter,
+    fontWeight: "500",
   },
   search01Parent: {
     borderColor: Color.colorPlum,
@@ -1200,23 +1245,34 @@ skeletonFooter: {
     gap: Gap.gap_4xs,
   },
   frameChild: {
-    borderRadius: Border.br_xl,
-    width: 131,
-    height: 131,
-    zIndex: 0,
+    borderRadius: 12,
+    width: 80,
+    height: 80,
+    marginBottom: 16,
   },
   jordanRivers: {
-    fontSize: FontSize.size_xl,
-    fontWeight: "500",
-    color: Color.cSK430B92950,
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#1e293b",
+    marginBottom: 4,
+    fontFamily: FontFamily.inter,
   },
   available: {
-    color: Color.cSK430B92500,
+    color: "#10b981",
     textAlign: "center",
+    fontSize: 12,
+    fontWeight: "600",
   },
   availableParent: {
-    backgroundColor: Color.cSK430B9250,
-    gap: Gap.gap_4xs,
+    backgroundColor: "#d1fae5",
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    alignSelf: "flex-start",
+    marginBottom: 12,
   },
   jordanRiversParent: {
     flexWrap: "wrap",
@@ -1224,13 +1280,16 @@ skeletonFooter: {
     gap: 5,
   },
   m: {
-    fontSize: FontSize.size_5xl,
-    color: Color.cSK430B92950,
+    fontSize: 18,
+    color: "#1e293b",
     fontFamily: FontFamily.inter,
+    fontWeight: "600",
   },
   followersParent: {
-    height: 29,
     justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 8,
+    paddingVertical: 4,
   },
   twitterIconTransparent1: {
     left: 43,
@@ -1250,9 +1309,7 @@ skeletonFooter: {
     marginLeft: "10%",
   },
   frameParent2: {
-    justifyContent: "flex-end",
-    gap: Gap.gap_5xs,
-    zIndex: 1,
+    flex: 1,
     width: "100%",
   },
   shareParent: {
@@ -1263,15 +1320,18 @@ skeletonFooter: {
     zIndex: 2,
   },
   food: {
-    color: Color.colorLimegreen_100,
-    fontSize: FontSize.size_sm,
+    color: "#3b82f6",
+    fontSize: 12,
     fontFamily: FontFamily.inter,
+    fontWeight: "500",
   },
   foodWrapper: {
-    top: 16,
-    left: 24,
-    zIndex: 3,
-    position: "absolute",
+    backgroundColor: "#dbeafe",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+    marginRight: 6,
+    marginBottom: 4,
   },
   icons: {
     top: 19,
@@ -1280,21 +1340,25 @@ skeletonFooter: {
     position: "absolute",
   },
   rectangleParent: {
-    borderRadius: Border.br_5xl,
-    paddingTop: Padding.p_29xl,
-    paddingBottom: Padding.p_5xl,
-    paddingHorizontal: Padding.p_5xl,
-    gap: Gap.gap_lg,
-    backgroundColor: Color.buttonSelectable,
+    borderRadius: 16,
+    padding: 24,
+    backgroundColor: "white",
     // ---- width -----------------------------------------------------------
-    // RN-web accepts any valid CSS string – tell TS to chill once
     // @ts-ignore
     flexBasis : Platform.OS === 'web'
       ? `calc((100% - ${(COLS - 1) * CARD_GAP}px) / ${COLS})`
-      : '33%',                 // native: plain percentage is fine
+      : '33%',
     minWidth  : 300,
-
-    marginBottom : 20,
+    maxWidth  : 380,
+    marginBottom : 24,
+    borderWidth: 1,
+    borderColor: "#f1f5f9",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 4,
+    position: "relative", // Ensure proper stacking
   },
   cardPressed: {
     opacity: 0.95,
@@ -1397,10 +1461,10 @@ skeletonFooter: {
     backgroundColor: Color.cSK430B92500,
   },
   axeesMockup2: {
-    backgroundColor: Color.white,
+    backgroundColor: "#f8fafc",
     flex: 1,
-    width: "100%",    
-    overflow: "visible",
+    width: "100%",
+    minHeight: "100vh",
   },
   
   paginationContainer: {
@@ -1429,35 +1493,36 @@ skeletonFooter: {
   },
 
 
-  // Tag chips container
+  // Tag chips container - cleaned up
   tagChipsContainer: {
-    paddingHorizontal: 25,
-    paddingVertical: 10,
-    gap: 10,    
-    maxHeight:70,    
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    gap: 8,
+    marginBottom: 16,
   },
 
-  // Tag chip
+  // Tag chip - improved spacing
   tagChip: {
-    backgroundColor: Color.colorLimegreen_200,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 12,
-    minHeight: 40,
+    backgroundColor: "#f8f9fa",
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
     alignItems: "center",
     justifyContent: "center",
-    margin: 5,
+    borderWidth: 1,
+    borderColor: "#e9ecef",
   },
 
-  // Selected tag chip
+  // Selected tag chip - better contrast
   selectedTagChip: {
     backgroundColor: Color.cSK430B92500,
+    borderColor: Color.cSK430B92500,
   },
 
-  // Tag chip text
+  // Tag chip text - better readability
   tagChipText: {
-    color: Color.colorLimegreen_100,
-    fontSize: FontSize.size_sm,
+    color: "#495057",
+    fontSize: 14,
     fontFamily: FontFamily.inter,
     fontWeight: "500",
     textAlign: "center",
@@ -1466,6 +1531,128 @@ skeletonFooter: {
   // Selected tag chip text
   selectedTagChipText: {
     color: Color.white,
+  },
+  // Inline search styles - cleaner design
+  inlineSearchContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 20,
+  },
+  inlineSearchBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: "#e1e5e9",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  inlineSearchInput: {
+    flex: 1,
+    marginLeft: 12,
+    fontSize: 16,
+    color: "#2d3748",
+    fontFamily: FontFamily.inter,
+    outlineStyle: "none", // Remove web outline
+  },
+  clearButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#e2e8f0",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 8,
+  },
+  clearButtonText: {
+    color: "#64748b",
+    fontSize: 16,
+    fontWeight: "600",
+    lineHeight: 16,
+  },
+
+  // New clean card layout styles
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-start",
+    marginBottom: 16,
+  },
+
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 16,
+    paddingHorizontal: 4,
+  },
+
+  statItem: {
+    flex: 1,
+    alignItems: "center",
+  },
+
+  cardActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+    marginBottom: 16,
+  },
+
+  primaryButton: {
+    backgroundColor: Color.cSK430B92500,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    flex: 1,
+    marginRight: 8,
+  },
+
+  primaryButtonText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "600",
+    textAlign: "center",
+    fontFamily: FontFamily.inter,
+  },
+
+  secondaryButton: {
+    backgroundColor: "#f1f5f9",
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  categoriesContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    marginBottom: 12,
+  },
+
+  favoriteButton: {
+    position: "absolute",
+    top: 16,
+    right: 16,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+
+  favoriteIcon: {
+    width: 20,
+    height: 20,
   },
 });
 

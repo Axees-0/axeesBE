@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Viewer</title>
+    <style>
+        body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+        iframe { width: 100%; height: 80vh; border: 1px solid #ccc; }
+        .info { margin-bottom: 20px; padding: 10px; background: #f0f0f0; }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h2>Debug Viewer - Port 8081</h2>
+        <p>This page shows the current state of localhost:8081</p>
+        <p>If you see a red background with white text, React is working.</p>
+        <p>If you see a blank white page, React is not mounting.</p>
+        <button onclick="document.getElementById('app-frame').src=document.getElementById('app-frame').src">Refresh</button>
+    </div>
+    <iframe id="app-frame" src="http://localhost:8081"></iframe>
+</body>
+</html>

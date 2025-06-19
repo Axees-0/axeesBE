@@ -70,7 +70,7 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
         if (selectedRole === 'creator') {
           router.replace('/(tabs)/deals');
         } else {
-          router.replace('/(tabs)/'); // Index route is the explore page
+          router.replace('/'); // Root route is the explore page
         }
         
         onClose();
@@ -94,7 +94,7 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
               if (selectedRole === 'creator') {
                 router.replace('/(tabs)/deals');
               } else {
-                router.replace('/(tabs)/'); // Index route is the explore page
+                router.replace('/'); // Root route is the explore page
               }
               
               onClose();

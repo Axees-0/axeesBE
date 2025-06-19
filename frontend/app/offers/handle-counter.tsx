@@ -119,13 +119,18 @@ const HandleCounterOfferPage: React.FC = () => {
                 
                 Alert.alert(
                   'Counter Offer Accepted!',
-                  'The deal is now active. A chat room has been created for communication.',
+                  'Great! Let\'s set up milestones for this deal.',
                   [
                     { 
-                      text: 'View Deal', 
+                      text: 'Set Up Milestones', 
                       onPress: () => router.replace({
-                        pathname: '/deals/[id]',
-                        params: { id: `DEAL-${Date.now()}` }
+                        pathname: '/milestones/setup',
+                        params: { 
+                          dealId: `DEAL-${Date.now()}`,
+                          totalAmount: counterOffer.counterOffer.amount.toString(),
+                          offerTitle: counterOffer.originalOffer.offerType,
+                          creatorName: counterOffer.creator.name
+                        }
                       })
                     }
                   ]
@@ -169,10 +174,45 @@ const HandleCounterOfferPage: React.FC = () => {
         break;
         
       case 'negotiate':
-        // In a real app, this would open a negotiation interface
         Alert.alert(
           'Continue Negotiation',
-          'This would open a chat or allow you to send another counter offer.'
+          'How would you like to proceed?',
+          [
+            { text: 'Cancel', style: 'cancel' },
+            { 
+              text: 'Open Chat', 
+              onPress: async () => {
+                // Send notification to creator about negotiation
+                await notificationService.notifyCreator(counterOffer.creator.id, {
+                  type: 'message',
+                  title: 'Negotiation Continues',
+                  message: `${user?.name || user?.company || 'Marketer'} wants to discuss your counter offer`,
+                  actionType: 'open_chat',
+                  actionParams: { chatId: `chat-${counterOffer.originalOfferId}` }
+                });
+                
+                // Navigate to chat
+                router.push({
+                  pathname: '/chat/[id]',
+                  params: { id: `chat-${counterOffer.originalOfferId}` }
+                });
+              }
+            },
+            { 
+              text: 'Make Counter Offer', 
+              onPress: () => {
+                // Navigate to counter offer creation
+                router.push({
+                  pathname: '/offers/counter',
+                  params: { 
+                    originalOfferId: counterOffer.originalOfferId,
+                    creatorId: counterOffer.creator.id,
+                    previousAmount: counterOffer.counterOffer.amount.toString()
+                  }
+                });
+              }
+            }
+          ]
         );
         break;
     }

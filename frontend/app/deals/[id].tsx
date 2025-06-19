@@ -62,6 +62,7 @@ const DealDetailPage: React.FC = () => {
   const { id } = useLocalSearchParams();
   const isWeb = Platform.OS === 'web';
   const [selectedMilestone, setSelectedMilestone] = useState<string | null>(null);
+  const [milestoneStatuses, setMilestoneStatuses] = useState<{[key: string]: string}>({});
   const { user } = useAuth();
 
   // Demo deal data mapping
@@ -97,6 +98,11 @@ const DealDetailPage: React.FC = () => {
   };
 
   const dealData = getDealData(id as string);
+
+  // Helper function to get current milestone status
+  const getMilestoneStatus = (milestone: Milestone) => {
+    return milestoneStatuses[milestone.id] || milestone.status;
+  };
 
   // Demo deal data
   const deal: Deal = useMemo(() => ({
@@ -184,7 +190,10 @@ const DealDetailPage: React.FC = () => {
               text: 'Fund', 
               onPress: async () => {
                 // Update milestone status (FUND_MILESTONE -> MilestoneFunded)
-                // In a real app, this would process payment through the escrow system
+                setMilestoneStatuses(prev => ({
+                  ...prev,
+                  [milestoneId]: 'funded'
+                }));
                 
                 // Send notification to creator (NOTIFY_C)
                 await notificationService.notifyCreator(deal.creator.id, {
@@ -257,9 +266,9 @@ const DealDetailPage: React.FC = () => {
         </View>
         <View style={styles.milestoneStatus}>
           <Text style={styles.milestoneAmount}>${milestone.amount}</Text>
-          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(milestone.status) + '20' }]}>
-            <Text style={[styles.statusText, { color: getStatusColor(milestone.status) }]}>
-              {getStatusLabel(milestone.status)}
+          <View style={[styles.statusBadge, { backgroundColor: getStatusColor(getMilestoneStatus(milestone)) + '20' }]}>
+            <Text style={[styles.statusText, { color: getStatusColor(getMilestoneStatus(milestone)) }]}>
+              {getStatusLabel(getMilestoneStatus(milestone))}
             </Text>
           </View>
         </View>
@@ -294,7 +303,7 @@ const DealDetailPage: React.FC = () => {
 
       {/* Action Buttons */}
       <View style={styles.milestoneActions}>
-        {milestone.status === 'pending' && (
+        {getMilestoneStatus(milestone) === 'pending' && (
           <TouchableOpacity 
             style={styles.actionButton}
             onPress={() => handleMilestoneAction(milestone.id, 'fund')}
@@ -303,7 +312,7 @@ const DealDetailPage: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {milestone.status === 'funded' && (
+        {getMilestoneStatus(milestone) === 'funded' && (
           <TouchableOpacity 
             style={[styles.actionButton, styles.secondaryButton]}
             onPress={() => handleMilestoneAction(milestone.id, 'submit_work')}
@@ -312,7 +321,7 @@ const DealDetailPage: React.FC = () => {
           </TouchableOpacity>
         )}
 
-        {milestone.status === 'submitted' && (
+        {getMilestoneStatus(milestone) === 'submitted' && (
           <View style={styles.reviewActions}>
             <TouchableOpacity 
               style={[styles.actionButton, styles.approveButton]}
@@ -329,7 +338,7 @@ const DealDetailPage: React.FC = () => {
           </View>
         )}
 
-        {milestone.status === 'approved' && (
+        {getMilestoneStatus(milestone) === 'approved' && (
           <TouchableOpacity 
             style={[styles.actionButton, styles.proofButton]}
             onPress={() => handleMilestoneAction(milestone.id, 'upload_proof')}

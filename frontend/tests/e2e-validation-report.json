@@ -1,0 +1,144 @@
+{
+  "timestamp": "2025-06-19T01:11:35.195Z",
+  "totalTests": 16,
+  "passedTests": 16,
+  "failedTests": 0,
+  "workflows": {
+    "Authentication Flow": {
+      "name": "Authentication Flow",
+      "totalTests": 4,
+      "passedTests": 4,
+      "failedTests": 0,
+      "tests": {
+        "auth-files-exist": {
+          "success": true,
+          "message": "File exists (8108 bytes)",
+          "details": {
+            "size": 8108,
+            "path": "/Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/frontend/app/login.tsx"
+          }
+        },
+        "auth-register-exists": {
+          "success": true,
+          "message": "File exists (10990 bytes)",
+          "details": {
+            "size": 10990,
+            "path": "/Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/frontend/app/register.tsx"
+          }
+        },
+        "auth-context-integration": {
+          "success": true,
+          "message": "All 2 imports found"
+        },
+        "auth-navigation": {
+          "success": true,
+          "message": "Route 'login' is properly configured"
+        }
+      }
+    },
+    "Chat/Messaging System": {
+      "name": "Chat/Messaging System",
+      "totalTests": 3,
+      "passedTests": 3,
+      "failedTests": 0,
+      "tests": {
+        "chat-files-exist": {
+          "success": true,
+          "message": "File exists (11144 bytes)",
+          "details": {
+            "size": 11144,
+            "path": "/Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/frontend/app/chat/[id].tsx"
+          }
+        },
+        "message-list-exists": {
+          "success": true,
+          "message": "All 3 integration points verified"
+        },
+        "chat-auto-creation": {
+          "success": true,
+          "message": "Data flow verified through 2 steps"
+        }
+      }
+    },
+    "Notification System": {
+      "name": "Notification System",
+      "totalTests": 3,
+      "passedTests": 3,
+      "failedTests": 0,
+      "tests": {
+        "notification-service-exists": {
+          "success": true,
+          "message": "File exists (4131 bytes)",
+          "details": {
+            "size": 4131,
+            "path": "/Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/frontend/services/notificationService.ts"
+          }
+        },
+        "notification-center-exists": {
+          "success": true,
+          "message": "File exists (11721 bytes)",
+          "details": {
+            "size": 11721,
+            "path": "/Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/frontend/app/notifications/center.tsx"
+          }
+        },
+        "notification-integration": {
+          "success": true,
+          "message": "Data flow verified through 2 steps"
+        }
+      }
+    },
+    "Payment/Escrow System": {
+      "name": "Payment/Escrow System",
+      "totalTests": 3,
+      "passedTests": 3,
+      "failedTests": 0,
+      "tests": {
+        "payment-marketer-exists": {
+          "success": true,
+          "message": "File exists (20377 bytes)",
+          "details": {
+            "size": 20377,
+            "path": "/Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/frontend/app/payments/marketer.tsx"
+          }
+        },
+        "payment-navigation": {
+          "success": true,
+          "message": "Route 'payments/marketer' is properly configured"
+        },
+        "escrow-funding": {
+          "success": true,
+          "message": "All 3 integration points verified"
+        }
+      }
+    },
+    "Counter-Offer System": {
+      "name": "Counter-Offer System",
+      "totalTests": 3,
+      "passedTests": 3,
+      "failedTests": 0,
+      "tests": {
+        "counter-offer-handler-exists": {
+          "success": true,
+          "message": "File exists (17201 bytes)",
+          "details": {
+            "size": 17201,
+            "path": "/Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/frontend/app/offers/handle-counter.tsx"
+          }
+        },
+        "counter-offer-creation": {
+          "success": true,
+          "message": "File exists (20062 bytes)",
+          "details": {
+            "size": 20062,
+            "path": "/Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/frontend/app/offers/counter.tsx"
+          }
+        },
+        "counter-offer-alert": {
+          "success": true,
+          "message": "All 3 integration points verified"
+        }
+      }
+    }
+  }
+}

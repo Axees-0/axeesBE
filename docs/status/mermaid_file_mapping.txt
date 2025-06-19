@@ -1,0 +1,39 @@
+MERMAID FILE MAPPING FOR STATUS DIRECTORY FILES
+===============================================
+
+Based on the files in /docs/status, here are the corresponding mermaid file paths:
+
+STATUS FILE → CORRESPONDING MERMAID FILE
+---------------------------------------
+
+1 offer to deal workflow.png
+→ /Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/docs/mermaid/03_offer_to_deal_workflow.mmd
+
+2 deal execution milestones.png  
+→ /Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/docs/mermaid/04_deal_execution_milestones.mmd
+
+3 frontend overall navigation.png
+→ /Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/docs/mermaid/11_frontend_overall_navigation.mmd
+
+4 frontend marketer offer flow.png
+→ /Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/docs/mermaid/13_frontend_marketer_offer_flow.mmd
+
+5 frontend creator deal flow.png
+→ /Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/docs/mermaid/14_frontend_creator_deal_flow.mmd
+
+6 frontend user journey comparison.png
+→ /Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/docs/mermaid/16_frontend_user_journey_comparison.mmd
+
+api_testing_status.md
+→ /Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/docs/mermaid/08_api_endpoint_mapping.mmd
+
+api_testing_status_diagram.png
+→ /Users/Mike/Desktop/programming/2_proposals/upwork/communication/axeeio_021932170180429028184/AWS/axees-eb-extracted/axees-sourcebundle/docs/mermaid/08_api_endpoint_mapping.mmd
+
+SUMMARY
+-------
+Total status files: 8
+Corresponding mermaid files: 7 (unique)
+All mermaid files exist in the target directory.
+
+Generated on: $(date)
