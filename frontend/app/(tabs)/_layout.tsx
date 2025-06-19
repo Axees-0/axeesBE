@@ -19,14 +19,14 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Discoveryiconlypro from "../../assets/discovery--iconly-pro.svg";
 import Hotprice from "../../assets/hotprice.svg";
 import Message01 from "../../assets/message01.svg";
-import Notification02 from "../../assets/notification02.svg";
+import BellNotificationRegular from "../../assets/user.svg";
 import User from "../../assets/user.svg";
 
 const TABS = [
   { name: "index", icon: Discoveryiconlypro, label: "Explore", route: "/" },
   { name: "deals", icon: Hotprice, label: "Deals/Offers", route: "/deals" },
   { name: "messages", icon: Message01, label: "Messages", route: "/messages" },
-  { name: "notifications", icon: Notification02, label: "Notifications", route: "/notifications" },
+  { name: "notifications", icon: BellNotificationRegular, label: "Notifications", route: "/notifications" },
   { name: "profile", icon: User, label: "Profile", route: "/profile" },
 ];
 
@@ -65,17 +65,22 @@ export default function TabLayout() {
             height: Platform.select({
               ios: 65 + insets.bottom,
               android: 65,
-              web: isWideScreen ? 100 : 85,
+              web: 100,
             }),
             paddingBottom: Platform.select({
               ios: insets.bottom,
               default: 20,
             }),
-            width: Platform.select({
-              default: width,
-            }),
-            minWidth: 1280,
-            justifyContent: "center",
+            paddingHorizontal: 0,
+            width: "100vw",
+            maxWidth: "100vw",
+            position: "fixed",
+            bottom: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
+            flexDirection: "row",
+            justifyContent: "space-around",
             alignItems: "center",
             display: TABS.some((tab) => tab.name === route.name) ? "flex" : "none"
           },

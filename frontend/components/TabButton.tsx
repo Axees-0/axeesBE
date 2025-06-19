@@ -78,10 +78,11 @@ const styles = StyleSheet.create({
     height: 83,
     paddingVertical: Padding.p_xs,
     gap: Gap.gap_6xs,
-    paddingHorizontal: 0,
+    paddingHorizontal: 8,
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
+    minWidth: 0,
     opacity: 0.6,
   },
   activeTab: {
