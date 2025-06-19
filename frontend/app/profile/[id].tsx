@@ -23,7 +23,7 @@ import { DemoData } from '@/demo/DemoData';
 import { DEMO_MODE } from '@/demo/DemoMode';
 
 // Icons
-import ArrowLeft from '@/assets/arrowleft02.svg';
+import ArrowLeft from '@/assets/arrowleft021.svg';
 import Share from '@/assets/share-08.png';
 import Heart from '@/assets/icons.png';
 import HeartFilled from '@/assets/heart-red.png';

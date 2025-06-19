@@ -14,10 +14,13 @@ import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { DemoData } from '@/demo/DemoData';
+import { notificationService } from '@/services/notificationService';
+import { useAuth } from '@/contexts/AuthContext';
 
 const SuccessPage: React.FC = () => {
   const { creatorId, offerId, offerType, totalPrice } = useLocalSearchParams();
   const isWeb = Platform.OS === 'web';
+  const { user } = useAuth();
   
   // Animation values
   const fadeAnim = new Animated.Value(0);
@@ -43,6 +46,17 @@ const SuccessPage: React.FC = () => {
         useNativeDriver: true,
       }),
     ]).start();
+
+    // Send notification to creator (NOTIFY_C)
+    if (creatorId) {
+      notificationService.notifyCreator(creatorId as string, {
+        type: 'offer',
+        title: 'New Offer Received!',
+        message: `${user?.name || user?.company || 'Marketer'} sent you an offer for ${offerType}`,
+        actionType: 'view_offer',
+        actionParams: { offerId: offerId }
+      });
+    }
   }, []);
 
   const handleViewOffers = () => {

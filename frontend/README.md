@@ -1,6 +1,6 @@
 # Axees Frontend
 
-A high-performance React Native + Expo app with advanced monitoring and security features.
+A high-performance React Native + Expo creator collaboration platform, **DEMO READY** for investor presentations and stakeholder demonstrations.
 
 ## 🚀 Quick Start
 
@@ -11,9 +11,21 @@ npm install
 # Start development server
 npm run web
 
-# Performance audit
-npm run perf
+# Demo mode is enabled by default for presentations
+# Access at http://localhost:8081
 ```
+
+## 🎯 Demo Features
+
+### Live Role Switching
+- Switch between marketer and creator perspectives during demos
+- Access via Profile → "🔄 Switch Role" button
+- Complete dual user experience in single session
+
+### Demo Data
+- Pre-loaded with realistic demo creators (Emma Thompson, Marcus Johnson, Sofia Rodriguez)
+- Rich offer data showing various statuses and deal types
+- Professional analytics dashboard for presentations
 
 ## 📊 Performance
 

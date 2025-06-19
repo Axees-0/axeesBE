@@ -16,7 +16,7 @@ import { Redirect, router } from "expo-router";
 import axios from "axios";
 import { useMutation } from "@tanstack/react-query";
 import Logo from "@/assets/Logo.svg";
-import Arrowleft02 from "@/assets/arrowleft02.svg";
+import Arrowleft02 from "@/assets/arrowleft021.svg";
 import Group1000000859 from "@/assets/group-1000000859.svg";
 import Interfaceessentiallockpassword from "@/assets/interface-essentiallock-password.svg";
 import Vector105 from "@/assets/vector-105.svg";

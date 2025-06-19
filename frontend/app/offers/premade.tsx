@@ -15,7 +15,7 @@ import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 
 // Icons
-import ArrowLeft from '@/assets/arrowleft02.svg';
+import ArrowLeft from '@/assets/arrowleft021.svg';
 
 interface PreMadeOffer {
   id: string;

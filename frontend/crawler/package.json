@@ -1,0 +1,25 @@
+{
+  "name": "axees-workflow-tests",
+  "version": "1.0.0",
+  "description": "Comprehensive workflow tests for Axees platform",
+  "main": "test-all-workflows.js",
+  "scripts": {
+    "test": "node test-all-workflows.js",
+    "test:offer": "node test-offer-to-deal-workflow.js",
+    "test:milestones": "node test-deal-execution-milestones.js",
+    "test:nav": "node test-navigation.js",
+    "test:all": "npm run test"
+  },
+  "dependencies": {
+    "puppeteer": "^21.0.0"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "testing",
+    "e2e",
+    "puppeteer",
+    "workflow"
+  ],
+  "author": "Axees Test Team",
+  "license": "ISC"
+}

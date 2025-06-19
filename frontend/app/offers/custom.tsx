@@ -18,7 +18,7 @@ import WebBottomTabs from '@/components/WebBottomTabs';
 import { DemoData } from '@/demo/DemoData';
 
 // Icons
-import ArrowLeft from '@/assets/arrowleft02.svg';
+import ArrowLeft from '@/assets/arrowleft021.svg';
 
 interface CustomOfferData {
   title: string;

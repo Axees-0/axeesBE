@@ -54,6 +54,9 @@ const ProfilePage = () => {
             <TouchableOpacity 
               style={styles.roleSwitchButton}
               onPress={() => setShowRoleSwitcher(true)}
+              testID="role-switcher-button"
+              accessibilityRole="button"
+              accessibilityLabel="Switch Role"
             >
               <Text style={styles.roleSwitchButtonText}>🔄 Switch Role</Text>
             </TouchableOpacity>

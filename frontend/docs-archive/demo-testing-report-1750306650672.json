@@ -1,0 +1,122 @@
+{
+  "timestamp": "2025-06-19T04:16:28.446Z",
+  "flows": [
+    {
+      "name": "Complete Marketer→Creator Demo Flow",
+      "steps": [
+        {
+          "step": "Login as marketer",
+          "status": "passed"
+        }
+      ],
+      "status": "failed",
+      "blockers": [
+        "Critical error: this.page.waitForTimeout is not a function"
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "test_error",
+      "test": "Missing demo transitions",
+      "error": "SyntaxError: Failed to execute 'querySelector' on 'Document': '[data-testid=\"role-switcher\"], button:has-text(\"Creator\"), button:has-text(\"Marketer\")' is not a valid selector.",
+      "severity": "medium"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    },
+    {
+      "type": "console_error",
+      "message": "Invalid style property of \"borderLeft\". Please use long-form properties.",
+      "severity": "high"
+    }
+  ],
+  "dataValidation": [
+    {
+      "name": "Demo users exist",
+      "status": "passed"
+    },
+    {
+      "name": "Creator profiles populated",
+      "status": "passed"
+    },
+    {
+      "name": "Analytics data present",
+      "status": "failed"
+    }
+  ],
+  "summary": {
+    "totalFlows": 1,
+    "passedFlows": 0,
+    "failedFlows": 1,
+    "criticalBlockers": 0,
+    "readyForDemo": false
+  }
+}

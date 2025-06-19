@@ -509,6 +509,9 @@ const chipTags = useMemo(() => {
             router.push(`/profile/${item._id}`);
           }
         }}
+        testID={`creator-card-${item._id}`}
+        accessibilityRole="button"
+        accessibilityLabel={`View ${item.name} profile`}
       >
         <Image
             style={styles.cardImg}

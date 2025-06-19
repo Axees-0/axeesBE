@@ -82,7 +82,7 @@ export default function TabLayout() {
             flexDirection: "row",
             justifyContent: "space-around",
             alignItems: "center",
-            display: TABS.some((tab) => tab.name === route.name) ? "flex" : "none"
+            display: "flex"
           },
           headerShown: false,
         })}

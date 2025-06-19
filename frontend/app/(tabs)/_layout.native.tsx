@@ -18,7 +18,7 @@ import { Indicator } from "@/components/Indicator";
 import Discoveryiconlypro from "../../assets/discovery--iconly-pro.svg";
 import Hotprice from "../../assets/hotprice.svg";
 import Message01 from "../../assets/message01.svg";
-import Notification02 from "../../assets/notification02.svg";
+import Notification02 from "../../assets/user.svg";
 import User from "../../assets/user.svg";
 
 const TABS = [

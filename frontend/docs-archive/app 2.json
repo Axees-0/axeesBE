@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "axees",
+    "slug": "axees",    
+    "platforms": ["ios", "android", "web"],
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "axees",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "io.freshify.axees",
+      "googleServicesFile": "./GoogleService-Info.plist"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#430B92"
+      },
+      "package": "io.freshify.axees",
+      "googleServicesFile": "./google-services.json"
+    },
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#430B92"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "@react-native-firebase/app",
+      "@react-native-firebase/messaging",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash.png",
+          "resizeMode": "contain",
+          "backgroundColor": "#430B92"
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

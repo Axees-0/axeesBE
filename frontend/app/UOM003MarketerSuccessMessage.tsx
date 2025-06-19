@@ -4,7 +4,7 @@ import React from "react";
 import { View, Text, Pressable, StyleSheet, SafeAreaView } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import Arrowleft02 from "../assets/arrowleft02.svg";
+import Arrowleft02 from "../assets/arrowleft021.svg";
 import Tickdouble03 from "../assets/tickdouble03.svg";
 import CustomBackButton from "@/components/CustomBackButton";
 
