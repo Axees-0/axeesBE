@@ -6,7 +6,7 @@ import { Color } from "@/GlobalStyles";
 import Discoveryiconlypro from "../assets/discovery--iconly-pro.svg";
 import Hotprice from "../assets/hotprice.svg";
 import Message01 from "../assets/message01.svg";
-import Notification02 from "../assets/notification02.svg";
+import Notification02 from "../assets/user.svg";
 import User from "../assets/user.svg";
 import { TabButton } from "./TabButton";
 import { useWindowDimensions } from "react-native";
@@ -15,15 +15,11 @@ import { useUnreadMessages } from "@/hooks/messagesContext";
 // import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 
 const TABS = [
-  { name: "index", icon: Discoveryiconlypro, label: "Explore" },
-  {
-    name: "UOM08MarketerDealHistoryList",
-    icon: Hotprice,
-    label: "Deals/Offers",
-  },
-  { name: "messages", icon: Message01, label: "Messages" },
-  { name: "notifications", icon: Notification02, label: "Notifications" },
-  { name: "profile", icon: User, label: "Profile" },
+  { name: "index", icon: Discoveryiconlypro, label: "Explore", route: "/" },
+  { name: "deals", icon: Hotprice, label: "Deals/Offers", route: "/deals" },
+  { name: "messages", icon: Message01, label: "Messages", route: "/messages" },
+  { name: "notifications", icon: Notification02, label: "Notifications", route: "/notifications" },
+  { name: "profile", icon: User, label: "Profile", route: "/profile" },
 ];
 
 const WebBottomTabs = ({ activeIndex }: { activeIndex: number }) => {
@@ -65,11 +61,7 @@ const WebBottomTabs = ({ activeIndex }: { activeIndex: number }) => {
               label={tab.label}
               isActive={index === activeIndex}
               onPress={() => {
-                if (tab.name === "index") {
-                  router.push("/");
-                } else {
-                  router.push(`/${tab.name}`);
-                }
+                router.push(tab.route);
               }}
             />
             {/* Add badge only to Messages tab */}

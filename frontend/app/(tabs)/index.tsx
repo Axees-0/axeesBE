@@ -16,7 +16,6 @@ import { Fragment, useState } from "react";
 import Mobile from "@/components/mobile";
 import Web from "@/components/web";
 import { WebSEO } from "../web-seo";
-import WebBottomTabs from "@/components/WebBottomTabs";
 import { useAuth } from "@/contexts/AuthContext";
 import { Color } from "@/GlobalStyles";
 import { router } from "expo-router";

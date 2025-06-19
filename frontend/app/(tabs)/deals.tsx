@@ -12,7 +12,6 @@ import {
 import { useRouter } from "expo-router";
 import Mobile from "@/components/mobile/UOM08MarketerDealHistoryList";
 import Web from "@/components/web/UOM08MarketerDealHistoryList";
-import WebBottomTabs from "@/components/WebBottomTabs";
 import CuratedDeals from "@/demo/CuratedDeals";
 import { DEMO_MODE, demoLog } from "@/demo/DemoMode";
 import { DemoData } from "@/demo/DemoData";
