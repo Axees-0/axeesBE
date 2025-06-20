@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Axees Demo Visual Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body { margin: 0; font-family: -apple-system, sans-serif; }
+        .test-header { 
+            background: #430B92; 
+            color: white; 
+            padding: 20px; 
+            text-align: center;
+        }
+        .test-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        .test-section {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #430B92;
+        }
+        .status { 
+            padding: 5px 10px; 
+            border-radius: 4px; 
+            display: inline-block;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+        .pending { background: #fff3cd; color: #856404; }
+        iframe { 
+            width: 100%; 
+            height: 600px; 
+            border: 1px solid #ccc;
+            border-radius: 8px;
+        }
+        .checklist {
+            margin: 10px 0;
+        }
+        .checklist label {
+            display: block;
+            padding: 5px 0;
+            cursor: pointer;
+        }
+        .checklist input:checked + span {
+            text-decoration: line-through;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>🎯 Axees Demo Visual Verification</h1>
+        <p>Live Testing: <a href="https://polite-ganache-3a4e1b.netlify.app" target="_blank" style="color: white;">https://polite-ganache-3a4e1b.netlify.app</a></p>
+    </div>
+
+    <div class="test-grid">
+        <div class="test-section">
+            <h3>📱 Mobile View (390px)</h3>
+            <iframe 
+                src="https://polite-ganache-3a4e1b.netlify.app" 
+                style="width: 390px; height: 844px;"
+                id="mobile-frame">
+            </iframe>
+        </div>
+
+        <div class="test-section">
+            <h3>💻 Desktop View (1200px)</h3>
+            <iframe 
+                src="https://polite-ganache-3a4e1b.netlify.app" 
+                style="width: 100%; height: 800px;"
+                id="desktop-frame">
+            </iframe>
+        </div>
+    </div>
+
+    <div style="padding: 20px;">
+        <div class="test-section">
+            <h3>✅ Visual Confirmation Checklist</h3>
+            <div class="checklist">
+                <label><input type="checkbox"> <span>Page loads without white screen</span></label>
+                <label><input type="checkbox"> <span>Navigation tabs visible at bottom</span></label>
+                <label><input type="checkbox"> <span>Creator grid/list displays on first tab</span></label>
+                <label><input type="checkbox"> <span>Creator profile images load</span></label>
+                <label><input type="checkbox"> <span>Search bar is visible and styled</span></label>
+                <label><input type="checkbox"> <span>No horizontal scrolling on mobile</span></label>
+                <label><input type="checkbox"> <span>Professional color scheme (purple theme)</span></label>
+                <label><input type="checkbox"> <span>All text is readable</span></label>
+                <label><input type="checkbox"> <span>Demo user logged in (check profile tab)</span></label>
+                <label><input type="checkbox"> <span>No console errors (F12 to check)</span></label>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🔍 Quick Tests</h3>
+            <button onclick="testNavigation()">Test Navigation</button>
+            <button onclick="testSearch()">Test Search</button>
+            <button onclick="testCreatorClick()">Test Creator Click</button>
+            <button onclick="checkConsoleErrors()">Check Console</button>
+            <div id="test-results" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <script>
+        const results = document.getElementById('test-results');
+        
+        function addResult(message, status) {
+            const div = document.createElement('div');
+            div.className = `status ${status}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function testNavigation() {
+            results.innerHTML = '';
+            addResult('Testing navigation tabs...', 'pending');
+            // Manual test - user clicks through tabs
+            setTimeout(() => {
+                addResult('Check each tab manually in the iframes above', 'pending');
+            }, 1000);
+        }
+
+        function testSearch() {
+            results.innerHTML = '';
+            addResult('Testing search functionality...', 'pending');
+            addResult('Type "Emma" in search bar and verify filtering', 'pending');
+        }
+
+        function testCreatorClick() {
+            results.innerHTML = '';
+            addResult('Testing creator profile navigation...', 'pending');
+            addResult('Click on any creator card to test profile routing', 'pending');
+        }
+
+        function checkConsoleErrors() {
+            results.innerHTML = '';
+            if (window.console && window.console.error) {
+                addResult('Open DevTools (F12) and check Console tab for errors', 'pending');
+            }
+        }
+
+        // Auto-save test results
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                const completed = document.querySelectorAll('input[type="checkbox"]:checked').length;
+                const total = document.querySelectorAll('input[type="checkbox"]').length;
+                console.log(`Visual Test Progress: ${completed}/${total} completed`);
+            });
+        });
+
+        // Initial load message
+        window.onload = function() {
+            addResult('Visual test page loaded. Check iframes above.', 'pass');
+            console.log('🎯 Axees Demo Visual Test Started');
+            console.log('📱 Mobile frame:', document.getElementById('mobile-frame'));
+            console.log('💻 Desktop frame:', document.getElementById('desktop-frame'));
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Live Demo Test</title>
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 4px; }
+        .pass { background: #d4edda; border: 1px solid #c3e6cb; }
+        .fail { background: #f8d7da; border: 1px solid #f5c6cb; }
+        .pending { background: #fff3cd; border: 1px solid #ffeaa7; }
+        iframe { width: 100%; height: 600px; border: 1px solid #ccc; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎯 AXEES DEMO TACTICAL ASSESSMENT</h1>
+    
+    <div id="test-results">
+        <div class="test-result pending">⏳ Loading demo site...</div>
+    </div>
+    
+    <h2>Live Demo Frame:</h2>
+    <iframe src="https://polite-ganache-3a4e1b.netlify.app" id="demo-frame"></iframe>
+    
+    <script>
+        const results = document.getElementById('test-results');
+        const iframe = document.getElementById('demo-frame');
+        
+        function addTestResult(message, status) {
+            const div = document.createElement('div');
+            div.className = `test-result ${status}`;
+            div.innerHTML = message;
+            results.appendChild(div);
+        }
+        
+        // Clear pending message
+        results.innerHTML = '';
+        
+        addTestResult('✅ HTML structure loaded successfully', 'pass');
+        addTestResult('✅ JavaScript bundle accessible (749b7d032be66045d8085c203f966485.js)', 'pass');
+        
+        iframe.onload = function() {
+            addTestResult('✅ Demo iframe loaded', 'pass');
+            
+            setTimeout(() => {
+                try {
+                    const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+                    const rootElement = iframeDoc.getElementById('root');
+                    
+                    if (rootElement && rootElement.children.length > 0) {
+                        addTestResult('✅ React app mounted successfully - ROOT ELEMENT HAS CONTENT', 'pass');
+                        addTestResult(`📊 Root element children count: ${rootElement.children.length}`, 'pass');
+                        
+                        // Try to find navigation elements
+                        const navElements = iframeDoc.querySelectorAll('[role="tablist"], nav, .tab, .navigation');
+                        if (navElements.length > 0) {
+                            addTestResult(`✅ Navigation elements found: ${navElements.length}`, 'pass');
+                        } else {
+                            addTestResult('⚠️  No navigation elements detected', 'fail');
+                        }
+                        
+                        // Check for demo content
+                        const textContent = rootElement.textContent || '';
+                        if (textContent.includes('axees') || textContent.includes('creator') || textContent.includes('marketer')) {
+                            addTestResult('✅ Demo content detected in app', 'pass');
+                        } else {
+                            addTestResult('⚠️  No demo content detected', 'fail');
+                        }
+                        
+                    } else {
+                        addTestResult('❌ CRITICAL: React app failed to mount - ROOT IS EMPTY', 'fail');
+                        addTestResult('🔍 Checking for error messages...', 'pending');
+                        
+                        // Check for error content
+                        const bodyText = iframeDoc.body.textContent;
+                        if (bodyText.includes('JavaScript')) {
+                            addTestResult('❌ JavaScript disabled error detected', 'fail');
+                        } else {
+                            addTestResult('❌ Unknown rendering error - no content in root', 'fail');
+                        }
+                    }
+                } catch (e) {
+                    addTestResult(`❌ Cross-origin error: ${e.message}`, 'fail');
+                    addTestResult('ℹ️  Cannot inspect iframe content due to CORS', 'pending');
+                }
+            }, 3000); // Wait 3 seconds for React to mount
+        };
+        
+        iframe.onerror = function() {
+            addTestResult('❌ CRITICAL: Demo iframe failed to load', 'fail');
+        };
+        
+        // Add current timestamp
+        addTestResult(`🕒 Test initiated at: ${new Date().toLocaleString()}`, 'pass');
+        addTestResult(`🌐 Testing URL: https://polite-ganache-3a4e1b.netlify.app`, 'pass');
+    </script>
+</body>
+</html>

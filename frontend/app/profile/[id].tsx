@@ -24,6 +24,8 @@ import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { DemoData } from '@/demo/DemoData';
 import { DEMO_MODE } from '@/demo/DemoMode';
+import { DemoOfferFlow } from '@/components/DemoOfferFlow';
+import { AvatarWithFallback } from '@/components/AvatarWithFallback';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -112,57 +114,33 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
     }
   };
 
-  // Offer Modal Component
+  // Offer Modal Component with DemoOfferFlow
   const OfferModal = () => (
-    <View style={styles.modalOverlay}>
-      <View style={[styles.modalContainer, styles.offerModalContainer]}>
-        <Text style={styles.modalTitle}>Create Offer for {creator.name}</Text>
-        <Text style={styles.modalDescription}>
-          Choose how you'd like to create your offer
-        </Text>
-        
-        <View style={styles.offerOptions}>
-          <TouchableOpacity 
-            style={styles.offerOptionButton}
-            onPress={() => {
-              setIsOfferModalVisible(false);
-              router.push({
-                pathname: '/offers/premade',
-                params: { creatorId: creator._id }
-              });
-            }}
-          >
-            <Text style={styles.offerOptionTitle}>Pre-Made Offers</Text>
-            <Text style={styles.offerOptionDescription}>
-              Choose from our curated offer templates
-            </Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.offerOptionButton}
-            onPress={() => {
-              setIsOfferModalVisible(false);
-              router.push({
-                pathname: '/offers/custom',
-                params: { creatorId: creator._id }
-              });
-            }}
-          >
-            <Text style={styles.offerOptionTitle}>Custom Offer</Text>
-            <Text style={styles.offerOptionDescription}>
-              Create a personalized offer from scratch
-            </Text>
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity 
-          style={styles.modalCancelBtn}
-          onPress={() => setIsOfferModalVisible(false)}
-        >
-          <Text style={styles.modalCancelText}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+    <Modal
+      visible={isOfferModalVisible}
+      animationType="slide"
+      transparent={false}
+      onRequestClose={() => setIsOfferModalVisible(false)}
+    >
+      <DemoOfferFlow
+        creatorName={creator.name}
+        creatorHandle={creator.userName}
+        onComplete={() => {
+          setIsOfferModalVisible(false);
+          // Show success message
+          if (Platform.OS === 'web') {
+            window.alert(`Offer sent successfully to ${creator.name}! They will receive a notification.`);
+          } else {
+            Alert.alert(
+              'Offer Sent!',
+              `Your offer has been sent to ${creator.name}. They will receive a notification.`,
+              [{ text: 'OK' }]
+            );
+          }
+        }}
+        onCancel={() => setIsOfferModalVisible(false)}
+      />
+    </Modal>
   );
 
   // Platform Icons
@@ -398,10 +376,10 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
         <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
           {/* Profile Hero */}
           <View style={styles.heroSection}>
-            <Image 
-              source={{ uri: creator.avatarUrl }} 
-              style={styles.profileImage}
-              placeholder={require('@/assets/empty-image.png')}
+            <AvatarWithFallback 
+              source={creator.avatarUrl}
+              name={creator.name}
+              size={120}
             />
             
             <View style={styles.profileInfo}>
@@ -574,7 +552,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
         )}
         
         {/* Offer Modal */}
-        {isOfferModalVisible && <OfferModal />}
+        <OfferModal />
         
         {/* Bottom Navigation for Web */}
         {isWeb && <WebBottomTabs activeIndex={0} />}

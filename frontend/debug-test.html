@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Test</title>
+</head>
+<body>
+    <div id="test">Original content</div>
+    <script>
+        console.log('Script loaded');
+        document.getElementById('test').innerHTML = 'JavaScript is working!';
+        
+        // Test if the main bundle loads
+        fetch('/_expo/static/js/web/entry-68e6df735e617cbb0efea3da2f220dfa.js')
+            .then(response => {
+                console.log('Bundle response:', response.status);
+                if (response.ok) {
+                    return response.text();
+                }
+                throw new Error('Bundle not found');
+            })
+            .then(text => {
+                console.log('Bundle size:', text.length);
+                console.log('Contains React?', text.includes('React'));
+                console.log('Contains Expo?', text.includes('expo'));
+            })
+            .catch(error => {
+                console.error('Bundle error:', error);
+            });
+    </script>
+</body>
+</html>

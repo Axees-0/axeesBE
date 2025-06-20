@@ -497,6 +497,32 @@ export const DemoData = {
         specialties: ['Plant Care', 'Garden Design', 'Sustainable Practices'],
       },
     },
+    {
+      _id: 'creator-016',
+      name: 'Nathan Taylor',
+      userName: '@coachnate',
+      avatarUrl: 'https://randomuser.me/api/portraits/men/16.jpg',
+      isActive: true,
+      userType: 'Creator',
+      bio: 'Life Coach | Motivational Speaker | Personal Development Expert',
+      location: 'Atlanta, GA',
+      rating: 5.0,
+      completedDeals: 42,
+      responseTime: '45 minutes',
+      joinedDate: new Date('2021-08-25'),
+      verified: true,
+      creatorData: {
+        totalFollowers: 298000,
+        platforms: [
+          { platform: 'instagram', handle: '@coachnate', followersCount: 187000, engagement: 11.9, verified: true },
+          { platform: 'linkedin', handle: '@nathantaylorcoach', followersCount: 111000, engagement: 8.2 },
+        ],
+        categories: ['Motivation', 'Education', 'Lifestyle'],
+        portfolioHighlights: ['Best-Selling Author', 'Fortune 500 Speaker', 'Top Life Coach 2023'],
+        avgDealValue: 4900,
+        specialties: ['Personal Growth', 'Motivational Content', 'Career Development'],
+      },
+    },
   ],
 
   // Analytics Data

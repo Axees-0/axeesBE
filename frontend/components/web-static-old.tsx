@@ -4,8 +4,22 @@ import { Image } from 'expo-image';
 import { Color } from '@/GlobalStyles';
 import { router } from 'expo-router';
 import { DemoData } from '@/demo/DemoData';
+import { EmptyState } from '@/components/ErrorState';
+import { AvatarWithFallback } from '@/components/AvatarWithFallback';
+import { CreatorCardSkeleton } from '@/components/LoadingIndicator';
+import { StatsDashboard, StatsBar } from '@/components/StatsDashboard';
 
 const Web = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Simulate initial loading for demo
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800); // Quick loading for demo polish
+    return () => clearTimeout(timer);
+  }, []);
+  
   // Creator data - Using DemoData.creators with mapped structure for explore page
   const creators = DemoData.creators.map(creator => {
     // Calculate total followers and average engagement for stats display
@@ -128,6 +142,12 @@ const Web = () => {
           <Text style={styles.subtitle}>Connect with top creators for your brand campaigns</Text>
         </View>
         
+        {/* Stats Dashboard for investors */}
+        <StatsDashboard style={styles.statsSection} />
+        
+        {/* Compact stats bar */}
+        <StatsBar style={styles.statsBar} />
+        
         <View style={styles.searchSection}>
           <View style={styles.searchBar}>
             <Text style={styles.searchIcon}>🔍</Text>
@@ -162,17 +182,25 @@ const Web = () => {
         )}
         
         <View style={styles.creatorsGrid}>
-          {filteredCreators.map((creator) => (
+          {isLoading ? (
+            // Show skeleton loaders while loading
+            Array.from({ length: 6 }).map((_, index) => (
+              <View key={`skeleton-${index}`} style={styles.creatorCard}>
+                <CreatorCardSkeleton />
+              </View>
+            ))
+          ) : (
+            filteredCreators.map((creator) => (
             <TouchableOpacity 
               key={creator.id}
               style={styles.creatorCard}
               onPress={() => router.push(`/profile/${creator.id}`)}
             >
-              <Image
+              <AvatarWithFallback
+                source={creator.avatarUrl}
+                name={creator.name}
+                size={100}
                 style={styles.creatorAvatar}
-                source={creator.avatarUrl || require("@/assets/empty-image.png")}
-                placeholder={require("@/assets/empty-image.png")}
-                contentFit="cover"
               />
               <Text style={styles.creatorName}>{creator.name}</Text>
               <Text style={styles.creatorHandle}>{creator.handle}</Text>
@@ -184,18 +212,26 @@ const Web = () => {
                 ))}
               </View>
             </TouchableOpacity>
-          ))}
-          {filteredCreators.length === 0 && (
-            <View style={styles.noResults}>
-              <Text style={styles.noResultsText}>
-                No creators found
-                {searchText && ` matching "${searchText}"`}
-                {selectedFilters.length > 0 && ` with filters: ${selectedFilters.join(', ')}`}
-              </Text>
-              <Text style={styles.noResultsSubtext}>
-                Try {selectedFilters.length > 0 ? 'removing some filters or ' : ''}searching for different terms like "Fashion", "Tech", or creator names
-              </Text>
-            </View>
+          ))
+          )}
+          {!isLoading && filteredCreators.length === 0 && (
+            <EmptyState
+              icon="🔍"
+              title={searchText || selectedFilters.length > 0 ? "No creators found" : "No creators available"}
+              message={
+                searchText 
+                  ? `No results for "${searchText}"${selectedFilters.length > 0 ? ` with filters: ${selectedFilters.join(', ')}` : ''}`
+                  : selectedFilters.length > 0
+                  ? `No creators found with filters: ${selectedFilters.join(', ')}`
+                  : "Start by searching or selecting a category"
+              }
+              actionText={searchText || selectedFilters.length > 0 ? "Clear search" : undefined}
+              onAction={searchText || selectedFilters.length > 0 ? () => {
+                setSearchText('');
+                setSelectedFilters([]);
+                applyFilters('', []);
+              } : undefined}
+            />
           )}
         </View>
       </ScrollView>
@@ -394,6 +430,12 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     fontSize: 12,
     fontWeight: '600',
+  },
+  statsSection: {
+    marginBottom: 24,
+  },
+  statsBar: {
+    marginBottom: 24,
   },
 });
 
