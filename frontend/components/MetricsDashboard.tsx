@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
   content: {
     maxHeight: 400,
     padding: 12,
+    paddingRight: 16, // Add extra padding to prevent scrollbar overlap
   },
   section: {
     marginBottom: 16,

@@ -16,9 +16,7 @@ import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { notificationService } from '@/services/notificationService';
 import { useAuth } from '@/contexts/AuthContext';
-
-// Icons
-import ArrowLeft from '@/assets/arrowleft021.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface CounterOfferDetails {
   id: string;
@@ -51,7 +49,7 @@ interface CounterOfferDetails {
 
 const HandleCounterOfferPage: React.FC = () => {
   const { counterId } = useLocalSearchParams();
-  const isWeb = Platform.OS === 'web';
+  const isWeb = Platform?.OS === 'web';
   const { user } = useAuth();
   
   // Demo counter offer data
@@ -98,8 +96,6 @@ const HandleCounterOfferPage: React.FC = () => {
   });
 
   const handleAction = (action: 'accept' | 'reject' | 'negotiate') => {
-    const isWeb = Platform.OS === 'web';
-    
     switch (action) {
       case 'accept':
         if (isWeb) {
@@ -318,12 +314,11 @@ const HandleCounterOfferPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
+          <UniversalBackButton 
             style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+            fallbackRoute="/deals"
+            iconSize={24}
+          />
           
           <Text style={styles.headerTitle}>Counter Offer</Text>
           <View style={styles.headerSpacer} />
@@ -430,6 +425,10 @@ const HandleCounterOfferPage: React.FC = () => {
           <TouchableOpacity 
             style={styles.rejectButton}
             onPress={() => handleAction('reject')}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Reject counter offer from ${counterOffer.creator.name}`}
+            accessibilityHint="Declines the counter offer and notifies the creator"
           >
             <Text style={styles.rejectButtonText}>Reject</Text>
           </TouchableOpacity>
@@ -437,6 +436,10 @@ const HandleCounterOfferPage: React.FC = () => {
           <TouchableOpacity 
             style={styles.negotiateButton}
             onPress={() => handleAction('negotiate')}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Continue negotiating with ${counterOffer.creator.name}`}
+            accessibilityHint="Opens chat or allows making a counter offer"
           >
             <Text style={styles.negotiateButtonText}>Negotiate</Text>
           </TouchableOpacity>
@@ -444,6 +447,10 @@ const HandleCounterOfferPage: React.FC = () => {
           <TouchableOpacity 
             style={styles.acceptButton}
             onPress={() => handleAction('accept')}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Accept counter offer for $${counterOffer.counterOffer.amount}`}
+            accessibilityHint="Accepts the terms and starts setting up deal milestones"
           >
             <Text style={styles.acceptButtonText}>Accept</Text>
           </TouchableOpacity>
@@ -674,6 +681,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#FECACA',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+        ':focus': {
+          borderColor: '#DC2626',
+          borderWidth: 2,
+          shadowColor: '#DC2626',
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+        }
+      }
+    }),
   },
   rejectButtonText: {
     color: '#DC2626',
@@ -688,6 +707,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#a78bfa',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+        ':focus': {
+          borderColor: '#5b21b6',
+          borderWidth: 2,
+          shadowColor: '#5b21b6',
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+        }
+      }
+    }),
   },
   negotiateButtonText: {
     color: '#5b21b6',
@@ -700,6 +731,20 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Color.cSK430B92500,
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+        ':focus': {
+          borderColor: '#FFFFFF',
+          borderWidth: 2,
+          shadowColor: Color.cSK430B92500,
+          shadowOpacity: 0.4,
+          shadowRadius: 4,
+        }
+      }
+    }),
   },
   acceptButtonText: {
     color: '#fff',

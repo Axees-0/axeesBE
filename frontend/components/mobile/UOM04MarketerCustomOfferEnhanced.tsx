@@ -570,7 +570,11 @@ export default function CustomOfferEnhanced() {
               onPress={handleSaveDraft}
               disabled={isSubmitting}
             >
-              <Text style={styles.draftButtonText}>
+              <Text 
+                style={styles.draftButtonText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {isSubmitting ? "Saving..." : "Save Draft"}
               </Text>
             </TouchableOpacity>
@@ -586,7 +590,11 @@ export default function CustomOfferEnhanced() {
               {isCheckingEmails ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.sendButtonText}>
+                <Text 
+                  style={styles.sendButtonText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
                   {isSubmitting ? "Sending..." : "Send Offer"}
                 </Text>
               )}
@@ -871,11 +879,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
+    paddingHorizontal: 8,
+    minWidth: 120,
   },
   draftButtonText: {
     fontSize: 16,
     color: "#430B92",
     fontWeight: "500",
+    textAlign: "center",
+    flexShrink: 1,
   },
   sendButton: {
     flex: 1,
@@ -884,6 +896,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 8,
+    minWidth: 120,
   },
   webSendButton: {
     alignSelf: "center",
@@ -893,6 +907,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#FFFFFF",
     fontWeight: "500",
+    textAlign: "center",
+    flexShrink: 1,
   },
   modalOverlay: {
     flex: 1,

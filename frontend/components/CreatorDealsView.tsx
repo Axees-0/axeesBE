@@ -6,9 +6,11 @@ import {
   TouchableOpacity,
   Alert,
   Platform,
+  useWindowDimensions,
 } from 'react-native';
 import { router } from 'expo-router';
 import { Color } from '@/GlobalStyles';
+import { BREAKPOINTS, isTablet, isDesktop, isMobile } from '@/constants/breakpoints';
 
 interface Offer {
   id: string;
@@ -33,6 +35,9 @@ interface CreatorDealsViewProps {
 }
 
 const CreatorDealsView: React.FC<CreatorDealsViewProps> = ({ userRole }) => {
+  // Get window dimensions for responsive layout
+  const { width } = useWindowDimensions();
+
   // Demo creator offers data
   const [creatorOffers] = useState<Offer[]>([
     {
@@ -120,6 +125,102 @@ const CreatorDealsView: React.FC<CreatorDealsViewProps> = ({ userRole }) => {
     }
   };
 
+  // Get responsive styles for offer cards
+  const getOfferCardStyles = () => {
+    const baseStyle = styles.offerCard;
+    
+    if (Platform.OS !== 'web') {
+      return baseStyle;
+    }
+
+    // Responsive styles for web
+    if (isMobile(width)) {
+      return [
+        baseStyle,
+        {
+          marginHorizontal: 0,
+          width: '100%',
+        }
+      ];
+    } else if (isTablet(width)) {
+      return [
+        baseStyle,
+        {
+          marginHorizontal: 0,
+          width: '100%',
+          maxWidth: '100%', // Fluid width on tablet
+          padding: 20, // Increased padding for better readability on tablet
+        }
+      ];
+    } else {
+      return [
+        baseStyle,
+        {
+          marginHorizontal: 0,
+          width: '100%',
+          maxWidth: 800, // Max width for desktop
+        }
+      ];
+    }
+  };
+
+  // Get responsive styles for summary cards
+  const getSummaryRowStyles = () => {
+    if (Platform.OS !== 'web') {
+      return styles.summaryRow;
+    }
+
+    if (isMobile(width)) {
+      return [
+        styles.summaryRow,
+        {
+          flexDirection: 'column',
+          gap: 12,
+        }
+      ];
+    } else if (isTablet(width)) {
+      return [
+        styles.summaryRow,
+        {
+          flexDirection: 'row',
+          gap: 16,
+          justifyContent: 'space-between',
+        }
+      ];
+    } else {
+      return styles.summaryRow;
+    }
+  };
+
+  // Get responsive styles for action buttons
+  const getActionButtonsStyles = () => {
+    if (Platform.OS !== 'web') {
+      return styles.actionButtons;
+    }
+
+    if (isMobile(width)) {
+      return [
+        styles.actionButtons,
+        {
+          flexDirection: 'column',
+          gap: 12,
+        }
+      ];
+    } else if (isTablet(width)) {
+      return [
+        styles.actionButtons,
+        {
+          flexDirection: 'row',
+          gap: 12,
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+        }
+      ];
+    } else {
+      return styles.actionButtons;
+    }
+  };
+
   const handleOfferAction = (offerId: string, action: string) => {
     const offer = creatorOffers.find(o => o.id === offerId);
     if (!offer) return;
@@ -184,7 +285,7 @@ const CreatorDealsView: React.FC<CreatorDealsViewProps> = ({ userRole }) => {
   const renderOfferCard = (offer: Offer) => (
     <TouchableOpacity 
       key={offer.id} 
-      style={styles.offerCard}
+      style={getOfferCardStyles()}
       onPress={() => handleOfferAction(offer.id, 'view')}
     >
       <View style={styles.offerHeader}>
@@ -218,7 +319,7 @@ const CreatorDealsView: React.FC<CreatorDealsViewProps> = ({ userRole }) => {
       </View>
 
       {/* Action Buttons */}
-      <View style={styles.actionButtons}>
+      <View style={getActionButtonsStyles()}>
         {offer.status === 'pending' && (
           <>
             <TouchableOpacity 
@@ -277,7 +378,7 @@ const CreatorDealsView: React.FC<CreatorDealsViewProps> = ({ userRole }) => {
   return (
     <View style={styles.container}>
       {/* Summary Cards */}
-      <View style={styles.summaryRow}>
+      <View style={getSummaryRowStyles()}>
         <View style={styles.summaryCard}>
           <Text style={styles.summaryValue}>{pendingOffers.length}</Text>
           <Text style={styles.summaryLabel}>Pending Review</Text>
@@ -499,6 +600,8 @@ const styles = StyleSheet.create({
   },
   acceptButton: {
     backgroundColor: Color.cSK430B92500,
+    borderWidth: 1,
+    borderColor: Color.cSK430B92500,
   },
   acceptButtonText: {
     color: '#FFFFFF',

@@ -18,7 +18,7 @@ import { DemoData } from "@/demo/DemoData";
 import { useAuth } from "@/contexts/AuthContext";
 import CreatorDealsView from "@/components/CreatorDealsView";
 import Navbar from "@/components/web/navbar";
-import { BREAKPOINTS, isMobile, isWideScreen } from "@/constants/breakpoints";
+import { BREAKPOINTS, isMobile, isWideScreen, isTablet, isDesktop } from "@/constants/breakpoints";
 import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/performance";
 import { WebSEO } from "../web-seo";
 
@@ -26,14 +26,23 @@ const UOM08MarketerDealHistoryList = () => {
   const { width } = useWindowDimensions();
   const { user } = useAuth();
   const router = useRouter();
-  const isWeb = Platform.OS === "web";
+  const isWeb = Platform?.OS === "web";
   const isWide = isWideScreen(width);
   const isMobileDevice = isMobile(width);
   const isMobileScreen = width <= 768;
+  const isVeryNarrow = width <= 380; // Very narrow screens need special handling
   
   // const [activeTab, setActiveTab] = useState('deals');
   const [isLoading, setIsLoading] = useState(true);
   const [chartsReady, setChartsReady] = useState(false);
+  
+  // Navbar search state
+  const [searchText, setSearchText] = useState('');
+  const handleSubmitSearch = () => {
+    if (searchText.trim()) {
+      router.push(`/?search=${encodeURIComponent(searchText.trim())}`);
+    }
+  };
 
   // Demo analytics data
   const [analyticsData] = useState({
@@ -76,6 +85,60 @@ const UOM08MarketerDealHistoryList = () => {
       submittedDate: new Date(Date.now() - 7200000), // 2 hours ago
     }
   ]);
+
+  // Responsive styles for metric cards
+  const getMetricsRowStyles = () => {
+    if (isMobileDevice || isVeryNarrow) {
+      return styles.metricsColumn;
+    } else if (isTablet(width)) {
+      return [
+        styles.metricsRow,
+        {
+          gap: 20,
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+        }
+      ];
+    } else {
+      return styles.metricsRow;
+    }
+  };
+
+  // Responsive styles for offer cards
+  const getOfferCardStyles = () => {
+    if (Platform.OS !== 'web') {
+      return styles.offerCard;
+    }
+
+    if (isMobile(width)) {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          marginHorizontal: 0,
+        }
+      ];
+    } else if (isTablet(width)) {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          maxWidth: '100%', // Fluid width on tablet
+          marginHorizontal: 0,
+          padding: 18, // Slightly more padding for tablet
+        }
+      ];
+    } else {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          maxWidth: 800, // Max width for desktop
+          marginHorizontal: 0,
+        }
+      ];
+    }
+  };
 
   useEffect(() => {
     if (DEMO_MODE) {
@@ -216,7 +279,7 @@ const UOM08MarketerDealHistoryList = () => {
     return (
       <View style={[styles.content, isWide && styles.wideContent]}>
         {/* Summary Cards */}
-        <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
+        <View style={getMetricsRowStyles()}>
           <MetricCard
             title="Total Offers"
             value={demoOffers.length}
@@ -244,7 +307,19 @@ const UOM08MarketerDealHistoryList = () => {
         {counterOffers.length > 0 && (
           <TouchableOpacity 
             style={styles.counterOfferAlert}
-            onPress={() => router.push('/offers/handle-counter')}
+            onPress={() => {
+              router.push({
+                pathname: '/offers/handle-counter',
+                params: { 
+                  counterId: counterOffers[0].id,
+                  from: 'deals'
+                }
+              });
+            }}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Review counter offer from ${counterOffers[0].creatorName}`}
+            accessibilityHint={`Opens counter offer details for ${counterOffers[0].offerType}`}
           >
             <View style={styles.counterOfferContent}>
               <Text style={styles.counterOfferIcon}>🔔</Text>
@@ -270,7 +345,7 @@ const UOM08MarketerDealHistoryList = () => {
               <TouchableOpacity 
                 key={offer.id} 
                 style={({ pressed }) => [
-                  styles.offerCard,
+                  ...Array.isArray(getOfferCardStyles()) ? getOfferCardStyles() : [getOfferCardStyles()],
                   pressed && styles.offerCardPressed
                 ]} 
                 data-testid="deal-card"
@@ -360,7 +435,7 @@ const UOM08MarketerDealHistoryList = () => {
   const renderAnalyticsTab = () => (
     <View style={[styles.content, isWide && styles.wideContent]}>
       {/* Key Metrics Row */}
-      <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
+      <View style={getMetricsRowStyles()}>
         <MetricCard
           title="Total Earnings"
           value={`$${analyticsData.totalEarnings.toLocaleString()}`}
@@ -382,7 +457,7 @@ const UOM08MarketerDealHistoryList = () => {
       </View>
 
       {/* Secondary Metrics */}
-      <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
+      <View style={getMetricsRowStyles()}>
         <MetricCard
           title="Total Deals"
           value={analyticsData.totalDeals}
@@ -492,7 +567,11 @@ const UOM08MarketerDealHistoryList = () => {
           description="Manage your deals and offers. High-value creator opportunities and brand partnerships."
           keywords="creator deals, brand partnerships, influencer opportunities, offers"
         />
-        <Navbar pageTitle="Deals & Offers" />
+        <Navbar 
+          searchText={searchText}
+          setSearchText={setSearchText}
+          onSubmitSearch={handleSubmitSearch}
+        />
         <SafeAreaView style={styles.container}>
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
             {/* Content */}
@@ -548,7 +627,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    ...(isWeb && { cursor: 'pointer' as any }),
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+        ':focus': {
+          borderColor: '#EA580C',
+          borderWidth: 2,
+          shadowColor: '#EA580C',
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+          backgroundColor: '#FFF7ED',
+        },
+        ':hover': {
+          backgroundColor: '#FEF3C7',
+          borderColor: '#F59E0B',
+        }
+      }
+    }),
   },
   counterOfferContent: {
     flexDirection: 'row',
@@ -582,6 +677,10 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#EA580C',
+    paddingLeft: 12,
+    paddingVertical: 8,
+    textAlign: 'center',
+    minWidth: 80,
   },
   tabHeader: {
     backgroundColor: "#FFFFFF",
@@ -624,9 +723,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 16,
     marginBottom: 20,
+    flexWrap: "wrap", // Allow wrapping on very narrow screens
   },
   metricsColumn: {
     flexDirection: "column",
+    gap: 16,
+    alignItems: "stretch", // Ensure cards take full width when stacked
   },
   metricCard: {
     flex: 1,
@@ -635,10 +737,18 @@ const styles = StyleSheet.create({
     padding: 16,
     borderWidth: 1,
     borderColor: "#E2D0FB",
-    minHeight: 100,
+    height: 120, // Fixed height instead of minHeight for consistency
+    minWidth: 120, // Prevent cards from becoming too narrow
+    maxWidth: '100%', // Ensure cards don't overflow their container
+    justifyContent: 'space-between', // Distribute content evenly within the fixed height
   },
   metricCardWide: {
-    minHeight: 120,
+    height: 140, // Slightly taller for wide screens, but still fixed
+  },
+  metricCardMobile: {
+    flex: 0, // Don't flex when stacked vertically
+    width: '100%', // Take full width when stacked
+    height: 100, // Slightly shorter on mobile to save space
   },
   metricTitle: {
     fontSize: 14,
@@ -646,7 +756,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   metricValue: {
-    fontSize: Platform.OS === "web" ? 24 : 20,
+    fontSize: Platform?.OS === "web" ? 24 : 20,
     fontWeight: "700",
     color: "#430B92",
     marginBottom: 4,
@@ -683,8 +793,8 @@ const styles = StyleSheet.create({
     alignItems: "flex-end",
     backgroundColor: "#F8F9FD",
     borderRadius: 16,
-    padding: Platform.OS === "web" ? 20 : 16,
-    height: Platform.OS === "web" ? 200 : 180,
+    padding: Platform?.OS === "web" ? 20 : 16,
+    height: Platform?.OS === "web" ? 200 : 180,
     overflow: "hidden",
   },
   chartBar: {
@@ -693,7 +803,7 @@ const styles = StyleSheet.create({
   },
   bar: {
     backgroundColor: "#430B92",
-    width: Platform.OS === "web" ? 30 : 24,
+    width: Platform?.OS === "web" ? 30 : 24,
     borderRadius: 4,
     marginBottom: 8,
     minHeight: 20,
@@ -851,7 +961,7 @@ const styles = StyleSheet.create({
   },
   barSkeleton: {
     backgroundColor: "#E2D0FB",
-    width: Platform.OS === "web" ? 30 : 24,
+    width: Platform?.OS === "web" ? 30 : 24,
     height: 60,
     borderRadius: 4,
     marginBottom: 8,
@@ -879,7 +989,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
-    ...(isWeb && { cursor: 'pointer' as any }),
+    ...(Platform?.OS === 'web' && { cursor: 'pointer' as any }),
   },
   offerCardPressed: {
     opacity: 0.8,

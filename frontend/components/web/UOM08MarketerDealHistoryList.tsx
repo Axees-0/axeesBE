@@ -70,7 +70,7 @@ function getPlatformIcon(platform: string) {
 export default function MarketerDealHistoryList() {
   const { user } = useAuth();
   const windowSize = useWindowDimensions();
-  const isWeb = Platform.OS === "web";
+  const isWeb = Platform?.OS === "web";
   const isWideScreen = windowSize.width >= BREAKPOINTS.TABLET;
 
   const [filterStatus, setFilterStatus] = useState("");

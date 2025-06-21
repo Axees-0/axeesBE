@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-06-21T17:34:18+00:00",
+  "status": "ready_for_deployment",
+  "packages": {
+    "original_stable": {
+      "url": "https://polite-ganache-3a4e1b.netlify.app",
+      "status": "deployed",
+      "description": "Original stable version before QA fixes"
+    },
+    "qa_fixes": {
+      "package": "axees-frontend-qa-fixes.zip",
+      "size": "6.7M",
+      "status": "ready",
+      "description": "New version with all 34 QA fixes",
+      "fixes_count": 34
+    }
+  },
+  "deployment_method": "manual_netlify_drag_drop",
+  "instructions_file": "DEPLOYMENT_INSTRUCTIONS.md"
+}

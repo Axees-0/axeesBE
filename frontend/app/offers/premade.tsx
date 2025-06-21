@@ -230,7 +230,13 @@ const PreMadeOffersPage: React.FC = () => {
                 params: { creatorId }
               })}
             >
-              <Text style={styles.customOfferButtonText}>Create Custom Offer</Text>
+              <Text 
+                style={styles.customOfferButtonText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                Create Custom Offer
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -435,11 +441,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 44,
   },
   customOfferButtonText: {
     color: Color.cSK430B92500,
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
+    flexShrink: 1,
   },
 });
 

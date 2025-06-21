@@ -24,6 +24,8 @@ import { usePayment } from "@/contexts/PaymentContext";
 import { format } from "date-fns";
 import ProfileInfo from "@/components/ProfileInfo";
 import Navbar from "@/components/web/navbar";
+import { isTablet, isDesktop, isMobile } from "@/constants/breakpoints";
+import { WebSEO } from "./web-seo";
 
 // Demo Mode Imports
 import { DEMO_MODE, DemoConfig, demoLog } from "@/demo/DemoMode";
@@ -352,6 +354,68 @@ export default function CreatorOfferDetails() {
     }
   };
 
+  // Get responsive styles for the offer card
+  const getOfferCardStyles = () => {
+    if (Platform.OS !== 'web') {
+      return styles.offerCard;
+    }
+
+    if (isMobile(window.width)) {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          padding: 16,
+        }
+      ];
+    } else if (isTablet(window.width)) {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          maxWidth: '100%', // Fluid width on tablet
+          padding: 20, // More padding for better readability
+        }
+      ];
+    } else {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          maxWidth: 800, // Max width for desktop
+        }
+      ];
+    }
+  };
+
+  // Get responsive styles for action buttons
+  const getActionButtonsStyles = () => {
+    if (Platform.OS !== 'web') {
+      return styles.actionButtons;
+    }
+
+    if (isMobile(window.width)) {
+      return [
+        styles.actionButtons,
+        {
+          flexDirection: 'column',
+          gap: 12,
+        }
+      ];
+    } else if (isTablet(window.width)) {
+      return [
+        styles.actionButtons,
+        {
+          flexDirection: 'row',
+          gap: 16,
+          flexWrap: 'wrap',
+        }
+      ];
+    } else {
+      return styles.actionButtons;
+    }
+  };
+
   const getStatus = (offer, role) => {
     if (offer?.draft) {
       return "Draft";
@@ -418,6 +482,11 @@ export default function CreatorOfferDetails() {
 
   return (
     <>
+      <WebSEO 
+        title="Offer Details | Axees"
+        description="Review offer details and manage collaboration opportunities"
+        keywords="offer details, creator collaboration, brand partnership, counter offer"
+      />
       <Navbar pageTitle="Offer Details" />
       <SafeAreaView style={styles.container}>
         <StatusBar style="auto" />
@@ -435,7 +504,7 @@ export default function CreatorOfferDetails() {
             </TouchableOpacity> */}
             </View>
             {/* Offer Card */}
-            <View style={styles.offerCard}>
+            <View style={getOfferCardStyles()}>
               <Text style={styles.offerName}>{displayData?.offerName}</Text>
               <Text style={styles.offerAmount}>
                 {displayData?.proposedAmount?.toLocaleString("en-US", {
@@ -561,10 +630,7 @@ export default function CreatorOfferDetails() {
               displayData?.status !== "Accepted" &&
               displayData?.status !== "Cancelled" && (
                 <View
-                  style={[
-                    styles.actionButtons,
-                    isMobile && { flexDirection: "column" },
-                  ]}
+                  style={getActionButtonsStyles()}
                 >
                   {isMarketerOwner ? (
                     // If user is a marketer, they can only see action buttons if the creator countered
@@ -723,7 +789,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    marginHorizontal: "15%",
+    marginHorizontal: Platform.OS === 'web' ? "10%" : "5%", // More responsive margins
   },
   loadingContainer: {
     flex: 1,
@@ -873,7 +939,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
   },
   acceptButton: {
     backgroundColor: "#430B92",
@@ -882,7 +948,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    maxWidth: "30%",
   },
   acceptButtonText: {
     color: "#FFFFFF",
@@ -897,7 +962,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    maxWidth: "30%",
   },
   counterButtonText: {
     color: "#6C6C6C",
@@ -912,7 +976,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    maxWidth: "30%",
   },
   rejectButtonText: {
     color: "#ED0006",

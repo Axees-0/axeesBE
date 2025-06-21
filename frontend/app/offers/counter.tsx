@@ -646,7 +646,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   submitButton: {
-    flex: 2,
+    flex: 1,
     backgroundColor: Color.cSK430B92500,
     paddingVertical: 16,
     borderRadius: 8,

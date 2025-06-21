@@ -32,6 +32,7 @@ import Heart from '@/assets/icons.png';
 import HeartFilled from '@/assets/heart-red.png';
 import Message from '@/assets/message01.svg';
 import CheckBadge from '@/assets/checkmarkbadge01.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface CreatorProfileProps {}
 
@@ -92,6 +93,47 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
+  };
+
+  // Handle share profile
+  const handleShareProfile = async () => {
+    const profileUrl = `${Platform.OS === 'web' ? window.location.origin : 'https://axees.com'}/profile/${creator._id}`;
+    const shareText = `Check out ${creator.name}'s creator profile on Axees!`;
+    
+    if (Platform.OS === 'web' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${creator.name} - Axees Creator`,
+          text: shareText,
+          url: profileUrl,
+        });
+      } catch (error) {
+        // User cancelled share or share API not supported
+        // Fallback to copy to clipboard
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(profileUrl);
+          Alert.alert('Success', 'Profile link copied to clipboard!');
+        }
+      }
+    } else if (Platform.OS === 'web') {
+      // Fallback for browsers without share API
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(profileUrl);
+        Alert.alert('Success', 'Profile link copied to clipboard!');
+      }
+    } else {
+      // Mobile share
+      const { Share: RNShare } = require('react-native');
+      try {
+        await RNShare.share({
+          message: `${shareText} ${profileUrl}`,
+          url: profileUrl,
+          title: shareText,
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    }
   };
 
   // Simple working contact form with Subject validation
@@ -414,12 +456,9 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton 
+            fallbackRoute="/explore"
+          />
           
           <View style={styles.headerActions}>
             <TouchableOpacity 
@@ -434,7 +473,10 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
               />
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.actionButton}>
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => handleShareProfile()}
+            >
               <Image 
                 source={Share} 
                 style={styles.actionIcon}
@@ -526,15 +568,26 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                   style={styles.collaborateButton}
                   onPress={() => setIsOfferModalVisible(true)}
                 >
-                  <Text style={styles.collaborateText}>Create Offer</Text>
+                  <Text 
+                    style={styles.collaborateText}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Create Offer
+                  </Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
 
           {/* Tab Navigation */}
-          <View style={styles.tabContainer}>
-            {['about', 'portfolio', 'rates'].map((tab) => (
+          <View 
+            style={styles.tabContainer}
+            accessible={true}
+            accessibilityRole="tablist"
+            accessibilityLabel="Profile navigation tabs"
+          >
+            {['about', 'portfolio', 'rates'].map((tab, index) => (
               <TouchableOpacity
                 key={tab}
                 style={({ focused }) => [
@@ -547,6 +600,8 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                 accessibilityRole="tab"
                 accessibilityState={{ selected: activeTab === tab }}
                 accessibilityLabel={`${tab.charAt(0).toUpperCase() + tab.slice(1)} tab`}
+                accessibilityHint={`Shows ${tab} information for ${creator.name}`}
+                tabIndex={activeTab === tab ? 0 : -1} // Proper tab navigation
               >
                 <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -725,11 +780,17 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 40,
+    justifyContent: 'space-evenly',
+    gap: isMobileScreen ? 20 : 40,
     marginBottom: 20,
+    flexWrap: 'wrap',
+    paddingHorizontal: isMobileScreen ? 10 : 0,
   },
   statItem: {
     alignItems: 'center',
+    minWidth: isMobileScreen ? 80 : 100,
+    flex: 1,
+    maxWidth: isMobileScreen ? 120 : 140,
   },
   statNumber: {
     fontSize: 20,
@@ -786,24 +847,34 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
+    paddingHorizontal: 8,
     borderRadius: 8,
     backgroundColor: Color.cSK430B92500,
+    minHeight: 44,
   },
   collaborateText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
+    flexShrink: 1,
   },
   tabContainer: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
     marginTop: 20,
+    paddingHorizontal: 4, // Add horizontal padding to prevent edge concatenation
+    gap: 4, // Add gap between tabs for modern browsers
   },
   tabButton: {
     flex: 1,
     paddingVertical: 16,
+    paddingHorizontal: 16, // Increased horizontal padding for better spacing
     alignItems: 'center',
+    marginHorizontal: 8, // Increased margin between tabs to prevent concatenation
+    minWidth: 90, // Increased minimum width for better layout
+    borderRadius: 8, // Add border radius for better visual separation
   },
   activeTabButton: {
     borderBottomWidth: 2,
@@ -816,6 +887,11 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 16,
     color: '#666',
+    textAlign: 'center',
+    letterSpacing: 0.8, // Increased letter spacing for better readability and separation
+    fontWeight: '500',
+    lineHeight: 20, // Add line height for better vertical spacing
+    paddingHorizontal: 4, // Add horizontal padding to prevent text truncation
   },
   activeTabText: {
     color: Color.cSK430B92500,

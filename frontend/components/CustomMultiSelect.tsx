@@ -66,7 +66,7 @@ export default function CustomMultiSelect({
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{label ?? "Select Options"}</Text>
 
-            <ScrollView style={{ maxHeight: 300, marginVertical: 10 }}>
+            <ScrollView style={styles.optionsList}>
               {allOptions.map((option) => {
                 const checked = selectedValues.includes(option);
                 return (
@@ -142,6 +142,11 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: "#430b92",
     fontWeight: "bold",
+  },
+  optionsList: {
+    maxHeight: 300,
+    marginVertical: 10,
+    paddingRight: 8, // Add padding to prevent scrollbar overlap
   },
   optionRow: {
     flexDirection: "row",

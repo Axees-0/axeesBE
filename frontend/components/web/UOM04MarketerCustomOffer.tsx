@@ -611,11 +611,15 @@ export default function CustomOffer() {
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.draftButton}
-              onPress={handleSaveDraft}
-              disabled={createOfferMutation.isPending}
+              onPress={() => saveDraftMutation.mutate()}
+              disabled={saveDraftMutation.isPending}
             >
-              <Text style={styles.draftButtonText}>
-                {createOfferMutation.isPending ? "Saving..." : "Save Draft"}
+              <Text 
+                style={styles.draftButtonText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
+                {saveDraftMutation.isPending ? "Saving..." : "Save Draft"}
               </Text>
             </TouchableOpacity>
 
@@ -624,16 +628,22 @@ export default function CustomOffer() {
                 styles.sendButton,
                 !isFormValid() && styles.sendButtonDisabled,
               ]}
-              onPress={handleSendOffer}
-              disabled={!isFormValid() || createOfferMutation.isPending}
+              onPress={() => {
+                if (isFormValid()) {
+                  setPaymentModalVisible(true);
+                }
+              }}
+              disabled={!isFormValid() || sendOfferMutation.isPending}
             >
               <Text
                 style={[
                   styles.sendButtonText,
                   !isFormValid() && styles.sendButtonTextDisabled,
                 ]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
               >
-                {createOfferMutation.isPending ? "Sending..." : "Send for $1"}
+                {sendOfferMutation.isPending ? "Sending..." : "Send for $1"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -896,11 +906,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
+    paddingHorizontal: 8,
+    minWidth: 120,
   },
   draftButtonText: {
     fontSize: 16,
     color: "#430B92",
     fontWeight: "500",
+    textAlign: "center",
+    flexShrink: 1,
   },
   sendButton: {
     flex: 1,
@@ -909,6 +923,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 8,
+    minWidth: 120,
   },
   sendButtonDisabled: {
     backgroundColor: "#E2D0FB",
@@ -917,6 +933,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#FFFFFF",
     fontWeight: "500",
+    textAlign: "center",
+    flexShrink: 1,
   },
   sendButtonTextDisabled: {
     color: "#FFFFFF",

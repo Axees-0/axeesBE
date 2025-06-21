@@ -709,8 +709,8 @@ const chipTags = useMemo(() => {
             }}
             returnKeyType="search"
             style={styles.searchInput}
-            placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
-            placeholderTextColor="#888"
+            placeholder="Search creators by name, location, or category"
+            placeholderTextColor="#666"
           />
           {showClearButton && (
             <Pressable
@@ -836,7 +836,7 @@ const makeStyles = (w: number) => {
       fontSize: 15,
       color: "#0b0218",
       paddingVertical: 0,
-      opacity: 0.5,
+      minWidth: 0, // Prevents text overflow issues
     },
     clearButton: {
       width: 24,

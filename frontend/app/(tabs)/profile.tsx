@@ -23,7 +23,7 @@ const BREAKPOINTS = {
 
 const ProfilePage = () => {
   const window = useWindowDimensions();
-  const isWeb = Platform.OS === "web";
+  const isWeb = Platform?.OS === "web";
   const isMobileScreen = window.width <= BREAKPOINTS.mobile;
   const { user, logout } = useAuth();
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
@@ -476,9 +476,11 @@ const styles = StyleSheet.create({
   },
   statsGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     marginBottom: 20,
-    gap: 10,
+    gap: 8,
+    flexWrap: 'wrap',
+    paddingHorizontal: 4,
   },
   statItem: {
     backgroundColor: 'white',
@@ -491,6 +493,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
+    minWidth: 75,
+    maxWidth: 120,
+    justifyContent: 'center',
   },
   statValue: {
     fontSize: 20,

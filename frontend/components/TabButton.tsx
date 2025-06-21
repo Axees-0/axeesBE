@@ -1,6 +1,6 @@
 import type React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { Color, FontFamily, FontSize, Padding, Gap } from "../GlobalStyles";
+import { View, Text, StyleSheet, Pressable, Platform } from "react-native";
+import { Color, FontFamily, FontSize, Padding, Gap, Focus } from "../GlobalStyles";
 import { useWindowDimensions } from "react-native";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -67,13 +67,19 @@ export function TabButton({
 
   return (
     <Pressable
-      style={[styles.parentFlexBox, isActive && styles.activeTab]}
+      style={({ pressed, focused }) => [
+        styles.parentFlexBox, 
+        isActive && styles.activeTab,
+        focused && styles.focusedTab,
+        pressed && styles.pressedTab
+      ]}
       onPress={onPress}
       accessible={true}
       accessibilityRole="tab"
       accessibilityLabel={getAccessibilityLabel()}
       accessibilityState={{ selected: isActive }}
       accessibilityHint={`Navigate to ${label} page`}
+      {...(Platform.OS === 'web' && { tabIndex: 0 })}
     >
       {label.toLowerCase() === "notifications" &&
         unreadNotifications.length > 0 && (
@@ -108,6 +114,15 @@ const styles = StyleSheet.create({
     borderColor: Color.backgroundsPrimary,
     borderBottomWidth: 3,
     borderStyle: "solid",
+  },
+  focusedTab: {
+    ...Focus.primary,
+    borderRadius: 8,
+    opacity: 1,
+  },
+  pressedTab: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
   },
   label: {
     color: Color.backgroundsPrimary,

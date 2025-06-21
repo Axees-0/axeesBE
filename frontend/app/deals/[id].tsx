@@ -20,6 +20,7 @@ import { notificationService } from '@/services/notificationService';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface Milestone {
   id: string;
@@ -60,7 +61,7 @@ interface Deal {
 
 const DealDetailPage: React.FC = () => {
   const { id } = useLocalSearchParams();
-  const isWeb = Platform.OS === 'web';
+  const isWeb = Platform?.OS === 'web';
   const [selectedMilestone, setSelectedMilestone] = useState<string | null>(null);
   const [milestoneStatuses, setMilestoneStatuses] = useState<{[key: string]: string}>({});
   const { user } = useAuth();
@@ -190,7 +191,6 @@ const DealDetailPage: React.FC = () => {
     switch (action) {
       case 'fund':
         // Use web-compatible confirmation
-        const isWeb = Platform.OS === 'web';
         const confirmed = isWeb 
           ? window.confirm(`Fund ${milestone.title} for $${milestone.amount}?`)
           : true; // Will show Alert.alert for mobile
@@ -240,7 +240,6 @@ const DealDetailPage: React.FC = () => {
       }
       
       // Use web-compatible success message
-      const isWeb = Platform.OS === 'web';
       if (isWeb) {
         const openChat = window.confirm('Milestone funded successfully! The creator has been notified and can start working.\n\nOpen chat?');
         if (openChat) {
@@ -285,7 +284,6 @@ const DealDetailPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Error funding milestone:', error);
-      const isWeb = Platform.OS === 'web';
       if (isWeb) {
         window.alert('Failed to fund milestone. Please try again.');
       } else {
@@ -410,12 +408,9 @@ const DealDetailPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton 
+            fallbackRoute="/deals"
+          />
           
           <Text style={styles.headerTitle}>Deal Details</Text>
           

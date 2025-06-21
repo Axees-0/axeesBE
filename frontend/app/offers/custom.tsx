@@ -372,7 +372,11 @@ const CustomOfferPage: React.FC = () => {
             onPress={handleContinueToPreview}
             disabled={!isFormValid()}
           >
-            <Text style={[styles.continueButtonText, !isFormValid() && styles.disabledButtonText]}>
+            <Text 
+              style={[styles.continueButtonText, !isFormValid() && styles.disabledButtonText]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               Continue to Preview
             </Text>
           </TouchableOpacity>
@@ -627,8 +631,11 @@ const styles = StyleSheet.create({
   continueButton: {
     backgroundColor: Color.cSK430B92500,
     paddingVertical: 16,
+    paddingHorizontal: 16,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 54,
   },
   disabledButton: {
     backgroundColor: '#ccc',
@@ -637,6 +644,8 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 18,
     fontWeight: '600',
+    textAlign: 'center',
+    flexShrink: 1,
   },
   disabledButtonText: {
     color: '#999',

@@ -1,0 +1,34 @@
+{
+  "timestamp": "2025-06-21T18:24:00Z",
+  "status": "sites_created_ready_for_deployment",
+  "sites_created": {
+    "original_stable": {
+      "site_id": "126e6fe6-0b38-4a7d-aa63-b6f55bbc8dcf",
+      "url": "https://axees-original-stable-1750530121.netlify.app",
+      "admin_url": "https://app.netlify.com/projects/axees-original-stable-1750530121",
+      "package": "axees-frontend-original-stable.zip",
+      "ready": true
+    },
+    "qa_fixes": {
+      "site_id": "4bfb3af6-ffb7-465f-b989-5d7a70cb6c83", 
+      "url": "https://axees-qa-fixes-1750530226.netlify.app",
+      "admin_url": "https://app.netlify.com/projects/axees-qa-fixes-1750530226",
+      "package": "axees-frontend-qa-fixes.zip",
+      "ready": true
+    }
+  },
+  "deployment_method": "manual_drag_drop_required",
+  "reason": "Sites have build configurations that prevent direct static deployment",
+  "next_steps": [
+    "Go to https://app.netlify.com/projects/axees-original-stable-1750530121/deploys",
+    "Click 'Deploy manually'",
+    "Drag and drop axees-frontend-original-stable.zip",
+    "Go to https://app.netlify.com/projects/axees-qa-fixes-1750530226/deploys", 
+    "Click 'Deploy manually'",
+    "Drag and drop axees-frontend-qa-fixes.zip"
+  ],
+  "expected_result": {
+    "original_stable_live_url": "https://axees-original-stable-1750530121.netlify.app",
+    "qa_fixes_live_url": "https://axees-qa-fixes-1750530226.netlify.app"
+  }
+}

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Color } from '@/GlobalStyles';
+import { Color, Focus } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -36,6 +36,8 @@ const NotificationCenterPage: React.FC = () => {
   const isWeb = Platform.OS === 'web';
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+  const [markAllHovered, setMarkAllHovered] = useState(false);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 'notif-1',
@@ -159,7 +161,56 @@ const NotificationCenterPage: React.FC = () => {
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    const unreadCount = notifications.filter(n => !n.read).length;
+    
+    if (unreadCount === 0 || markingAllRead) {
+      return; // No unread notifications or already processing
+    }
+    
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(
+        `Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read?`
+      );
+      if (confirmed) {
+        setMarkingAllRead(true);
+        setTimeout(() => {
+          setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+          setMarkingAllRead(false);
+          // Show success feedback
+          setTimeout(() => {
+            alert(`${unreadCount} notification${unreadCount > 1 ? 's' : ''} marked as read`);
+          }, 100);
+        }, 500); // Small delay for visual feedback
+      }
+    } else {
+      // For mobile, use Alert.alert
+      const { Alert } = require('react-native');
+      Alert.alert(
+        'Mark All Read',
+        `Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Mark Read', 
+            onPress: () => {
+              setMarkingAllRead(true);
+              setTimeout(() => {
+                setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+                setMarkingAllRead(false);
+                // Show success feedback
+                setTimeout(() => {
+                  Alert.alert(
+                    'Success',
+                    `${unreadCount} notification${unreadCount > 1 ? 's' : ''} marked as read`,
+                    [{ text: 'OK' }]
+                  );
+                }, 100);
+              }, 500); // Small delay for visual feedback
+            }
+          }
+        ]
+      );
+    }
   };
 
   const onRefresh = () => {
@@ -196,10 +247,23 @@ const NotificationCenterPage: React.FC = () => {
           
           {unreadCount > 0 && (
             <TouchableOpacity 
-              style={styles.markAllButton}
+              style={[
+                styles.markAllButton,
+                markAllHovered && isWeb && styles.markAllButtonHovered,
+                markingAllRead && styles.markAllButtonLoading
+              ]}
               onPress={markAllAsRead}
+              activeOpacity={0.7}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read`}
+              accessibilityHint="Marks all unread notifications as read"
+              onMouseEnter={isWeb ? () => setMarkAllHovered(true) : undefined}
+              onMouseLeave={isWeb ? () => setMarkAllHovered(false) : undefined}
             >
-              <Text style={styles.markAllText}>Mark all read</Text>
+              <Text style={styles.markAllText}>
+                {markingAllRead ? 'Marking...' : 'Mark all read'}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -312,13 +376,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   markAllButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Color.cSK430B92500,
+    minHeight: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+      },
+    }),
   },
   markAllText: {
     color: Color.cSK430B92500,
     fontSize: 14,
     fontWeight: '600',
+    textAlign: 'center',
+    ...Platform.select({
+      web: {
+        userSelect: 'none',
+      },
+    }),
   },
   scrollContainer: {
     flex: 1,
@@ -414,6 +496,26 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     lineHeight: 24,
+  },
+  markAllButtonHovered: {
+    backgroundColor: Color.cSK430B9250,
+    borderColor: Color.cSK430B92500,
+  },
+  markAllButtonLoading: {
+    opacity: 0.6,
+    backgroundColor: Color.cSK430B92100,
+  },
+  markAllButtonDisabled: {
+    opacity: 0.5,
+    borderColor: '#ccc',
+    ...Platform.select({
+      web: {
+        cursor: 'not-allowed' as any,
+      },
+    }),
+  },
+  markAllTextDisabled: {
+    color: '#999',
   },
 });
 

@@ -129,21 +129,41 @@
                 value={searchText}
                 onChangeText={setSearchText}
                 returnKeyType="search"
-                blurOnSubmit={true}                     // ← blur automatically after submit
+                blurOnSubmit={true}
                 onSubmitEditing={() => {
-                  onSubmitSearch();                      // your existing search trigger
-                  inputRef.current?.blur();              // explicitly remove focus
+                  onSubmitSearch();
+                  inputRef.current?.blur();
                 }}
-                placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
+                placeholder={isWide ? "Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)" : "Search creators by name, location, or category"}
                 placeholderTextColor={Color.cSK430B92950}
                 style={styles.searchInput}
+                accessible={true}
+                accessibilityRole="searchbox"
+                accessibilityLabel="Search creators"
+                accessibilityHint="Search by name, location, or category"
+                tabIndex={1} // Ensure search gets focus priority
               />
+              {searchText.length > 0 && (
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={() => {
+                    setSearchText('');
+                    inputRef.current?.focus();
+                  }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear search"
+                  accessibilityHint="Clear the search text and refocus search input"
+                >
+                  <Text style={styles.clearButtonText}>×</Text>
+                </TouchableOpacity>
+              )}
             </View>
            )}
    
            {/* ─── Right: auth buttons / user dropdown ───────────── */}
            <View style={styles.right}>
-             {!user?._id ? (
+             {!user || !user._id ? (
                <View style={styles.authBtns}>
                  <TouchableOpacity
                    style={styles.signInBtn}

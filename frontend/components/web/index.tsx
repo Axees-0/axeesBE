@@ -40,6 +40,7 @@ import React from "react";
 import MainScene from "@/assets/main-scene.gif";   // ➊ new
 import { DEMO_MODE } from "@/demo/DemoMode";
 import { DemoData } from "@/demo/DemoData";
+import { BREAKPOINTS, isTablet, isDesktop, isMobile } from "@/constants/breakpoints";
 
 
 /* …imports stay exactly the same … */
@@ -87,7 +88,7 @@ interface FindPage {
 
 //  ─── constants you can re-use ──────────────────────────────────────────
 const CARD_GAP = 30;     // ↔ the value in columnWrapperStyle.gap
-const COLS     = 3;      // 3 columns on desktop
+const COLS     = 3;      // 3 columns on desktop (will be overridden by responsive logic)
 
 
 // ─── Type-writer helper ───────────────────────────────────────────
@@ -179,6 +180,17 @@ const AxeesMockup = () => {
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [accountUrl, setAccountUrl] = useState("");
   
+  // Get window dimensions for responsive layout
+  const { width } = Dimensions.get('window');
+
+  // Responsive column logic for creator cards
+  const getNumColumns = () => {
+    if (isMobile(width)) return 1;
+    if (isTablet(width)) return 2; // Tablet gets 2 columns for fluid width
+    return 3; // Desktop gets 3 columns
+  };
+
+  const numColumns = getNumColumns();
 
   const { requestNotificationPermission } = useNotifications();
   const queryClient = useQueryClient();
@@ -537,6 +549,51 @@ const isAIRequestActive =
   hasUserQuery;  
   
 
+  // Get responsive card styles
+  const getCardStyles = () => {
+    const baseStyle = styles.rectangleParent;
+    
+    if (Platform.OS !== 'web') {
+      return [baseStyle, styles.parentFlexBox1];
+    }
+
+    // Responsive styles for web
+    if (isMobile(width)) {
+      return [
+        baseStyle,
+        styles.parentFlexBox1,
+        {
+          width: '100%',
+          minWidth: 280,
+          maxWidth: '100%',
+          flex: 1,
+        }
+      ];
+    } else if (isTablet(width)) {
+      return [
+        baseStyle,
+        styles.parentFlexBox1,
+        {
+          width: `calc((100% - ${(2 - 1) * CARD_GAP}px) / 2)`,
+          minWidth: 320,
+          maxWidth: 480,
+          flex: 1,
+        }
+      ];
+    } else {
+      return [
+        baseStyle,
+        styles.parentFlexBox1,
+        {
+          width: `calc((100% - ${(3 - 1) * CARD_GAP}px) / 3)`,
+          minWidth: 300,
+          maxWidth: 380,
+          flex: 1,
+        }
+      ];
+    }
+  };
+
   // Render each user card
   const renderUserCard = (usr: any, index: number) => {
     const creatorCategory = usr.creatorData?.categories?.slice(0, 2);
@@ -550,8 +607,7 @@ const isAIRequestActive =
       <Pressable
         key={usr._id}
         style={({ pressed, hovered }) => [
-          styles.rectangleParent, 
-          styles.parentFlexBox1,
+          ...getCardStyles(),
           pressed && styles.cardPressed,
           Platform.OS === 'web' && hovered && styles.cardHovered,
         ]}
@@ -768,9 +824,33 @@ const isAIRequestActive =
     };
     
     const handleChipKeyPress = (event: any, tag: string) => {
-      if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === ' ') {
+      const key = event.nativeEvent.key;
+      
+      if (key === 'Enter' || key === ' ') {
         event.preventDefault();
         handleChipPress(tag);
+        return;
+      }
+      
+      // Handle arrow key navigation between chips
+      if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
+        event.preventDefault();
+        
+        const currentIndex = chipTags.indexOf(tag);
+        let nextIndex;
+        
+        if (key === 'ArrowUp' || key === 'ArrowLeft') {
+          nextIndex = currentIndex > 0 ? currentIndex - 1 : chipTags.length - 1;
+        } else {
+          nextIndex = currentIndex < chipTags.length - 1 ? currentIndex + 1 : 0;
+        }
+        
+        // Focus the next chip
+        const nextTag = chipTags[nextIndex];
+        const nextElement = document.querySelector(`[data-filter-tag="${nextTag}"]`);
+        if (nextElement) {
+          (nextElement as HTMLElement).focus();
+        }
       }
     };
     
@@ -790,6 +870,7 @@ const isAIRequestActive =
         accessibilityLabel={`Filter by ${tag}`}
         accessibilityState={{ selected: selectedTag === tag }}
         accessibilityHint={selectedTag === tag ? "Double tap to remove filter" : "Double tap to apply filter"}
+        {...(Platform.OS === 'web' && { 'data-filter-tag': tag })}
       >
         <Text
           style={[
@@ -835,7 +916,7 @@ const renderListHeader = () => (
           value={searchText}
           onChangeText={setSearchText}
           onSubmitEditing={onSubmitSearch}
-          placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
+          placeholder={isDesktop(width) ? "Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)" : "Search creators by name, location, or category"}
           placeholderTextColor={Color.cSK430B92950}
           style={styles.inlineSearchInput}
           returnKeyType="search"
@@ -988,17 +1069,17 @@ const renderEmpty = () => {
             ListHeaderComponent={renderListHeader}
             ListEmptyComponent={renderEmpty}
             renderItem={({ item, index }) => renderUserCard(item, index)}
-            numColumns={3}
-            columnWrapperStyle={{
+            numColumns={numColumns}
+            columnWrapperStyle={numColumns > 1 ? {
               flexDirection: 'row',
               flexWrap    : 'wrap',
               gap         : CARD_GAP,
               paddingHorizontal: 20,
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-            }}
+            } : undefined}
             contentContainerStyle={{ 
-              paddingBottom: 80, 
+              paddingBottom: Platform.OS === 'web' ? 120 : 80, 
               paddingTop: 20,
               paddingHorizontal: 20,
               flexGrow: 1,
@@ -1405,13 +1486,6 @@ skeletonFooter: {
     borderRadius: 16,
     padding: 24,
     backgroundColor: "white",
-    // ---- width -----------------------------------------------------------
-    // @ts-ignore
-    flexBasis : Platform.OS === 'web'
-      ? `calc((100% - ${(COLS - 1) * CARD_GAP}px) / ${COLS})`
-      : '33%',
-    minWidth  : 300,
-    maxWidth  : 380,
     marginBottom : 24,
     borderWidth: 1,
     borderColor: "#f1f5f9",
@@ -1421,6 +1495,7 @@ skeletonFooter: {
     shadowRadius: 12,
     elevation: 4,
     position: "relative", // Ensure proper stacking
+    // Base responsive styles will be applied dynamically
   },
   cardPressed: {
     opacity: 0.95,
@@ -1593,8 +1668,8 @@ skeletonFooter: {
 
   // Selected tag chip - better contrast
   selectedTagChip: {
-    backgroundColor: Color.cSK430B92500,
-    borderColor: Color.cSK430B92500,
+    backgroundColor: Color.cSK430B92950,
+    borderColor: Color.cSK430B92950,
   },
 
   // Tag chip text - better readability
@@ -1664,14 +1739,17 @@ skeletonFooter: {
 
   statsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     marginBottom: 16,
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
+    gap: 12,
   },
 
   statItem: {
     flex: 1,
     alignItems: "center",
+    minWidth: 60,
+    maxWidth: 100,
   },
 
   cardActions: {

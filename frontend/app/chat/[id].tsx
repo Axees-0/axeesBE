@@ -15,9 +15,12 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
 import { useAuth } from '@/contexts/AuthContext';
+import { WebSEO } from '../web-seo';
+import WebBottomTabs from '@/components/WebBottomTabs';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface Message {
   id: string;
@@ -206,17 +209,21 @@ const ChatScreen: React.FC = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <>
+      <WebSEO 
+        title={`Chat with ${otherParticipant.name} | Axees`}
+        description={`Private conversation with ${otherParticipant.name} about your collaboration`}
+        keywords="chat, messaging, collaboration, communication"
+      />
+      
+      <SafeAreaView style={styles.container}>
       <StatusBar style="auto" />
       
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <ArrowLeft width={24} height={24} />
-        </TouchableOpacity>
+        <UniversalBackButton 
+          fallbackRoute="/messages"
+        />
         
         <View style={styles.headerInfo}>
           <Text style={styles.headerName}>{otherParticipant.name}</Text>
@@ -273,12 +280,27 @@ const ChatScreen: React.FC = () => {
             ]}
             onPress={sendMessage}
             disabled={!newMessage.trim()}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Send message"
+            accessibilityState={{ disabled: !newMessage.trim() }}
+            accessibilityHint={!newMessage.trim() ? "Enter a message to send" : `Send message to ${otherParticipant.name}`}
+            tabIndex={!newMessage.trim() ? -1 : 0} // Remove from tab order when disabled
           >
-            <Text style={styles.sendButtonText}>Send</Text>
+            <Text style={[
+              styles.sendButtonText,
+              !newMessage.trim() && styles.sendButtonTextDisabled
+            ]}>
+              Send
+            </Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
+      
+      {/* Bottom Navigation for Web */}
+      {Platform.OS === 'web' && <WebBottomTabs activeIndex={2} />}
     </SafeAreaView>
+    </>
   );
 };
 
@@ -373,10 +395,24 @@ const styles = StyleSheet.create({
   ownMessageBubble: {
     backgroundColor: Color.cSK430B92500,
     borderBottomRightRadius: 4,
+    marginLeft: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
   otherMessageBubble: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: '#fff',
     borderBottomLeftRadius: 4,
+    marginRight: 40,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   messageText: {
     fontSize: 15,
@@ -430,6 +466,9 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 14,
     fontWeight: '600',
+  },
+  sendButtonTextDisabled: {
+    color: '#ccc',
   },
 });
 

@@ -216,6 +216,7 @@ const styles = StyleSheet.create({
   },
   eventList: {
     maxHeight: 300,
+    paddingRight: 12, // Add padding to prevent scrollbar overlap
   },
   event: {
     padding: 10,

@@ -48,7 +48,7 @@ interface OfferDetails {
 
 const OfferReviewPage: React.FC = () => {
   const { offerId } = useLocalSearchParams();
-  const isWeb = Platform.OS === 'web';
+  const isWeb = Platform?.OS === 'web';
   const { user } = useAuth();
   
   // Demo offer data
@@ -100,8 +100,6 @@ const OfferReviewPage: React.FC = () => {
   });
 
   const handleOfferAction = (action: string) => {
-    const isWeb = Platform.OS === 'web';
-    
     switch (action) {
       case 'accept':
         if (isWeb) {
@@ -643,6 +641,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Color.cSK430B92500,
   },
   acceptButtonText: {
     color: '#fff',

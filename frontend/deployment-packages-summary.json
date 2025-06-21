@@ -1,0 +1,19 @@
+{
+  "timestamp": "2025-06-21T17:48:32.695Z",
+  "packages": {
+    "original_stable": {
+      "file": "axees-frontend-original-stable.zip",
+      "size": "0.2MB",
+      "commit": "a23d9b0",
+      "description": "Original stable version (pre-QA-fixes)",
+      "type": "reference_package"
+    },
+    "qa_fixes": {
+      "file": "axees-frontend-qa-fixes.zip",
+      "description": "QA fixes version (34 issues resolved)",
+      "type": "full_application"
+    }
+  },
+  "deployment_strategy": "Deploy both packages to separate Netlify sites",
+  "current_issue": "polite-ganache-3a4e1b.netlify.app hosts QA fixes, need original stable too"
+}

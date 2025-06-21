@@ -935,6 +935,8 @@ const styles = StyleSheet.create({
   },
   rejectButton: {
     backgroundColor: '#EF4444',
+    borderWidth: 1,
+    borderColor: '#EF4444',
   },
   rejectButtonText: {
     fontSize: 14,
@@ -953,6 +955,8 @@ const styles = StyleSheet.create({
   },
   acceptButton: {
     backgroundColor: '#10B981',
+    borderWidth: 1,
+    borderColor: '#10B981',
   },
   acceptButtonText: {
     fontSize: 14,

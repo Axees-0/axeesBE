@@ -4,6 +4,8 @@ import { Image } from 'expo-image';
 import { Color } from '@/GlobalStyles';
 import { router } from 'expo-router';
 import { DemoData } from '@/demo/DemoData';
+import { AccessibleFilters } from './AccessibleFilters';
+import { EmptyState } from './EmptyState';
 
 const Web = () => {
   // Creator data - Using DemoData.creators with mapped structure for explore page
@@ -91,35 +93,18 @@ const Web = () => {
   return (
     <View style={styles.container}>
       <View style={styles.sidebar}>
-        <Text style={styles.sidebarTitle}>Filters</Text>
-        {availableFilters.map((filter) => (
-          <TouchableOpacity
-            key={filter}
-            style={[
-              styles.filterItem,
-              selectedFilters.includes(filter) && styles.filterItemActive
-            ]}
-            onPress={() => toggleFilter(filter)}
-          >
-            <Text style={[
-              styles.filterText,
-              selectedFilters.includes(filter) && styles.filterTextActive
-            ]}>
-              {selectedFilters.includes(filter) ? '✓' : '○'} {filter}
-            </Text>
-          </TouchableOpacity>
-        ))}
-        {selectedFilters.length > 0 && (
-          <TouchableOpacity
-            style={styles.clearFiltersButton}
-            onPress={() => {
-              setSelectedFilters([]);
-              applyFilters(searchText, []);
-            }}
-          >
-            <Text style={styles.clearFiltersText}>Clear All Filters</Text>
-          </TouchableOpacity>
-        )}
+        <AccessibleFilters
+          availableFilters={availableFilters}
+          selectedFilters={selectedFilters}
+          onFilterChange={(newFilters) => {
+            setSelectedFilters(newFilters);
+            applyFilters(searchText, newFilters);
+          }}
+          onClearAll={() => {
+            setSelectedFilters([]);
+            applyFilters(searchText, []);
+          }}
+        />
       </View>
       
       <ScrollView style={styles.mainContent}>
@@ -129,19 +114,30 @@ const Web = () => {
         </View>
         
         <View style={styles.searchSection}>
-          <View style={styles.searchBar}>
-            <Text style={styles.searchIcon}>🔍</Text>
+          <View style={styles.searchBar} role="search">
+            <Text style={styles.searchIcon} aria-hidden="true">🔍</Text>
             <TextInput
               style={styles.searchInput}
-              placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
+              placeholder="Search creators by name, location, or category"
               placeholderTextColor="#999"
               value={searchText}
               onChangeText={handleSearch}
               returnKeyType="search"
+              accessibilityLabel="Search creators"
+              accessibilityHint="Enter name, location, or category to filter results"
+              accessibilityRole="searchbox"
             />
             {searchText.length > 0 && (
-              <Pressable onPress={() => handleSearch('')} style={styles.clearButton}>
-                <Text style={styles.clearButtonText}>×</Text>
+              <Pressable 
+                onPress={() => handleSearch('')} 
+                style={({ pressed, focused }) => [
+                  styles.clearButton,
+                  (pressed || focused) && styles.clearButtonFocused
+                ]}
+                accessibilityLabel="Clear search"
+                accessibilityRole="button"
+              >
+                <Text style={styles.clearButtonText} aria-hidden="true">×</Text>
               </Pressable>
             )}
           </View>
@@ -186,16 +182,21 @@ const Web = () => {
             </TouchableOpacity>
           ))}
           {filteredCreators.length === 0 && (
-            <View style={styles.noResults}>
-              <Text style={styles.noResultsText}>
-                No creators found
-                {searchText && ` matching "${searchText}"`}
-                {selectedFilters.length > 0 && ` with filters: ${selectedFilters.join(', ')}`}
-              </Text>
-              <Text style={styles.noResultsSubtext}>
-                Try {selectedFilters.length > 0 ? 'removing some filters or ' : ''}searching for different terms like "Fashion", "Tech", or creator names
-              </Text>
-            </View>
+            <EmptyState
+              searchText={searchText}
+              selectedFilters={selectedFilters}
+              onClearSearch={() => handleSearch('')}
+              onClearFilters={() => {
+                setSelectedFilters([]);
+                applyFilters(searchText, []);
+              }}
+              onClearAll={() => {
+                handleSearch('');
+                setSelectedFilters([]);
+                applyFilters('', []);
+              }}
+              totalCreators={creators.length}
+            />
           )}
         </View>
       </ScrollView>
@@ -317,6 +318,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     fontWeight: 'bold',
+  },
+  clearButtonFocused: {
+    outlineWidth: 2,
+    outlineColor: Color.cSK430B92500,
+    outlineStyle: 'solid',
   },
   noResults: {
     flex: 1,
