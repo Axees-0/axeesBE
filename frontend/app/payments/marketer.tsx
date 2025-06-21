@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Platform,
-  Alert,
   TextInput,
 } from 'react-native';
 import { router } from 'expo-router';
@@ -16,9 +15,12 @@ import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
+import { CreditCardModal } from '@/components/CreditCardModal';
+import { useConfirmModal } from '@/components/ConfirmModal';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface PaymentMethod {
   id: string;
@@ -45,9 +47,23 @@ const MarketerPaymentsPage: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'methods' | 'history'>('overview');
   const [showAddMethod, setShowAddMethod] = useState(false);
+  const [showCreditCardModal, setShowCreditCardModal] = useState(false);
+  const { showConfirm, ConfirmModalComponent } = useConfirmModal();
+  
+  // Handle browser navigation on web platform
+  React.useEffect(() => {
+    if (isWeb && typeof window !== 'undefined') {
+      // Force router to recognize this page on mount
+      const currentPath = window.location.pathname;
+      if (currentPath === '/payments/marketer') {
+        // Ensure content is properly loaded
+        console.log('Payment page mounted:', currentPath);
+      }
+    }
+  }, [isWeb]);
   
   // Demo payment data
-  const [paymentMethods] = useState<PaymentMethod[]>([
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
     {
       id: 'pm-1',
       type: 'credit_card',
@@ -98,52 +114,140 @@ const MarketerPaymentsPage: React.FC = () => {
   const totalSpent = transactions
     .filter(t => t.type === 'escrow' && t.status === 'completed')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-  const activeDeals = 3;
-  const pendingPayments = transactions.filter(t => t.status === 'pending').length;
-
-  const handleAddPaymentMethod = (type: string) => {
-    Alert.alert(
-      'Add Payment Method',
-      `Add new ${type} payment method?`,
+  
+  // Payment method handlers
+  const handleSetDefault = (method: PaymentMethod) => {
+    showConfirm(
+      'Set Default Payment Method',
+      `Set ${method.name} as your default payment method?`,
       [
         { text: 'Cancel', style: 'cancel' },
         { 
-          text: 'Add', 
+          text: 'Set Default',
           onPress: () => {
-            Alert.alert('Success', 'Payment method added successfully');
-            setShowAddMethod(false);
+            // Update the state to set the new default method
+            setPaymentMethods(prevMethods => 
+              prevMethods.map(m => ({
+                ...m,
+                isDefault: m.id === method.id
+              }))
+            );
+            
+            // Show success message
+            setTimeout(() => {
+              showConfirm(
+                'Success',
+                `${method.name} has been set as your default payment method.`,
+                [{ text: 'OK' }]
+              );
+            }, 100);
           }
         }
       ]
     );
   };
-
+  
   const handleRemoveMethod = (method: PaymentMethod) => {
     if (method.isDefault) {
-      Alert.alert('Cannot Remove', 'You cannot remove your default payment method. Please set another method as default first.');
+      showConfirm(
+        'Cannot Remove Default',
+        'Please set another payment method as default before removing this one.',
+        [{ text: 'OK' }]
+      );
       return;
     }
     
-    Alert.alert(
+    showConfirm(
       'Remove Payment Method',
-      `Remove ${method.name}?`,
+      `Are you sure you want to remove ${method.name}?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Remove', style: 'destructive' }
+        { 
+          text: 'Remove', 
+          style: 'destructive',
+          onPress: () => {
+            // Remove the payment method from state
+            setPaymentMethods(prevMethods => 
+              prevMethods.filter(m => m.id !== method.id)
+            );
+            
+            // Show success message
+            setTimeout(() => {
+              showConfirm(
+                'Success',
+                `${method.name} has been removed.`,
+                [{ text: 'OK' }]
+              );
+            }, 100);
+          }
+        }
       ]
     );
   };
+  
+  const handleAddPaymentMethod = (type: string) => {
+    setShowAddMethod(false);
+    
+    if (type === 'Credit Card') {
+      // Show the credit card modal
+      setShowCreditCardModal(true);
+    } else if (type === 'Bank Account') {
+      showConfirm(
+        'Add Bank Account',
+        'Bank account form would appear here with fields for:\n\n• Account Number\n• Routing Number\n• Account Type',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Add Account', 
+            onPress: () => {
+              setTimeout(() => {
+                showConfirm('Success', 'Bank account added successfully!', [{ text: 'OK' }]);
+              }, 100);
+            }
+          }
+        ]
+      );
+    } else if (type === 'PayPal') {
+      showConfirm(
+        'Connect PayPal',
+        'You would be redirected to PayPal to authorize the connection.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Connect', 
+            onPress: () => {
+              setTimeout(() => {
+                showConfirm('Success', 'PayPal account connected successfully!', [{ text: 'OK' }]);
+              }, 100);
+            }
+          }
+        ]
+      );
+    }
+  };
 
-  const handleSetDefault = (method: PaymentMethod) => {
-    Alert.alert(
-      'Set Default',
-      `Set ${method.name} as your default payment method?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Set Default' }
-      ]
-    );
+  const activeDeals = 3;
+  const pendingPayments = transactions.filter(t => t.status === 'pending').length;
+  
+  const handleAddCreditCard = (cardData: any) => {
+    // Create new payment method from card data
+    const newMethod: PaymentMethod = {
+      id: `pm-${Date.now()}`,
+      type: 'credit_card',
+      name: `${cardData.number.startsWith('4') ? 'Visa' : 'Card'} ending in ${cardData.last4}`,
+      last4: cardData.last4,
+      isDefault: paymentMethods.length === 0,
+      icon: '💳',
+    };
+    
+    // Add to payment methods
+    setPaymentMethods(prev => [...prev, newMethod]);
+    
+    // Close modal and show success
+    setShowCreditCardModal(false);
+    setTimeout(() => {
+      showConfirm('Success', 'Credit card added successfully!', [{ text: 'OK' }]);
+    }, 100);
   };
 
   const formatDate = (date: Date) => {
@@ -167,12 +271,9 @@ const MarketerPaymentsPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton 
+            fallbackRoute="/profile"
+          />
           
           <Text style={styles.headerTitle}>Payments</Text>
           <View style={styles.headerSpacer} />
@@ -237,7 +338,19 @@ const MarketerPaymentsPage: React.FC = () => {
               {/* Quick Actions */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Quick Actions</Text>
-                <TouchableOpacity style={styles.actionCard}>
+                <TouchableOpacity 
+                  style={styles.actionCard}
+                  onPress={() => {
+                    showConfirm(
+                      'Fund Escrow',
+                      'This would redirect you to select a deal and fund its escrow account.',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Continue', onPress: () => router.push('/deals') }
+                      ]
+                    );
+                  }}
+                >
                   <Text style={styles.actionIcon}>💰</Text>
                   <View style={styles.actionContent}>
                     <Text style={styles.actionTitle}>Fund Escrow</Text>
@@ -413,6 +526,16 @@ const MarketerPaymentsPage: React.FC = () => {
         
         {/* Bottom Navigation for Web */}
         {isWeb && <WebBottomTabs activeIndex={4} />}
+        
+        {/* Credit Card Modal */}
+        <CreditCardModal 
+          visible={showCreditCardModal}
+          onClose={() => setShowCreditCardModal(false)}
+          onAdd={handleAddCreditCard}
+        />
+        
+        {/* Confirm Modal */}
+        <ConfirmModalComponent />
       </SafeAreaView>
     </>
   );
@@ -463,19 +586,39 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     alignItems: 'center',
+    borderRadius: 8,
+    marginHorizontal: 4,
+    backgroundColor: 'transparent',
   },
   activeTab: {
-    borderBottomWidth: 2,
+    borderBottomWidth: 4, // Increased thickness for better visibility
     borderBottomColor: Color.cSK430B92500,
+    backgroundColor: 'rgba(67, 11, 146, 0.08)', // Slightly more prominent background
+    position: 'relative',
+    transform: [{ scale: 1.02 }], // Subtle scale effect for active state
+    // Add a subtle shadow for depth
+    shadowColor: Color.cSK430B92500,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2, // For Android shadow
   },
   tabText: {
     fontSize: 14,
     fontWeight: '500',
     color: '#666',
+    textAlign: 'center',
   },
   activeTabText: {
     color: Color.cSK430B92500,
-    fontWeight: '600',
+    fontWeight: '700', // Increased weight
+    fontSize: 15, // Slightly larger font size for active tab
+    textShadowColor: 'rgba(67, 11, 146, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   scrollContainer: {
     flex: 1,
@@ -572,60 +715,72 @@ const styles = StyleSheet.create({
     color: '#10B981',
   },
   methodCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: Platform.select({ default: 'column', web: 'row' }),
+    alignItems: Platform.select({ default: 'stretch', web: 'center' }),
     backgroundColor: '#f8f9fa',
-    padding: 16,
+    padding: Platform.select({ default: 12, web: 16 }),
     borderRadius: 12,
     marginBottom: 12,
+    gap: Platform.select({ default: 8, web: 0 }),
   },
   methodIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: Platform.select({ default: 40, web: 48 }),
+    height: Platform.select({ default: 40, web: 48 }),
+    borderRadius: Platform.select({ default: 20, web: 24 }),
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16,
+    marginRight: Platform.select({ default: 0, web: 16 }),
+    alignSelf: Platform.select({ default: 'flex-start', web: 'auto' }),
   },
   methodEmoji: {
-    fontSize: 24,
+    fontSize: Platform.select({ default: 20, web: 24 }),
   },
   methodInfo: {
     flex: 1,
+    flexDirection: Platform.select({ default: 'row', web: 'column' }),
+    justifyContent: Platform.select({ default: 'space-between', web: 'flex-start' }),
+    alignItems: Platform.select({ default: 'center', web: 'flex-start' }),
   },
   methodName: {
-    fontSize: 16,
+    fontSize: Platform.select({ default: 14, web: 16 }),
     fontWeight: '600',
     color: '#333',
-    marginBottom: 4,
+    marginBottom: Platform.select({ default: 0, web: 4 }),
+    flex: Platform.select({ default: 1, web: 0 }),
   },
   methodDetail: {
-    fontSize: 14,
+    fontSize: Platform.select({ default: 12, web: 14 }),
     color: '#666',
   },
   defaultBadge: {
     backgroundColor: Color.cSK430B92500,
-    paddingHorizontal: 8,
+    paddingHorizontal: Platform.select({ default: 6, web: 8 }),
     paddingVertical: 2,
     borderRadius: 4,
-    marginTop: 4,
+    marginTop: Platform.select({ default: 0, web: 4 }),
     alignSelf: 'flex-start',
   },
   defaultText: {
     color: '#fff',
-    fontSize: 10,
+    fontSize: Platform.select({ default: 9, web: 10 }),
     fontWeight: '600',
   },
   methodActions: {
-    gap: 8,
+    gap: Platform.select({ default: 4, web: 8 }),
+    flexDirection: Platform.select({ default: 'row', web: 'column' }),
+    alignItems: Platform.select({ default: 'center', web: 'flex-end' }),
   },
   methodAction: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: Platform.select({ default: 8, web: 12 }),
+    paddingVertical: Platform.select({ default: 4, web: 6 }),
+    backgroundColor: Platform.select({ default: '#fff', web: 'transparent' }),
+    borderRadius: Platform.select({ default: 4, web: 0 }),
+    borderWidth: Platform.select({ default: 1, web: 0 }),
+    borderColor: Platform.select({ default: '#e0e0e0', web: 'transparent' }),
   },
   methodActionText: {
-    fontSize: 14,
+    fontSize: Platform.select({ default: 12, web: 14 }),
     color: Color.cSK430B92500,
     fontWeight: '500',
   },
@@ -640,39 +795,44 @@ const styles = StyleSheet.create({
     borderColor: Color.cSK430B92500,
     borderStyle: 'dashed',
     borderRadius: 12,
-    padding: 16,
+    padding: Platform.select({ default: 12, web: 16 }),
     marginTop: 12,
+    minHeight: Platform.select({ default: 48, web: 56 }),
   },
   addMethodIcon: {
-    fontSize: 20,
+    fontSize: Platform.select({ default: 18, web: 20 }),
     color: Color.cSK430B92500,
     marginRight: 8,
   },
   addMethodText: {
-    fontSize: 16,
+    fontSize: Platform.select({ default: 14, web: 16 }),
     color: Color.cSK430B92500,
     fontWeight: '600',
+    textAlign: 'center',
+    flex: Platform.select({ default: 1, web: 0 }),
   },
   addMethodOptions: {
     marginTop: 16,
-    gap: 8,
+    gap: Platform.select({ default: 6, web: 8 }),
   },
   methodOption: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#fff',
-    padding: 16,
+    padding: Platform.select({ default: 12, web: 16 }),
     borderRadius: 8,
     borderWidth: 1,
     borderColor: '#e0e0e0',
+    minHeight: Platform.select({ default: 44, web: 52 }),
   },
   methodOptionIcon: {
-    fontSize: 24,
-    marginRight: 12,
+    fontSize: Platform.select({ default: 20, web: 24 }),
+    marginRight: Platform.select({ default: 8, web: 12 }),
   },
   methodOptionText: {
-    fontSize: 16,
+    fontSize: Platform.select({ default: 14, web: 16 }),
     color: '#333',
+    flex: 1,
   },
   historyItem: {
     flexDirection: 'row',
