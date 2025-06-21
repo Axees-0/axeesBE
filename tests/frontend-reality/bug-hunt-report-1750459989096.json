@@ -1,0 +1,120 @@
+{
+  "timestamp": "2025-06-20T22:53:09.096Z",
+  "environment": {
+    "environment": "local",
+    "frontendUrl": "http://localhost:19006",
+    "hostname": "localhost",
+    "port": "19006",
+    "isLocal": true,
+    "isSecure": false
+  },
+  "duration": "12.92",
+  "summary": {
+    "totalBugs": 4,
+    "critical": 4,
+    "medium": 0,
+    "low": 0
+  },
+  "testResults": {
+    "authentication": {
+      "error": "Could not find Chrome (ver. 121.0.6167.85). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /root/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "totalBugs": 0,
+      "bugs": []
+    },
+    "forms": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Form Page Error",
+          "description": "Form page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/create-offer",
+          "timestamp": "2025-06-20T22:52:56.744Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "realtime": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Chat Page Load Failed",
+          "description": "Chat page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/chat",
+          "timestamp": "2025-06-20T22:52:57.529Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "mobile": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Touch Target Test Failed",
+          "description": "Failed to test touch targets: net::ERR_CONNECTION_REFUSED at http://localhost:19006",
+          "timestamp": "2025-06-20T22:53:08.566Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "performance": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Page Load Failed",
+          "description": "Failed to load page: net::ERR_CONNECTION_REFUSED at http://localhost:19006",
+          "timestamp": "2025-06-20T22:52:58.037Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    }
+  },
+  "allBugs": [
+    {
+      "severity": "CRITICAL",
+      "category": "Form Page Error",
+      "description": "Form page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/create-offer",
+      "timestamp": "2025-06-20T22:52:56.744Z",
+      "url": "about:blank"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Chat Page Load Failed",
+      "description": "Chat page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/chat",
+      "timestamp": "2025-06-20T22:52:57.529Z",
+      "url": "about:blank"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Page Load Failed",
+      "description": "Failed to load page: net::ERR_CONNECTION_REFUSED at http://localhost:19006",
+      "timestamp": "2025-06-20T22:52:58.037Z",
+      "url": "about:blank"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Touch Target Test Failed",
+      "description": "Failed to test touch targets: net::ERR_CONNECTION_REFUSED at http://localhost:19006",
+      "timestamp": "2025-06-20T22:53:08.566Z",
+      "url": "about:blank"
+    }
+  ],
+  "recommendations": []
+}

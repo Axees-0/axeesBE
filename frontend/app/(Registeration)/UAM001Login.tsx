@@ -267,7 +267,13 @@ export default function Login() {
                 }
                 placeholderTextColor="#6C6C6C"
               />
-              <Pressable onPress={() => setShowPassword(!showPassword)}>
+              <Pressable 
+                onPress={() => setShowPassword(!showPassword)}
+                accessible={true}
+                accessibilityRole="button"
+                accessibilityLabel={showPassword ? "Hide password" : "Show password"}
+                accessibilityHint="Toggle password visibility"
+              >
                 {!showPassword ? (
                   <Feather name="eye" size={16} color="#6C6C6C" />
                 ) : (

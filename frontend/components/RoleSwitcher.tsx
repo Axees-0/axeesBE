@@ -9,7 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
-import { Color } from '@/GlobalStyles';
+import { Color, Focus } from '@/GlobalStyles';
 import { router } from 'expo-router';
 
 interface RoleSwitcherProps {
@@ -30,6 +30,20 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
       setSelectedRole(currentOppositeRole);
     }
   }, [visible, user?.userType]);
+
+  // Add Esc key support for web
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [visible, onClose]);
 
   const roleProfiles = {
     creator: {
@@ -62,7 +76,7 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
     
     // Use web-compatible confirm dialog for web, Alert.alert for native
     if (Platform.OS === 'web') {
-      const confirmed = window.confirm(`Switch to ${roleDisplayName} mode?`);
+      const confirmed = window.confirm(`Switch to ${roleDisplayName} role?`);
       if (confirmed) {
         updateUser(newProfile);
         
@@ -76,13 +90,13 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
         onClose();
         
         // Success notification
-        window.alert(`Role Switched! You are now viewing the app as a ${roleDisplayName}`);
+        window.alert(`Role switched successfully! You are now viewing the app as a ${roleDisplayName}.`);
       }
     } else {
       // Native React Native Alert for mobile
       Alert.alert(
         'Switch Role',
-        `Switch to ${roleDisplayName} mode?`,
+        `Switch to ${roleDisplayName} role?`,
         [
           { text: 'Cancel', style: 'cancel' },
           {
@@ -100,8 +114,8 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
               onClose();
               
               Alert.alert(
-                'Role Switched!',
-                `You are now viewing the app as a ${roleDisplayName}`,
+                'Success',
+                `Role switched successfully! You are now viewing the app as a ${roleDisplayName}.`,
                 [{ text: 'OK' }]
               );
             }
@@ -121,7 +135,7 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Demo Mode: Switch Role</Text>
+            <Text style={styles.modalTitle}>Switch Role</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
               <Text style={styles.closeButtonText}>×</Text>
             </TouchableOpacity>
@@ -134,11 +148,20 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
           <View style={styles.roleOptions}>
             {/* Creator Option */}
             <TouchableOpacity
-              style={[
+              style={({ focused }) => [
                 styles.roleCard,
-                selectedRole === 'creator' && styles.selectedRoleCard
+                selectedRole === 'creator' && styles.selectedRoleCard,
+                focused && styles.roleCardFocused,
               ]}
               onPress={() => setSelectedRole('creator')}
+              accessible={true}
+              accessibilityRole="radio"
+              accessibilityState={{ 
+                selected: selectedRole === 'creator',
+                checked: selectedRole === 'creator' 
+              }}
+              accessibilityLabel="Creator role"
+              accessibilityHint="Select Creator role - Content creator with 45K followers. Receive offers, submit content, track earnings."
             >
               <Text style={styles.roleEmoji}>🎨</Text>
               <Text style={styles.roleName}>Creator</Text>
@@ -162,11 +185,20 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
 
             {/* Marketer Option */}
             <TouchableOpacity
-              style={[
+              style={({ focused }) => [
                 styles.roleCard,
-                selectedRole === 'marketer' && styles.selectedRoleCard
+                selectedRole === 'marketer' && styles.selectedRoleCard,
+                focused && styles.roleCardFocused,
               ]}
               onPress={() => setSelectedRole('marketer')}
+              accessible={true}
+              accessibilityRole="radio"
+              accessibilityState={{ 
+                selected: selectedRole === 'marketer',
+                checked: selectedRole === 'marketer' 
+              }}
+              accessibilityLabel="Marketer role"
+              accessibilityHint="Select Marketer role - Brand manager at TechStyle. Discover creators, send offers, manage campaigns."
             >
               <Text style={styles.roleEmoji}>💼</Text>
               <Text style={styles.roleName}>Marketer</Text>
@@ -276,6 +308,10 @@ const styles = StyleSheet.create({
   selectedRoleCard: {
     borderColor: Color.cSK430B92500,
     backgroundColor: Color.cSK430B92500 + '10',
+  },
+  roleCardFocused: {
+    ...Focus.primary,
+    borderRadius: 12,
   },
   roleEmoji: {
     fontSize: 32,

@@ -1,0 +1,34 @@
+{
+  "timestamp": "2025-06-20T21:55:11.542Z",
+  "environment": {
+    "environment": "local",
+    "frontendUrl": "http://localhost:19006",
+    "hostname": "localhost",
+    "port": "19006",
+    "isLocal": true,
+    "isSecure": false
+  },
+  "duration": "7.37",
+  "summary": {
+    "totalBugs": 0,
+    "critical": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "testResults": {
+    "authentication": {
+      "totalBugs": 0,
+      "bugs": [],
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "forms": null,
+    "realtime": null,
+    "mobile": null,
+    "performance": null
+  },
+  "allBugs": [],
+  "recommendations": []
+}

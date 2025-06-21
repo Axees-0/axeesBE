@@ -116,7 +116,11 @@ const PreviewPaymentPage: React.FC = () => {
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Creator Info */}
           <View style={styles.creatorSection}>
             <Text style={styles.sectionTitle}>Collaboration With</Text>

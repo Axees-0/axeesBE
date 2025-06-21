@@ -44,7 +44,7 @@ const PROTECTED_ROUTES = [
 
 // Authentication routes that should redirect to home if already logged in
 const AUTH_ROUTES = [
-  '/UAM001Login',
+  '/login',
   '/URM01CreateAccount',
   '/URM01Phone',
   '/URM02Name', 
@@ -57,7 +57,7 @@ const AUTH_ROUTES = [
   '/ULM4ResetPassword',
 ];
 
-export function AuthGuard({ children, requireAuth, redirectTo = '/UAM001Login' }: AuthGuardProps) {
+export function AuthGuard({ children, requireAuth, redirectTo = '/login' }: AuthGuardProps) {
   const { isAuthenticated, isLoading } = useAuth();
   const pathname = usePathname();
 

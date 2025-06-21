@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 // Assets and Components
-import { Color, FontFamily, FontSize, Gap, Padding } from '@/GlobalStyles';
+import { Color, FontFamily, FontSize, Gap, Padding, Focus } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -69,6 +69,20 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
     );
   }
 
+  // Add Esc key support for contact modal (web only)
+  useEffect(() => {
+    if (!isContactModalVisible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsContactModalVisible(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [isContactModalVisible]);
+
   // Calculate total followers and engagement
   const totalFollowers = creator.creatorData?.totalFollowers || 0;
   const avgEngagement = creator.creatorData?.platforms?.reduce((acc, p) => acc + (p.engagement || 0), 0) / (creator.creatorData?.platforms?.length || 1);
@@ -80,15 +94,40 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
     return num.toString();
   };
 
-  // Simple working contact form - no fancy stuff
+  // Simple working contact form with Subject validation
   const handleSendMessage = () => {
-    const subject = (document.getElementById('contact-subject') as HTMLInputElement)?.value || 'Collaboration Opportunity';
+    const subject = (document.getElementById('contact-subject') as HTMLInputElement)?.value || '';
     const message = (document.getElementById('contact-message') as HTMLTextAreaElement)?.value || '';
     
-    if (!message.trim()) {
-      window.alert('Please enter a message before sending.');
+    // Validate Subject field
+    if (!subject.trim()) {
+      window.alert('Please enter a subject before sending.');
+      // Focus the subject field for better UX
+      const subjectField = document.getElementById('contact-subject') as HTMLInputElement;
+      if (subjectField) {
+        subjectField.focus();
+        subjectField.style.borderColor = '#ed0006'; // Red border for error state
+      }
       return;
     }
+    
+    // Validate Message field
+    if (!message.trim()) {
+      window.alert('Please enter a message before sending.');
+      // Focus the message field for better UX
+      const messageField = document.getElementById('contact-message') as HTMLTextAreaElement;
+      if (messageField) {
+        messageField.focus();
+        messageField.style.borderColor = '#ed0006'; // Red border for error state
+      }
+      return;
+    }
+    
+    // Reset border colors to normal if validation passes
+    const subjectField = document.getElementById('contact-subject') as HTMLInputElement;
+    const messageField = document.getElementById('contact-message') as HTMLTextAreaElement;
+    if (subjectField) subjectField.style.borderColor = '#ddd';
+    if (messageField) messageField.style.borderColor = '#ddd';
     
     // Create chat ID for this conversation
     const chatId = `chat-${id}-${Date.now()}`;
@@ -235,6 +274,8 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                     <Image 
                       source={getPlatformIcon(platform.platform)} 
                       style={styles.platformIcon}
+                      alt={`${platform.platform} icon`}
+                      accessibilityLabel={`${platform.platform} platform icon`}
                     />
                     <View>
                       <Text style={styles.platformName}>
@@ -327,6 +368,8 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                       <Image 
                         source={getPlatformIcon(platform.platform)} 
                         style={styles.rateIcon}
+                        alt={`${platform.platform} icon`}
+                        accessibilityLabel={`${platform.platform} platform icon`}
                       />
                       <View>
                         <Text style={styles.ratePlatform}>
@@ -385,17 +428,28 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
             >
               <Image 
                 source={isFavorited ? HeartFilled : Heart} 
-                style={styles.actionIcon} 
+                style={styles.actionIcon}
+                alt={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                accessibilityLabel={isFavorited ? "Remove from favorites" : "Add to favorites"}
               />
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.actionButton}>
-              <Image source={Share} style={styles.actionIcon} />
+              <Image 
+                source={Share} 
+                style={styles.actionIcon}
+                alt="Share profile"
+                accessibilityLabel="Share profile"
+              />
             </TouchableOpacity>
           </View>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Profile Hero */}
           <View style={styles.heroSection}>
             <Image 
@@ -415,18 +469,33 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
               <Text style={styles.username}>{creator.userName}</Text>
               
               <View style={styles.statsRow}>
-                <View style={styles.statItem}>
+                <View 
+                  style={styles.statItem}
+                  accessible={true}
+                  accessibilityLabel={`Total followers: ${formatNumber(totalFollowers)}`}
+                  accessibilityHint="Combined follower count across all social media platforms"
+                >
                   <Text style={styles.statNumber}>{formatNumber(totalFollowers)}</Text>
                   <Text style={styles.statLabel}>Total Followers</Text>
                 </View>
                 
-                <View style={styles.statItem}>
+                <View 
+                  style={styles.statItem}
+                  accessible={true}
+                  accessibilityLabel={`Average engagement rate: ${avgEngagement.toFixed(1)} percent`}
+                  accessibilityHint="Average percentage of followers who interact with posts"
+                >
                   <Text style={styles.statNumber}>{avgEngagement.toFixed(1)}%</Text>
                   <Text style={styles.statLabel}>Avg Engagement</Text>
                 </View>
                 
-                <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{creator.rating?.toFixed(1)}</Text>
+                <View 
+                  style={styles.statItem}
+                  accessible={true}
+                  accessibilityLabel={`Rating: ${creator.rating?.toFixed(1)} out of 5 stars`}
+                  accessibilityHint="Average rating from completed collaborations"
+                >
+                  <Text style={styles.statNumber}>{creator.rating?.toFixed(1)}/5</Text>
                   <Text style={styles.statLabel}>Rating</Text>
                 </View>
               </View>
@@ -468,8 +537,16 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
             {['about', 'portfolio', 'rates'].map((tab) => (
               <TouchableOpacity
                 key={tab}
-                style={[styles.tabButton, activeTab === tab && styles.activeTabButton]}
+                style={({ focused }) => [
+                  styles.tabButton, 
+                  activeTab === tab && styles.activeTabButton,
+                  focused && styles.tabButtonFocused
+                ]}
                 onPress={() => setActiveTab(tab as any)}
+                accessible={true}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: activeTab === tab }}
+                accessibilityLabel={`${tab.charAt(0).toUpperCase() + tab.slice(1)} tab`}
               >
                 <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -672,7 +749,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   categoryChip: {
-    backgroundColor: '#f0e7fd',
+    backgroundColor: '#e6d5ff',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -732,6 +809,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 2,
     borderBottomColor: Color.cSK430B92500,
   },
+  tabButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 8,
+  },
   tabText: {
     fontSize: 16,
     color: '#666',
@@ -781,14 +862,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   specialtyChip: {
-    backgroundColor: '#e7f3ff',
+    backgroundColor: '#d1ecf1',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   specialtyText: {
     fontSize: 12,
-    color: '#007bff',
+    color: '#0c5460',
     fontWeight: '500',
   },
   platformRow: {

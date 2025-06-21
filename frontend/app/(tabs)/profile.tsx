@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { router } from 'expo-router';
 import { WebSEO } from "../web-seo";
-import { Color } from "@/GlobalStyles";
+import { Color, Focus } from "@/GlobalStyles";
 import { DEMO_MODE } from "@/demo/DemoMode";
 import { DemoData } from "@/demo/DemoData";
 import { useAuth } from "@/contexts/AuthContext";
@@ -156,29 +156,57 @@ const ProfilePage = () => {
             {isCreator ? (
               <>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/deals')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="View Offers"
+                  accessibilityHint="Navigate to offers and deals page"
                 >
                   <Text style={styles.actionIcon}>📋</Text>
                   <Text style={styles.actionText}>View Offers</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/earnings')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Earnings"
+                  accessibilityHint="Navigate to earnings page"
                 >
                   <Text style={styles.actionIcon}>💰</Text>
                   <Text style={styles.actionText}>Earnings</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/profile/edit')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit Profile"
+                  accessibilityHint="Navigate to profile editing page"
                 >
                   <Text style={styles.actionIcon}>✏️</Text>
                   <Text style={styles.actionText}>Edit Profile</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/profile/mediakit')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Media Kit"
+                  accessibilityHint="Navigate to media kit page"
                 >
                   <Text style={styles.actionIcon}>📊</Text>
                   <Text style={styles.actionText}>Media Kit</Text>
@@ -187,22 +215,43 @@ const ProfilePage = () => {
             ) : (
               <>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/(tabs)')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Find Creators"
+                  accessibilityHint="Navigate to creator discovery page"
                 >
                   <Text style={styles.actionIcon}>🔍</Text>
                   <Text style={styles.actionText}>Find Creators</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/deals')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Sent Offers"
+                  accessibilityHint="Navigate to sent offers page"
                 >
                   <Text style={styles.actionIcon}>📤</Text>
                   <Text style={styles.actionText}>Sent Offers</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/payments/marketer')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Payments"
+                  accessibilityHint="Navigate to payments page"
                 >
                   <Text style={styles.actionIcon}>💳</Text>
                   <Text style={styles.actionText}>Payments</Text>
@@ -515,6 +564,10 @@ const styles = StyleSheet.create({
     minWidth: '45%',
     borderWidth: 1,
     borderColor: '#e0e0e0',
+  },
+  actionButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 12,
   },
   actionIcon: {
     fontSize: 24,

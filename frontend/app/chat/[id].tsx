@@ -261,6 +261,9 @@ const ChatScreen: React.FC = () => {
             onChangeText={setNewMessage}
             multiline
             maxLength={500}
+            accessible={true}
+            accessibilityLabel="Message input"
+            accessibilityHint={`Type your message to ${otherParticipant.name}. Maximum 500 characters.`}
           />
           
           <TouchableOpacity 

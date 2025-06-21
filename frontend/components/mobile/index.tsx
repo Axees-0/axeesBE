@@ -172,7 +172,7 @@ const SidebarMenu = ({
                 title: "Log Out",
                 onPress: async () => {
                   await logout();
-                  router.replace("/UAM001Login");
+                  router.replace("/login");
                 },
                 logout: true,
               },

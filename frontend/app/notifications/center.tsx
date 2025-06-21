@@ -206,6 +206,7 @@ const NotificationCenterPage: React.FC = () => {
 
         <ScrollView 
           style={styles.scrollContainer}
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl

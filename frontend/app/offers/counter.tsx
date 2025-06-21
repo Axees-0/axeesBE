@@ -208,7 +208,11 @@ const CounterOfferPage: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Original Offer Summary */}
           <View style={styles.originalOfferSection}>
             <Text style={styles.sectionTitle}>Original Offer</Text>

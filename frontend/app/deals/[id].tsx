@@ -441,7 +441,11 @@ const DealDetailPage: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Deal Overview */}
           <View style={styles.dealOverview}>
             <Text style={styles.dealTitle}>{deal.offerTitle}</Text>

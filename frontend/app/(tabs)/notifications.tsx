@@ -120,6 +120,49 @@ const NotificationsPage: React.FC = () => {
     }
   };
 
+  const getDateGroup = (date: Date): string => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfYesterday = new Date(startOfToday);
+    startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+    const startOfWeek = new Date(startOfToday);
+    startOfWeek.setDate(startOfWeek.getDate() - 7);
+
+    if (date >= startOfToday) {
+      return 'Today';
+    } else if (date >= startOfYesterday) {
+      return 'Yesterday';
+    } else if (date >= startOfWeek) {
+      return 'This Week';
+    } else {
+      return 'Earlier';
+    }
+  };
+
+  const groupNotificationsByDate = (notifs: Notification[]) => {
+    const grouped: { [key: string]: Notification[] } = {};
+    
+    notifs.forEach(notif => {
+      const group = getDateGroup(notif.timestamp);
+      if (!grouped[group]) {
+        grouped[group] = [];
+      }
+      grouped[group].push(notif);
+    });
+
+    // Order the groups
+    const orderedGroups = ['Today', 'Yesterday', 'This Week', 'Earlier'];
+    const result: { group: string; notifications: Notification[] }[] = [];
+    
+    orderedGroups.forEach(group => {
+      if (grouped[group]) {
+        result.push({ group, notifications: grouped[group] });
+      }
+    });
+
+    return result;
+  };
+
   const handleNotificationPress = (notification: Notification) => {
     // Mark as read
     setNotifications(prev => 
@@ -156,7 +199,34 @@ const NotificationsPage: React.FC = () => {
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    const unreadCount = notifications.filter(n => !n.read).length;
+    
+    if (unreadCount === 0) {
+      return; // No unread notifications
+    }
+    
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(
+        `Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read?`
+      );
+      if (confirmed) {
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      }
+    } else {
+      // For mobile, use Alert.alert
+      const { Alert } = require('react-native');
+      Alert.alert(
+        'Mark All Read',
+        `Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Mark Read', 
+            onPress: () => setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+          }
+        ]
+      );
+    }
   };
 
   const onRefresh = () => {
@@ -205,61 +275,50 @@ const NotificationsPage: React.FC = () => {
             />
           }
         >
-          {unreadCount > 0 && (
-            <View style={styles.unreadSection}>
-              <Text style={styles.sectionTitle}>New</Text>
-              {notifications.filter(n => !n.read).map(notification => (
-                <TouchableOpacity
-                  key={notification.id}
-                  style={[styles.notificationItem, styles.unreadItem]}
-                  onPress={() => handleNotificationPress(notification)}
-                >
-                  <View style={[styles.iconContainer, { backgroundColor: getNotificationColor(notification.type) + '20' }]}>
-                    <Text style={styles.icon}>{notification.icon}</Text>
-                  </View>
-                  
-                  <View style={styles.notificationContent}>
-                    <Text style={styles.notificationTitle}>{notification.title}</Text>
-                    <Text style={styles.notificationMessage} numberOfLines={2}>
-                      {notification.message}
-                    </Text>
-                    <Text style={styles.timestamp}>{formatTimestamp(notification.timestamp)}</Text>
-                  </View>
-                  
-                  <View style={[styles.unreadDot, { backgroundColor: getNotificationColor(notification.type) }]} />
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {notifications.filter(n => n.read).length > 0 && (
-            <View style={styles.readSection}>
-              <Text style={styles.sectionTitle}>Earlier</Text>
-              {notifications.filter(n => n.read).map(notification => (
-                <TouchableOpacity
-                  key={notification.id}
-                  style={styles.notificationItem}
-                  onPress={() => handleNotificationPress(notification)}
-                >
-                  <View style={[styles.iconContainer, { backgroundColor: '#f3f4f6' }]}>
-                    <Text style={styles.icon}>{notification.icon}</Text>
-                  </View>
-                  
-                  <View style={styles.notificationContent}>
-                    <Text style={[styles.notificationTitle, styles.readTitle]}>
-                      {notification.title}
-                    </Text>
-                    <Text style={[styles.notificationMessage, styles.readMessage]} numberOfLines={2}>
-                      {notification.message}
-                    </Text>
-                    <Text style={styles.timestamp}>{formatTimestamp(notification.timestamp)}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {notifications.length === 0 && (
+          {notifications.length > 0 ? (
+            groupNotificationsByDate(notifications).map(({ group, notifications: groupNotifs }) => (
+              <View key={group} style={styles.dateSection}>
+                <Text style={styles.dateSectionTitle}>{group}</Text>
+                {groupNotifs.map(notification => (
+                  <TouchableOpacity
+                    key={notification.id}
+                    style={[
+                      styles.notificationItem,
+                      !notification.read && styles.unreadItem
+                    ]}
+                    onPress={() => handleNotificationPress(notification)}
+                  >
+                    <View style={[
+                      styles.iconContainer, 
+                      { backgroundColor: notification.read ? '#f3f4f6' : getNotificationColor(notification.type) + '20' }
+                    ]}>
+                      <Text style={styles.icon}>{notification.icon}</Text>
+                    </View>
+                    
+                    <View style={styles.notificationContent}>
+                      <Text style={[
+                        styles.notificationTitle,
+                        notification.read && styles.readTitle
+                      ]}>
+                        {notification.title}
+                      </Text>
+                      <Text style={[
+                        styles.notificationMessage,
+                        notification.read && styles.readMessage
+                      ]} numberOfLines={2}>
+                        {notification.message}
+                      </Text>
+                      <Text style={styles.timestamp}>{formatTimestamp(notification.timestamp)}</Text>
+                    </View>
+                    
+                    {!notification.read && (
+                      <View style={[styles.unreadDot, { backgroundColor: getNotificationColor(notification.type) }]} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            ))
+          ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyTitle}>No notifications yet</Text>
               <Text style={styles.emptyText}>
@@ -303,6 +362,16 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flex: 1,
+  },
+  dateSection: {
+    paddingTop: 20,
+  },
+  dateSectionTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#666',
+    paddingHorizontal: 20,
+    paddingBottom: 12,
   },
   unreadSection: {
     paddingTop: 20,

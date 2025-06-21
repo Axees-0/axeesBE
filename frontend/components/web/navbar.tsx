@@ -20,7 +20,7 @@
    import { router, usePathname } from "expo-router";
    import { useAuth } from "@/contexts/AuthContext";
    import Search01 from "@/assets/search01.svg";
-   import { FontFamily, FontSize, Color, Padding } from "@/GlobalStyles";
+   import { FontFamily, FontSize, Color, Padding, Focus } from "@/GlobalStyles";
    
    /* ———————————————————————————————————————————————————————
       Props
@@ -94,9 +94,16 @@
                  {TABS.map(t => (
                    <Pressable
                      key={t.name}
+                     style={({ focused }) => [
+                       styles.tabButton,
+                       focused && styles.tabButtonFocused,
+                     ]}
                      onPress={() =>
                        router.push(t.name === "/" ? "/" : `/${t.name}`)
                      }
+                     accessible={true}
+                     accessibilityRole="button"
+                     accessibilityLabel={`Navigate to ${t.label}`}
                    >
                      <Text
                        style={[
@@ -140,7 +147,7 @@
                <View style={styles.authBtns}>
                  <TouchableOpacity
                    style={styles.signInBtn}
-                   onPress={() => router.push("/UAM001Login")}
+                   onPress={() => router.push("/login")}
                  >
                    <Text style={styles.signInTxt}>Sign In</Text>
                  </TouchableOpacity>
@@ -215,7 +222,7 @@
                    title: "Log Out",
                    onPress: async () => {
                      await logout();
-                     router.replace("/UAM001Login");
+                     router.replace("/login");
                    },
                    logout: true,
                  },
@@ -279,6 +286,18 @@ const styles = StyleSheet.create({
   logo: { width: 160, height: 70, resizeMode: "contain" },
 
   tabs: { flexDirection: "row", gap: 24, flexWrap: "wrap" },
+  
+  tabButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  
+  tabButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 8,
+  },
+  
   tabLabel: {
     fontSize: FontSize.size_lg,
     fontFamily: FontFamily.inter,

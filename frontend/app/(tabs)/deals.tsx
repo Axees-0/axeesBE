@@ -548,6 +548,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    ...(isWeb && { cursor: 'pointer' as any }),
   },
   counterOfferContent: {
     flexDirection: 'row',
@@ -878,6 +879,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    ...(isWeb && { cursor: 'pointer' as any }),
   },
   offerCardPressed: {
     opacity: 0.8,

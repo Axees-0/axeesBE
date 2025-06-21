@@ -239,6 +239,27 @@ export default function CreatorOfferDetails() {
         demoLog('Handling offer acceptance in demo mode');
       }
       
+      // Add confirmation dialog
+      if (Platform.OS === 'web') {
+        const confirmed = window.confirm(
+          `Accept the offer "${displayData?.offerName}" for ${displayData?.proposedAmount?.toLocaleString("en-US", { currency: "USD", style: "currency" })}?`
+        );
+        if (!confirmed) return;
+      } else {
+        // For mobile, use Alert.alert
+        const { Alert } = require('react-native');
+        await new Promise((resolve, reject) => {
+          Alert.alert(
+            'Accept Offer',
+            `Accept the offer "${displayData?.offerName}" for ${displayData?.proposedAmount?.toLocaleString("en-US", { currency: "USD", style: "currency" })}?`,
+            [
+              { text: 'Cancel', style: 'cancel', onPress: () => reject(new Error('User cancelled')) },
+              { text: 'Accept', onPress: () => resolve(true) }
+            ]
+          );
+        });
+      }
+      
       const result = await acceptMutation.mutateAsync();
       
       if (!DEMO_MODE) {
@@ -252,6 +273,9 @@ export default function CreatorOfferDetails() {
       }
       // Demo mode navigation handled in mutation onSuccess
     } catch (error) {
+      if (error.message === 'User cancelled') {
+        return; // User cancelled, do nothing
+      }
       console.error("Error accepting offer:", error);
       if (DEMO_MODE) {
         // Even if there's an error in demo, show success
@@ -269,6 +293,27 @@ export default function CreatorOfferDetails() {
   // Reject
   const handleReject = async () => {
     try {
+      // Add confirmation dialog
+      if (Platform.OS === 'web') {
+        const confirmed = window.confirm(
+          `Are you sure you want to reject the offer "${displayData?.offerName}"?`
+        );
+        if (!confirmed) return;
+      } else {
+        // For mobile, use Alert.alert
+        const { Alert } = require('react-native');
+        await new Promise((resolve, reject) => {
+          Alert.alert(
+            'Reject Offer',
+            `Are you sure you want to reject the offer "${displayData?.offerName}"?`,
+            [
+              { text: 'Cancel', style: 'cancel', onPress: () => reject(new Error('User cancelled')) },
+              { text: 'Reject', style: 'destructive', onPress: () => resolve(true) }
+            ]
+          );
+        });
+      }
+      
       const result = await rejectMutation.mutateAsync();
       router.push({
         pathname: "/UOM15OfferRejectMessage",
@@ -278,6 +323,9 @@ export default function CreatorOfferDetails() {
         },
       });
     } catch (error) {
+      if (error.message === 'User cancelled') {
+        return; // User cancelled, do nothing
+      }
       console.error("Error rejecting offer:", error);
     }
   };

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Color } from '@/GlobalStyles';
+import { Color, Focus } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { DemoData } from '@/demo/DemoData';
@@ -72,6 +72,9 @@ const OfferDetailsPage: React.FC = () => {
     totalPrice: offerTemplate.basePrice,
   });
 
+  // State for keyboard navigation of radio buttons
+  const [focusedTimelineIndex, setFocusedTimelineIndex] = useState(1); // Default to 'standard' (index 1)
+
   const timelineOptions = [
     { id: 'rush', label: 'Rush (1-2 days)', multiplier: 1.5 },
     { id: 'standard', label: `Standard (${offerTemplate.deliveryDays} days)`, multiplier: 1.0 },
@@ -86,6 +89,36 @@ const OfferDetailsPage: React.FC = () => {
         timeline,
         totalPrice: Math.round(offerTemplate.basePrice * option.multiplier)
       }));
+      // Update focused index to match selected timeline
+      const newIndex = timelineOptions.findIndex(opt => opt.id === timeline);
+      if (newIndex !== -1) {
+        setFocusedTimelineIndex(newIndex);
+      }
+    }
+  };
+
+  // Keyboard navigation for radio buttons
+  const handleTimelineKeyPress = (event: any, index: number) => {
+    switch (event.nativeEvent.key) {
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        event.preventDefault();
+        const prevIndex = index > 0 ? index - 1 : timelineOptions.length - 1;
+        setFocusedTimelineIndex(prevIndex);
+        handleTimelineChange(timelineOptions[prevIndex].id);
+        break;
+      case 'ArrowDown':
+      case 'ArrowRight':
+        event.preventDefault();
+        const nextIndex = index < timelineOptions.length - 1 ? index + 1 : 0;
+        setFocusedTimelineIndex(nextIndex);
+        handleTimelineChange(timelineOptions[nextIndex].id);
+        break;
+      case 'Enter':
+      case ' ':
+        event.preventDefault();
+        handleTimelineChange(timelineOptions[index].id);
+        break;
     }
   };
 
@@ -132,7 +165,11 @@ const OfferDetailsPage: React.FC = () => {
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Offer Summary */}
           <View style={styles.summarySection}>
             <Text style={styles.summaryTitle}>{offerTemplate.title}</Text>
@@ -193,14 +230,28 @@ const OfferDetailsPage: React.FC = () => {
             {/* Timeline Selection */}
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Timeline & Pricing</Text>
-              {timelineOptions.map((option) => (
+              <Text style={styles.radioGroupInstructions}>
+                Use arrow keys to navigate between options
+              </Text>
+              {timelineOptions.map((option, index) => (
                 <TouchableOpacity
                   key={option.id}
-                  style={[
+                  style={({ focused }) => [
                     styles.timelineOption,
-                    config.timeline === option.id && styles.selectedTimelineOption
+                    config.timeline === option.id && styles.selectedTimelineOption,
+                    focused && styles.focusedTimelineOption,
+                    focusedTimelineIndex === index && styles.keyboardFocusedOption,
                   ]}
                   onPress={() => handleTimelineChange(option.id)}
+                  onKeyPress={(event) => handleTimelineKeyPress(event, index)}
+                  accessible={true}
+                  accessibilityRole="radio"
+                  accessibilityState={{ 
+                    selected: config.timeline === option.id,
+                    checked: config.timeline === option.id 
+                  }}
+                  accessibilityLabel={`${option.label} - $${Math.round(offerTemplate.basePrice * option.multiplier).toLocaleString()}`}
+                  accessibilityHint="Use arrow keys to navigate between timeline options"
                 >
                   <View style={styles.timelineContent}>
                     <Text style={[
@@ -372,6 +423,12 @@ const styles = StyleSheet.create({
     color: Color.cSK430B92950,
     marginBottom: 8,
   },
+  radioGroupInstructions: {
+    fontSize: 14,
+    color: '#666',
+    fontStyle: 'italic',
+    marginBottom: 12,
+  },
   textInput: {
     borderWidth: 1,
     borderColor: '#ddd',
@@ -393,6 +450,14 @@ const styles = StyleSheet.create({
   selectedTimelineOption: {
     borderColor: Color.cSK430B92500,
     backgroundColor: '#f0e7fd',
+  },
+  focusedTimelineOption: {
+    ...Focus.primary,
+    borderRadius: 8,
+  },
+  keyboardFocusedOption: {
+    ...Focus.primary,
+    borderRadius: 8,
   },
   timelineContent: {
     flex: 1,

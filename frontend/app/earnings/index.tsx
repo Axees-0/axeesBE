@@ -171,7 +171,11 @@ const EarningsPage: React.FC = () => {
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Balance Overview */}
           <View style={styles.balanceSection}>
             <View style={styles.mainBalanceCard}>

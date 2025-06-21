@@ -139,3 +139,78 @@ export const Border = {
 
   br_xs_5: 12,
 };
+
+/* Focus Styles - WCAG 2.1 Compliant Focus Indicators */
+export const Focus = {
+  // Primary focus outline - high contrast purple
+  primary: {
+    borderWidth: 2,
+    borderColor: "#430b92",
+    borderStyle: "solid",
+    shadowColor: "#430b92",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  
+  // Secondary focus outline - for lighter backgrounds
+  secondary: {
+    borderWidth: 2,
+    borderColor: "#0b0218",
+    borderStyle: "solid",
+    shadowColor: "#0b0218",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  
+  // High contrast focus - for accessibility
+  highContrast: {
+    borderWidth: 3,
+    borderColor: "#000000",
+    borderStyle: "solid",
+    shadowColor: "#ffffff",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 1,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  
+  // Error focus state
+  error: {
+    borderWidth: 2,
+    borderColor: "#ed0006",
+    borderStyle: "solid",
+    shadowColor: "#ed0006",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  
+  // Success focus state
+  success: {
+    borderWidth: 2,
+    borderColor: "#15cb15",
+    borderStyle: "solid",
+    shadowColor: "#15cb15",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  
+  // Subtle focus - for less prominent elements
+  subtle: {
+    borderWidth: 1,
+    borderColor: "#c5a0f8",
+    borderStyle: "solid",
+    shadowColor: "#c5a0f8",
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+};

@@ -167,7 +167,11 @@ const CustomOfferPage: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Creator Info */}
           <View style={styles.creatorSection}>
             <Text style={styles.creatorLabel}>Creating offer for:</Text>

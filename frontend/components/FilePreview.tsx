@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Modal,
   View,
@@ -28,6 +28,20 @@ export default function FilePreviewModal({
   const isStartsWithHttp =
     file?.fileUrl?.startsWith("http://") ||
     file?.fileUrl?.startsWith("https://");
+
+  // Add Esc key support for web
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [visible, onClose]);
 
   return (
     <Modal visible={visible} animationType="slide" transparent={true}>

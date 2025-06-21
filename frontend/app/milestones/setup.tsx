@@ -162,7 +162,11 @@ const MilestoneSetupWizard: React.FC = () => {
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           <View style={styles.content}>
             {/* Deal Info */}
             <View style={styles.dealInfo}>

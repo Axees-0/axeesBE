@@ -11,7 +11,8 @@ import {
   Dimensions,
   Platform,
   ViewStyle,
-  TextInput
+  TextInput,
+  Alert
 } from "react-native";
 import Arrowdown01 from "@/assets/arrowdown01.svg";
 import Search01 from "@/assets/search01.svg";
@@ -24,6 +25,7 @@ import {
   Gap,
   Color,
   FontSize,
+  Focus,
 } from "@/GlobalStyles";
 import { router } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
@@ -475,7 +477,7 @@ const sortedData = React.useMemo(() => {
 /* ───────────── toggle Favourite (with toast) ───────────── */
 const toggleFavorite = useMutation({
   mutationFn: async (creatorId: string) => {
-    if (!user?._id) { router.push("/UAM001Login"); throw new Error(); }
+    if (!user?._id) { router.push("/login"); throw new Error(); }
 
     const { data } = await axios.patch(
       `${API_URL}/users/${user._id}/favorites`,
@@ -726,6 +728,15 @@ const isAIRequestActive =
   hitSlop={10}
   onPress={(e) => {
     e.stopPropagation?.();
+    if (!user?._id) {
+      // Show authentication required message
+      if (Platform.OS === 'web') {
+        alert('Please sign in to save favorites');
+      } else {
+        Alert.alert('Sign In Required', 'Please sign in to save favorites');
+      }
+      return;
+    }
     toggleFavorite.mutate(usr._id);
   }}
   style={styles.favoriteButton}
@@ -747,34 +758,70 @@ const isAIRequestActive =
 
   
 
-// ** UPDATED: ** use `apiTags` when rendering chips
-  const renderTagChips = () => (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.tagChipsContainer as ViewStyle}
-    >
-      {chipTags.map(tag => (
-        <Pressable
-          key={tag}
+// ** UPDATED: ** use `apiTags` when rendering chips with keyboard accessibility
+  const renderTagChips = () => {
+    const { width } = Dimensions.get('window');
+    const isMobile = width <= 768;
+    
+    const handleChipPress = (tag: string) => {
+      setSelectedTag(selectedTag === tag ? null : tag);
+    };
+    
+    const handleChipKeyPress = (event: any, tag: string) => {
+      if (event.nativeEvent.key === 'Enter' || event.nativeEvent.key === ' ') {
+        event.preventDefault();
+        handleChipPress(tag);
+      }
+    };
+    
+    const renderChip = (tag: string) => (
+      <Pressable
+        key={tag}
+        style={({ pressed, focused }) => [
+          styles.tagChip,
+          selectedTag === tag && styles.selectedTagChip,
+          focused && styles.tagChipFocused,
+          pressed && { opacity: 0.8 },
+        ]}
+        onPress={() => handleChipPress(tag)}
+        onKeyPress={(event) => handleChipKeyPress(event, tag)}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={`Filter by ${tag}`}
+        accessibilityState={{ selected: selectedTag === tag }}
+        accessibilityHint={selectedTag === tag ? "Double tap to remove filter" : "Double tap to apply filter"}
+      >
+        <Text
           style={[
-            styles.tagChip,
-            selectedTag === tag && styles.selectedTagChip,
+            styles.tagChipText,
+            selectedTag === tag && styles.selectedTagChipText,
           ]}
-          onPress={() => setSelectedTag(selectedTag === tag ? null : tag)}
         >
-          <Text
-            style={[
-              styles.tagChipText,
-              selectedTag === tag && styles.selectedTagChipText,
-            ]}
-          >
-            {tag}
-          </Text>
-        </Pressable>
-      ))}
-    </ScrollView>
-  );
+          {tag}
+        </Text>
+      </Pressable>
+    );
+    
+    if (isMobile) {
+      // Mobile: Use wrapping container instead of horizontal scroll
+      return (
+        <View style={styles.tagChipsWrapContainer}>
+          {chipTags.map(renderChip)}
+        </View>
+      );
+    }
+    
+    // Desktop: Keep horizontal scrolling
+    return (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tagChipsContainer as ViewStyle}
+      >
+        {chipTags.map(renderChip)}
+      </ScrollView>
+    );
+  };
 
 
 const renderListHeader = () => (
@@ -801,6 +848,10 @@ const renderListHeader = () => (
               setSelectedTag(null);
             }}
             style={styles.clearButton}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Clear search"
+            accessibilityHint="Clears the search field and resets filters"
           >
             <Text style={styles.clearButtonText}>×</Text>
           </Pressable>
@@ -982,6 +1033,17 @@ const renderEmpty = () => {
               //     {[1,2,3].map(i => <UserCardSkeleton key={i}/> )}
               //   </View>
               // );
+
+              /* 3️⃣ End of results indicator */
+              if (hasItems && !hasNextPage && !isFetchingNextPage && !aiPending) {
+                return (
+                  <View style={styles.endOfListContainer}>
+                    <View style={styles.endOfListLine} />
+                    <Text style={styles.endOfListText}>End of results</Text>
+                    <View style={styles.endOfListLine} />
+                  </View>
+                );
+              }
 
               return null;
             }}
@@ -1501,7 +1563,17 @@ skeletonFooter: {
     marginBottom: 16,
   },
 
-  // Tag chip - improved spacing
+  // Mobile tag chips container - wrapping layout
+  tagChipsWrapContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    marginBottom: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+
+  // Tag chip - improved spacing with focus states
   tagChip: {
     backgroundColor: "#f8f9fa",
     paddingVertical: 8,
@@ -1511,6 +1583,12 @@ skeletonFooter: {
     justifyContent: "center",
     borderWidth: 1,
     borderColor: "#e9ecef",
+  },
+
+  // Tag chip focused state
+  tagChipFocused: {
+    ...Focus.primary,
+    borderRadius: 20,
   },
 
   // Selected tag chip - better contrast
@@ -1653,6 +1731,25 @@ skeletonFooter: {
   favoriteIcon: {
     width: 20,
     height: 20,
+  },
+
+  endOfListContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  endOfListLine: {
+    height: 1,
+    backgroundColor: '#e2e8f0',
+    flex: 1,
+  },
+  endOfListText: {
+    fontSize: 14,
+    color: '#94a3b8',
+    fontFamily: FontFamily.inter,
   },
 });
 

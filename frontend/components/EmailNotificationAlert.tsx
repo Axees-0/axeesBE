@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   View,
   Text,
@@ -36,6 +36,20 @@ export default function EmailNotificationAlert({
   const hasMarketerEmail = recipientDetails?.marketer?.hasEmail || false;
   const creatorNotificationsEnabled = recipientDetails?.creator?.notificationEnabled !== false;
   const marketerNotificationsEnabled = recipientDetails?.marketer?.notificationEnabled !== false;
+
+  // Add Esc key support for web
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [visible, onClose]);
 
   const handleGoToSettings = () => {
     onClose();

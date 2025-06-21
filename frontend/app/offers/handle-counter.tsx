@@ -329,7 +329,11 @@ const HandleCounterOfferPage: React.FC = () => {
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Creator Info */}
           <View style={styles.creatorSection}>
             <Text style={styles.creatorName}>{counterOffer.creator.name}</Text>
@@ -678,15 +682,15 @@ const styles = StyleSheet.create({
   },
   negotiateButton: {
     flex: 1,
-    backgroundColor: '#E0E7FF',
+    backgroundColor: '#ddd6fe',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#C7D2FE',
+    borderColor: '#a78bfa',
   },
   negotiateButtonText: {
-    color: '#4F46E5',
+    color: '#5b21b6',
     fontSize: 16,
     fontWeight: '600',
   },

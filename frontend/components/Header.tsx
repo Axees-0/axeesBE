@@ -101,7 +101,7 @@ const Header = ({ title }: { title: string }) => {
           onPress={() => {
             requestNotificationPermission();
             if (title === "URM01CreateAccount") {
-              router.push("/UAM001Login");
+              router.push("/login");
             } else {
               router.push("/URM01CreateAccount");
             }

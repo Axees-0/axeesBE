@@ -37,6 +37,9 @@ const WebBottomTabs = ({ activeIndex }: { activeIndex: number }) => {
         height: 100,
         backgroundColor: Color.cSK430B92500,
         width: "100%",
+        zIndex: 1000,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255, 255, 255, 0.1)',
       }}
     >
       <View

@@ -138,7 +138,11 @@ const WorkSubmissionPage: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Milestone Overview */}
           <View style={styles.milestoneSection}>
             <Text style={styles.sectionTitle}>Milestone Details</Text>

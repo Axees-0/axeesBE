@@ -1,0 +1,35 @@
+{
+  "name": "production-reality-tests",
+  "version": "1.0.0",
+  "description": "Tests that validate real-world production scenarios",
+  "scripts": {
+    "test": "jest --detectOpenHandles --forceExit",
+    "test:watch": "jest --watch",
+    "test:auth": "jest authentication-torture",
+    "test:realtime": "jest realtime-chaos", 
+    "test:data": "jest data-consistency",
+    "test:payments": "jest payment-nightmares",
+    "test:mobile": "jest mobile-reality",
+    "test:quick": "node test-orchestrator.js --quick",
+    "test:comprehensive": "node test-orchestrator.js --comprehensive",
+    "reality-check": "node test-orchestrator.js"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^6.3.3",
+    "socket.io-client": "^4.7.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testTimeout": 30000,
+    "setupFilesAfterEnv": ["../setup.js"],
+    "testMatch": [
+      "**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "../../../**/*.js",
+      "!../../../node_modules/**",
+      "!../../../tests/**"
+    ]
+  }
+}

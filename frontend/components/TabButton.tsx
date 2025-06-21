@@ -5,6 +5,7 @@ import { useWindowDimensions } from "react-native";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUnreadMessages } from "@/hooks/messagesContext";
 import axios from "axios";
 
 interface TabButtonProps {
@@ -23,6 +24,7 @@ export function TabButton({
   const window = useWindowDimensions();
 
   const [notifications, setNotifications] = useState<any[]>([]);
+  const { unreadCount: messagesUnreadCount } = useUnreadMessages();
 
   const { user } = useAuth();
 
@@ -52,10 +54,26 @@ export function TabButton({
     (notification) => notification.unread === true
   );
 
+  // Create dynamic accessibility label based on notifications and messages
+  const getAccessibilityLabel = () => {
+    if (label.toLowerCase() === "notifications" && unreadNotifications.length > 0) {
+      return `${label} tab, ${unreadNotifications.length} unread`;
+    }
+    if (label.toLowerCase() === "messages" && messagesUnreadCount > 0) {
+      return `${label} tab, ${messagesUnreadCount} unread`;
+    }
+    return `${label} tab`;
+  };
+
   return (
     <Pressable
       style={[styles.parentFlexBox, isActive && styles.activeTab]}
       onPress={onPress}
+      accessible={true}
+      accessibilityRole="tab"
+      accessibilityLabel={getAccessibilityLabel()}
+      accessibilityState={{ selected: isActive }}
+      accessibilityHint={`Navigate to ${label} page`}
     >
       {label.toLowerCase() === "notifications" &&
         unreadNotifications.length > 0 && (
