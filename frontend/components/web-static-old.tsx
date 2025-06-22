@@ -91,23 +91,8 @@ const Web = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.sidebar}>
-        <AccessibleFilters
-          availableFilters={availableFilters}
-          selectedFilters={selectedFilters}
-          onFilterChange={(newFilters) => {
-            setSelectedFilters(newFilters);
-            applyFilters(searchText, newFilters);
-          }}
-          onClearAll={() => {
-            setSelectedFilters([]);
-            applyFilters(searchText, []);
-          }}
-        />
-      </View>
-      
-      <ScrollView style={styles.mainContent}>
+    <ScrollView style={styles.container}>
+      <View style={styles.mainContent}>
         <View style={styles.header}>
           <Text style={styles.title}>Explore Creators & Influencers</Text>
           <Text style={styles.subtitle}>Connect with top creators for your brand campaigns</Text>
@@ -139,6 +124,48 @@ const Web = () => {
               >
                 <Text style={styles.clearButtonText} aria-hidden="true">×</Text>
               </Pressable>
+            )}
+          </View>
+        </View>
+        
+        {/* Filters Section - Now displayed horizontally */}
+        <View style={styles.filtersSection}>
+          <View style={styles.filtersContainer}>
+            {availableFilters.map((filter) => {
+              const isSelected = selectedFilters.includes(filter);
+              return (
+                <TouchableOpacity
+                  key={filter}
+                  style={[
+                    styles.filterChip,
+                    isSelected && styles.filterChipActive
+                  ]}
+                  onPress={() => toggleFilter(filter)}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: isSelected }}
+                  accessibilityLabel={`${filter} filter`}
+                >
+                  <Text style={[
+                    styles.filterChipText,
+                    isSelected && styles.filterChipTextActive
+                  ]}>
+                    {filter}
+                  </Text>
+                </TouchableOpacity>
+              );
+            })}
+            {selectedFilters.length > 0 && (
+              <TouchableOpacity
+                style={styles.clearFiltersChip}
+                onPress={() => {
+                  setSelectedFilters([]);
+                  applyFilters(searchText, []);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Clear all filters"
+              >
+                <Text style={styles.clearFiltersText}>Clear All</Text>
+              </TouchableOpacity>
             )}
           </View>
         </View>
@@ -199,59 +226,15 @@ const Web = () => {
             />
           )}
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
     backgroundColor: '#f8f9fa',
-  },
-  sidebar: {
-    width: 250,
-    backgroundColor: 'white',
-    padding: 20,
-    borderRightWidth: 1,
-    borderRightColor: '#e0e0e0',
-  },
-  sidebarTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-  },
-  filterItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginVertical: 2,
-    borderRadius: 6,
-  },
-  filterItemActive: {
-    backgroundColor: Color.cSK430B92500,
-  },
-  filterText: {
-    fontSize: 14,
-    color: '#555',
-  },
-  filterTextActive: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  clearFiltersButton: {
-    marginTop: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  clearFiltersText: {
-    fontSize: 12,
-    color: '#666',
-    fontWeight: 'bold',
   },
   filterStatus: {
     marginBottom: 16,
@@ -263,8 +246,49 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   mainContent: {
-    flex: 1,
     padding: 24,
+  },
+  filtersSection: {
+    marginBottom: 24,
+  },
+  filtersContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    alignItems: 'center',
+  },
+  filterChip: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    marginBottom: 8,
+  },
+  filterChipActive: {
+    backgroundColor: Color.cSK430B92500,
+    borderColor: Color.cSK430B92500,
+  },
+  filterChipText: {
+    fontSize: 14,
+    color: '#555',
+    fontWeight: '500',
+  },
+  filterChipTextActive: {
+    color: 'white',
+  },
+  clearFiltersChip: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    marginBottom: 8,
+  },
+  clearFiltersText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '600',
   },
   header: {
     marginBottom: 24,
