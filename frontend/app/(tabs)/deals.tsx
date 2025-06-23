@@ -21,6 +21,7 @@ import Navbar from "@/components/web/navbar";
 import { BREAKPOINTS, isMobile, isWideScreen, isTablet, isDesktop } from "@/constants/breakpoints";
 import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/performance";
 import { WebSEO } from "../web-seo";
+import { DealSkeleton, DealMetricsSkeleton, DealActivitySkeleton } from "@/components/DealSkeleton";
 
 const UOM08MarketerDealHistoryList = () => {
   const { width } = useWindowDimensions();
@@ -74,7 +75,7 @@ const UOM08MarketerDealHistoryList = () => {
   });
 
   // Demo counter-offers for marketers
-  const [counterOffers] = useState([
+  const [counterOffers, setCounterOffers] = useState([
     {
       id: 'counter-001',
       creatorName: 'Emma Thompson',
@@ -85,6 +86,41 @@ const UOM08MarketerDealHistoryList = () => {
       submittedDate: new Date(Date.now() - 7200000), // 2 hours ago
     }
   ]);
+  
+  // Track accepted offer IDs to hide their banners
+  const [acceptedOfferIds, setAcceptedOfferIds] = useState<string[]>(
+    // Check localStorage for previously accepted offers
+    typeof window !== 'undefined' 
+      ? JSON.parse(localStorage.getItem('acceptedOfferIds') || '[]')
+      : []
+  );
+  
+  // Filter out accepted offers
+  const pendingCounterOffers = counterOffers.filter(
+    offer => offer.status === 'pending' && !acceptedOfferIds.includes(offer.id)
+  );
+  
+  // Listen for offer acceptance events
+  useEffect(() => {
+    const handleOfferAccepted = (event: any) => {
+      const offerId = event.detail?.offerId;
+      if (offerId) {
+        const newAcceptedIds = [...acceptedOfferIds, offerId];
+        setAcceptedOfferIds(newAcceptedIds);
+        // Persist to localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('acceptedOfferIds', JSON.stringify(newAcceptedIds));
+        }
+      }
+    };
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener('offerAccepted', handleOfferAccepted);
+      return () => {
+        window.removeEventListener('offerAccepted', handleOfferAccepted);
+      };
+    }
+  }, [acceptedOfferIds]);
 
   // Responsive styles for metric cards
   const getMetricsRowStyles = () => {
@@ -194,6 +230,26 @@ const UOM08MarketerDealHistoryList = () => {
       return isMobileScreen ? <Mobile /> : <Web />;
     }
     
+    // Show skeleton loading for demo mode
+    if (isLoading) {
+      return (
+        <View style={[styles.content, isWide && styles.wideContent]}>
+          {/* Summary skeleton */}
+          <DealMetricsSkeleton count={4} />
+          
+          {/* Main content skeleton */}
+          <View style={styles.section}>
+            <DealSkeleton variant="card" count={3} />
+          </View>
+          
+          {/* Activity skeleton */}
+          <View style={styles.section}>
+            <DealActivitySkeleton count={3} />
+          </View>
+        </View>
+      );
+    }
+    
     // Check user role to determine which view to show
     const userRole = user?.role || 'marketer'; // Default to marketer for backward compatibility
     
@@ -201,7 +257,7 @@ const UOM08MarketerDealHistoryList = () => {
     if (userRole === 'creator') {
       return (
         <View style={[styles.content, isWide && styles.wideContent]}>
-          <CreatorDealsView userRole="creator" />
+          <CreatorDealsView userRole="creator" isLoading={isLoading} />
         </View>
       );
     }
@@ -304,32 +360,32 @@ const UOM08MarketerDealHistoryList = () => {
         </View>
 
         {/* Counter Offers Alert */}
-        {counterOffers.length > 0 && (
+        {pendingCounterOffers.length > 0 && (
           <TouchableOpacity 
             style={styles.counterOfferAlert}
             onPress={() => {
               router.push({
                 pathname: '/offers/handle-counter',
                 params: { 
-                  counterId: counterOffers[0].id,
+                  counterId: pendingCounterOffers[0].id,
                   from: 'deals'
                 }
               });
             }}
             accessible={true}
             accessibilityRole="button"
-            accessibilityLabel={`Review counter offer from ${counterOffers[0].creatorName}`}
-            accessibilityHint={`Opens counter offer details for ${counterOffers[0].offerType}`}
+            accessibilityLabel={`Review counter offer from ${pendingCounterOffers[0].creatorName}`}
+            accessibilityHint={`Opens counter offer details for ${pendingCounterOffers[0].offerType}`}
           >
             <View style={styles.counterOfferContent}>
               <Text style={styles.counterOfferIcon}>🔔</Text>
               <View style={styles.counterOfferInfo}>
-                <Text style={styles.counterOfferTitle}>Counter Offer Received</Text>
-                <Text style={styles.counterOfferText}>
-                  {counterOffers[0].creatorName} sent a counter offer for {counterOffers[0].offerType}
+                <Text style={styles.counterOfferTitle} numberOfLines={undefined}>Counter Offer Received</Text>
+                <Text style={styles.counterOfferText} numberOfLines={undefined}>
+                  {pendingCounterOffers[0].creatorName} sent a counter offer for {pendingCounterOffers[0].offerType}
                 </Text>
-                <Text style={styles.counterOfferAmount}>
-                  ${counterOffers[0].originalAmount} → ${counterOffers[0].counterAmount}
+                <Text style={styles.counterOfferAmount} numberOfLines={undefined}>
+                  ${pendingCounterOffers[0].originalAmount} → ${pendingCounterOffers[0].counterAmount}
                 </Text>
               </View>
             </View>
@@ -656,22 +712,28 @@ const styles = StyleSheet.create({
   },
   counterOfferInfo: {
     flex: 1,
+    minWidth: 0, // Prevent text from pushing beyond container
+    paddingRight: 8, // Add some space before action button
   },
   counterOfferTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#EA580C',
     marginBottom: 2,
+    flexWrap: 'wrap',
   },
   counterOfferText: {
     fontSize: 14,
     color: '#92400E',
     marginBottom: 4,
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
   counterOfferAmount: {
     fontSize: 14,
     fontWeight: '600',
     color: '#92400E',
+    flexWrap: 'wrap',
   },
   counterOfferAction: {
     fontSize: 14,

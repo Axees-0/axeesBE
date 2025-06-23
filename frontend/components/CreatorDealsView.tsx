@@ -11,6 +11,7 @@ import {
 import { router } from 'expo-router';
 import { Color } from '@/GlobalStyles';
 import { BREAKPOINTS, isTablet, isDesktop, isMobile } from '@/constants/breakpoints';
+import { DealSkeleton, DealMetricsSkeleton } from '@/components/DealSkeleton';
 
 interface Offer {
   id: string;
@@ -32,9 +33,10 @@ interface Offer {
 
 interface CreatorDealsViewProps {
   userRole: 'creator' | 'marketer';
+  isLoading?: boolean;
 }
 
-const CreatorDealsView: React.FC<CreatorDealsViewProps> = ({ userRole }) => {
+const CreatorDealsView: React.FC<CreatorDealsViewProps> = ({ userRole, isLoading = false }) => {
   // Get window dimensions for responsive layout
   const { width } = useWindowDimensions();
 
@@ -375,6 +377,32 @@ const CreatorDealsView: React.FC<CreatorDealsViewProps> = ({ userRole }) => {
   const activeOffers = creatorOffers.filter(o => o.status === 'accepted');
   const otherOffers = creatorOffers.filter(o => !['pending', 'accepted'].includes(o.status));
 
+  if (isLoading) {
+    return (
+      <View style={styles.container}>
+        {/* Summary skeleton */}
+        <DealMetricsSkeleton count={3} />
+        
+        {/* Main content skeleton */}
+        <View style={styles.section}>
+          <View style={styles.skeletonSectionHeader}>
+            <View style={styles.skeletonTitle} />
+            <View style={styles.skeletonSubtitle} />
+          </View>
+          <DealSkeleton variant="card" count={2} />
+        </View>
+        
+        <View style={styles.section}>
+          <View style={styles.skeletonSectionHeader}>
+            <View style={styles.skeletonTitle} />
+            <View style={styles.skeletonSubtitle} />
+          </View>
+          <DealSkeleton variant="card" count={1} />
+        </View>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       {/* Summary Cards */}
@@ -672,6 +700,23 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
+  },
+  // Skeleton styles
+  skeletonSectionHeader: {
+    marginBottom: 16,
+  },
+  skeletonTitle: {
+    height: 20,
+    width: '40%',
+    backgroundColor: '#E2D0FB',
+    borderRadius: 4,
+    marginBottom: 8,
+  },
+  skeletonSubtitle: {
+    height: 14,
+    width: '60%',
+    backgroundColor: '#E2D0FB',
+    borderRadius: 4,
   },
 });
 

@@ -25,6 +25,7 @@ import Arrowdown01 from "../../assets/arrowdown01.svg";
 import CustomBackButton from "@/components/CustomBackButton";
 import { FontFamily } from "../../GlobalStyles";
 import ProfileInfo from "../ProfileInfo";
+import { DealListSkeleton } from "@/components/DealSkeleton";
 
 // For web layout breakpoints
 const BREAKPOINTS = {
@@ -100,9 +101,31 @@ export default function MarketerDealHistoryList() {
   // If isLoading
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#430B92" />
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          {!isWideScreen && <CustomBackButton />}
+          <Text style={styles.headerTitle}>Deals</Text>
+          {!isWideScreen && <View style={{ width: 40 }} />}
+        </View>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <View style={styles.filterSection}>
+            <View style={styles.filterBar}>
+              <View style={styles.sortBy}>
+                <Text style={styles.sortByLabel}>Sort by:</Text>
+                <View style={styles.sortButton}>
+                  <Text style={styles.sortButtonText}>Brand</Text>
+                </View>
+              </View>
+              <View style={styles.filterButton}>
+                <Text style={styles.filterButtonText}>All Status</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.content}>
+            <DealListSkeleton count={6} />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
@@ -444,5 +467,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginVertical: 20,
+  },
+  // Add missing styles for skeleton loading
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2D0FB',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#430B92',
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  filterSection: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2D0FB',
+  },
+  content: {
+    padding: 20,
   },
 });

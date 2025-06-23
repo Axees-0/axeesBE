@@ -22,6 +22,7 @@ import { FontFamily } from "@/GlobalStyles";
 import CustomBackButton from "@/components/CustomBackButton";
 import ProfileInfo from "../ProfileInfo";
 import { format } from "date-fns";
+import { DealListSkeleton } from "@/components/DealSkeleton";
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/marketer/deals";
 
@@ -164,9 +165,29 @@ export default function MarketerDealHistoryList() {
 
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#430B92" />
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <CustomBackButton />
+          <Text style={styles.headerTitle}>Deals</Text>
+          <View style={{ width: 40 }} />
+        </View>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <View style={styles.filterBar}>
+            <View style={styles.sortBy}>
+              <Text style={styles.sortByLabel}>Sort by:</Text>
+              <View style={styles.sortButton}>
+                <Text style={styles.sortButtonText}>Brand</Text>
+              </View>
+            </View>
+            <View style={styles.filterButton}>
+              <Text style={styles.filterButtonText}>All Status</Text>
+            </View>
+          </View>
+          <View style={styles.content}>
+            <DealListSkeleton count={5} />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
@@ -493,5 +514,28 @@ const styles = StyleSheet.create({
   dropdownItemText: {
     fontSize: 14,
     color: "#000000",
+  },
+  // Add missing styles for skeleton loading
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2D0FB',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#430B92',
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  content: {
+    padding: 20,
   },
 });
