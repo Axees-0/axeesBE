@@ -11,6 +11,7 @@ import {
 import { useAuth } from '@/contexts/AuthContext';
 import { Color, Focus } from '@/GlobalStyles';
 import { router } from 'expo-router';
+import { useConfirmModal, useAlertModal } from '@/components/ConfirmModal';
 
 interface RoleSwitcherProps {
   visible: boolean;
@@ -22,6 +23,8 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
   // Default to the opposite role (the one they can switch TO)
   const oppositeRole = user?.userType === 'creator' ? 'marketer' : 'creator';
   const [selectedRole, setSelectedRole] = useState<'creator' | 'marketer'>(oppositeRole);
+  const { showConfirm, ConfirmModalComponent } = useConfirmModal();
+  const { showAlert, AlertModalComponent } = useAlertModal();
 
   // Reset to opposite role when modal opens
   useEffect(() => {
@@ -74,31 +77,53 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
     const newProfile = roleProfiles[selectedRole];
     const roleDisplayName = selectedRole === 'creator' ? 'Creator' : 'Marketer';
     
-    // Use web-compatible confirm dialog for web, Alert.alert for native
-    if (Platform.OS === 'web') {
-      const confirmed = window.confirm(`Switch to ${roleDisplayName} role?`);
-      if (confirmed) {
-        updateUser(newProfile);
-        
-        // Navigate to appropriate home screen
-        if (selectedRole === 'creator') {
-          router.replace('/(tabs)/deals');
-        } else {
-          router.replace('/'); // Root route is the explore page
+    // Use styled confirm modal for all platforms
+    showConfirm(
+      'Switch Role',
+      `Switch to ${roleDisplayName} role?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Switch', 
+          style: 'default',
+          onPress: () => {
+            updateUser(newProfile);
+            
+            // Navigate to appropriate home screen
+            if (selectedRole === 'creator') {
+              router.replace('/(tabs)/deals');
+            } else {
+              router.replace('/'); // Root route is the explore page
+            }
+            
+            onClose();
+            
+            // Success notification
+            showAlert(
+              'Success',
+              `Role switched successfully! You are now viewing the app as a ${roleDisplayName}.`,
+              'OK'
+            );
+          }
         }
-        
-        onClose();
-        
-        // Success notification
-        window.alert(`Role switched successfully! You are now viewing the app as a ${roleDisplayName}.`);
-      }
-    } else {
+      ]
+    );
+    
+    // Legacy code for reference - can be removed after testing
+    if (false && Platform.OS === 'web') {
       // Native React Native Alert for mobile
       Alert.alert(
         'Switch Role',
         `Switch to ${roleDisplayName} role?`,
         [
-          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Cancel', 
+            style: 'cancel',
+            onPress: () => {
+              // User cancelled - close the modal
+              onClose();
+            }
+          },
           {
             text: 'Switch',
             onPress: () => {
@@ -126,6 +151,7 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
   };
 
   return (
+    <>
     <Modal
       visible={visible}
       animationType="slide"
@@ -228,21 +254,38 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
             </Text>
           </View>
 
-          <TouchableOpacity
-            style={[
-              styles.switchButton,
-              selectedRole === user?.userType && styles.disabledButton
-            ]}
-            onPress={handleRoleSwitch}
-            disabled={selectedRole === user?.userType}
-          >
-            <Text style={[
-              styles.switchButtonText,
-              selectedRole === user?.userType && styles.disabledButtonText
-            ]}>
-              {selectedRole === user?.userType ? 'Already in this role' : `Switch to ${selectedRole === 'creator' ? 'Creator' : 'Marketer'}`}
-            </Text>
-          </TouchableOpacity>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={onClose}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Cancel"
+              accessibilityHint="Close the role switcher dialog"
+            >
+              <Text style={styles.cancelButtonText}>Cancel</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[
+                styles.switchButton,
+                selectedRole === user?.userType && styles.disabledButton
+              ]}
+              onPress={handleRoleSwitch}
+              disabled={selectedRole === user?.userType}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={selectedRole === user?.userType ? 'Already in this role' : `Switch to ${selectedRole === 'creator' ? 'Creator' : 'Marketer'}`}
+              accessibilityState={{ disabled: selectedRole === user?.userType }}
+            >
+              <Text style={[
+                styles.switchButtonText,
+                selectedRole === user?.userType && styles.disabledButtonText
+              ]}>
+                {selectedRole === user?.userType ? 'Already in this role' : `Switch to ${selectedRole === 'creator' ? 'Creator' : 'Marketer'}`}
+              </Text>
+            </TouchableOpacity>
+          </View>
 
           <Text style={styles.disclaimer}>
             This is a demo feature for testing purposes only. In production, users have fixed roles.
@@ -250,6 +293,10 @@ const RoleSwitcher: React.FC<RoleSwitcherProps> = ({ visible, onClose }) => {
         </View>
       </View>
     </Modal>
+    
+    <ConfirmModalComponent />
+    <AlertModalComponent />
+    </>
   );
 };
 
@@ -367,12 +414,31 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: Color.cSK430B92950,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  cancelButton: {
+    flex: 1,
+    backgroundColor: '#f0f0f0',
+    paddingVertical: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  cancelButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '600',
+  },
   switchButton: {
+    flex: 1,
     backgroundColor: Color.cSK430B92500,
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
-    marginBottom: 16,
   },
   disabledButton: {
     backgroundColor: '#ccc',

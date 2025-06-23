@@ -16,11 +16,14 @@ import { Color } from '@/GlobalStyles';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 const PhoneRegistrationScreen: React.FC = () => {
   const { role } = useLocalSearchParams();
   const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [hasInteracted, setHasInteracted] = useState(false);
 
   const validatePhoneNumber = (phone: string) => {
     // Simple phone validation - must be 10 digits
@@ -39,9 +42,23 @@ const PhoneRegistrationScreen: React.FC = () => {
   };
 
   const handlePhoneChange = (text: string) => {
-    const formatted = formatPhoneNumber(text);
-    if (formatted.replace(/\D/g, '').length <= 10) {
+    // Only allow digits
+    const digitsOnly = text.replace(/\D/g, '');
+    
+    if (!hasInteracted) {
+      setHasInteracted(true);
+    }
+    
+    const formatted = formatPhoneNumber(digitsOnly);
+    if (digitsOnly.length <= 10) {
       setPhoneNumber(formatted);
+      
+      // Show error if invalid after interaction
+      if (hasInteracted && digitsOnly.length > 0 && digitsOnly.length < 10) {
+        setShowError(true);
+      } else {
+        setShowError(false);
+      }
     }
   };
 
@@ -49,6 +66,8 @@ const PhoneRegistrationScreen: React.FC = () => {
     const cleanPhone = phoneNumber.replace(/\D/g, '');
     
     if (!validatePhoneNumber(cleanPhone)) {
+      setShowError(true);
+      setHasInteracted(true);
       Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number.');
       return;
     }
@@ -94,12 +113,7 @@ const PhoneRegistrationScreen: React.FC = () => {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton fallbackRoute="/register" />
           
           <Text style={styles.headerTitle}>Phone Verification</Text>
           <View style={styles.headerSpacer} />
@@ -132,9 +146,16 @@ const PhoneRegistrationScreen: React.FC = () => {
                 placeholderTextColor="#999"
               />
             </View>
-            <Text style={styles.inputHelp}>
-              We'll only use this to verify your account and send important updates
-            </Text>
+            {showError && (
+              <Text style={styles.errorText}>
+                Please enter a valid 10-digit phone number
+              </Text>
+            )}
+            {!showError && (
+              <Text style={styles.inputHelp}>
+                We'll only use this to verify your account and send important updates
+              </Text>
+            )}
           </View>
 
           {/* Demo Info */}
@@ -274,6 +295,13 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 8,
     lineHeight: 16,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#dc2626',
+    marginTop: 8,
+    lineHeight: 16,
+    fontWeight: '500',
   },
   demoInfo: {
     backgroundColor: '#e7f3ff',

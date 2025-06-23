@@ -20,28 +20,55 @@ export const UniversalBackButton: React.FC<UniversalBackButtonProps> = ({
   const pathname = usePathname();
 
   const handleBackPress = () => {
+    // Prevent multiple rapid clicks with a much shorter timeout
+    if ((window as any).__navigating) {
+      return;
+    }
+    (window as any).__navigating = true;
+    setTimeout(() => {
+      (window as any).__navigating = false;
+    }, 100); // Reduced from 500ms to 100ms
+
     if (onPress) {
       onPress();
       return;
     }
 
-    // For web, try browser history first
-    if (Platform.OS === 'web' && window.history.length > 1) {
-      window.history.back();
+    // Determine best navigation method based on route
+    const isModalRoute = pathname.includes('counter') || pathname.includes('verification');
+    const isChatRoute = pathname.includes('/chat/');
+    
+    // For web platform
+    if (Platform.OS === 'web') {
+      // For chat routes, always go back to messages
+      if (isChatRoute) {
+        router.push(fallbackRoute);
+        return;
+      }
+      
+      // For modal-like routes, use router.back()
+      if (isModalRoute || router.canGoBack()) {
+        router.back();
+      } else if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        router.push(fallbackRoute);
+      }
       return;
     }
 
-    // Try router.back() 
+    // For native platforms
     try {
-      if (router.canGoBack()) {
+      // For chat routes, always go back to messages
+      if (isChatRoute) {
+        router.push(fallbackRoute);
+      } else if (router.canGoBack()) {
         router.back();
       } else {
-        // If can't go back, navigate to fallback route
         router.push(fallbackRoute);
       }
     } catch (error) {
       console.warn('Navigation error:', error);
-      // Fallback navigation
       router.push(fallbackRoute);
     }
   };

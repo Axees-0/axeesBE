@@ -462,8 +462,16 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
           
           <View style={styles.headerActions}>
             <TouchableOpacity 
-              style={styles.actionButton}
+              style={({ focused }) => [
+                styles.actionButton,
+                focused && styles.actionButtonFocused,
+              ]}
               onPress={() => setIsFavorited(!isFavorited)}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={isFavorited ? "Remove from favorites" : "Add to favorites"}
+              accessibilityHint={isFavorited ? "Remove this creator from your favorites list" : "Add this creator to your favorites list"}
+              accessibilityState={{ selected: isFavorited }}
             >
               <Image 
                 source={isFavorited ? HeartFilled : Heart} 
@@ -474,8 +482,15 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
             </TouchableOpacity>
             
             <TouchableOpacity 
-              style={styles.actionButton}
+              style={({ focused }) => [
+                styles.actionButton,
+                focused && styles.actionButtonFocused,
+              ]}
               onPress={() => handleShareProfile()}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Share creator profile"
+              accessibilityHint="Share this creator's profile with others via link or social media"
             >
               <Image 
                 source={Share} 
@@ -504,15 +519,20 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
               <View style={styles.nameRow}>
                 <Text style={styles.creatorName}>{creator.name}</Text>
                 {creator.verified && (
-                  <CheckBadge width={20} height={20} />
+                  <CheckBadge 
+                    width={20} 
+                    height={20} 
+                    accessibilityLabel="Verified creator"
+                    accessibilityRole="image" 
+                  />
                 )}
               </View>
               
               <Text style={styles.username}>{creator.userName}</Text>
               
-              <View style={styles.statsRow}>
+              <View style={[styles.statsRow, isMobileScreen && styles.statsRowMobile]}>
                 <View 
-                  style={styles.statItem}
+                  style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
                   accessible={true}
                   accessibilityLabel={`Total followers: ${formatNumber(totalFollowers)}`}
                   accessibilityHint="Combined follower count across all social media platforms"
@@ -522,7 +542,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                 </View>
                 
                 <View 
-                  style={styles.statItem}
+                  style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
                   accessible={true}
                   accessibilityLabel={`Average engagement rate: ${avgEngagement.toFixed(1)} percent`}
                   accessibilityHint="Average percentage of followers who interact with posts"
@@ -532,7 +552,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                 </View>
                 
                 <View 
-                  style={styles.statItem}
+                  style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
                   accessible={true}
                   accessibilityLabel={`Rating: ${creator.rating?.toFixed(1)} out of 5 stars`}
                   accessibilityHint="Average rating from completed collaborations"
@@ -554,19 +574,39 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
               {/* Action Buttons */}
               <View style={styles.actionButtons}>
                 <TouchableOpacity 
-                  style={styles.contactButton}
+                  style={({ focused }) => [
+                    styles.contactButton,
+                    focused && styles.contactButtonFocused,
+                  ]}
                   onPress={() => {
                     console.log('📞 Contact button pressed, opening modal');
                     setIsContactModalVisible(true);
                   }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Contact creator"
+                  accessibilityHint="Open contact form to send a message"
                 >
-                  <Message width={20} height={20} />
+                  <Message 
+                    width={20} 
+                    height={20} 
+                    accessibilityLabel="Send message icon"
+                    accessibilityRole="image"
+                    aria-label="Send message icon"
+                  />
                   <Text style={styles.contactText}>Contact</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={styles.collaborateButton}
+                  style={({ focused }) => [
+                    styles.collaborateButton,
+                    focused && styles.collaborateButtonFocused,
+                  ]}
                   onPress={() => setIsOfferModalVisible(true)}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Create offer for creator"
+                  accessibilityHint="Open form to create a collaboration offer"
                 >
                   <Text 
                     style={styles.collaborateText}
@@ -738,6 +778,14 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     padding: 8,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    borderStyle: 'solid',
+  },
+  actionButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 8,
   },
   actionIcon: {
     width: 24,
@@ -781,16 +829,24 @@ const styles = StyleSheet.create({
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
-    gap: isMobileScreen ? 20 : 40,
+    gap: 40, // Default desktop gap
     marginBottom: 20,
     flexWrap: 'wrap',
-    paddingHorizontal: isMobileScreen ? 10 : 0,
+    paddingHorizontal: 0, // Default desktop padding
+  },
+  statsRowMobile: {
+    gap: 20, // Mobile gap
+    paddingHorizontal: 10, // Mobile padding
   },
   statItem: {
     alignItems: 'center',
-    minWidth: isMobileScreen ? 80 : 100,
+    minWidth: 100, // Default desktop width
     flex: 1,
-    maxWidth: isMobileScreen ? 120 : 140,
+    maxWidth: 140, // Default desktop max width
+  },
+  statItemMobile: {
+    minWidth: 80, // Mobile width
+    maxWidth: 120, // Mobile max width
   },
   statNumber: {
     fontSize: 20,
@@ -837,6 +893,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Color.cSK430B92500,
   },
+  contactButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 8,
+  },
   contactText: {
     color: Color.cSK430B92500,
     fontSize: 16,
@@ -851,6 +911,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: Color.cSK430B92500,
     minHeight: 44,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    borderStyle: 'solid',
+  },
+  collaborateButtonFocused: {
+    ...Focus.secondary,
+    borderRadius: 8,
   },
   collaborateText: {
     color: '#fff',

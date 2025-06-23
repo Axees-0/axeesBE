@@ -15,6 +15,7 @@ import { TabButton } from "@/components/TabButton";
 import { Indicator } from "@/components/Indicator";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBrowserHistory } from "@/hooks/useBrowserHistory";
+import { BREAKPOINTS } from "@/constants/breakpoints";
 
 // Import tab icons
 import Discoveryiconlypro from "../../assets/discovery--iconly-pro.svg";
@@ -37,9 +38,10 @@ export default function TabLayout() {
   const { width } = useWindowDimensions();
   const [activeIndex, setActiveIndex] = React.useState(0);
   const isWeb = Platform.OS === "web";
-  const isWideScreen = width > 1280;
+  const isWideScreen = width > BREAKPOINTS.DESKTOP;
+  const isUltraWide = width >= BREAKPOINTS.ULTRA_WIDE;
   const currentPath = usePathname();
-  const isMobile = width <= 768;
+  const isMobile = width <= BREAKPOINTS.TABLET;
 
   // Use browser history hook to handle back/forward button navigation
   useBrowserHistory({
@@ -116,7 +118,7 @@ export default function TabLayout() {
             height: Platform.select({
               ios: 65 + insets.bottom,
               android: 65,
-              web: isWideScreen ? 100 : 85,
+              web: isUltraWide ? 120 : isWideScreen ? 100 : 85,
             }),
             paddingBottom: Platform.select({
               ios: insets.bottom,
@@ -125,7 +127,8 @@ export default function TabLayout() {
             width: Platform.select({
               default: width,
             }),
-            minWidth: 1280,
+            minWidth: isUltraWide ? 1440 : 1280,
+            maxWidth: isUltraWide ? 2200 : 2030,
             justifyContent: "center",
             alignItems: "center",
             display: TABS.some((tab) => tab.name === route.name) ? "flex" : "none"
@@ -143,8 +146,8 @@ export default function TabLayout() {
                   {...props}
                   icon={
                     <tab.icon
-                      width={isWideScreen ? 40 : 24}
-                      height={isWideScreen ? 40 : 24}
+                      width={isUltraWide ? 48 : isWideScreen ? 40 : 24}
+                      height={isUltraWide ? 48 : isWideScreen ? 40 : 24}
                     />
                   }
                   label={tab.label}

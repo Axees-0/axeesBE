@@ -19,15 +19,14 @@ import { WebSEO } from "../web-seo";
 import { useAuth } from "@/contexts/AuthContext";
 import { Color } from "@/GlobalStyles";
 import { router } from "expo-router";
+import { BREAKPOINTS, isUltraWide, isWideScreen, isTablet } from "@/constants/breakpoints";
 const { width, height } = Dimensions.get("window");
-const BREAKPOINTS = {
-  mobile: 768,
-  tablet: 1200,
-};
 const UFM01ResultsScreen = () => {
   const { width } = useWindowDimensions();
   // const { user, isLoading } = useAuth();
-  const isMobileScreen = width <= BREAKPOINTS.tablet;
+  const isMobileScreen = width <= BREAKPOINTS.TABLET;
+  const isUltraWideScreen = isUltraWide(width);
+  const isWideScreenDevice = isWideScreen(width);
   const isWeb = Platform.OS === "web";
 
   return (

@@ -7,7 +7,6 @@ import {
   Text, 
   StyleSheet,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { router } from 'expo-router';
 import { WebSEO } from "../web-seo";
@@ -16,6 +15,7 @@ import { DEMO_MODE } from "@/demo/DemoMode";
 import { DemoData } from "@/demo/DemoData";
 import { useAuth } from "@/contexts/AuthContext";
 import RoleSwitcher from "@/components/RoleSwitcher";
+import { useConfirmModal } from "@/components/ConfirmModal";
 
 const BREAKPOINTS = {
   mobile: 768,
@@ -27,6 +27,7 @@ const ProfilePage = () => {
   const isMobileScreen = window.width <= BREAKPOINTS.mobile;
   const { user, logout } = useAuth();
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
+  const { showConfirm, ConfirmModalComponent } = useConfirmModal();
 
   const isCreator = user?.userType === 'creator';
 
@@ -211,6 +212,20 @@ const ProfilePage = () => {
                   <Text style={styles.actionIcon}>📊</Text>
                   <Text style={styles.actionText}>Media Kit</Text>
                 </TouchableOpacity>
+                <TouchableOpacity 
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
+                  onPress={() => router.push('/payments/creator')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Payments"
+                  accessibilityHint="Navigate to payments page"
+                >
+                  <Text style={styles.actionIcon}>💳</Text>
+                  <Text style={styles.actionText}>Payments</Text>
+                </TouchableOpacity>
               </>
             ) : (
               <>
@@ -323,7 +338,7 @@ const ProfilePage = () => {
         <TouchableOpacity 
           style={styles.logoutButton}
           onPress={() => {
-            Alert.alert(
+            showConfirm(
               'Logout',
               'Are you sure you want to logout?',
               [
@@ -364,6 +379,7 @@ const ProfilePage = () => {
         />
       )}
       
+      <ConfirmModalComponent />
     </>
   );
 };

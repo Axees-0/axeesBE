@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Modal,
   View,
@@ -13,6 +13,7 @@ import {
   Alert,
 } from 'react-native';
 import { Color, Focus } from '@/GlobalStyles';
+import { useAccessibleFocusTrap } from '@/hooks/useFocusTrap';
 
 interface CreditCardModalProps {
   visible: boolean;
@@ -32,35 +33,64 @@ export const CreditCardModal: React.FC<CreditCardModalProps> = ({
   const [cvv, setCvv] = useState('');
   const [billingZip, setBillingZip] = useState('');
   const [focusedInput, setFocusedInput] = useState<string | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  
+  // Use focus trap hook
+  const focusTrapRef = useAccessibleFocusTrap(
+    visible,
+    'Add Credit/Debit Card',
+    'Enter your credit or debit card information'
+  );
+
+  // Add ESC key support for web
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [visible, onClose]);
 
   const handleSubmit = () => {
-    // Basic validation
-    if (!cardNumber || !cardholderName || !expiryMonth || !expiryYear || !cvv) {
-      Alert.alert('Error', 'Please fill in all required fields');
-      return;
-    }
-
-    // Format and validate card number
+    // Mark all fields as touched to show validation errors
+    setTouched({
+      cardNumber: true,
+      cardholderName: true,
+      expiryMonth: true,
+      expiryYear: true,
+      cvv: true,
+    });
+    
+    // Validate all fields
     const cleanCardNumber = cardNumber.replace(/\s/g, '');
-    if (cleanCardNumber.length < 13 || cleanCardNumber.length > 19) {
-      Alert.alert('Error', 'Invalid card number');
-      return;
-    }
-
-    // Validate expiry
-    const month = parseInt(expiryMonth);
-    const year = parseInt(expiryYear);
-    if (month < 1 || month > 12) {
-      Alert.alert('Error', 'Invalid expiry month');
-      return;
+    const isCardValid = validateCardNumber(cleanCardNumber);
+    const isNameValid = validateName(cardholderName);
+    const isExpiryValid = validateExpiry(expiryMonth, expiryYear);
+    const isCvvValid = validateCVV(cvv);
+    
+    if (!isCardValid || !isNameValid || !isExpiryValid || !isCvvValid) {
+      // Show platform-specific error message
+      if (Platform.OS === 'web') {
+        // Errors are already shown inline, no need for alert
+        return;
+      } else {
+        Alert.alert('Validation Error', 'Please fix the errors in the form');
+        return;
+      }
     }
 
     // In a real app, this would be sent to a payment processor
     const cardData = {
       number: cleanCardNumber,
       name: cardholderName,
-      expiryMonth: month,
-      expiryYear: year,
+      expiryMonth: parseInt(expiryMonth),
+      expiryYear: parseInt(expiryYear),
       cvv,
       billingZip,
       last4: cleanCardNumber.slice(-4),
@@ -77,6 +107,8 @@ export const CreditCardModal: React.FC<CreditCardModalProps> = ({
     setExpiryYear('');
     setCvv('');
     setBillingZip('');
+    setErrors({});
+    setTouched({});
   };
 
   const formatCardNumber = (text: string) => {
@@ -87,6 +119,112 @@ export const CreditCardModal: React.FC<CreditCardModalProps> = ({
     const formatted = cleaned.match(/.{1,4}/g)?.join(' ') || cleaned;
     
     setCardNumber(formatted);
+    
+    // Validate card number in real-time
+    if (touched.cardNumber) {
+      validateCardNumber(cleaned);
+    }
+  };
+  
+  const validateCardNumber = (number: string) => {
+    const newErrors = { ...errors };
+    
+    if (!number) {
+      newErrors.cardNumber = 'Card number is required';
+    } else if (number.length < 13 || number.length > 19) {
+      newErrors.cardNumber = 'Card number must be between 13 and 19 digits';
+    } else if (!isValidCardNumber(number)) {
+      newErrors.cardNumber = 'Invalid card number';
+    } else {
+      delete newErrors.cardNumber;
+    }
+    
+    setErrors(newErrors);
+    return !newErrors.cardNumber;
+  };
+  
+  const isValidCardNumber = (number: string) => {
+    // Luhn algorithm for basic card validation
+    let sum = 0;
+    let isEven = false;
+    
+    for (let i = number.length - 1; i >= 0; i--) {
+      let digit = parseInt(number[i]);
+      
+      if (isEven) {
+        digit *= 2;
+        if (digit > 9) {
+          digit -= 9;
+        }
+      }
+      
+      sum += digit;
+      isEven = !isEven;
+    }
+    
+    return sum % 10 === 0;
+  };
+  
+  const validateName = (name: string) => {
+    const newErrors = { ...errors };
+    
+    if (!name.trim()) {
+      newErrors.cardholderName = 'Cardholder name is required';
+    } else if (name.trim().length < 3) {
+      newErrors.cardholderName = 'Name must be at least 3 characters';
+    } else if (!/^[a-zA-Z\s]+$/.test(name)) {
+      newErrors.cardholderName = 'Name should only contain letters and spaces';
+    } else {
+      delete newErrors.cardholderName;
+    }
+    
+    setErrors(newErrors);
+    return !newErrors.cardholderName;
+  };
+  
+  const validateExpiry = (month: string, year: string) => {
+    const newErrors = { ...errors };
+    const currentYear = new Date().getFullYear() % 100; // Get last 2 digits
+    const currentMonth = new Date().getMonth() + 1;
+    
+    const monthNum = parseInt(month);
+    const yearNum = parseInt(year);
+    
+    if (!month) {
+      newErrors.expiryMonth = 'Month is required';
+    } else if (monthNum < 1 || monthNum > 12) {
+      newErrors.expiryMonth = 'Invalid month (01-12)';
+    } else {
+      delete newErrors.expiryMonth;
+    }
+    
+    if (!year) {
+      newErrors.expiryYear = 'Year is required';
+    } else if (yearNum < currentYear || (yearNum === currentYear && monthNum < currentMonth)) {
+      newErrors.expiryYear = 'Card is expired';
+    } else {
+      delete newErrors.expiryYear;
+    }
+    
+    setErrors(newErrors);
+    return !newErrors.expiryMonth && !newErrors.expiryYear;
+  };
+  
+  const validateCVV = (cvv: string) => {
+    const newErrors = { ...errors };
+    
+    if (!cvv) {
+      newErrors.cvv = 'CVV is required';
+    } else if (cvv.length < 3 || cvv.length > 4) {
+      newErrors.cvv = 'CVV must be 3 or 4 digits';
+    } else if (!/^\d+$/.test(cvv)) {
+      newErrors.cvv = 'CVV must contain only digits';
+    } else {
+      delete newErrors.cvv;
+    }
+    
+    setErrors(newErrors);
+    return !newErrors.cvv;
   };
 
   return (
@@ -106,7 +244,7 @@ export const CreditCardModal: React.FC<CreditCardModalProps> = ({
           onPress={onClose}
         />
         
-        <View style={styles.modalContent}>
+        <View ref={focusTrapRef} style={styles.modalContent}>
           <View style={styles.header}>
             <Text style={styles.title}>Add Credit/Debit Card</Text>
             <Pressable 
@@ -129,17 +267,27 @@ export const CreditCardModal: React.FC<CreditCardModalProps> = ({
               <TextInput
                 style={[
                   styles.input,
-                  focusedInput === 'cardNumber' && styles.inputFocused
+                  focusedInput === 'cardNumber' && styles.inputFocused,
+                  errors.cardNumber && touched.cardNumber && styles.inputError
                 ]}
                 placeholder="1234 5678 9012 3456"
                 value={cardNumber}
                 onChangeText={formatCardNumber}
                 onFocus={() => setFocusedInput('cardNumber')}
-                onBlur={() => setFocusedInput(null)}
+                onBlur={() => {
+                  setFocusedInput(null);
+                  setTouched({ ...touched, cardNumber: true });
+                  validateCardNumber(cardNumber.replace(/\s/g, ''));
+                }}
                 keyboardType="numeric"
                 maxLength={19} // 16 digits + 3 spaces
                 accessibilityLabel="Card number input"
+                accessibilityInvalid={!!errors.cardNumber && touched.cardNumber}
+                accessibilityErrorMessage={errors.cardNumber}
               />
+              {errors.cardNumber && touched.cardNumber && (
+                <Text style={styles.errorText}>{errors.cardNumber}</Text>
+              )}
             </View>
 
             <View style={styles.inputGroup}>
@@ -147,16 +295,31 @@ export const CreditCardModal: React.FC<CreditCardModalProps> = ({
               <TextInput
                 style={[
                   styles.input,
-                  focusedInput === 'cardholderName' && styles.inputFocused
+                  focusedInput === 'cardholderName' && styles.inputFocused,
+                  errors.cardholderName && touched.cardholderName && styles.inputError
                 ]}
                 placeholder="John Doe"
                 value={cardholderName}
-                onChangeText={setCardholderName}
+                onChangeText={(text) => {
+                  setCardholderName(text);
+                  if (touched.cardholderName) {
+                    validateName(text);
+                  }
+                }}
                 onFocus={() => setFocusedInput('cardholderName')}
-                onBlur={() => setFocusedInput(null)}
+                onBlur={() => {
+                  setFocusedInput(null);
+                  setTouched({ ...touched, cardholderName: true });
+                  validateName(cardholderName);
+                }}
                 autoCapitalize="words"
                 accessibilityLabel="Cardholder name input"
+                accessibilityInvalid={!!errors.cardholderName && touched.cardholderName}
+                accessibilityErrorMessage={errors.cardholderName}
               />
+              {errors.cardholderName && touched.cardholderName && (
+                <Text style={styles.errorText}>{errors.cardholderName}</Text>
+              )}
             </View>
 
             <View style={styles.row}>
@@ -167,34 +330,61 @@ export const CreditCardModal: React.FC<CreditCardModalProps> = ({
                     style={[
                       styles.input, 
                       styles.expiryInput,
-                      focusedInput === 'expiryMonth' && styles.inputFocused
+                      focusedInput === 'expiryMonth' && styles.inputFocused,
+                      errors.expiryMonth && touched.expiryMonth && styles.inputError
                     ]}
                     placeholder="MM"
                     value={expiryMonth}
-                    onChangeText={setExpiryMonth}
+                    onChangeText={(text) => {
+                      setExpiryMonth(text);
+                      if (touched.expiryMonth) {
+                        validateExpiry(text, expiryYear);
+                      }
+                    }}
                     onFocus={() => setFocusedInput('expiryMonth')}
-                    onBlur={() => setFocusedInput(null)}
+                    onBlur={() => {
+                      setFocusedInput(null);
+                      setTouched({ ...touched, expiryMonth: true });
+                      validateExpiry(expiryMonth, expiryYear);
+                    }}
                     keyboardType="numeric"
                     maxLength={2}
                     accessibilityLabel="Expiry month input"
+                    accessibilityInvalid={!!errors.expiryMonth && touched.expiryMonth}
+                    accessibilityErrorMessage={errors.expiryMonth}
                   />
                   <Text style={styles.expirySeparator}>/</Text>
                   <TextInput
                     style={[
                       styles.input, 
                       styles.expiryInput,
-                      focusedInput === 'expiryYear' && styles.inputFocused
+                      focusedInput === 'expiryYear' && styles.inputFocused,
+                      errors.expiryYear && touched.expiryYear && styles.inputError
                     ]}
                     placeholder="YY"
                     value={expiryYear}
-                    onChangeText={setExpiryYear}
+                    onChangeText={(text) => {
+                      setExpiryYear(text);
+                      if (touched.expiryYear) {
+                        validateExpiry(expiryMonth, text);
+                      }
+                    }}
                     onFocus={() => setFocusedInput('expiryYear')}
-                    onBlur={() => setFocusedInput(null)}
+                    onBlur={() => {
+                      setFocusedInput(null);
+                      setTouched({ ...touched, expiryYear: true });
+                      validateExpiry(expiryMonth, expiryYear);
+                    }}
                     keyboardType="numeric"
                     maxLength={2}
+                    accessibilityInvalid={!!errors.expiryYear && touched.expiryYear}
+                    accessibilityErrorMessage={errors.expiryYear}
                     accessibilityLabel="Expiry year input"
                   />
                 </View>
+                {(errors.expiryMonth || errors.expiryYear) && (touched.expiryMonth || touched.expiryYear) && (
+                  <Text style={styles.errorText}>{errors.expiryMonth || errors.expiryYear}</Text>
+                )}
               </View>
 
               <View style={[styles.inputGroup, styles.halfWidth]}>
@@ -202,18 +392,33 @@ export const CreditCardModal: React.FC<CreditCardModalProps> = ({
                 <TextInput
                   style={[
                     styles.input,
-                    focusedInput === 'cvv' && styles.inputFocused
+                    focusedInput === 'cvv' && styles.inputFocused,
+                    errors.cvv && touched.cvv && styles.inputError
                   ]}
                   placeholder="123"
                   value={cvv}
-                  onChangeText={setCvv}
+                  onChangeText={(text) => {
+                    setCvv(text);
+                    if (touched.cvv) {
+                      validateCVV(text);
+                    }
+                  }}
                   onFocus={() => setFocusedInput('cvv')}
-                  onBlur={() => setFocusedInput(null)}
+                  onBlur={() => {
+                    setFocusedInput(null);
+                    setTouched({ ...touched, cvv: true });
+                    validateCVV(cvv);
+                  }}
                   keyboardType="numeric"
                   maxLength={4}
                   secureTextEntry
                   accessibilityLabel="CVV input"
+                  accessibilityInvalid={!!errors.cvv && touched.cvv}
+                  accessibilityErrorMessage={errors.cvv}
                 />
+                {errors.cvv && touched.cvv && (
+                  <Text style={styles.errorText}>{errors.cvv}</Text>
+                )}
               </View>
             </View>
 
@@ -414,5 +619,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#fff',
+  },
+  inputError: {
+    borderColor: Color.colorRed,
+    borderWidth: 2,
+  },
+  errorText: {
+    fontSize: 12,
+    color: Color.colorRed,
+    marginTop: 4,
+    marginLeft: 4,
   },
 });

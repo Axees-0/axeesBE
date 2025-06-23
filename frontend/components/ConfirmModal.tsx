@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Modal,
   View,
@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
 } from 'react-native';
 import { Color } from '@/GlobalStyles';
+import { useAccessibleFocusTrap } from '@/hooks/useFocusTrap';
 
 interface ConfirmModalProps {
   visible: boolean;
@@ -31,6 +32,27 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
   onConfirm,
   onCancel,
 }) => {
+  // Use focus trap hook
+  const focusTrapRef = useAccessibleFocusTrap(
+    visible,
+    title,
+    message
+  );
+  
+  // Add ESC key support for web
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onCancel();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [visible, onCancel]);
+
   return (
     <Modal
       visible={visible}
@@ -53,6 +75,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
         />
         
         <View 
+          ref={focusTrapRef}
           style={styles.modalContent}
           accessibilityRole="dialog"
           accessibilityLiveRegion="assertive"
@@ -164,6 +187,89 @@ const styles = StyleSheet.create({
   },
 });
 
+// AlertModal component for simple alerts (OK button only)
+interface AlertModalProps {
+  visible: boolean;
+  title: string;
+  message: string;
+  confirmText?: string;
+  onConfirm: () => void;
+}
+
+export const AlertModal: React.FC<AlertModalProps> = ({
+  visible,
+  title,
+  message,
+  confirmText = 'OK',
+  onConfirm,
+}) => {
+  // Use focus trap hook
+  const focusTrapRef = useAccessibleFocusTrap(
+    visible,
+    title,
+    message
+  );
+  
+  // Add ESC key support for web
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onConfirm();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [visible, onConfirm]);
+
+  return (
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onConfirm}
+      accessibilityViewIsModal
+      accessibilityLabel={`${title} alert dialog`}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.container}
+      >
+        <TouchableOpacity 
+          style={styles.backdrop} 
+          activeOpacity={1} 
+          onPress={onConfirm}
+          accessibilityLabel="Close dialog"
+          accessibilityRole="button"
+        />
+        
+        <View 
+          ref={focusTrapRef}
+          style={styles.modalContent}
+          accessibilityRole="dialog"
+          accessibilityLiveRegion="assertive"
+        >
+          <Text style={styles.title}>{title}</Text>
+          <Text style={styles.message}>{message}</Text>
+          
+          <TouchableOpacity
+            style={[styles.button, styles.confirmButton]}
+            onPress={onConfirm}
+            accessibilityRole="button"
+            accessibilityLabel={confirmText}
+          >
+            <Text style={styles.confirmButtonText}>
+              {confirmText}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </Modal>
+  );
+};
+
 // Helper hook to replace Alert.alert with ConfirmModal
 export const useConfirmModal = () => {
   const [modalState, setModalState] = React.useState({
@@ -224,6 +330,53 @@ export const useConfirmModal = () => {
         confirmStyle={modalState.confirmStyle}
         onConfirm={modalState.onConfirm}
         onCancel={modalState.onCancel}
+      />
+    ),
+  };
+};
+
+// Helper hook for simple AlertModal (OK button only)
+export const useAlertModal = () => {
+  const [alertState, setAlertState] = React.useState({
+    visible: false,
+    title: '',
+    message: '',
+    confirmText: 'OK',
+    onConfirm: () => {},
+  });
+
+  const showAlert = (
+    title: string,
+    message: string,
+    confirmText: string = 'OK',
+    onConfirm?: () => void
+  ) => {
+    setAlertState({
+      visible: true,
+      title,
+      message,
+      confirmText,
+      onConfirm: () => {
+        onConfirm?.();
+        setAlertState(prev => ({ ...prev, visible: false }));
+      },
+    });
+  };
+
+  const hideAlert = () => {
+    setAlertState(prev => ({ ...prev, visible: false }));
+  };
+
+  return {
+    showAlert,
+    hideAlert,
+    AlertModalComponent: () => (
+      <AlertModal
+        visible={alertState.visible}
+        title={alertState.title}
+        message={alertState.message}
+        confirmText={alertState.confirmText}
+        onConfirm={alertState.onConfirm}
       />
     ),
   };

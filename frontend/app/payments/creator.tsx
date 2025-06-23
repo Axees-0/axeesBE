@@ -37,12 +37,12 @@ interface Transaction {
   date: Date;
   description: string;
   amount: number;
-  type: 'payment' | 'refund' | 'escrow';
+  type: 'earning' | 'withdrawal' | 'pending';
   status: 'completed' | 'pending' | 'failed';
   dealId?: string;
 }
 
-const MarketerPaymentsPage: React.FC = () => {
+const CreatorPaymentsPage: React.FC = () => {
   const isWeb = Platform.OS === 'web';
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'methods' | 'history'>('overview');
@@ -55,9 +55,9 @@ const MarketerPaymentsPage: React.FC = () => {
     if (isWeb && typeof window !== 'undefined') {
       // Force router to recognize this page on mount
       const currentPath = window.location.pathname;
-      if (currentPath === '/payments/marketer') {
+      if (currentPath === '/payments/creator') {
         // Ensure content is properly loaded
-        console.log('Payment page mounted:', currentPath);
+        console.log('Creator payment page mounted:', currentPath);
       }
     }
   }, [isWeb]);
@@ -66,17 +66,17 @@ const MarketerPaymentsPage: React.FC = () => {
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
     {
       id: 'pm-1',
-      type: 'credit_card',
-      name: 'Visa ending in 4242',
-      last4: '4242',
+      type: 'bank_account',
+      name: 'Chase ending in 1234',
+      last4: '1234',
       isDefault: true,
-      icon: '💳',
+      icon: '🏦',
     },
     {
       id: 'pm-2',
       type: 'paypal',
       name: 'PayPal',
-      email: 'sarah@techstyle.com',
+      email: 'creator@example.com',
       isDefault: false,
       icon: '🅿️',
     },
@@ -86,34 +86,40 @@ const MarketerPaymentsPage: React.FC = () => {
     {
       id: 'tx-1',
       date: new Date(Date.now() - 86400000),
-      description: 'Milestone funding - Instagram Post Campaign',
-      amount: -750,
-      type: 'escrow',
+      description: 'Milestone payment - Instagram Post Campaign',
+      amount: 750,
+      type: 'earning',
       status: 'completed',
       dealId: 'DEAL-001',
     },
     {
       id: 'tx-2',
       date: new Date(Date.now() - 172800000),
-      description: 'Milestone funding - Product Review Video',
-      amount: -1200,
-      type: 'escrow',
+      description: 'Withdrawal to Bank Account',
+      amount: -500,
+      type: 'withdrawal',
       status: 'completed',
-      dealId: 'DEAL-002',
     },
     {
       id: 'tx-3',
       date: new Date(Date.now() - 259200000),
-      description: 'Refund - Cancelled campaign',
-      amount: 500,
-      type: 'refund',
-      status: 'completed',
+      description: 'Milestone payment - Product Review Video',
+      amount: 1200,
+      type: 'earning',
+      status: 'pending',
+      dealId: 'DEAL-002',
     },
   ]);
 
-  const totalSpent = transactions
-    .filter(t => t.type === 'escrow' && t.status === 'completed')
+  const totalEarnings = transactions
+    .filter(t => t.type === 'earning' && t.status === 'completed')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+  
+  const pendingEarnings = transactions
+    .filter(t => t.type === 'earning' && t.status === 'pending')
+    .reduce((sum, t) => sum + Math.abs(t.amount), 0);
+    
+  const availableBalance = 950; // Demo balance
   
   // Payment method handlers
   const handleSetDefault = (method: PaymentMethod) => {
@@ -222,8 +228,9 @@ const MarketerPaymentsPage: React.FC = () => {
     }
   };
 
-  const activeDeals = 3;
-  const pendingPayments = transactions.filter(t => t.status === 'pending').length;
+  const handleWithdraw = () => {
+    router.push('/earnings/withdraw');
+  };
   
   const handleAddCreditCard = (cardData: any) => {
     // Create new payment method from card data
@@ -256,8 +263,8 @@ const MarketerPaymentsPage: React.FC = () => {
     <>
       <WebSEO 
         title="Payment Management | Axees"
-        description="Manage your payment methods and transaction history"
-        keywords="payments, billing, transactions, marketer"
+        description="Manage your payment methods and earnings"
+        keywords="payments, earnings, withdrawals, creator"
       />
       
       <SafeAreaView style={styles.container}>
@@ -274,18 +281,10 @@ const MarketerPaymentsPage: React.FC = () => {
         </View>
 
         {/* Tabs */}
-        <View style={styles.tabs} role="tablist" aria-label="Payment navigation tabs">
+        <View style={styles.tabs}>
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'overview' && styles.activeTab]}
             onPress={() => setActiveTab('overview')}
-            accessible={true}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: activeTab === 'overview' }}
-            accessibilityLabel="Overview tab"
-            accessibilityHint="Shows payment overview and statistics"
-            aria-selected={activeTab === 'overview'}
-            aria-controls="overview-panel"
-            {...(Platform.OS === 'web' && { tabIndex: 0 })}
           >
             <Text style={[styles.tabText, activeTab === 'overview' && styles.activeTabText]}>
               Overview
@@ -295,14 +294,6 @@ const MarketerPaymentsPage: React.FC = () => {
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'methods' && styles.activeTab]}
             onPress={() => setActiveTab('methods')}
-            accessible={true}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: activeTab === 'methods' }}
-            accessibilityLabel="Payment Methods tab"
-            accessibilityHint="Shows saved payment methods"
-            aria-selected={activeTab === 'methods'}
-            aria-controls="methods-panel"
-            {...(Platform.OS === 'web' && { tabIndex: 0 })}
           >
             <Text style={[styles.tabText, activeTab === 'methods' && styles.activeTabText]}>
               Payment Methods
@@ -312,14 +303,6 @@ const MarketerPaymentsPage: React.FC = () => {
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'history' && styles.activeTab]}
             onPress={() => setActiveTab('history')}
-            accessible={true}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: activeTab === 'history' }}
-            accessibilityLabel="History tab"
-            accessibilityHint="Shows payment transaction history"
-            aria-selected={activeTab === 'history'}
-            aria-controls="history-panel"
-            {...(Platform.OS === 'web' && { tabIndex: 0 })}
           >
             <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
               History
@@ -334,21 +317,28 @@ const MarketerPaymentsPage: React.FC = () => {
         >
           {/* Overview Tab */}
           {activeTab === 'overview' && (
-            <View style={styles.tabContent} role="tabpanel" id="overview-panel" aria-labelledby="overview-tab">
+            <View style={styles.tabContent}>
+              {/* Balance Card */}
+              <View style={styles.balanceCard}>
+                <Text style={styles.balanceLabel}>Available Balance</Text>
+                <Text style={styles.balanceAmount}>${availableBalance.toLocaleString()}</Text>
+                <TouchableOpacity 
+                  style={styles.withdrawButton}
+                  onPress={handleWithdraw}
+                >
+                  <Text style={styles.withdrawButtonText}>Withdraw Funds</Text>
+                </TouchableOpacity>
+              </View>
+
               {/* Stats */}
               <View style={styles.statsGrid}>
                 <View style={styles.statCard}>
-                  <Text style={styles.statValue}>${totalSpent.toLocaleString()}</Text>
-                  <Text style={styles.statLabel}>Total Spent</Text>
+                  <Text style={styles.statValue}>${totalEarnings.toLocaleString()}</Text>
+                  <Text style={styles.statLabel}>Total Earned</Text>
                 </View>
                 
                 <View style={styles.statCard}>
-                  <Text style={styles.statValue}>{activeDeals}</Text>
-                  <Text style={styles.statLabel}>Active Deals</Text>
-                </View>
-                
-                <View style={styles.statCard}>
-                  <Text style={styles.statValue}>{pendingPayments}</Text>
+                  <Text style={styles.statValue}>${pendingEarnings.toLocaleString()}</Text>
                   <Text style={styles.statLabel}>Pending</Text>
                 </View>
               </View>
@@ -358,21 +348,12 @@ const MarketerPaymentsPage: React.FC = () => {
                 <Text style={styles.sectionTitle}>Quick Actions</Text>
                 <TouchableOpacity 
                   style={styles.actionCard}
-                  onPress={() => {
-                    showConfirm(
-                      'Fund Escrow',
-                      'This would redirect you to select a deal and fund its escrow account.',
-                      [
-                        { text: 'Cancel', style: 'cancel' },
-                        { text: 'Continue', onPress: () => router.push('/deals') }
-                      ]
-                    );
-                  }}
+                  onPress={() => router.push('/earnings')}
                 >
-                  <Text style={styles.actionIcon}>💰</Text>
+                  <Text style={styles.actionIcon}>📊</Text>
                   <View style={styles.actionContent}>
-                    <Text style={styles.actionTitle}>Fund Escrow</Text>
-                    <Text style={styles.actionDescription}>Add funds to deal escrow accounts</Text>
+                    <Text style={styles.actionTitle}>View Earnings Details</Text>
+                    <Text style={styles.actionDescription}>See your earnings breakdown</Text>
                   </View>
                   <Text style={styles.actionArrow}>→</Text>
                 </TouchableOpacity>
@@ -413,7 +394,7 @@ const MarketerPaymentsPage: React.FC = () => {
 
           {/* Payment Methods Tab */}
           {activeTab === 'methods' && (
-            <View style={styles.tabContent} role="tabpanel" id="methods-panel" aria-labelledby="methods-tab">
+            <View style={styles.tabContent}>
               {paymentMethods.map(method => (
                 <View key={method.id} style={styles.methodCard}>
                   <View style={styles.methodIcon}>
@@ -609,12 +590,11 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   activeTab: {
-    borderBottomWidth: 4, // Increased thickness for better visibility
+    borderBottomWidth: 4,
     borderBottomColor: Color.cSK430B92500,
-    backgroundColor: 'rgba(67, 11, 146, 0.08)', // Slightly more prominent background
+    backgroundColor: 'rgba(67, 11, 146, 0.08)',
     position: 'relative',
-    transform: [{ scale: 1.02 }], // Subtle scale effect for active state
-    // Add a subtle shadow for depth
+    transform: [{ scale: 1.02 }],
     shadowColor: Color.cSK430B92500,
     shadowOffset: {
       width: 0,
@@ -622,7 +602,7 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.1,
     shadowRadius: 3,
-    elevation: 2, // For Android shadow
+    elevation: 2,
   },
   tabText: {
     fontSize: 14,
@@ -632,8 +612,8 @@ const styles = StyleSheet.create({
   },
   activeTabText: {
     color: Color.cSK430B92500,
-    fontWeight: '700', // Increased weight
-    fontSize: 15, // Slightly larger font size for active tab
+    fontWeight: '700',
+    fontSize: 15,
     textShadowColor: 'rgba(67, 11, 146, 0.3)',
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
@@ -643,6 +623,35 @@ const styles = StyleSheet.create({
   },
   tabContent: {
     padding: 20,
+  },
+  balanceCard: {
+    backgroundColor: Color.cSK430B92500,
+    padding: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  balanceLabel: {
+    fontSize: 14,
+    color: 'rgba(255, 255, 255, 0.8)',
+    marginBottom: 8,
+  },
+  balanceAmount: {
+    fontSize: 36,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 16,
+  },
+  withdrawButton: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  withdrawButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: Color.cSK430B92500,
   },
   statsGrid: {
     flexDirection: 'row',
@@ -909,4 +918,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default MarketerPaymentsPage;
+export default CreatorPaymentsPage;

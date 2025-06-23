@@ -72,7 +72,7 @@ const OTPVerificationScreen: React.FC = () => {
             {
               text: 'Continue',
               onPress: () => {
-                router.replace({
+                router.push({
                   pathname: '/register-details',
                   params: { 
                     role: role,

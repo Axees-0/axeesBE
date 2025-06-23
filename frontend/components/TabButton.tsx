@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useUnreadMessages } from "@/hooks/messagesContext";
+import { BREAKPOINTS } from "@/constants/breakpoints";
 import axios from "axios";
 
 interface TabButtonProps {
@@ -21,7 +22,9 @@ export function TabButton({
   isActive = false,
   onPress,
 }: TabButtonProps) {
-  const window = useWindowDimensions();
+  const { width } = useWindowDimensions();
+  const isUltraWide = width >= BREAKPOINTS.ULTRA_WIDE;
+  const isWideScreen = width >= BREAKPOINTS.DESKTOP;
 
   const [notifications, setNotifications] = useState<any[]>([]);
   const { unreadCount: messagesUnreadCount } = useUnreadMessages();
@@ -69,6 +72,8 @@ export function TabButton({
     <Pressable
       style={({ pressed, focused }) => [
         styles.parentFlexBox, 
+        isUltraWide && styles.parentFlexBoxUltraWide,
+        isWideScreen && styles.parentFlexBoxWide,
         isActive && styles.activeTab,
         focused && styles.focusedTab,
         pressed && styles.pressedTab
@@ -79,7 +84,7 @@ export function TabButton({
       accessibilityLabel={getAccessibilityLabel()}
       accessibilityState={{ selected: isActive }}
       accessibilityHint={`Navigate to ${label} page`}
-      {...(Platform.OS === 'web' && { tabIndex: 0 })}
+      {...(Platform.OS === 'web' && { tabIndex: -1 })}
     >
       {label.toLowerCase() === "notifications" &&
         unreadNotifications.length > 0 && (
@@ -92,7 +97,7 @@ export function TabButton({
           </View>
         )}
       {icon}
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, isUltraWide && styles.labelUltraWide, isWideScreen && styles.labelWide]}>{label}</Text>
     </Pressable>
   );
 }
@@ -108,6 +113,18 @@ const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
     opacity: 0.6,
+  },
+  parentFlexBoxWide: {
+    height: 100,
+    paddingVertical: Padding.p_base,
+    gap: Gap.gap_2xs,
+    paddingHorizontal: 12,
+  },
+  parentFlexBoxUltraWide: {
+    height: 120,
+    paddingVertical: Padding.p_xl,
+    gap: Gap.gap_sm,
+    paddingHorizontal: 16,
   },
   activeTab: {
     opacity: 1,
@@ -130,6 +147,13 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.inter,
     fontSize: FontSize.size_xs,
     textTransform: "capitalize",
+  },
+  labelWide: {
+    fontSize: FontSize.size_sm,
+  },
+  labelUltraWide: {
+    fontSize: FontSize.size_base,
+    fontWeight: "500",
   },
   notificationBadge: {
     position: "absolute",

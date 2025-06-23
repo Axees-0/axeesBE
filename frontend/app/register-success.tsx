@@ -38,11 +38,11 @@ const RegisterSuccessScreen: React.FC = () => {
   }, []);
 
   const handleGetStarted = () => {
-    router.replace('/(tabs)');
+    router.push('/(tabs)');
   };
 
   const handleCompleteProfile = () => {
-    router.replace('/(tabs)/profile');
+    router.push('/(tabs)/profile');
   };
 
   return (

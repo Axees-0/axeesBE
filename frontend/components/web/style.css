@@ -191,4 +191,78 @@
       height: 48px;
     }
   }
+
+  /* Ultra-wide screens (≥1440px) */
+  @media (min-width: 1440px) {
+    .webContainer {
+      max-width: 1600px;
+      padding: 0 60px;
+    }
+    
+    .container {
+      padding: 40px;
+    }
+    
+    .headerTitle {
+      font-size: 32px;
+    }
+    
+    .sectionTitle {
+      font-size: 28px;
+      margin-bottom: 32px;
+    }
+    
+    .formRow {
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+    
+    .inputContainer {
+      padding: 20px;
+      height: 64px;
+      border-radius: 12px;
+    }
+    
+    .input {
+      font-size: 18px;
+    }
+    
+    .label {
+      font-size: 16px;
+      margin-bottom: 12px;
+    }
+    
+    .addButton {
+      height: 64px;
+      font-size: 20px;
+      margin: 24px;
+      width: calc(100% - 48px);
+      border-radius: 12px;
+    }
+    
+    .section {
+      margin-bottom: 48px;
+    }
+  }
+
+  /* Extra ultra-wide screens (≥1920px) */
+  @media (min-width: 1920px) {
+    .webContainer {
+      max-width: 1800px;
+      padding: 0 80px;
+    }
+    
+    .container {
+      padding: 60px;
+    }
+    
+    .formRow {
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+    
+    .section {
+      margin-bottom: 64px;
+    }
+  }
   

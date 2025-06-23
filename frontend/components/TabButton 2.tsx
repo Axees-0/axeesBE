@@ -52,10 +52,42 @@ export function TabButton({
     (notification) => notification.unread === true
   );
 
+  // Build accessibility label with notification count
+  const getAccessibilityLabel = () => {
+    if (label.toLowerCase() === "notifications" && unreadNotifications.length > 0) {
+      return `${label}, ${unreadNotifications.length} unread notification${unreadNotifications.length > 1 ? 's' : ''}`;
+    }
+    return label;
+  };
+
+  // Get accessibility hint based on tab type
+  const getAccessibilityHint = () => {
+    switch (label.toLowerCase()) {
+      case 'explore':
+        return 'Navigate to discover creators';
+      case 'deals':
+      case 'offers':
+        return 'Navigate to deals and offers';
+      case 'messages':
+        return 'Navigate to messages';
+      case 'notifications':
+        return 'Navigate to notifications';
+      case 'profile':
+        return 'Navigate to your profile';
+      default:
+        return `Navigate to ${label}`;
+    }
+  };
+
   return (
     <Pressable
       style={[styles.parentFlexBox, isActive && styles.activeTab]}
       onPress={onPress}
+      accessible={true}
+      accessibilityRole="tab"
+      accessibilityLabel={getAccessibilityLabel()}
+      accessibilityHint={getAccessibilityHint()}
+      accessibilityState={{ selected: isActive }}
     >
       {label.toLowerCase() === "notifications" &&
         unreadNotifications.length > 0 && (

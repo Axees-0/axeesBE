@@ -271,6 +271,7 @@ const ChatScreen: React.FC = () => {
             accessible={true}
             accessibilityLabel="Message input"
             accessibilityHint={`Type your message to ${otherParticipant.name}. Maximum 500 characters.`}
+            {...(Platform.OS === 'web' && { tabIndex: 0 })}
           />
           
           <TouchableOpacity 

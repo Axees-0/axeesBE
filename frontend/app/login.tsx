@@ -55,7 +55,7 @@ const LoginScreen: React.FC = () => {
         const user = demoUsers[email];
         if (user && password === 'demo123') {
           await login(user, 'demo-token');
-          router.replace('/(tabs)');
+          router.push('/(tabs)');
         } else {
           Alert.alert('Invalid Credentials', 'Use demo credentials:\n\nMarketer: sarah@techstyle.com\nCreator: emma@creativestudio.com\nPassword: demo123');
         }

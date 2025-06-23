@@ -8,13 +8,13 @@ import {
   SafeAreaView,
   Platform,
   TextInput,
-  Alert,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
+import { useAlertModal, useConfirmModal } from '@/components/ConfirmModal';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -28,6 +28,8 @@ interface SubmissionData {
 const WorkSubmissionPage: React.FC = () => {
   const { dealId, milestoneId } = useLocalSearchParams();
   const isWeb = Platform.OS === 'web';
+  const { showAlert, AlertModalComponent } = useAlertModal();
+  const { showConfirm, ConfirmModalComponent } = useConfirmModal();
   
   const [submissionData, setSubmissionData] = useState<SubmissionData>({
     content: '',
@@ -68,11 +70,11 @@ const WorkSubmissionPage: React.FC = () => {
 
   const handleSubmit = () => {
     if (!submissionData.content.trim()) {
-      Alert.alert('Missing Content', 'Please provide details about your work submission.');
+      showAlert('Missing Content', 'Please provide details about your work submission.');
       return;
     }
 
-    Alert.alert(
+    showConfirm(
       'Submit Work',
       'Are you ready to submit this work for review? You can still make changes if revisions are requested.',
       [
@@ -81,22 +83,14 @@ const WorkSubmissionPage: React.FC = () => {
           text: 'Submit', 
           onPress: () => {
             // In a real app, this would call the API
-            Alert.alert(
+            showAlert(
               'Work Submitted!',
-              'Your work has been submitted for review. The marketer will be notified and you\'ll receive an update within 24-48 hours. Payment Released when approved.',
-              [
-                { 
-                  text: 'View Deal', 
-                  onPress: () => router.replace({
-                    pathname: '/deals/[id]',
-                    params: { id: dealId }
-                  })
-                },
-                {
-                  text: 'View Earnings',
-                  onPress: () => router.push('/earnings')
-                }
-              ]
+              'Your work has been submitted for review. The marketer will be notified and you\'ll receive an update within 24-48 hours. Payment will be released when approved.',
+              'View Deal',
+              () => router.replace({
+                pathname: '/deals/[id]',
+                params: { id: dealId }
+              })
             );
           }
         }
@@ -105,7 +99,7 @@ const WorkSubmissionPage: React.FC = () => {
   };
 
   const handleSaveDraft = () => {
-    Alert.alert('Draft Saved', 'Your work has been saved as a draft. You can continue working on it later.');
+    showAlert('Draft Saved', 'Your work has been saved as a draft. You can continue working on it later.');
   };
 
   return (
@@ -288,6 +282,9 @@ const WorkSubmissionPage: React.FC = () => {
         {/* Bottom Navigation for Web */}
         {isWeb && <WebBottomTabs activeIndex={1} />}
       </SafeAreaView>
+      
+      <AlertModalComponent />
+      <ConfirmModalComponent />
     </>
   );
 };

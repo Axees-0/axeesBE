@@ -85,10 +85,28 @@ const CustomOfferPage: React.FC = () => {
   };
 
   const removeDeliverable = (index: number) => {
-    setOfferData(prev => ({
-      ...prev,
-      deliverables: prev.deliverables.filter((_, i) => i !== index)
-    }));
+    const deliverableToRemove = offerData.deliverables[index];
+    
+    Alert.alert(
+      'Remove Deliverable',
+      `Are you sure you want to remove "${deliverableToRemove}"? This action cannot be undone.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => {
+            setOfferData(prev => ({
+              ...prev,
+              deliverables: prev.deliverables.filter((_, i) => i !== index)
+            }));
+          }
+        }
+      ]
+    );
   };
 
   const addSuggestedDeliverable = (suggestion: string) => {

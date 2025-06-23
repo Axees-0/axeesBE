@@ -92,21 +92,37 @@ const MilestoneSetupWizard: React.FC = () => {
     const dealAmount = Number(totalAmount);
     
     if (Math.abs(totalMilestoneAmount - dealAmount) > 0.01) {
-      Alert.alert('Amount Mismatch', `Milestone amounts ($${totalMilestoneAmount}) must equal deal total ($${dealAmount})`);
+      if (isWeb) {
+        window.alert(`Milestone amounts ($${totalMilestoneAmount}) must equal deal total ($${dealAmount})`);
+      } else {
+        Alert.alert('Amount Mismatch', `Milestone amounts ($${totalMilestoneAmount}) must equal deal total ($${dealAmount})`);
+      }
       return false;
     }
 
     for (const milestone of milestones) {
       if (!milestone.title.trim() || !milestone.description.trim()) {
-        Alert.alert('Missing Information', 'All milestones must have a title and description');
+        if (isWeb) {
+          window.alert('All milestones must have a title and description');
+        } else {
+          Alert.alert('Missing Information', 'All milestones must have a title and description');
+        }
         return false;
       }
       if (milestone.amount <= 0) {
-        Alert.alert('Invalid Amount', 'All milestones must have a positive amount');
+        if (isWeb) {
+          window.alert('All milestones must have a positive amount');
+        } else {
+          Alert.alert('Invalid Amount', 'All milestones must have a positive amount');
+        }
         return false;
       }
       if (milestone.deliverables.length === 0 || milestone.deliverables.some(d => !d.trim())) {
-        Alert.alert('Missing Deliverables', 'All milestones must have at least one deliverable');
+        if (isWeb) {
+          window.alert('All milestones must have at least one deliverable');
+        } else {
+          Alert.alert('Missing Deliverables', 'All milestones must have at least one deliverable');
+        }
         return false;
       }
     }
@@ -117,26 +133,42 @@ const MilestoneSetupWizard: React.FC = () => {
   const handleCreateMilestones = () => {
     if (!validateMilestones()) return;
 
-    Alert.alert(
-      'Create Milestones',
-      `Create ${milestones.length} milestones for this deal?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Create Deal',
-          onPress: () => {
-            // Navigate to deal page with milestones created
-            router.replace({
-              pathname: '/deals/[id]',
-              params: { 
-                id: dealId,
-                milestonesSetup: 'true'
-              }
-            });
+    if (isWeb) {
+      const confirmed = window.confirm(
+        `Create ${milestones.length} milestones for this deal?`
+      );
+      if (confirmed) {
+        // Navigate to deal page with milestones created
+        router.replace({
+          pathname: '/deals/[id]',
+          params: { 
+            id: dealId,
+            milestonesSetup: 'true'
           }
-        }
-      ]
-    );
+        });
+      }
+    } else {
+      Alert.alert(
+        'Create Milestones',
+        `Create ${milestones.length} milestones for this deal?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Create Deal',
+            onPress: () => {
+              // Navigate to deal page with milestones created
+              router.replace({
+                pathname: '/deals/[id]',
+                params: { 
+                  id: dealId,
+                  milestonesSetup: 'true'
+                }
+              });
+            }
+          }
+        ]
+      );
+    }
   };
 
   return (

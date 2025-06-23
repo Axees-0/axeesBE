@@ -75,8 +75,18 @@ export const AccessibleFilters: React.FC<AccessibleFiltersProps> = ({
     
     if (isClearButton && clearButtonRef.current) {
       (clearButtonRef.current as any)?.focus?.();
+      // Scroll into view
+      (clearButtonRef.current as any)?.scrollIntoView?.({ 
+        behavior: 'smooth', 
+        block: 'nearest' 
+      });
     } else if (filterRefs.current[focusedIndex]) {
       (filterRefs.current[focusedIndex] as any)?.focus?.();
+      // Scroll into view
+      (filterRefs.current[focusedIndex] as any)?.scrollIntoView?.({ 
+        behavior: 'smooth', 
+        block: 'nearest' 
+      });
     }
   }, [focusedIndex, availableFilters.length]);
 

@@ -18,7 +18,7 @@ import { DemoData } from "@/demo/DemoData";
 import { useAuth } from "@/contexts/AuthContext";
 import CreatorDealsView from "@/components/CreatorDealsView";
 import Navbar from "@/components/web/navbar";
-import { BREAKPOINTS, isMobile, isWideScreen, isTablet, isDesktop } from "@/constants/breakpoints";
+import { BREAKPOINTS, isMobile, isWideScreen, isTablet, isDesktop, isUltraWide } from "@/constants/breakpoints";
 import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/performance";
 import { WebSEO } from "../web-seo";
 import { DealSkeleton, DealMetricsSkeleton, DealActivitySkeleton } from "@/components/DealSkeleton";
@@ -29,6 +29,7 @@ const UOM08MarketerDealHistoryList = () => {
   const router = useRouter();
   const isWeb = Platform?.OS === "web";
   const isWide = isWideScreen(width);
+  const isUltraWideScreen = isUltraWide(width);
   const isMobileDevice = isMobile(width);
   const isMobileScreen = width <= 768;
   const isVeryNarrow = width <= 380; // Very narrow screens need special handling

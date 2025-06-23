@@ -34,6 +34,7 @@ const NotificationsPage: React.FC = () => {
   const { width } = useWindowDimensions();
   const [refreshing, setRefreshing] = useState(false);
   const [markAllHovered, setMarkAllHovered] = useState(false);
+  const [markAllFocused, setMarkAllFocused] = useState(false);
   const [markingAllRead, setMarkingAllRead] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -216,10 +217,6 @@ const NotificationsPage: React.FC = () => {
         setTimeout(() => {
           setNotifications(prev => prev.map(n => ({ ...n, read: true })));
           setMarkingAllRead(false);
-          // Show success feedback
-          setTimeout(() => {
-            alert(`${unreadCount} notification${unreadCount > 1 ? 's' : ''} marked as read`);
-          }, 100);
         }, 500); // Small delay for visual feedback
       }
     } else {
@@ -237,14 +234,6 @@ const NotificationsPage: React.FC = () => {
               setTimeout(() => {
                 setNotifications(prev => prev.map(n => ({ ...n, read: true })));
                 setMarkingAllRead(false);
-                // Show success feedback
-                setTimeout(() => {
-                  Alert.alert(
-                    'Success',
-                    `${unreadCount} notification${unreadCount > 1 ? 's' : ''} marked as read`,
-                    [{ text: 'OK' }]
-                  );
-                }, 100);
               }, 500); // Small delay for visual feedback
             }
           }
@@ -283,6 +272,7 @@ const NotificationsPage: React.FC = () => {
               style={[
                 styles.markAllButton,
                 markAllHovered && isWeb && styles.markAllButtonHovered,
+                markAllFocused && styles.markAllButtonFocused,
                 markingAllRead && styles.markAllButtonLoading
               ]}
               onPress={markAllAsRead}
@@ -293,8 +283,14 @@ const NotificationsPage: React.FC = () => {
               accessibilityHint="Marks all unread notifications as read"
               onMouseEnter={isWeb ? () => setMarkAllHovered(true) : undefined}
               onMouseLeave={isWeb ? () => setMarkAllHovered(false) : undefined}
+              onFocus={() => setMarkAllFocused(true)}
+              onBlur={() => setMarkAllFocused(false)}
+              {...(Platform.OS === 'web' && { tabIndex: 0 })}
             >
-              <Text style={styles.markAllText}>
+              <Text style={[
+                styles.markAllText,
+                markAllFocused && styles.markAllTextFocused
+              ]}>
                 {markingAllRead ? 'Marking...' : 'Mark all read'}
               </Text>
             </TouchableOpacity>
@@ -342,7 +338,7 @@ const NotificationsPage: React.FC = () => {
                       <Text style={[
                         styles.notificationMessage,
                         notification.read && styles.readMessage
-                      ]} numberOfLines={2}>
+                      ]} numberOfLines={width <= 375 ? undefined : 2}>
                         {notification.message}
                       </Text>
                       <Text style={styles.timestamp}>{formatTimestamp(notification.timestamp)}</Text>
@@ -466,6 +462,7 @@ const styles = StyleSheet.create({
   },
   notificationContent: {
     flex: 1,
+    minWidth: 0, // Allow content to shrink below intrinsic width
   },
   notificationTitle: {
     fontSize: 16,
@@ -520,6 +517,10 @@ const styles = StyleSheet.create({
     backgroundColor: Color.cSK430B9250,
     borderColor: Color.cSK430B92500,
   },
+  markAllButtonFocused: {
+    ...Focus.primary,
+    backgroundColor: Color.cSK430B9250,
+  },
   markAllButtonLoading: {
     opacity: 0.6,
     backgroundColor: Color.cSK430B92100,
@@ -535,6 +536,9 @@ const styles = StyleSheet.create({
   },
   markAllTextDisabled: {
     color: '#999',
+  },
+  markAllTextFocused: {
+    color: Color.cSK430B92950,
   },
 });
 

@@ -110,6 +110,13 @@ const HandleCounterOfferPage: React.FC = () => {
               actionParams: { dealId: `DEAL-${Date.now()}` }
             }).catch(console.error);
             
+            // Dispatch event to hide the banner
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('offerAccepted', {
+                detail: { offerId: counterOffer.id }
+              }));
+            }
+            
             window.alert('Counter Offer Accepted! Let\'s set up milestones for this deal.');
             router.replace({
               pathname: '/milestones/setup',
@@ -123,8 +130,8 @@ const HandleCounterOfferPage: React.FC = () => {
           }
         } else {
           Alert.alert(
-          'Accept Counter Offer',
-          `Accept the counter offer from ${counterOffer.creator.name} for $${counterOffer.counterOffer.amount}?`,
+            'Accept Counter Offer',
+            `Accept the counter offer from ${counterOffer.creator.name} for $${counterOffer.counterOffer.amount}?`,
           [
             { text: 'Cancel', style: 'cancel' },
             { 
@@ -138,6 +145,13 @@ const HandleCounterOfferPage: React.FC = () => {
                   actionType: 'view_deal',
                   actionParams: { dealId: `DEAL-${Date.now()}` }
                 });
+                
+                // Dispatch event to hide the banner
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('offerAccepted', {
+                    detail: { offerId: counterOffer.id }
+                  }));
+                }
                 
                 Alert.alert(
                   'Counter Offer Accepted!',
@@ -182,8 +196,8 @@ const HandleCounterOfferPage: React.FC = () => {
           }
         } else {
           Alert.alert(
-          'Reject Counter Offer',
-          'Are you sure you want to reject this counter offer?',
+            'Reject Counter Offer',
+            'Are you sure you want to reject this counter offer?',
           [
             { text: 'Cancel', style: 'cancel' },
             { 
@@ -243,8 +257,8 @@ const HandleCounterOfferPage: React.FC = () => {
           }
         } else {
           Alert.alert(
-          'Continue Negotiation',
-          'How would you like to proceed?',
+            'Continue Negotiation',
+            'How would you like to proceed?',
           [
             { text: 'Cancel', style: 'cancel' },
             { 

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Keyboard Navigation Test - Mark All Read Button</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            background: #f5f5f5;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid #f0f0f0;
+            justify-content: space-between;
+            background: white;
+            margin-bottom: 20px;
+        }
+        
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #0b0218;
+        }
+        
+        /* Original button styles */
+        .mark-all-button {
+            padding: 8px 16px;
+            border-radius: 8px;
+            background-color: transparent;
+            border: 1px solid #430b92;
+            min-height: 36px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .mark-all-text {
+            color: #430b92;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            user-select: none;
+        }
+        
+        /* Hover state */
+        .mark-all-button:hover {
+            background-color: #f0e7fd;
+            border-color: #430b92;
+        }
+        
+        /* NEW: Focus state - matching React Native Focus.primary style */
+        .mark-all-button:focus {
+            outline: none;
+            border-width: 2px;
+            border-color: #430b92;
+            border-style: solid;
+            box-shadow: 0 0 0 4px rgba(67, 11, 146, 0.3);
+            background-color: #f0e7fd;
+        }
+        
+        .mark-all-button:focus .mark-all-text {
+            color: #0b0218;
+        }
+        
+        /* Loading state */
+        .mark-all-button.loading {
+            opacity: 0.6;
+            background-color: #e2d0fb;
+        }
+        
+        .instructions {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .test-area {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        
+        .other-button {
+            margin-right: 20px;
+            padding: 8px 16px;
+            background: #6c6c6c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .other-button:focus {
+            outline: 2px solid #430b92;
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">
+        <h2>Keyboard Navigation Test</h2>
+        <p>This demonstrates the fixed "Mark all read" button with proper keyboard focus indicators.</p>
+        <p><strong>Instructions:</strong></p>
+        <ol>
+            <li>Press <kbd>Tab</kbd> to navigate through the page</li>
+            <li>The "Mark all read" button should show a clear purple focus indicator when focused</li>
+            <li>The focus indicator includes:
+                <ul>
+                    <li>2px purple border (#430b92)</li>
+                    <li>Purple shadow for better visibility</li>
+                    <li>Light purple background (#f0e7fd)</li>
+                    <li>Darker text color for contrast</li>
+                </ul>
+            </li>
+            <li>Press <kbd>Enter</kbd> or <kbd>Space</kbd> when focused to activate the button</li>
+        </ol>
+    </div>
+    
+    <div class="test-area">
+        <div class="header">
+            <h1 class="header-title">Notifications</h1>
+            <button class="mark-all-button" tabindex="0" onclick="markAllRead()">
+                <span class="mark-all-text">Mark all read</span>
+            </button>
+        </div>
+        
+        <p>Other focusable elements for testing tab order:</p>
+        <button class="other-button">Previous Button</button>
+        <button class="other-button">Next Button</button>
+    </div>
+    
+    <script>
+        function markAllRead() {
+            const button = event.currentTarget;
+            const text = button.querySelector('.mark-all-text');
+            
+            // Simulate loading state
+            button.classList.add('loading');
+            text.textContent = 'Marking...';
+            
+            setTimeout(() => {
+                button.classList.remove('loading');
+                text.textContent = 'All marked!';
+                
+                setTimeout(() => {
+                    text.textContent = 'Mark all read';
+                }, 1500);
+            }, 1000);
+        }
+        
+        // Add keyboard support
+        document.querySelectorAll('.mark-all-button').forEach(button => {
+            button.addEventListener('keydown', (e) => {
+                if (e.key === ' ' || e.key === 'Enter') {
+                    e.preventDefault();
+                    button.click();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

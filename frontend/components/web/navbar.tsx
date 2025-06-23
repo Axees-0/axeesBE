@@ -41,7 +41,7 @@
      { name: "notifications", label: "Notifications" },
    ];
    
-   const BREAKPOINTS = { DESKTOP: 1280 };
+   const BREAKPOINTS = { DESKTOP: 1280, ULTRA_WIDE: 1440 };
    
    /* ———————————————————————————————————————————————————————
       Component
@@ -53,6 +53,7 @@
    }: NavbarProps) {
      const { width } = Dimensions.get("window");
      const isWide = width >= BREAKPOINTS.DESKTOP;
+     const isUltraWide = width >= BREAKPOINTS.ULTRA_WIDE;
      const { user, logout } = useAuth();
      const inputRef = useRef<RNTextInput>(null);
      const path = usePathname();
@@ -78,9 +79,9 @@
      /* ——— render ——— */
      return (
        <TouchableWithoutFeedback>
-         <View style={[styles.container, isWide && styles.containerWide]}>
+         <View style={[styles.container, isWide && styles.containerWide, isUltraWide && styles.containerUltraWide]}>
            {/* ─── Left: logo + tabs ─────────────────────────────── */}
-           <View style={styles.left}>
+           <View style={[styles.left, isUltraWide && styles.leftUltraWide]}>
              <TouchableOpacity onPress={() => router.push("/")}>
                <Image
                  source={require("@/assets/3.png")}
@@ -122,8 +123,8 @@
    
            {/* ─── Center: global search bar (Explore page only) ─── */}
            {path === "/" && (
-             <View style={[styles.searchBar, isWide && styles.searchBarWide]}>
-               <Search01 width={20} height={20} />
+             <View style={[styles.searchBar, isWide && styles.searchBarWide, isUltraWide && styles.searchBarUltraWide]}>
+               <Search01 width={isUltraWide ? 24 : 20} height={isUltraWide ? 24 : 20} />
                <TextInput
                 ref={inputRef}
                 value={searchText}
@@ -134,7 +135,7 @@
                   onSubmitSearch();
                   inputRef.current?.blur();
                 }}
-                placeholder={isWide ? "Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)" : "Search creators by name, location, or category"}
+                placeholder={isUltraWide ? "Search by name, location, or category (e.g. Emma, Los Angeles, Fashion, #lifestyle)" : isWide ? "Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)" : "Search creators by name, location, or category"}
                 placeholderTextColor={Color.cSK430B92950}
                 style={styles.searchInput}
                 accessible={true}
@@ -295,6 +296,11 @@ const styles = StyleSheet.create({
     maxWidth: 2030,
     alignSelf: "center",
   },
+  containerUltraWide: {
+    height: 80,
+    paddingHorizontal: 40,
+    maxWidth: 2200,
+  },
 
   /* —— left —— */
   left: {
@@ -302,6 +308,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 24,
     flexShrink: 0,                 // never shrink logo/tabs
+  },
+  leftUltraWide: {
+    gap: 32,
   },
   logo: { width: 160, height: 70, resizeMode: "contain" },
 
@@ -346,6 +355,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   searchBarWide: { maxWidth: 960 },
+  searchBarUltraWide: { 
+    maxWidth: 1200,
+    height: 56,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    gap: 14,
+  },
 
   searchInput: {
     flex: 1,

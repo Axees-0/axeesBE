@@ -37,6 +37,7 @@ const NotificationCenterPage: React.FC = () => {
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
   const [markAllHovered, setMarkAllHovered] = useState(false);
+  const [markAllFocused, setMarkAllFocused] = useState(false);
   const [markingAllRead, setMarkingAllRead] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
     {
@@ -176,10 +177,6 @@ const NotificationCenterPage: React.FC = () => {
         setTimeout(() => {
           setNotifications(prev => prev.map(n => ({ ...n, read: true })));
           setMarkingAllRead(false);
-          // Show success feedback
-          setTimeout(() => {
-            alert(`${unreadCount} notification${unreadCount > 1 ? 's' : ''} marked as read`);
-          }, 100);
         }, 500); // Small delay for visual feedback
       }
     } else {
@@ -197,14 +194,6 @@ const NotificationCenterPage: React.FC = () => {
               setTimeout(() => {
                 setNotifications(prev => prev.map(n => ({ ...n, read: true })));
                 setMarkingAllRead(false);
-                // Show success feedback
-                setTimeout(() => {
-                  Alert.alert(
-                    'Success',
-                    `${unreadCount} notification${unreadCount > 1 ? 's' : ''} marked as read`,
-                    [{ text: 'OK' }]
-                  );
-                }, 100);
               }, 500); // Small delay for visual feedback
             }
           }
@@ -239,6 +228,10 @@ const NotificationCenterPage: React.FC = () => {
           <TouchableOpacity 
             style={styles.backButton}
             onPress={() => router.back()}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Go back"
+            accessibilityHint="Navigate to previous screen"
           >
             <ArrowLeft width={24} height={24} />
           </TouchableOpacity>
@@ -250,6 +243,7 @@ const NotificationCenterPage: React.FC = () => {
               style={[
                 styles.markAllButton,
                 markAllHovered && isWeb && styles.markAllButtonHovered,
+                markAllFocused && styles.markAllButtonFocused,
                 markingAllRead && styles.markAllButtonLoading
               ]}
               onPress={markAllAsRead}
@@ -260,8 +254,14 @@ const NotificationCenterPage: React.FC = () => {
               accessibilityHint="Marks all unread notifications as read"
               onMouseEnter={isWeb ? () => setMarkAllHovered(true) : undefined}
               onMouseLeave={isWeb ? () => setMarkAllHovered(false) : undefined}
+              onFocus={() => setMarkAllFocused(true)}
+              onBlur={() => setMarkAllFocused(false)}
+              {...(Platform.OS === 'web' && { tabIndex: 0 })}
             >
-              <Text style={styles.markAllText}>
+              <Text style={[
+                styles.markAllText,
+                markAllFocused && styles.markAllTextFocused
+              ]}>
                 {markingAllRead ? 'Marking...' : 'Mark all read'}
               </Text>
             </TouchableOpacity>
@@ -290,7 +290,7 @@ const NotificationCenterPage: React.FC = () => {
                   onPress={() => handleNotificationPress(notification)}
                 >
                   <View style={[styles.iconContainer, { backgroundColor: getNotificationColor(notification.type) + '20' }]}>
-                    <Text style={styles.icon}>{notification.icon}</Text>
+                    <Text style={styles.icon} aria-hidden="true">{notification.icon}</Text>
                   </View>
                   
                   <View style={styles.notificationContent}>
@@ -317,7 +317,7 @@ const NotificationCenterPage: React.FC = () => {
                   onPress={() => handleNotificationPress(notification)}
                 >
                   <View style={[styles.iconContainer, { backgroundColor: '#f3f4f6' }]}>
-                    <Text style={styles.icon}>{notification.icon}</Text>
+                    <Text style={styles.icon} aria-hidden="true">{notification.icon}</Text>
                   </View>
                   
                   <View style={styles.notificationContent}>
@@ -501,6 +501,10 @@ const styles = StyleSheet.create({
     backgroundColor: Color.cSK430B9250,
     borderColor: Color.cSK430B92500,
   },
+  markAllButtonFocused: {
+    ...Focus.primary,
+    backgroundColor: Color.cSK430B9250,
+  },
   markAllButtonLoading: {
     opacity: 0.6,
     backgroundColor: Color.cSK430B92100,
@@ -516,6 +520,9 @@ const styles = StyleSheet.create({
   },
   markAllTextDisabled: {
     color: '#999',
+  },
+  markAllTextFocused: {
+    color: Color.cSK430B92950,
   },
 });
 

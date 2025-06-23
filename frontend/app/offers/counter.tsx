@@ -20,6 +20,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface CounterOfferData {
   amount: string;
@@ -48,6 +49,18 @@ const CounterOfferPage: React.FC = () => {
     ]
   });
 
+  const [validationErrors, setValidationErrors] = useState({
+    amount: false,
+    deliveryDays: false,
+    counterMessage: false
+  });
+
+  const [hasInteracted, setHasInteracted] = useState({
+    amount: false,
+    deliveryDays: false,
+    counterMessage: false
+  });
+
   // Original offer data for reference
   const originalOffer = {
     id: offerId as string,
@@ -68,6 +81,65 @@ const CounterOfferPage: React.FC = () => {
     ]
   };
 
+  const validateAmount = (value: string) => {
+    const numValue = parseFloat(value);
+    return value.trim() !== '' && !isNaN(numValue) && numValue > 0;
+  };
+
+  const validateDeliveryDays = (value: string) => {
+    const numValue = parseInt(value);
+    return value.trim() !== '' && !isNaN(numValue) && numValue > 0;
+  };
+
+  const validateCounterMessage = (value: string) => {
+    return value.trim().length > 0;
+  };
+
+  const handleAmountChange = (text: string) => {
+    if (!hasInteracted.amount) {
+      setHasInteracted(prev => ({ ...prev, amount: true }));
+    }
+    
+    setCounterData(prev => ({ ...prev, amount: text }));
+    
+    if (hasInteracted.amount) {
+      setValidationErrors(prev => ({
+        ...prev,
+        amount: !validateAmount(text)
+      }));
+    }
+  };
+
+  const handleDeliveryDaysChange = (text: string) => {
+    if (!hasInteracted.deliveryDays) {
+      setHasInteracted(prev => ({ ...prev, deliveryDays: true }));
+    }
+    
+    setCounterData(prev => ({ ...prev, deliveryDays: text }));
+    
+    if (hasInteracted.deliveryDays) {
+      setValidationErrors(prev => ({
+        ...prev,
+        deliveryDays: !validateDeliveryDays(text)
+      }));
+    }
+  };
+
+  const handleCounterMessageChange = (text: string) => {
+    if (!hasInteracted.counterMessage) {
+      setHasInteracted(prev => ({ ...prev, counterMessage: true }));
+    }
+    
+    setCounterData(prev => ({ ...prev, counterMessage: text }));
+    
+    if (hasInteracted.counterMessage) {
+      setValidationErrors(prev => ({
+        ...prev,
+        counterMessage: !validateCounterMessage(text)
+      }));
+    }
+  };
+
   const handleDeliverableChange = (index: number, value: string) => {
     const updated = [...counterData.adjustedDeliverables];
     updated[index] = value;
@@ -82,22 +154,57 @@ const CounterOfferPage: React.FC = () => {
   };
 
   const removeDeliverable = (index: number) => {
-    const updated = counterData.adjustedDeliverables.filter((_, i) => i !== index);
-    setCounterData(prev => ({ ...prev, adjustedDeliverables: updated }));
+    const deliverableToRemove = counterData.adjustedDeliverables[index];
+    
+    Alert.alert(
+      'Remove Deliverable',
+      `Are you sure you want to remove "${deliverableToRemove}"? This action cannot be undone.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => {
+            const updated = counterData.adjustedDeliverables.filter((_, i) => i !== index);
+            setCounterData(prev => ({ ...prev, adjustedDeliverables: updated }));
+          }
+        }
+      ]
+    );
   };
 
   const validateCounterOffer = () => {
-    if (!counterData.amount || parseFloat(counterData.amount) <= 0) {
+    // Trigger validation for all fields
+    const amountValid = validateAmount(counterData.amount);
+    const deliveryDaysValid = validateDeliveryDays(counterData.deliveryDays);
+    const counterMessageValid = validateCounterMessage(counterData.counterMessage);
+    
+    setValidationErrors({
+      amount: !amountValid,
+      deliveryDays: !deliveryDaysValid,
+      counterMessage: !counterMessageValid
+    });
+    
+    setHasInteracted({
+      amount: true,
+      deliveryDays: true,
+      counterMessage: true
+    });
+    
+    if (!amountValid) {
       Alert.alert('Invalid Amount', 'Please enter a valid counter offer amount.');
       return false;
     }
     
-    if (!counterData.deliveryDays || parseInt(counterData.deliveryDays) <= 0) {
+    if (!deliveryDaysValid) {
       Alert.alert('Invalid Timeline', 'Please enter a valid delivery timeline.');
       return false;
     }
     
-    if (!counterData.counterMessage.trim()) {
+    if (!counterMessageValid) {
       Alert.alert('Missing Message', 'Please provide a message explaining your counter offer.');
       return false;
     }
@@ -191,12 +298,7 @@ const CounterOfferPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton fallbackRoute="/offers/review" />
           
           <Text style={styles.headerTitle}>Counter Offer</Text>
           
@@ -246,17 +348,25 @@ const CounterOfferPage: React.FC = () => {
               <Text style={styles.inputHint}>
                 Your counter offer amount (original: ${originalOffer.amount.toLocaleString()})
               </Text>
-              <View style={styles.amountInputContainer}>
+              <View style={[
+                styles.amountInputContainer,
+                validationErrors.amount && styles.inputError
+              ]}>
                 <Text style={styles.currencySymbol}>$</Text>
                 <TextInput
                   style={styles.amountInput}
                   value={counterData.amount}
-                  onChangeText={(text) => setCounterData(prev => ({ ...prev, amount: text }))}
+                  onChangeText={handleAmountChange}
                   keyboardType="numeric"
                   placeholder="1800"
                 />
               </View>
-              {parseFloat(counterData.amount || '0') !== originalOffer.amount && (
+              {validationErrors.amount && (
+                <Text style={styles.errorText}>
+                  Please enter a valid amount greater than $0
+                </Text>
+              )}
+              {!validationErrors.amount && parseFloat(counterData.amount || '0') !== originalOffer.amount && (
                 <Text style={[
                   styles.changeIndicator,
                   parseFloat(counterData.amount || '0') > originalOffer.amount ? styles.increaseText : styles.decreaseText
@@ -274,17 +384,25 @@ const CounterOfferPage: React.FC = () => {
               <Text style={styles.inputHint}>
                 Days needed to complete (original: {originalOffer.deliveryDays} days)
               </Text>
-              <View style={styles.timelineInputContainer}>
+              <View style={[
+                styles.timelineInputContainer,
+                validationErrors.deliveryDays && styles.inputError
+              ]}>
                 <TextInput
                   style={styles.timelineInput}
                   value={counterData.deliveryDays}
-                  onChangeText={(text) => setCounterData(prev => ({ ...prev, deliveryDays: text }))}
+                  onChangeText={handleDeliveryDaysChange}
                   keyboardType="numeric"
                   placeholder="7"
                 />
                 <Text style={styles.daysLabel}>days</Text>
               </View>
-              {parseInt(counterData.deliveryDays || '0') !== originalOffer.deliveryDays && (
+              {validationErrors.deliveryDays && (
+                <Text style={styles.errorText}>
+                  Please enter a valid number of days greater than 0
+                </Text>
+              )}
+              {!validationErrors.deliveryDays && parseInt(counterData.deliveryDays || '0') !== originalOffer.deliveryDays && (
                 <Text style={[
                   styles.changeIndicator,
                   parseInt(counterData.deliveryDays || '0') > originalOffer.deliveryDays ? styles.increaseText : styles.decreaseText
@@ -349,13 +467,22 @@ const CounterOfferPage: React.FC = () => {
                 Explain your reasoning for the counter offer and highlight your value
               </Text>
               <TextInput
-                style={[styles.textInput, styles.textArea]}
+                style={[
+                  styles.textInput, 
+                  styles.textArea,
+                  validationErrors.counterMessage && styles.inputError
+                ]}
                 value={counterData.counterMessage}
-                onChangeText={(text) => setCounterData(prev => ({ ...prev, counterMessage: text }))}
+                onChangeText={handleCounterMessageChange}
                 placeholder="Example: Thank you for considering me for this campaign! I'm excited about the opportunity to work with TechStyle Brand. Based on my experience and engagement rates, I believe this counter offer reflects the value I can provide..."
                 multiline
                 numberOfLines={5}
               />
+              {validationErrors.counterMessage && (
+                <Text style={styles.errorText}>
+                  Please provide a message explaining your counter offer
+                </Text>
+              )}
             </View>
           </View>
 
@@ -394,14 +521,14 @@ const CounterOfferPage: React.FC = () => {
           <TouchableOpacity 
             style={[
               styles.submitButton,
-              (!counterData.amount || !counterData.deliveryDays || !counterData.counterMessage.trim()) && styles.disabledButton
+              (!validateAmount(counterData.amount) || !validateDeliveryDays(counterData.deliveryDays) || !validateCounterMessage(counterData.counterMessage)) && styles.disabledButton
             ]}
             onPress={handleSubmitCounterOffer}
-            disabled={!counterData.amount || !counterData.deliveryDays || !counterData.counterMessage.trim()}
+            disabled={!validateAmount(counterData.amount) || !validateDeliveryDays(counterData.deliveryDays) || !validateCounterMessage(counterData.counterMessage)}
           >
             <Text style={[
               styles.submitButtonText,
-              (!counterData.amount || !counterData.deliveryDays || !counterData.counterMessage.trim()) && styles.disabledButtonText
+              (!validateAmount(counterData.amount) || !validateDeliveryDays(counterData.deliveryDays) || !validateCounterMessage(counterData.counterMessage)) && styles.disabledButtonText
             ]}>
               Send Counter Offer
             </Text>
@@ -662,6 +789,17 @@ const styles = StyleSheet.create({
   },
   disabledButtonText: {
     color: '#999',
+  },
+  inputError: {
+    borderColor: '#dc2626',
+    borderWidth: 2,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#dc2626',
+    marginTop: 8,
+    lineHeight: 16,
+    fontWeight: '500',
   },
 });
 
