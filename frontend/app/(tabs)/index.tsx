@@ -14,7 +14,7 @@ import {
 import { Fragment, useState } from "react";
 
 import Mobile from "@/components/mobile/index";
-import Web from "@/components/web-static-old";
+import Dashboard from "@/components/Dashboard/index";
 import { WebSEO } from "../web-seo";
 import { useAuth } from "@/contexts/AuthContext";
 import { Color } from "@/GlobalStyles";
@@ -36,7 +36,7 @@ const UFM01ResultsScreen = () => {
         description="Discover and connect with top creators and influencers on Axees. Find the perfect match for your brand campaigns."
         keywords="influencers, creators, brand partnerships, marketing, campaigns"
       />
-      <Web />
+      <Dashboard />
     </>
   );
 };
