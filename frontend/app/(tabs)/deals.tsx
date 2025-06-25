@@ -22,6 +22,7 @@ import { BREAKPOINTS, isMobile, isWideScreen, isTablet, isDesktop, isUltraWide }
 import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/performance";
 import { WebSEO } from "../web-seo";
 import { DealSkeleton, DealMetricsSkeleton, DealActivitySkeleton } from "@/components/DealSkeleton";
+import DesignSystem from "@/styles/DesignSystem";
 
 const UOM08MarketerDealHistoryList = () => {
   const { width } = useWindowDimensions();
@@ -678,12 +679,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#FED7AA',
     borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 20,
+    padding: DesignSystem.ResponsiveSpacing.cardPadding.paddingHorizontal,
+    paddingVertical: DesignSystem.ResponsiveSpacing.cardPadding.paddingVertical + 4, // Extra vertical padding
+    marginHorizontal: DesignSystem.ResponsiveSpacing.containerHorizontal,
     marginBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    minHeight: 80, // Consistent height for banner
     ...Platform.select({
       web: {
         cursor: 'pointer' as any,
@@ -714,7 +717,8 @@ const styles = StyleSheet.create({
   counterOfferInfo: {
     flex: 1,
     minWidth: 0, // Prevent text from pushing beyond container
-    paddingRight: 8, // Add some space before action button
+    paddingRight: 16, // Increased space before action button
+    justifyContent: 'center', // Center content vertically
   },
   counterOfferTitle: {
     fontSize: 16,
@@ -740,10 +744,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#EA580C',
-    paddingLeft: 12,
-    paddingVertical: 8,
+    paddingLeft: 16,
+    paddingVertical: 12, // Increased for better vertical centering
     textAlign: 'center',
-    minWidth: 80,
+    minWidth: 90,
+    alignSelf: 'center', // Center arrow vertically
   },
   tabHeader: {
     backgroundColor: "#FFFFFF",
@@ -794,39 +799,35 @@ const styles = StyleSheet.create({
     alignItems: "stretch", // Ensure cards take full width when stacked
   },
   metricCard: {
+    ...DesignSystem.StatCardStyles.container,
     flex: 1,
-    backgroundColor: "#F8F9FD",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#E2D0FB",
-    height: 120, // Fixed height instead of minHeight for consistency
-    minWidth: 120, // Prevent cards from becoming too narrow
+    marginHorizontal: 4, // Equal spacing between stat cards
+    minWidth: 140, // Prevent cards from becoming too narrow
     maxWidth: '100%', // Ensure cards don't overflow their container
-    justifyContent: 'space-between', // Distribute content evenly within the fixed height
   },
   metricCardWide: {
-    height: 140, // Slightly taller for wide screens, but still fixed
+    ...DesignSystem.StatCardStyles.container,
+    flex: 1,
+    marginHorizontal: 4,
+    minWidth: 160, // Slightly wider on wide screens
   },
   metricCardMobile: {
+    ...DesignSystem.StatCardStyles.container,
     flex: 0, // Don't flex when stacked vertically
     width: '100%', // Take full width when stacked
-    height: 100, // Slightly shorter on mobile to save space
+    marginHorizontal: 0,
   },
   metricTitle: {
-    fontSize: 14,
-    color: "#6C6C6C",
-    marginBottom: 8,
+    ...DesignSystem.StatCardStyles.label,
   },
   metricValue: {
-    fontSize: Platform?.OS === "web" ? 24 : 20,
-    fontWeight: "700",
-    color: "#430B92",
-    marginBottom: 4,
+    ...DesignSystem.StatCardStyles.value,
+    fontSize: Platform?.OS === "web" ? 24 : 20, // Responsive sizing
   },
   metricSubtitle: {
-    fontSize: 12,
-    color: "#6C6C6C",
+    ...DesignSystem.StatCardStyles.label,
+    fontSize: 11, // Slightly smaller for subtitle
+    opacity: 0.8,
   },
   trendContainer: {
     marginTop: 8,
@@ -945,17 +946,20 @@ const styles = StyleSheet.create({
   },
   dealAmount: {
     alignItems: "flex-end",
+    minWidth: 100, // Consistent column width
+    paddingRight: DesignSystem.ResponsiveSpacing.containerHorizontal, // Consistent right gutter
   },
   dealPrice: {
+    ...DesignSystem.Typography.bodyMedium,
     fontSize: 16,
     fontWeight: "700",
     color: "#430B92",
-    marginBottom: 4,
+    marginBottom: 6,
+    textAlign: 'right', // Right-align prices
   },
   dealStatus: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    ...DesignSystem.PillStyles.status,
+    alignSelf: 'flex-end', // Align pills to right edge
   },
   statusCompleted: {
     backgroundColor: "#DCFCE7",
@@ -1086,21 +1090,21 @@ const styles = StyleSheet.create({
   },
   offerActions: {
     alignItems: 'flex-end',
+    paddingRight: DesignSystem.ResponsiveSpacing.containerHorizontal, // Consistent right gutter
+    minWidth: 120, // Consistent column width for price alignment
   },
   offerAmount: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    ...DesignSystem.Typography.h4,
     color: '#430B92',
-    marginBottom: 6,
+    marginBottom: 8,
+    textAlign: 'right', // Right-align all prices to consistent gutter
   },
   offerStatus: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    ...DesignSystem.PillStyles.status,
+    alignSelf: 'flex-end', // Align status pills to right edge
   },
   offerStatusText: {
-    fontSize: 12,
-    fontWeight: '600',
+    ...DesignSystem.PillTextStyles.status,
   },
   offerFooter: {
     flexDirection: 'row',

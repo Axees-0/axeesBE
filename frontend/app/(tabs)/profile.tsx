@@ -16,6 +16,7 @@ import { DemoData } from "@/demo/DemoData";
 import { useAuth } from "@/contexts/AuthContext";
 import RoleSwitcher from "@/components/RoleSwitcher";
 import { useConfirmModal } from "@/components/ConfirmModal";
+import DesignSystem from "@/styles/DesignSystem";
 
 const BREAKPOINTS = {
   mobile: 768,
@@ -402,15 +403,18 @@ const styles = StyleSheet.create({
     color: Color.cSK430B92500,
   },
   roleSwitchButton: {
-    backgroundColor: Color.cSK430B92500,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    ...DesignSystem.ButtonStyles.primary,
+    paddingHorizontal: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal + 8, // Increased horizontal padding
     borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120, // Consistent minimum width
   },
   roleSwitchButtonText: {
-    color: '#FFFFFF',
+    ...DesignSystem.ButtonTextStyles.primary,
     fontSize: 14,
-    fontWeight: '600',
+    textAlign: 'center',
   },
   profileHeader: {
     flexDirection: 'row',
@@ -479,13 +483,15 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   tierBadge: {
+    ...DesignSystem.PillStyles.default,
     backgroundColor: '#FFD700',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 12, // Consistent 8px horizontal padding as requested
+    paddingVertical: 6,
+    borderRadius: DesignSystem.PillStyles.default.borderRadius, // Consistent radius
     alignSelf: 'flex-start',
   },
   tierText: {
+    ...DesignSystem.PillTextStyles.default,
     fontSize: 12,
     fontWeight: 'bold',
     color: '#333',
@@ -574,17 +580,22 @@ const styles = StyleSheet.create({
   quickActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: DesignSystem.ResponsiveSpacing.rowSpacing.marginBottom,
+    justifyContent: 'space-between', // Equal distribution
   },
   actionButton: {
+    ...DesignSystem.ButtonStyles.secondary,
     backgroundColor: '#f8f9fa',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
+    justifyContent: 'center', // Center icon/label pairs
     flex: 1,
-    minWidth: '45%',
+    minWidth: '30%', // Equal column width for 3 columns
+    maxWidth: '31%', // Ensure consistent sizing
     borderWidth: 1,
     borderColor: '#e0e0e0',
+    minHeight: 80, // Consistent height for all buttons
   },
   actionButtonFocused: {
     ...Focus.primary,
@@ -593,27 +604,37 @@ const styles = StyleSheet.create({
   actionIcon: {
     fontSize: 24,
     marginBottom: 8,
+    textAlign: 'center', // Center icons
   },
   actionText: {
+    ...DesignSystem.Typography.small,
     fontSize: 12,
     color: '#333',
     fontWeight: '600',
+    textAlign: 'center', // Center text labels
   },
   infoRow: {
+    ...DesignSystem.LayoutUtils.tableRow,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    alignItems: 'center', // Align values vertically
+    paddingVertical: 16, // Increased padding for better spacing
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DesignSystem.AccessibleColors.borderLight,
+    minHeight: 56, // Consistent row height
   },
   infoLabel: {
+    ...DesignSystem.Typography.body,
     fontSize: 14,
-    color: '#666',
+    color: DesignSystem.AccessibleColors.textSecondary,
+    flex: 1, // Take up available space
   },
   infoValue: {
+    ...DesignSystem.Typography.bodyMedium,
     fontSize: 14,
     color: '#333',
-    fontWeight: '600',
+    textAlign: 'right', // Right-align values for neat column
+    minWidth: 100, // Consistent value column width
   },
   activeStatus: {
     color: '#10B981',

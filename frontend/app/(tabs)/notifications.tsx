@@ -15,6 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Color, Focus } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import { useAuth } from '@/contexts/AuthContext';
+import DesignSystem from '@/styles/DesignSystem';
 
 interface Notification {
   id: string;
@@ -385,15 +386,10 @@ const styles = StyleSheet.create({
     color: Color.cSK430B92950,
   },
   markAllButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    ...DesignSystem.ButtonStyles.secondary,
+    paddingHorizontal: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal,
+    height: DesignSystem.ButtonStyles.secondary.height,
     borderRadius: 8,
-    backgroundColor: 'transparent',
-    borderWidth: 1,
-    borderColor: Color.cSK430B92500,
-    minHeight: 36,
-    alignItems: 'center',
-    justifyContent: 'center',
     ...Platform.select({
       web: {
         cursor: 'pointer' as any,
@@ -401,10 +397,8 @@ const styles = StyleSheet.create({
     }),
   },
   markAllText: {
-    color: Color.cSK430B92500,
+    ...DesignSystem.ButtonTextStyles.secondary,
     fontSize: 14,
-    fontWeight: '600',
-    textAlign: 'center',
     ...Platform.select({
       web: {
         userSelect: 'none',
@@ -418,11 +412,16 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   dateSectionTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#666',
+    ...DesignSystem.Typography.h4,
+    fontSize: 16, // Increased for better hierarchy
+    fontWeight: '700', // Increased weight
+    color: DesignSystem.AccessibleColors.textSecondary,
+    backgroundColor: DesignSystem.AccessibleColors.backgroundSubtle, // Background for section distinction
     paddingHorizontal: 20,
-    paddingBottom: 12,
+    paddingVertical: 12, // Added vertical padding
+    marginBottom: 0, // Remove bottom margin for cleaner sections
+    borderTopWidth: 1,
+    borderTopColor: DesignSystem.AccessibleColors.borderLight,
   },
   unreadSection: {
     paddingTop: 20,
@@ -445,6 +444,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
     alignItems: 'flex-start',
+    minHeight: 80, // Consistent row height for dot alignment
   },
   unreadItem: {
     backgroundColor: '#f8f9fa',
@@ -488,11 +488,15 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginLeft: 8,
-    marginTop: 6,
+    width: 10, // Slightly larger for better visibility
+    height: 10,
+    borderRadius: 5,
+    marginLeft: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Consistent right margin
+    alignSelf: 'center', // Center vertically within notification item
+    position: 'absolute',
+    right: 20, // Consistent right positioning
+    top: '50%',
+    marginTop: -5, // Half height for perfect centering
   },
   emptyState: {
     flex: 1,

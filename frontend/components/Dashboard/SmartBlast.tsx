@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Color, Focus } from '@/GlobalStyles';
 import { useAuth } from '@/contexts/AuthContext';
+import DesignSystem from '@/styles/DesignSystem';
 
 interface SmartBlastProps {
   creators: any[];
@@ -410,28 +411,29 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     backgroundColor: 'white',
-    padding: 16,
     borderRadius: 12,
-    marginBottom: 16,
+    marginBottom: 20, // Consistent section spacing
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 2,
+    paddingHorizontal: DesignSystem.ResponsiveSpacing.containerHorizontal,
+    paddingVertical: 16,
   },
   statItem: {
+    ...DesignSystem.StatCardStyles.container,
     flex: 1,
-    alignItems: 'center',
+    marginHorizontal: 4, // Equal spacing between stat cards
+    shadowOpacity: 0, // Remove individual shadows to prevent overlap
+    borderWidth: 0, // Remove borders inside the container
   },
   statValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: Color.cSK430B92500,
+    ...DesignSystem.StatCardStyles.value,
+    fontSize: 20, // Slightly smaller for mobile
   },
   statLabel: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
+    ...DesignSystem.StatCardStyles.label,
     textAlign: 'center',
   },
   phaseContainer: {
@@ -453,34 +455,26 @@ const styles = StyleSheet.create({
   },
   actionContainer: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 16,
+    justifyContent: 'space-between',
+    alignItems: 'center', // Ensure identical height alignment
+    marginBottom: 20, // Consistent section spacing
+    paddingHorizontal: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal,
   },
   templateButton: {
+    ...DesignSystem.ButtonStyles.success,
     flex: 1,
-    backgroundColor: '#4CAF50',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: 'center',
+    marginRight: 8, // Half gap for consistent spacing
   },
   templateButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    ...DesignSystem.ButtonTextStyles.primary,
   },
   blastButton: {
+    ...DesignSystem.ButtonStyles.primary,
     flex: 1,
-    backgroundColor: Color.cSK430B92500,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: 'center',
+    marginLeft: 8, // Half gap for consistent spacing
   },
   blastButtonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '600',
+    ...DesignSystem.ButtonTextStyles.primary,
   },
   disabledButton: {
     backgroundColor: '#ccc',
@@ -556,53 +550,44 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+    paddingRight: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Prevent button from touching edge
   },
   tabTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    ...DesignSystem.Typography.h4,
     flex: 1,
+    marginRight: 12, // Space from Send button
   },
   sendTabButton: {
-    backgroundColor: Color.cSK430B92500,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 6,
+    ...DesignSystem.ButtonStyles.small,
+    marginRight: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Prevent edge touching
   },
   sendTabButtonText: {
-    color: 'white',
-    fontSize: 14,
-    fontWeight: '600',
+    ...DesignSystem.ButtonTextStyles.small,
   },
   creatorsList: {
     flex: 1,
   },
   creatorItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    ...DesignSystem.LayoutUtils.tableRow,
+    paddingVertical: 16, // Increased for better spacing
   },
   creatorInfo: {
     flex: 1,
+    paddingRight: 16, // Prevent text collision with response rate
   },
   creatorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
+    ...DesignSystem.Typography.bodyMedium,
+    marginBottom: 4, // Improved spacing
   },
   creatorStats: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+    ...DesignSystem.Typography.small,
+    lineHeight: 18, // Improved line height to prevent collision
+    marginBottom: 2,
   },
   creatorCost: {
-    fontSize: 14,
+    ...DesignSystem.Typography.captionMedium,
     color: Color.cSK430B92500,
-    fontWeight: '600',
-    marginTop: 2,
+    lineHeight: 18, // Consistent line height
   },
   creatorActions: {
     alignItems: 'flex-end',

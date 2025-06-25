@@ -22,6 +22,7 @@ import { PerformanceServices } from './PerformanceServices';
 import { MyNetwork } from './MyNetwork';
 import { useAuth } from '@/contexts/AuthContext';
 import { Feather, MaterialIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import DesignSystem from '@/styles/DesignSystem';
 
 type TabType = 'search' | 'smart-blast' | 'creative-services' | 'performance-services' | 'my-network';
 
@@ -282,7 +283,9 @@ const Dashboard = () => {
                   
                   <View style={styles.creatorTags}>
                     {creator.categories.slice(0, 2).map((tag, index) => (
-                      <Text key={index} style={styles.tag}>{tag}</Text>
+                      <View key={index} style={styles.tag}>
+                        <Text style={styles.tagText}>{tag}</Text>
+                      </View>
                     ))}
                   </View>
                 </View>
@@ -352,40 +355,55 @@ const Dashboard = () => {
           style={[styles.navItem, activeTab === 'search' && styles.navItemActive]}
           onPress={() => setActiveTab('search')}
         >
-          <Feather name="search" size={24} color={activeTab === 'search' ? '#430B92' : '#999'} />
-          <Text style={[styles.navLabel, activeTab === 'search' && styles.navLabelActive]}>Search</Text>
+          <View style={styles.navContent}>
+            <Feather name="search" size={24} color={activeTab === 'search' ? '#430B92' : '#999'} />
+            <Text style={[styles.navLabel, activeTab === 'search' && styles.navLabelActive]}>Search</Text>
+            {activeTab === 'search' && <View style={styles.navActiveBullet} />}
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={[styles.navItem, activeTab === 'smart-blast' && styles.navItemActive]}
           onPress={() => setActiveTab('smart-blast')}
         >
-          <Ionicons name="rocket" size={24} color={activeTab === 'smart-blast' ? '#430B92' : '#999'} />
-          <Text style={[styles.navLabel, activeTab === 'smart-blast' && styles.navLabelActive]}>Smart Blast</Text>
+          <View style={styles.navContent}>
+            <Ionicons name="rocket" size={24} color={activeTab === 'smart-blast' ? '#430B92' : '#999'} />
+            <Text style={[styles.navLabel, activeTab === 'smart-blast' && styles.navLabelActive]}>Smart Blast</Text>
+            {activeTab === 'smart-blast' && <View style={styles.navActiveBullet} />}
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={[styles.navItem, activeTab === 'creative-services' && styles.navItemActive]}
           onPress={() => setActiveTab('creative-services')}
         >
-          <Ionicons name="color-palette" size={24} color={activeTab === 'creative-services' ? '#430B92' : '#999'} />
-          <Text style={[styles.navLabel, activeTab === 'creative-services' && styles.navLabelActive]}>Creative</Text>
+          <View style={styles.navContent}>
+            <Ionicons name="color-palette" size={24} color={activeTab === 'creative-services' ? '#430B92' : '#999'} />
+            <Text style={[styles.navLabel, activeTab === 'creative-services' && styles.navLabelActive]}>Creative</Text>
+            {activeTab === 'creative-services' && <View style={styles.navActiveBullet} />}
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={[styles.navItem, activeTab === 'performance-services' && styles.navItemActive]}
           onPress={() => setActiveTab('performance-services')}
         >
-          <Ionicons name="trending-up" size={24} color={activeTab === 'performance-services' ? '#430B92' : '#999'} />
-          <Text style={[styles.navLabel, activeTab === 'performance-services' && styles.navLabelActive]}>Services</Text>
+          <View style={styles.navContent}>
+            <Ionicons name="trending-up" size={24} color={activeTab === 'performance-services' ? '#430B92' : '#999'} />
+            <Text style={[styles.navLabel, activeTab === 'performance-services' && styles.navLabelActive]}>Services</Text>
+            {activeTab === 'performance-services' && <View style={styles.navActiveBullet} />}
+          </View>
         </TouchableOpacity>
 
         <TouchableOpacity 
           style={[styles.navItem, activeTab === 'my-network' && styles.navItemActive]}
           onPress={() => setActiveTab('my-network')}
         >
-          <FontAwesome5 name="network-wired" size={20} color={activeTab === 'my-network' ? '#430B92' : '#999'} />
-          <Text style={[styles.navLabel, activeTab === 'my-network' && styles.navLabelActive]}>Network</Text>
+          <View style={styles.navContent}>
+            <FontAwesome5 name="network-wired" size={20} color={activeTab === 'my-network' ? '#430B92' : '#999'} />
+            <Text style={[styles.navLabel, activeTab === 'my-network' && styles.navLabelActive]}>Network</Text>
+            {activeTab === 'my-network' && <View style={styles.navActiveBullet} />}
+          </View>
         </TouchableOpacity>
       </View>
     </View>
@@ -435,46 +453,53 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
+    minHeight: 72, // Consistent section height
   },
   batchLabel: {
-    fontSize: 14,
-    color: '#666',
-    marginRight: 12,
+    ...DesignSystem.Typography.captionMedium,
+    marginRight: 16,
+    minWidth: 120, // Slightly wider for consistent label alignment
+    alignSelf: 'center', // Vertical centering with pills
   },
   batchOptions: {
     flexDirection: 'row',
     flex: 1,
+    alignItems: 'center', // Baseline alignment for pills
+    justifyContent: 'space-evenly', // Equal distribution
+    marginRight: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Consistent spacing
   },
   batchButton: {
+    ...DesignSystem.PillStyles.default,
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    marginRight: 8,
-    borderRadius: 20,
+    paddingVertical: 10,
+    minWidth: 48, // Slightly larger for better touch targets
+    borderRadius: 16,
     backgroundColor: '#ffffff',
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: DesignSystem.AccessibleColors.borderMedium,
+    alignItems: 'center', // Center text baseline
+    justifyContent: 'center',
   },
   batchButtonActive: {
     backgroundColor: '#430B92',
     borderColor: '#430B92',
   },
   batchButtonText: {
-    fontSize: 14,
-    color: '#666',
+    ...DesignSystem.PillTextStyles.default,
+    textAlign: 'center',
   },
   batchButtonTextActive: {
-    color: '#ffffff',
+    ...DesignSystem.PillTextStyles.counter,
   },
   selectBatchButton: {
-    backgroundColor: '#430B92',
+    ...DesignSystem.ButtonStyles.small,
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 16,
+    marginRight: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Prevent edge overflow
+    alignSelf: 'center', // Vertical center with pills
   },
   selectBatchButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '600',
+    ...DesignSystem.ButtonTextStyles.small,
   },
   resultsSummary: {
     padding: 16,
@@ -551,16 +576,21 @@ const styles = StyleSheet.create({
   creatorTags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
+    alignItems: 'flex-start', // Proper baseline alignment for text
+    marginTop: 6, // Consistent spacing from content above
+    minHeight: 28, // Consistent row height
   },
   tag: {
-    backgroundColor: '#f0f0f0',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    fontSize: 12,
-    color: '#666',
-    marginRight: 6,
+    ...DesignSystem.PillStyles.tag,
+    backgroundColor: DesignSystem.AccessibleColors.purpleSubtle,
+    paddingHorizontal: 10, // Increased for better visual balance
+    paddingVertical: 6, // Increased for better touch targets
+    marginRight: 8, // More spacing between tags
     marginBottom: 4,
+    alignItems: 'center', // Center text within pill
+  },
+  tagText: {
+    ...DesignSystem.PillTextStyles.tag,
   },
   filtersContainer: {
     backgroundColor: '#ffffff',
@@ -598,25 +628,49 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     backgroundColor: '#ffffff',
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: DesignSystem.AccessibleColors.borderLight,
     paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+    paddingHorizontal: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Consistent edge spacing
+    paddingTop: 8, // Top padding for visual balance
   },
   navItem: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 12,
+    justifyContent: 'center',
+    paddingVertical: 8, // Reduced for tighter layout
+    paddingHorizontal: 4,
+    borderRadius: 12, // Consistent with design system
+    minHeight: 64, // Increased for better touch targets
   },
   navItemActive: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: DesignSystem.AccessibleColors.purpleSubtle,
+  },
+  navContent: {
+    ...DesignSystem.IconAlignment.verticalIconText,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4, // Prevent content from touching edges
   },
   navLabel: {
-    fontSize: 11,
-    color: '#999',
-    marginTop: 4,
+    fontSize: 12, // Slightly larger for better readability
+    color: DesignSystem.AccessibleColors.textSecondary, // Better contrast
+    marginTop: 4, // More spacing for cleaner separation
+    textAlign: 'center',
+    lineHeight: 16, // Improved line height
+    fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   navLabelActive: {
     color: '#430B92',
     fontWeight: '600',
+    fontFamily: DesignSystem.Typography.captionMedium.fontFamily,
+  },
+  navActiveBullet: {
+    width: 6, // Slightly larger for better visibility
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: '#430B92',
+    marginTop: 4, // Consistent spacing from label
+    alignSelf: 'center', // Ensure perfect centering
   },
 });
 
