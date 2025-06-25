@@ -24,6 +24,10 @@ import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { DemoData } from '@/demo/DemoData';
 import { DEMO_MODE } from '@/demo/DemoMode';
+import BrandsetBanner from '@/components/Brandset/BrandsetBanner';
+import RealTimeMetrics from '@/components/Metrics/RealTimeMetrics';
+import QRGenerator from '@/components/QR/QRGenerator';
+import DesignSystem from '@/styles/DesignSystem';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -33,6 +37,7 @@ import HeartFilled from '@/assets/heart-red.png';
 import Message from '@/assets/message01.svg';
 import CheckBadge from '@/assets/checkmarkbadge01.svg';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
+import { MaterialIcons } from '@expo/vector-icons';
 
 interface CreatorProfileProps {}
 
@@ -55,6 +60,8 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
   const [contactSubject, setContactSubject] = useState('Collaboration Opportunity');
   const [isFavorited, setIsFavorited] = useState(false);
   const [isOfferModalVisible, setIsOfferModalVisible] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [showMetrics, setShowMetrics] = useState(true);
 
   // Find creator from demo data
   const creator = useMemo(() => {
@@ -507,6 +514,46 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
           contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
           showsVerticalScrollIndicator={false}
         >
+          {/* Brandset Banner */}
+          <BrandsetBanner
+            brands={[
+              {
+                id: '1',
+                name: 'Nike',
+                color: '#111111',
+                sponsorshipType: 'premium',
+                ctaText: 'Send Offer Now',
+                ctaAction: () => setIsOfferModalVisible(true),
+              },
+              {
+                id: '2',
+                name: 'Adidas',
+                color: '#000000',
+                sponsorshipType: 'featured',
+                ctaText: 'Collaborate',
+                ctaAction: () => setIsOfferModalVisible(true),
+              },
+            ]}
+            creatorId={creator._id}
+            onBrandClick={(brand) => console.log('Brand clicked:', brand)}
+          />
+
+          {/* Real-Time Metrics */}
+          {showMetrics && (
+            <RealTimeMetrics
+              creatorId={creator._id}
+              initialData={{
+                networkValue: totalFollowers,
+                brandValue: Math.round(totalFollowers * 0.05),
+                appInfluence: avgEngagement * 10,
+                reachScore: Math.round(totalFollowers * avgEngagement / 100),
+                engagementTrend: 'up',
+                lastUpdated: new Date(),
+              }}
+              onMetricClick={(metric) => console.log('Metric clicked:', metric)}
+            />
+          )}
+
           {/* Profile Hero */}
           <View style={styles.heroSection}>
             <Image 
@@ -571,7 +618,41 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                 ))}
               </View>
 
-              {/* Action Buttons */}
+              {/* Enhanced Action Buttons with Connect/Share/Verify */}
+              <View style={styles.actionButtonsContainer}>
+                <View style={styles.primaryActionButtons}>
+                  <TouchableOpacity 
+                    style={[styles.primaryActionButton, styles.connectButton]}
+                    onPress={() => setShowQRCode(!showQRCode)}
+                  >
+                    <MaterialIcons name="qr-code" size={20} color="#fff" />
+                    <Text style={styles.primaryActionText}>Connect</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={[styles.primaryActionButton, styles.verifyButton]}
+                    onPress={() => {
+                      Alert.alert('Verification', `${creator.name} is a verified creator with authentic metrics`);
+                    }}
+                  >
+                    <MaterialIcons name="verified" size={20} color="#fff" />
+                    <Text style={styles.primaryActionText}>Verify</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* QR Code Generator */}
+                {showQRCode && (
+                  <View style={styles.qrContainer}>
+                    <QRGenerator
+                      value={`axees://profile/${creator._id}?instant=true`}
+                      creatorName={creator.name}
+                      profileUrl={`${Platform.OS === 'web' ? window.location.origin : 'https://axees.com'}/profile/${creator._id}`}
+                      onScan={() => router.push('/qr/scan')}
+                      customMessage="Scan to instantly send offers - no login required!"
+                    />
+                  </View>
+                )}
+
               <View style={styles.actionButtons}>
                 <TouchableOpacity 
                   style={({ focused }) => [
@@ -616,6 +697,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                     Create Offer
                   </Text>
                 </TouchableOpacity>
+              </View>
               </View>
             </View>
           </View>
@@ -1157,6 +1239,40 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginTop: 50,
+  },
+  
+  // New Galaxies Features Styles
+  actionButtonsContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  primaryActionButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  primaryActionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  connectButton: {
+    backgroundColor: '#8B5CF6',
+  },
+  verifyButton: {
+    backgroundColor: '#10B981',
+  },
+  primaryActionText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  qrContainer: {
+    marginVertical: 16,
   },
   
   // Modal styles
