@@ -17,30 +17,35 @@ import { router } from 'expo-router';
 import { DemoData } from '@/demo/DemoData';
 import { AdvancedFilters } from './AdvancedFilters';
 import { SmartBlast } from './SmartBlast';
-import { CreativeTab } from './CreativeTab';
+import { CreativeServices } from './CreativeServices';
+import { PerformanceServices } from './PerformanceServices';
 import { MyNetwork } from './MyNetwork';
 import { useAuth } from '@/contexts/AuthContext';
+import { Feather, MaterialIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
-type TabType = 'dashboard' | 'smart-blast' | 'creative' | 'my-network';
+type TabType = 'search' | 'smart-blast' | 'creative-services' | 'performance-services' | 'my-network';
 
 const Dashboard = () => {
   const { width: screenWidth } = useWindowDimensions();
   const { user } = useAuth();
   
   // Tab management
-  const [activeTab, setActiveTab] = useState<TabType>('dashboard');
+  const [activeTab, setActiveTab] = useState<TabType>('search');
   
   // Filter management
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
   const [appliedFilters, setAppliedFilters] = useState<any>({});
   
-  // Creator data with enhanced structure for dashboard
+  // Batch selection
+  const [batchSize, setBatchSize] = useState<number>(10);
+  const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
+  
+  // Creator data with enhanced structure
   const creators = DemoData.creators.map(creator => {
     const totalFollowers = creator.creatorData?.totalFollowers || 0;
     const platforms = creator.creatorData?.platforms || [];
     const avgEngagement = platforms.reduce((acc, p) => acc + (p.engagement || 0), 0) / Math.max(platforms.length, 1);
     
-    // Enhanced creator data for dashboard features
     return {
       id: creator._id,
       name: creator.name,
@@ -60,21 +65,21 @@ const Dashboard = () => {
       estimatedCost: getEstimatedCost(totalFollowers, avgEngagement),
       postFrequency: getRandomPostFrequency(),
       demographics: getRandomDemographics(),
-      languages: ['English'], // Default, can be enhanced
+      languages: ['English'],
       gender: getRandomGender(),
       ageRange: getRandomAgeRange(),
       
       // Smart Blast compatibility
       isSelected: false,
       lastContactDate: null,
-      responseRate: Math.random() * 0.8 + 0.2, // 20-100%
+      responseRate: Math.random() * 0.8 + 0.2,
     };
   });
 
   const [filteredCreators, setFilteredCreators] = useState(creators);
   const [searchText, setSearchText] = useState('');
 
-  // Helper functions for enhanced data
+  // Helper functions
   function getTierFromFollowers(followers: number): string {
     if (followers >= 1000000) return 'Mega';
     if (followers >= 100000) return 'Macro';
@@ -83,7 +88,7 @@ const Dashboard = () => {
   }
 
   function getEstimatedCost(followers: number, engagement: number): number {
-    const baseCost = followers * 0.01; // $0.01 per follower
+    const baseCost = followers * 0.01;
     const engagementMultiplier = Math.max(engagement / 100, 0.5);
     return Math.round(baseCost * engagementMultiplier);
   }
@@ -99,7 +104,7 @@ const Dashboard = () => {
     
     return {
       age: ageGroups[Math.floor(Math.random() * ageGroups.length)],
-      location: 'US', // Simplified
+      location: 'US',
       interests: interests.slice(0, Math.floor(Math.random() * 3) + 1)
     };
   }
@@ -119,7 +124,6 @@ const Dashboard = () => {
     setAppliedFilters(filters);
     let filtered = creators;
 
-    // Apply search
     if (searchText.trim()) {
       const searchLower = searchText.toLowerCase();
       filtered = filtered.filter(creator => 
@@ -130,7 +134,6 @@ const Dashboard = () => {
       );
     }
 
-    // Apply advanced filters
     if (filters.priceRange) {
       filtered = filtered.filter(creator => 
         creator.estimatedCost >= filters.priceRange.min && 
@@ -148,18 +151,6 @@ const Dashboard = () => {
       );
     }
 
-    if (filters.postFrequency && filters.postFrequency.length > 0) {
-      filtered = filtered.filter(creator => filters.postFrequency.includes(creator.postFrequency));
-    }
-
-    if (filters.gender && filters.gender.length > 0) {
-      filtered = filtered.filter(creator => filters.gender.includes(creator.gender));
-    }
-
-    if (filters.ageRange && filters.ageRange.length > 0) {
-      filtered = filtered.filter(creator => filters.ageRange.includes(creator.ageRange));
-    }
-
     setFilteredCreators(filtered);
   };
 
@@ -168,54 +159,36 @@ const Dashboard = () => {
     applyFilters(appliedFilters);
   };
 
-  // Tab navigation
-  const renderTabBar = () => (
-    <View style={styles.tabBar}>
-      <TouchableOpacity 
-        style={[styles.tab, activeTab === 'dashboard' && styles.activeTab]}
-        onPress={() => setActiveTab('dashboard')}
-      >
-        <Text style={[styles.tabText, activeTab === 'dashboard' && styles.activeTabText]}>
-          📊 Dashboard
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={[styles.tab, activeTab === 'smart-blast' && styles.activeTab]}
-        onPress={() => setActiveTab('smart-blast')}
-      >
-        <Text style={[styles.tabText, activeTab === 'smart-blast' && styles.activeTabText]}>
-          🎯 Smart Blast
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={[styles.tab, activeTab === 'creative' && styles.activeTab]}
-        onPress={() => setActiveTab('creative')}
-      >
-        <Text style={[styles.tabText, activeTab === 'creative' && styles.activeTabText]}>
-          🧠 Creative
-        </Text>
-      </TouchableOpacity>
-      
-      <TouchableOpacity 
-        style={[styles.tab, activeTab === 'my-network' && styles.activeTab]}
-        onPress={() => setActiveTab('my-network')}
-      >
-        <Text style={[styles.tabText, activeTab === 'my-network' && styles.activeTabText]}>
-          🧩 My Network
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
+  // Batch selection handlers
+  const handleBatchSelect = () => {
+    const newSelection = new Set(selectedCreators);
+    const availableCreators = filteredCreators.slice(0, batchSize);
+    
+    availableCreators.forEach(creator => {
+      newSelection.add(creator.id);
+    });
+    
+    setSelectedCreators(newSelection);
+    Alert.alert('Batch Selection', `Selected ${availableCreators.length} creators`);
+  };
 
-  // Main dashboard content
-  const renderDashboardContent = () => (
-    <View style={styles.dashboardContent}>
+  const toggleCreatorSelection = (creatorId: string) => {
+    const newSelection = new Set(selectedCreators);
+    if (newSelection.has(creatorId)) {
+      newSelection.delete(creatorId);
+    } else {
+      newSelection.add(creatorId);
+    }
+    setSelectedCreators(newSelection);
+  };
+
+  // Search content (main dashboard)
+  const renderSearchContent = () => (
+    <View style={styles.searchContent}>
       {/* Search Bar */}
       <View style={styles.searchSection}>
         <View style={styles.searchBar}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          <Feather name="search" size={20} color="#666" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search creators by name, location, or category..."
@@ -226,10 +199,31 @@ const Dashboard = () => {
           />
           {searchText.length > 0 && (
             <Pressable onPress={() => handleSearch('')} style={styles.clearButton}>
-              <Text style={styles.clearButtonText}>×</Text>
+              <Ionicons name="close-circle" size={20} color="#999" />
             </Pressable>
           )}
         </View>
+      </View>
+
+      {/* Batch Selection Bar */}
+      <View style={styles.batchSelectionBar}>
+        <Text style={styles.batchLabel}>Select batch size:</Text>
+        <View style={styles.batchOptions}>
+          {[10, 20, 50, 100].map(size => (
+            <TouchableOpacity
+              key={size}
+              style={[styles.batchButton, batchSize === size && styles.batchButtonActive]}
+              onPress={() => setBatchSize(size)}
+            >
+              <Text style={[styles.batchButtonText, batchSize === size && styles.batchButtonTextActive]}>
+                {size}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <TouchableOpacity style={styles.selectBatchButton} onPress={handleBatchSelect}>
+          <Text style={styles.selectBatchButtonText}>Select Top {batchSize}</Text>
+        </TouchableOpacity>
       </View>
 
       {/* Results Summary */}
@@ -238,42 +232,63 @@ const Dashboard = () => {
           Found {filteredCreators.length.toLocaleString()} creators
         </Text>
         <Text style={styles.resultsSubtext}>
-          Estimated total reach: {filteredCreators.reduce((acc, creator) => acc + creator.totalFollowers, 0).toLocaleString()} followers
+          {selectedCreators.size} selected • Total reach: {filteredCreators.reduce((acc, creator) => acc + creator.totalFollowers, 0).toLocaleString()} followers
         </Text>
       </View>
 
       {/* Creator Grid */}
       <ScrollView style={styles.creatorGrid} showsVerticalScrollIndicator={false}>
         <View style={styles.creatorsContainer}>
-          {filteredCreators.map((creator) => (
-            <Pressable 
-              key={creator.id}
-              style={styles.creatorCard}
-              onPress={() => router.push(`/profile/${creator.id}`)}
-            >
-              <Image
-                style={styles.creatorAvatar}
-                source={creator.avatarUrl || require("@/assets/empty-image.png")}
-                placeholder={require("@/assets/empty-image.png")}
-                contentFit="cover"
-              />
-              
-              <View style={styles.creatorInfo}>
-                <Text style={styles.creatorName}>{creator.name}</Text>
-                <Text style={styles.creatorHandle}>@{creator.handle}</Text>
-                <Text style={styles.creatorStats}>
-                  {creator.totalFollowers.toLocaleString()} followers • {creator.avgEngagement}% engagement
-                </Text>
-                <Text style={styles.creatorTier}>{creator.tier} Influencer • ${creator.estimatedCost}/post</Text>
+          {filteredCreators.map((creator) => {
+            const isSelected = selectedCreators.has(creator.id);
+            return (
+              <Pressable 
+                key={creator.id}
+                style={[styles.creatorCard, isSelected && styles.creatorCardSelected]}
+                onPress={() => router.push(`/profile/${creator.id}`)}
+                onLongPress={() => toggleCreatorSelection(creator.id)}
+              >
+                <TouchableOpacity 
+                  style={styles.selectionCheckbox}
+                  onPress={(e) => {
+                    e.stopPropagation();
+                    toggleCreatorSelection(creator.id);
+                  }}
+                >
+                  {isSelected ? (
+                    <Ionicons name="checkbox" size={24} color="#430B92" />
+                  ) : (
+                    <Ionicons name="square-outline" size={24} color="#ccc" />
+                  )}
+                </TouchableOpacity>
+
+                <Image
+                  style={styles.creatorAvatar}
+                  source={creator.avatarUrl || require("@/assets/empty-image.png")}
+                  placeholder={require("@/assets/empty-image.png")}
+                  contentFit="cover"
+                />
                 
-                <View style={styles.creatorTags}>
-                  {creator.categories.slice(0, 2).map((tag, index) => (
-                    <Text key={index} style={styles.tag}>{tag}</Text>
-                  ))}
+                <View style={styles.creatorInfo}>
+                  <Text style={styles.creatorName}>{creator.name}</Text>
+                  <Text style={styles.creatorHandle}>@{creator.handle}</Text>
+                  <Text style={styles.creatorStats}>
+                    <FontAwesome5 name="users" size={12} color="#666" /> {creator.totalFollowers.toLocaleString()} • 
+                    <FontAwesome5 name="chart-line" size={12} color="#666" /> {creator.avgEngagement}%
+                  </Text>
+                  <Text style={styles.creatorTier}>
+                    <MaterialIcons name="stars" size={14} color="#430B92" /> {creator.tier} • ${creator.estimatedCost}/post
+                  </Text>
+                  
+                  <View style={styles.creatorTags}>
+                    {creator.categories.slice(0, 2).map((tag, index) => (
+                      <Text key={index} style={styles.tag}>{tag}</Text>
+                    ))}
+                  </View>
                 </View>
-              </View>
-            </Pressable>
-          ))}
+              </Pressable>
+            );
+          })}
         </View>
       </ScrollView>
     </View>
@@ -282,41 +297,45 @@ const Dashboard = () => {
   // Tab content renderer
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'dashboard':
-        return renderDashboardContent();
+      case 'search':
+        return renderSearchContent();
       case 'smart-blast':
         return <SmartBlast creators={filteredCreators} filters={appliedFilters} />;
-      case 'creative':
-        return <CreativeTab />;
+      case 'creative-services':
+        return <CreativeServices />;
+      case 'performance-services':
+        return <PerformanceServices />;
       case 'my-network':
         return <MyNetwork />;
       default:
-        return renderDashboardContent();
+        return renderSearchContent();
     }
   };
 
   return (
     <View style={styles.container}>
-      {/* Tab Navigation */}
-      {renderTabBar()}
-      
       {/* Main Content */}
       <View style={styles.mainContent}>
         {renderTabContent()}
       </View>
       
-      {/* Expandable Filters at Bottom */}
+      {/* Expandable Filters */}
       <View style={styles.filtersContainer}>
         <TouchableOpacity 
           style={styles.filtersToggle}
           onPress={() => setIsFiltersExpanded(!isFiltersExpanded)}
         >
-          <Text style={styles.filtersToggleText}>
-            🔧 Advanced Filters {isFiltersExpanded ? '▼' : '▲'}
-          </Text>
-          <Text style={styles.filtersCount}>
-            {Object.keys(appliedFilters).length} active
-          </Text>
+          <View style={styles.filtersToggleContent}>
+            <Feather name="filter" size={20} color="#430B92" />
+            <Text style={styles.filtersToggleText}>
+              Advanced Filters {isFiltersExpanded ? '▼' : '▲'}
+            </Text>
+            {Object.keys(appliedFilters).length > 0 && (
+              <View style={styles.filtersBadge}>
+                <Text style={styles.filtersBadgeText}>{Object.keys(appliedFilters).length}</Text>
+              </View>
+            )}
+          </View>
         </TouchableOpacity>
         
         {isFiltersExpanded && (
@@ -326,6 +345,49 @@ const Dashboard = () => {
           />
         )}
       </View>
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'search' && styles.navItemActive]}
+          onPress={() => setActiveTab('search')}
+        >
+          <Feather name="search" size={24} color={activeTab === 'search' ? '#430B92' : '#999'} />
+          <Text style={[styles.navLabel, activeTab === 'search' && styles.navLabelActive]}>Search</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'smart-blast' && styles.navItemActive]}
+          onPress={() => setActiveTab('smart-blast')}
+        >
+          <Ionicons name="rocket" size={24} color={activeTab === 'smart-blast' ? '#430B92' : '#999'} />
+          <Text style={[styles.navLabel, activeTab === 'smart-blast' && styles.navLabelActive]}>Smart Blast</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'creative-services' && styles.navItemActive]}
+          onPress={() => setActiveTab('creative-services')}
+        >
+          <Ionicons name="color-palette" size={24} color={activeTab === 'creative-services' ? '#430B92' : '#999'} />
+          <Text style={[styles.navLabel, activeTab === 'creative-services' && styles.navLabelActive]}>Creative</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'performance-services' && styles.navItemActive]}
+          onPress={() => setActiveTab('performance-services')}
+        >
+          <Ionicons name="trending-up" size={24} color={activeTab === 'performance-services' ? '#430B92' : '#999'} />
+          <Text style={[styles.navLabel, activeTab === 'performance-services' && styles.navLabelActive]}>Services</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity 
+          style={[styles.navItem, activeTab === 'my-network' && styles.navItemActive]}
+          onPress={() => setActiveTab('my-network')}
+        >
+          <FontAwesome5 name="network-wired" size={20} color={activeTab === 'my-network' ? '#430B92' : '#999'} />
+          <Text style={[styles.navLabel, activeTab === 'my-network' && styles.navLabelActive]}>Network</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -333,140 +395,140 @@ const Dashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  tabBar: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    paddingHorizontal: 16,
-    paddingTop: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e0e0e0',
-  },
-  tab: {
-    flex: 1,
-    paddingVertical: 12,
-    paddingHorizontal: 8,
-    alignItems: 'center',
-    borderBottomWidth: 2,
-    borderBottomColor: 'transparent',
-  },
-  activeTab: {
-    borderBottomColor: Color.cSK430B92500,
-  },
-  tabText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#666',
-  },
-  activeTabText: {
-    color: Color.cSK430B92500,
-    fontWeight: '600',
+    backgroundColor: '#ffffff',
   },
   mainContent: {
     flex: 1,
   },
-  dashboardContent: {
+  searchContent: {
     flex: 1,
-    padding: 16,
+    backgroundColor: '#ffffff',
   },
   searchSection: {
-    marginBottom: 16,
+    padding: 16,
+    backgroundColor: '#ffffff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   searchBar: {
-    backgroundColor: 'white',
-    padding: 16,
+    backgroundColor: '#f8f9fa',
+    padding: 12,
     borderRadius: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
   },
   searchIcon: {
-    fontSize: 18,
     marginRight: 12,
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
     color: '#333',
-    outlineStyle: 'none',
   },
   clearButton: {
-    marginLeft: 8,
     padding: 4,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 12,
-    width: 24,
-    height: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  clearButtonText: {
-    fontSize: 16,
+  batchSelectionBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    backgroundColor: '#f8f9fa',
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+  },
+  batchLabel: {
+    fontSize: 14,
     color: '#666',
-    fontWeight: 'bold',
+    marginRight: 12,
+  },
+  batchOptions: {
+    flexDirection: 'row',
+    flex: 1,
+  },
+  batchButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    marginRight: 8,
+    borderRadius: 20,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  batchButtonActive: {
+    backgroundColor: '#430B92',
+    borderColor: '#430B92',
+  },
+  batchButtonText: {
+    fontSize: 14,
+    color: '#666',
+  },
+  batchButtonTextActive: {
+    color: '#ffffff',
+  },
+  selectBatchButton: {
+    backgroundColor: '#430B92',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  selectBatchButtonText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '600',
   },
   resultsSummary: {
-    backgroundColor: 'white',
     padding: 16,
-    borderRadius: 12,
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
   },
   resultsText: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: Color.cSK430B92500,
+    fontWeight: '600',
+    color: '#333',
+    marginBottom: 4,
   },
   resultsSubtext: {
     fontSize: 14,
     color: '#666',
-    marginTop: 4,
   },
   creatorGrid: {
     flex: 1,
   },
   creatorsContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 16,
-    paddingBottom: 100, // Space for filters
+    padding: 16,
   },
   creatorCard: {
-    backgroundColor: 'white',
+    backgroundColor: '#ffffff',
     padding: 16,
-    borderRadius: 16,
-    width: '48%',
-    minWidth: 280,
-    maxWidth: 350,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
+    marginBottom: 12,
+    borderRadius: 12,
+    flexDirection: 'row',
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+    position: 'relative',
+  },
+  creatorCardSelected: {
+    borderColor: '#430B92',
+    borderWidth: 2,
+  },
+  selectionCheckbox: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    zIndex: 1,
   },
   creatorAvatar: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    marginBottom: 12,
-    borderWidth: 2,
-    borderColor: '#e0e0e0',
+    marginRight: 16,
   },
   creatorInfo: {
     flex: 1,
   },
   creatorName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
     color: '#333',
     marginBottom: 2,
   },
@@ -476,57 +538,85 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   creatorStats: {
-    fontSize: 12,
-    color: '#888',
+    fontSize: 13,
+    color: '#666',
     marginBottom: 4,
   },
   creatorTier: {
-    fontSize: 12,
-    color: Color.cSK430B92500,
-    fontWeight: '600',
+    fontSize: 13,
+    color: '#430B92',
+    fontWeight: '500',
     marginBottom: 8,
   },
   creatorTags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 4,
   },
   tag: {
-    backgroundColor: '#e7f3ff',
-    color: '#007bff',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    fontSize: 10,
-    fontWeight: '500',
-  },
-  filtersContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: 'white',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-  },
-  filtersToggle: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-  },
-  filtersToggleText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Color.cSK430B92500,
-  },
-  filtersCount: {
-    fontSize: 12,
-    color: '#666',
     backgroundColor: '#f0f0f0',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
+    fontSize: 12,
+    color: '#666',
+    marginRight: 6,
+    marginBottom: 4,
+  },
+  filtersContainer: {
+    backgroundColor: '#ffffff',
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+  },
+  filtersToggle: {
+    padding: 16,
+  },
+  filtersToggleContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filtersToggleText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#430B92',
+    marginLeft: 8,
+    flex: 1,
+  },
+  filtersBadge: {
+    backgroundColor: '#430B92',
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    minWidth: 24,
+    alignItems: 'center',
+  },
+  filtersBadgeText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    backgroundColor: '#ffffff',
+    borderTopWidth: 1,
+    borderTopColor: '#f0f0f0',
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
+  },
+  navItem: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 12,
+  },
+  navItemActive: {
+    backgroundColor: '#f8f9fa',
+  },
+  navLabel: {
+    fontSize: 11,
+    color: '#999',
+    marginTop: 4,
+  },
+  navLabelActive: {
+    color: '#430B92',
+    fontWeight: '600',
   },
 });
 
