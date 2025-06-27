@@ -20,6 +20,7 @@ import DesignSystem from '@/styles/DesignSystem';
 import { WebSEO } from '../web-seo';
 import { Color } from '@/GlobalStyles';
 import { Image } from 'expo-image';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface PaymentMethod {
   id: string;
@@ -92,7 +93,7 @@ const InstantPaymentPage: React.FC = () => {
       const stored = await AsyncStorage.getItem(GHOST_PROFILE_KEY);
       setHasGhostProfile(!!stored);
     } catch (error) {
-      console.error('Error checking ghost profile:', error);
+      // Handle error silently
     }
   };
 
@@ -413,7 +414,7 @@ const InstantPaymentPage: React.FC = () => {
                 { 
                   text: 'Cancel Payment', 
                   style: 'destructive',
-                  onPress: () => router.back()
+                  onPress: () => router.push('/')
                 },
               ]
             );

@@ -15,6 +15,7 @@ import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { DemoData } from '@/demo/DemoData';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -80,7 +81,7 @@ const PreviewPaymentPage: React.FC = () => {
   };
 
   const handleEditOffer = () => {
-    router.back();
+    router.push('/offers');
   };
 
   const getTimelineText = (timeline: string) => {
@@ -105,12 +106,7 @@ const PreviewPaymentPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton fallbackRoute="/offers" />
           
           <Text style={styles.headerTitle}>Review Offer</Text>
           <View style={styles.headerSpacer} />

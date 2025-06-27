@@ -54,6 +54,11 @@ npm run web
 - Protected routes with simplified AuthGuard
 - Secure environment variable handling
 
+### Navigation
+- Universal back button component with intelligent routing hierarchy
+- Consistent navigation across all dashboard pages (analytics, campaigns, discover, payments, creative, network)
+- Direct routing for critical paths to prevent navigation glitches
+
 ### Monitoring & Debugging
 - Sentry error tracking (production only)
 - Real-time metrics collection
@@ -124,6 +129,7 @@ npm run analyze
 - `NavigationDebugger`: Development navigation tracking
 - `MetricsDashboard`: Real-time performance monitoring
 - `AuthRateLimiter`: Security rate limiting with exponential backoff
+- `UniversalBackButton`: Intelligent back navigation with route hierarchy
 
 ### Key Files
 - `app/_layout.web.tsx`: Optimized root layout with lazy loading

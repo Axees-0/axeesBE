@@ -482,7 +482,7 @@ export default function MarketerOfferDetail() {
         visibilityTime: 3000,
         topOffset: 50,
       });
-      router.back();
+      router.push('/offers');
     },
     onError: (error) => {
       console.error("Error saving draft:", error);
@@ -671,7 +671,7 @@ export default function MarketerOfferDetail() {
         visibilityTime: 3000,
         topOffset: 50,
       });
-      router.back();
+      router.push('/offers');
     },
     onError: (error) => {
       console.error("Error deleting offer:", error);

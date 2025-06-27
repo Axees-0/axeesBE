@@ -222,7 +222,7 @@ export default function CreatorOfferDetails() {
       return response.data;
     },
     onSuccess: () => {
-      router.back();
+      router.push('/offers');
     },
   });
 
@@ -338,7 +338,7 @@ export default function CreatorOfferDetails() {
       await axios.delete(`${API_URL}/${offerId}`);
     },
     onSuccess: () => {
-      router.back();
+      router.push('/offers');
     },
     onError: (error) => {
       console.error("Error deleting offer:", error);

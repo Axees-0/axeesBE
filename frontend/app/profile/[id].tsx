@@ -93,10 +93,22 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
 
   // Calculate total followers and engagement
   const totalFollowers = creator.creatorData?.totalFollowers || 0;
-  const avgEngagement = creator.creatorData?.platforms?.reduce((acc, p) => acc + (p.engagement || 0), 0) / (creator.creatorData?.platforms?.length || 1);
+  
+  // Safe calculation of average engagement
+  const platforms = creator.creatorData?.platforms || [];
+  const totalEngagement = platforms.reduce((acc, p) => {
+    const engagement = typeof p.engagement === 'number' && !isNaN(p.engagement) ? p.engagement : 0;
+    return acc + engagement;
+  }, 0);
+  const avgEngagement = platforms.length > 0 ? totalEngagement / platforms.length : 0;
 
-  // Format numbers
+  // Format numbers with safety checks
   const formatNumber = (num: number) => {
+    // Ensure num is a valid number
+    if (typeof num !== 'number' || isNaN(num) || !isFinite(num)) {
+      return '0';
+    }
+    
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
@@ -338,7 +350,10 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                       {formatNumber(platform.followersCount || 0)}
                     </Text>
                     <Text style={styles.engagementText}>
-                      {platform.engagement?.toFixed(1)}% engagement
+                      {typeof platform.engagement === 'number' && !isNaN(platform.engagement) 
+                        ? `${platform.engagement.toFixed(1)}% engagement`
+                        : 'N/A engagement'
+                      }
                     </Text>
                   </View>
                 </View>
@@ -545,8 +560,10 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
               initialData={{
                 networkValue: totalFollowers,
                 brandValue: Math.round(totalFollowers * 0.05),
-                appInfluence: avgEngagement * 10,
-                reachScore: Math.round(totalFollowers * avgEngagement / 100),
+                appInfluence: !isNaN(avgEngagement) && isFinite(avgEngagement) ? avgEngagement * 10 : 0,
+                reachScore: !isNaN(avgEngagement) && isFinite(avgEngagement) 
+                  ? Math.round(totalFollowers * avgEngagement / 100) 
+                  : Math.round(totalFollowers * 0.087), // Default to 8.7% engagement
                 engagementTrend: 'up',
                 lastUpdated: new Date(),
               }}
@@ -591,20 +608,30 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                 <View 
                   style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
                   accessible={true}
-                  accessibilityLabel={`Average engagement rate: ${avgEngagement.toFixed(1)} percent`}
+                  accessibilityLabel={`Average engagement rate: ${!isNaN(avgEngagement) ? avgEngagement.toFixed(1) : '0'} percent`}
                   accessibilityHint="Average percentage of followers who interact with posts"
                 >
-                  <Text style={styles.statNumber}>{avgEngagement.toFixed(1)}%</Text>
+                  <Text style={styles.statNumber}>
+                    {!isNaN(avgEngagement) && isFinite(avgEngagement) 
+                      ? `${avgEngagement.toFixed(1)}%` 
+                      : '0.0%'
+                    }
+                  </Text>
                   <Text style={styles.statLabel}>Avg Engagement</Text>
                 </View>
                 
                 <View 
                   style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
                   accessible={true}
-                  accessibilityLabel={`Rating: ${creator.rating?.toFixed(1)} out of 5 stars`}
+                  accessibilityLabel={`Rating: ${typeof creator.rating === 'number' && !isNaN(creator.rating) ? creator.rating.toFixed(1) : '0.0'} out of 5 stars`}
                   accessibilityHint="Average rating from completed collaborations"
                 >
-                  <Text style={styles.statNumber}>{creator.rating?.toFixed(1)}/5</Text>
+                  <Text style={styles.statNumber}>
+                    {typeof creator.rating === 'number' && !isNaN(creator.rating) && isFinite(creator.rating)
+                      ? `${creator.rating.toFixed(1)}/5`
+                      : '0.0/5'
+                    }
+                  </Text>
                   <Text style={styles.statLabel}>Rating</Text>
                 </View>
               </View>

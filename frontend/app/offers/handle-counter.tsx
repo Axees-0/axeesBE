@@ -192,7 +192,7 @@ const HandleCounterOfferPage: React.FC = () => {
             }).catch(console.error);
             
             window.alert('Counter Offer Rejected. The creator has been notified.');
-            router.back();
+            router.push('/deals');
           }
         } else {
           Alert.alert(
@@ -217,7 +217,7 @@ const HandleCounterOfferPage: React.FC = () => {
                   'Counter Offer Rejected',
                   'The creator has been notified.',
                   [
-                    { text: 'OK', onPress: () => router.back() }
+                    { text: 'OK', onPress: () => router.push('/deals') }
                   ]
                 );
               }

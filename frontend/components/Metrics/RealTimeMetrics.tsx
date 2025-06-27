@@ -110,20 +110,35 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
     ]).start();
   }, [metrics]);
 
-  const formatValue = (value: number, type: string) => {
+  const formatValue = (value: number | Animated.AnimatedValue, type: string) => {
+    // Handle Animated values
+    let numValue: number;
+    if (value instanceof Animated.Value) {
+      // For Animated values, we need to use the internal value
+      // @ts-ignore - accessing private property
+      numValue = value._value || 0;
+    } else {
+      numValue = value;
+    }
+    
+    // Ensure value is a valid number
+    if (typeof numValue !== 'number' || isNaN(numValue) || !isFinite(numValue)) {
+      numValue = 0;
+    }
+    
     switch (type) {
       case 'currency':
-        return `$${value.toLocaleString()}`;
+        return `$${numValue.toLocaleString()}`;
       case 'percentage':
-        return `${value.toFixed(1)}%`;
+        return `${numValue.toFixed(1)}%`;
       case 'number':
-        return value > 1000000 
-          ? `${(value / 1000000).toFixed(1)}M`
-          : value > 1000 
-          ? `${(value / 1000).toFixed(1)}K`
-          : value.toString();
+        return numValue > 1000000 
+          ? `${(numValue / 1000000).toFixed(1)}M`
+          : numValue > 1000 
+          ? `${(numValue / 1000).toFixed(1)}K`
+          : numValue.toString();
       default:
-        return value.toString();
+        return numValue.toString();
     }
   };
 
@@ -136,6 +151,30 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
       default:
         return <MaterialCommunityIcons name="minus" size={16} color="#6B7280" />;
     }
+  };
+
+  // Component to handle animated values safely
+  const AnimatedMetricValue = ({ value, type, color, style }: any) => {
+    const [displayValue, setDisplayValue] = useState('0');
+
+    useEffect(() => {
+      if (value instanceof Animated.Value) {
+        const listener = value.addListener(({ value: animValue }) => {
+          setDisplayValue(formatValue(animValue, type));
+        });
+        return () => {
+          value.removeListener(listener);
+        };
+      } else {
+        setDisplayValue(formatValue(value, type));
+      }
+    }, [value, type]);
+
+    return (
+      <Text style={[style, { color }]}>
+        {displayValue}
+      </Text>
+    );
   };
 
   const MetricCard = ({ icon, label, value, type, color, onPress }: any) => (
@@ -165,9 +204,12 @@ export const RealTimeMetrics: React.FC<RealTimeMetricsProps> = ({
         
         <Text style={styles.metricLabel}>{label}</Text>
         
-        <Animated.Text style={[styles.metricValue, { color }]}>
-          {formatValue(value, type)}
-        </Animated.Text>
+        <AnimatedMetricValue 
+          value={value} 
+          type={type} 
+          color={color} 
+          style={styles.metricValue}
+        />
         
         {!compact && (
           <View style={styles.metricFooter}>

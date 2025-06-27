@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { 
   View, 
   Text, 
@@ -6,671 +6,524 @@ import {
   StyleSheet, 
   TouchableOpacity, 
   TextInput, 
-  Pressable, 
   Platform, 
   useWindowDimensions,
-  Alert 
+  SafeAreaView,
+  StatusBar
 } from 'react-native';
 import { Image } from 'expo-image';
-import { Color, Focus } from '@/GlobalStyles';
+import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
 import { DemoData } from '@/demo/DemoData';
-import { AdvancedFilters } from './AdvancedFilters';
-import { SmartBlast } from './SmartBlast';
-import { CreativeServices } from './CreativeServices';
-import { PerformanceServices } from './PerformanceServices';
-import { MyNetwork } from './MyNetwork';
 import { useAuth } from '@/contexts/AuthContext';
-import { Feather, MaterialIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
+import { 
+  Feather, 
+  MaterialIcons, 
+  Ionicons, 
+  FontAwesome5, 
+  MaterialCommunityIcons,
+  AntDesign,
+  Octicons
+} from '@expo/vector-icons';
 import DesignSystem from '@/styles/DesignSystem';
-
-type TabType = 'search' | 'smart-blast' | 'creative-services' | 'performance-services' | 'my-network';
 
 const Dashboard = () => {
   const { width: screenWidth } = useWindowDimensions();
   const { user } = useAuth();
+  const [searchQuery, setSearchQuery] = useState('');
   
-  // Tab management
-  const [activeTab, setActiveTab] = useState<TabType>('search');
-  
-  // Filter management
-  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
-  const [appliedFilters, setAppliedFilters] = useState<any>({});
-  
-  // Batch selection
-  const [batchSize, setBatchSize] = useState<number>(10);
-  const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
-  
-  // Creator data with enhanced structure
-  const creators = DemoData.creators.map(creator => {
-    const totalFollowers = creator.creatorData?.totalFollowers || 0;
-    const platforms = creator.creatorData?.platforms || [];
-    const avgEngagement = platforms.reduce((acc, p) => acc + (p.engagement || 0), 0) / Math.max(platforms.length, 1);
-    
-    return {
-      id: creator._id,
-      name: creator.name,
-      handle: creator.userName,
-      bio: creator.bio,
-      location: creator.location,
-      avatarUrl: creator.avatarUrl,
-      
-      // Enhanced metrics
-      totalFollowers,
-      avgEngagement: avgEngagement.toFixed(1),
-      platforms: platforms.map(p => p.platform).join(', '),
-      categories: creator.creatorData?.categories || ['Creator'],
-      
-      // Dashboard-specific data
-      tier: getTierFromFollowers(totalFollowers),
-      estimatedCost: getEstimatedCost(totalFollowers, avgEngagement),
-      postFrequency: getRandomPostFrequency(),
-      demographics: getRandomDemographics(),
-      languages: ['English'],
-      gender: getRandomGender(),
-      ageRange: getRandomAgeRange(),
-      
-      // Smart Blast compatibility
-      isSelected: false,
-      lastContactDate: null,
-      responseRate: Math.random() * 0.8 + 0.2,
-    };
-  });
-
-  const [filteredCreators, setFilteredCreators] = useState(creators);
-  const [searchText, setSearchText] = useState('');
-
-  // Helper functions
-  function getTierFromFollowers(followers: number): string {
-    if (followers >= 1000000) return 'Mega';
-    if (followers >= 100000) return 'Macro';
-    if (followers >= 10000) return 'Micro';
-    return 'Nano';
-  }
-
-  function getEstimatedCost(followers: number, engagement: number): number {
-    const baseCost = followers * 0.01;
-    const engagementMultiplier = Math.max(engagement / 100, 0.5);
-    return Math.round(baseCost * engagementMultiplier);
-  }
-
-  function getRandomPostFrequency(): string {
-    const frequencies = ['Daily', 'Weekly', 'Monthly'];
-    return frequencies[Math.floor(Math.random() * frequencies.length)];
-  }
-
-  function getRandomDemographics(): { age: string; location: string; interests: string[] } {
-    const ageGroups = ['18-24', '25-34', '35-44', '45-54', '55+'];
-    const interests = ['Fashion', 'Tech', 'Food', 'Travel', 'Fitness', 'Beauty', 'Gaming'];
-    
-    return {
-      age: ageGroups[Math.floor(Math.random() * ageGroups.length)],
-      location: 'US',
-      interests: interests.slice(0, Math.floor(Math.random() * 3) + 1)
-    };
-  }
-
-  function getRandomGender(): string {
-    const genders = ['Male', 'Female', 'Non-binary'];
-    return genders[Math.floor(Math.random() * genders.length)];
-  }
-
-  function getRandomAgeRange(): string {
-    const ranges = ['18-24', '25-34', '35-44', '45-54', '55+'];
-    return ranges[Math.floor(Math.random() * ranges.length)];
-  }
-
-  // Filter application
-  const applyFilters = (filters: any) => {
-    setAppliedFilters(filters);
-    let filtered = creators;
-
-    if (searchText.trim()) {
-      const searchLower = searchText.toLowerCase();
-      filtered = filtered.filter(creator => 
-        creator.name.toLowerCase().includes(searchLower) ||
-        creator.location.toLowerCase().includes(searchLower) ||
-        creator.categories.some(cat => cat.toLowerCase().includes(searchLower)) ||
-        creator.handle.toLowerCase().includes(searchLower)
-      );
+  // Mock user data - in production, this would come from useAuth
+  const userData = {
+    name: user?.fullName || 'Sarah Martinez',
+    role: user?.userType || 'Marketing Manager',
+    avatar: user?.avatarUrl || require('@/assets/empty-image.png'),
+    stats: {
+      totalCampaigns: 24,
+      activeInfluencers: 156,
+      totalSpend: '$125,400',
+      avgEngagement: '8.7%'
     }
-
-    if (filters.priceRange) {
-      filtered = filtered.filter(creator => 
-        creator.estimatedCost >= filters.priceRange.min && 
-        creator.estimatedCost <= filters.priceRange.max
-      );
-    }
-
-    if (filters.tiers && filters.tiers.length > 0) {
-      filtered = filtered.filter(creator => filters.tiers.includes(creator.tier));
-    }
-
-    if (filters.platforms && filters.platforms.length > 0) {
-      filtered = filtered.filter(creator => 
-        filters.platforms.some((platform: string) => creator.platforms.includes(platform))
-      );
-    }
-
-    setFilteredCreators(filtered);
   };
 
-  const handleSearch = (text: string) => {
-    setSearchText(text);
-    applyFilters(appliedFilters);
-  };
-
-  // Batch selection handlers
-  const handleBatchSelect = () => {
-    const newSelection = new Set(selectedCreators);
-    const availableCreators = filteredCreators.slice(0, batchSize);
-    
-    availableCreators.forEach(creator => {
-      newSelection.add(creator.id);
-    });
-    
-    setSelectedCreators(newSelection);
-    Alert.alert('Batch Selection', `Selected ${availableCreators.length} creators`);
-  };
-
-  const toggleCreatorSelection = (creatorId: string) => {
-    const newSelection = new Set(selectedCreators);
-    if (newSelection.has(creatorId)) {
-      newSelection.delete(creatorId);
-    } else {
-      newSelection.add(creatorId);
+  // Navigation items matching the design
+  const menuItems = [
+    {
+      id: 'discover',
+      title: 'Discover Creators',
+      subtitle: 'Find perfect matches for your brand',
+      icon: <Feather name="search" size={24} color="#430B92" />,
+      route: '/discover',
+      color: '#430B92'
+    },
+    {
+      id: 'campaigns',
+      title: 'My Campaigns',
+      subtitle: 'Manage active collaborations',
+      icon: <MaterialCommunityIcons name="rocket-launch" size={24} color="#10B981" />,
+      route: '/campaigns',
+      color: '#10B981'
+    },
+    {
+      id: 'analytics',
+      title: 'Analytics',
+      subtitle: 'Track performance metrics',
+      icon: <Ionicons name="analytics" size={24} color="#F59E0B" />,
+      route: '/analytics',
+      color: '#F59E0B'
+    },
+    {
+      id: 'payments',
+      title: 'Payments',
+      subtitle: 'Manage transactions',
+      icon: <MaterialIcons name="payment" size={24} color="#3B82F6" />,
+      route: '/payments',
+      color: '#3B82F6'
+    },
+    {
+      id: 'creative',
+      title: 'Creative Tools',
+      subtitle: 'Content creation resources',
+      icon: <MaterialCommunityIcons name="palette" size={24} color="#8B5CF6" />,
+      route: '/creative',
+      color: '#8B5CF6'
+    },
+    {
+      id: 'network',
+      title: 'My Network',
+      subtitle: 'Saved creators & contacts',
+      icon: <MaterialCommunityIcons name="account-group" size={24} color="#EC4899" />,
+      route: '/network',
+      color: '#EC4899'
     }
-    setSelectedCreators(newSelection);
-  };
+  ];
 
-  // Search content (main dashboard)
-  const renderSearchContent = () => (
-    <View style={styles.searchContent}>
-      {/* Search Bar */}
-      <View style={styles.searchSection}>
-        <View style={styles.searchBar}>
-          <Feather name="search" size={20} color="#666" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search creators by name, location, or category..."
-            placeholderTextColor="#999"
-            value={searchText}
-            onChangeText={handleSearch}
-            returnKeyType="search"
-          />
-          {searchText.length > 0 && (
-            <Pressable onPress={() => handleSearch('')} style={styles.clearButton}>
-              <Ionicons name="close-circle" size={20} color="#999" />
-            </Pressable>
-          )}
-        </View>
-      </View>
-
-      {/* Batch Selection Bar */}
-      <View style={styles.batchSelectionBar}>
-        <Text style={styles.batchLabel}>Select batch size:</Text>
-        <View style={styles.batchOptions}>
-          {[10, 20, 50, 100].map(size => (
-            <TouchableOpacity
-              key={size}
-              style={[styles.batchButton, batchSize === size && styles.batchButtonActive]}
-              onPress={() => setBatchSize(size)}
-            >
-              <Text style={[styles.batchButtonText, batchSize === size && styles.batchButtonTextActive]}>
-                {size}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-        <TouchableOpacity style={styles.selectBatchButton} onPress={handleBatchSelect}>
-          <Text style={styles.selectBatchButtonText}>Select Top {batchSize}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Results Summary */}
-      <View style={styles.resultsSummary}>
-        <Text style={styles.resultsText}>
-          Found {filteredCreators.length.toLocaleString()} creators
-        </Text>
-        <Text style={styles.resultsSubtext}>
-          {selectedCreators.size} selected • Total reach: {filteredCreators.reduce((acc, creator) => acc + creator.totalFollowers, 0).toLocaleString()} followers
-        </Text>
-      </View>
-
-      {/* Creator Grid */}
-      <ScrollView style={styles.creatorGrid} showsVerticalScrollIndicator={false}>
-        <View style={styles.creatorsContainer}>
-          {filteredCreators.map((creator) => {
-            const isSelected = selectedCreators.has(creator.id);
-            return (
-              <Pressable 
-                key={creator.id}
-                style={[styles.creatorCard, isSelected && styles.creatorCardSelected]}
-                onPress={() => router.push(`/profile/${creator.id}`)}
-                onLongPress={() => toggleCreatorSelection(creator.id)}
-              >
-                <TouchableOpacity 
-                  style={styles.selectionCheckbox}
-                  onPress={(e) => {
-                    e.stopPropagation();
-                    toggleCreatorSelection(creator.id);
-                  }}
-                >
-                  {isSelected ? (
-                    <Ionicons name="checkbox" size={24} color="#430B92" />
-                  ) : (
-                    <Ionicons name="square-outline" size={24} color="#ccc" />
-                  )}
-                </TouchableOpacity>
-
-                <Image
-                  style={styles.creatorAvatar}
-                  source={creator.avatarUrl || require("@/assets/empty-image.png")}
-                  placeholder={require("@/assets/empty-image.png")}
-                  contentFit="cover"
-                />
-                
-                <View style={styles.creatorInfo}>
-                  <Text style={styles.creatorName}>{creator.name}</Text>
-                  <Text style={styles.creatorHandle}>@{creator.handle}</Text>
-                  <Text style={styles.creatorStats}>
-                    <FontAwesome5 name="users" size={12} color="#666" /> {creator.totalFollowers.toLocaleString()} • 
-                    <FontAwesome5 name="chart-line" size={12} color="#666" /> {creator.avgEngagement}%
-                  </Text>
-                  <Text style={styles.creatorTier}>
-                    <MaterialIcons name="stars" size={14} color="#430B92" /> {creator.tier} • ${creator.estimatedCost}/post
-                  </Text>
-                  
-                  <View style={styles.creatorTags}>
-                    {creator.categories.slice(0, 2).map((tag, index) => (
-                      <View key={index} style={styles.tag}>
-                        <Text style={styles.tagText}>{tag}</Text>
-                      </View>
-                    ))}
-                  </View>
-                </View>
-              </Pressable>
-            );
-          })}
-        </View>
-      </ScrollView>
-    </View>
-  );
-
-  // Tab content renderer
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'search':
-        return renderSearchContent();
-      case 'smart-blast':
-        return <SmartBlast creators={filteredCreators} filters={appliedFilters} />;
-      case 'creative-services':
-        return <CreativeServices />;
-      case 'performance-services':
-        return <PerformanceServices />;
-      case 'my-network':
-        return <MyNetwork />;
-      default:
-        return renderSearchContent();
+  // Recent activity data
+  const recentActivity = [
+    {
+      id: '1',
+      type: 'campaign',
+      title: 'Summer Fashion Campaign',
+      subtitle: '12 creators responded',
+      time: '2 hours ago',
+      icon: <MaterialCommunityIcons name="tshirt-crew" size={20} color="#10B981" />
+    },
+    {
+      id: '2',
+      type: 'payment',
+      title: 'Payment sent to @alexcreates',
+      subtitle: '$2,500 for Tech Review',
+      time: '5 hours ago',
+      icon: <MaterialIcons name="attach-money" size={20} color="#3B82F6" />
+    },
+    {
+      id: '3',
+      type: 'message',
+      title: 'New message from @sophiastyle',
+      subtitle: 'Interested in beauty collab',
+      time: '1 day ago',
+      icon: <Ionicons name="chatbubble-ellipses" size={20} color="#8B5CF6" />
     }
+  ];
+
+  const handleMenuItemPress = (route: string) => {
+    // Navigate to the route
+    router.push(route);
   };
 
   return (
-    <View style={styles.container}>
-      {/* Main Content */}
-      <View style={styles.mainContent}>
-        {renderTabContent()}
-      </View>
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
       
-      {/* Expandable Filters */}
-      <View style={styles.filtersContainer}>
-        <TouchableOpacity 
-          style={styles.filtersToggle}
-          onPress={() => setIsFiltersExpanded(!isFiltersExpanded)}
-        >
-          <View style={styles.filtersToggleContent}>
-            <Feather name="filter" size={20} color="#430B92" />
-            <Text style={styles.filtersToggleText}>
-              Advanced Filters {isFiltersExpanded ? '▼' : '▲'}
-            </Text>
-            {Object.keys(appliedFilters).length > 0 && (
-              <View style={styles.filtersBadge}>
-                <Text style={styles.filtersBadgeText}>{Object.keys(appliedFilters).length}</Text>
+      <ScrollView 
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Header Section */}
+        <View style={styles.header}>
+          <View style={styles.userInfo}>
+            <Image
+              source={userData.avatar}
+              style={styles.avatar}
+              contentFit="cover"
+            />
+            <View style={styles.userDetails}>
+              <Text style={styles.userName}>{userData.name}</Text>
+              <Text style={styles.userRole}>{userData.role}</Text>
+            </View>
+            <TouchableOpacity style={styles.notificationButton}>
+              <Ionicons name="notifications-outline" size={24} color="#333" />
+              <View style={styles.notificationBadge}>
+                <Text style={styles.notificationBadgeText}>3</Text>
               </View>
+            </TouchableOpacity>
+          </View>
+
+          {/* Stats Cards */}
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            style={styles.statsContainer}
+            contentContainerStyle={styles.statsContent}
+          >
+            <View style={[styles.statCard, { backgroundColor: '#F3F4F6' }]}>
+              <MaterialCommunityIcons name="briefcase-outline" size={20} color="#6B7280" />
+              <Text style={styles.statValue}>{userData.stats.totalCampaigns}</Text>
+              <Text style={styles.statLabel}>Campaigns</Text>
+            </View>
+            
+            <View style={[styles.statCard, { backgroundColor: '#EDE9FE' }]}>
+              <MaterialCommunityIcons name="account-group-outline" size={20} color="#8B5CF6" />
+              <Text style={styles.statValue}>{userData.stats.activeInfluencers}</Text>
+              <Text style={styles.statLabel}>Influencers</Text>
+            </View>
+            
+            <View style={[styles.statCard, { backgroundColor: '#DBEAFE' }]}>
+              <MaterialIcons name="attach-money" size={20} color="#3B82F6" />
+              <Text style={styles.statValue}>{userData.stats.totalSpend}</Text>
+              <Text style={styles.statLabel}>Total Spend</Text>
+            </View>
+            
+            <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
+              <Ionicons name="trending-up" size={20} color="#10B981" />
+              <Text style={styles.statValue}>{userData.stats.avgEngagement}</Text>
+              <Text style={styles.statLabel}>Avg Engagement</Text>
+            </View>
+          </ScrollView>
+        </View>
+
+        {/* Search Section */}
+        <View style={styles.searchSection}>
+          <Text style={styles.sectionTitle}>Quick Search</Text>
+          <View style={styles.searchBar}>
+            <Feather name="search" size={20} color="#6B7280" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search creators, campaigns, or analytics..."
+              placeholderTextColor="#9CA3AF"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={() => setSearchQuery('')}>
+                <Ionicons name="close-circle" size={20} color="#9CA3AF" />
+              </TouchableOpacity>
             )}
           </View>
-        </TouchableOpacity>
-        
-        {isFiltersExpanded && (
-          <AdvancedFilters 
-            onFiltersChange={applyFilters}
-            initialFilters={appliedFilters}
-          />
-        )}
-      </View>
+        </View>
 
-      {/* Bottom Navigation */}
-      <View style={styles.bottomNav}>
-        <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'search' && styles.navItemActive]}
-          onPress={() => setActiveTab('search')}
-        >
-          <View style={styles.navContent}>
-            <Feather name="search" size={24} color={activeTab === 'search' ? '#430B92' : '#999'} />
-            <Text style={[styles.navLabel, activeTab === 'search' && styles.navLabelActive]}>Search</Text>
-            {activeTab === 'search' && <View style={styles.navActiveBullet} />}
+        {/* Menu Grid */}
+        <View style={styles.menuSection}>
+          <Text style={styles.sectionTitle}>Main Menu</Text>
+          <View style={styles.menuGrid}>
+            {menuItems.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.menuCard}
+                onPress={() => handleMenuItemPress(item.route)}
+                activeOpacity={0.7}
+              >
+                <LinearGradient
+                  colors={[`${item.color}10`, `${item.color}05`]}
+                  style={styles.menuCardGradient}
+                >
+                  <View style={[styles.menuIconContainer, { backgroundColor: `${item.color}20` }]}>
+                    {item.icon}
+                  </View>
+                  <Text style={styles.menuTitle}>{item.title}</Text>
+                  <Text style={styles.menuSubtitle}>{item.subtitle}</Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ))}
           </View>
-        </TouchableOpacity>
+        </View>
 
-        <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'smart-blast' && styles.navItemActive]}
-          onPress={() => setActiveTab('smart-blast')}
-        >
-          <View style={styles.navContent}>
-            <Ionicons name="rocket" size={24} color={activeTab === 'smart-blast' ? '#430B92' : '#999'} />
-            <Text style={[styles.navLabel, activeTab === 'smart-blast' && styles.navLabelActive]}>Smart Blast</Text>
-            {activeTab === 'smart-blast' && <View style={styles.navActiveBullet} />}
+        {/* Recent Activity */}
+        <View style={styles.activitySection}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Recent Activity</Text>
+            <TouchableOpacity>
+              <Text style={styles.viewAllLink}>View All</Text>
+            </TouchableOpacity>
           </View>
-        </TouchableOpacity>
+          
+          {recentActivity.map((activity) => (
+            <TouchableOpacity key={activity.id} style={styles.activityItem}>
+              <View style={[styles.activityIcon, { backgroundColor: '#F3F4F6' }]}>
+                {activity.icon}
+              </View>
+              <View style={styles.activityContent}>
+                <Text style={styles.activityTitle}>{activity.title}</Text>
+                <Text style={styles.activitySubtitle}>{activity.subtitle}</Text>
+              </View>
+              <Text style={styles.activityTime}>{activity.time}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-        <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'creative-services' && styles.navItemActive]}
-          onPress={() => setActiveTab('creative-services')}
-        >
-          <View style={styles.navContent}>
-            <Ionicons name="color-palette" size={24} color={activeTab === 'creative-services' ? '#430B92' : '#999'} />
-            <Text style={[styles.navLabel, activeTab === 'creative-services' && styles.navLabelActive]}>Creative</Text>
-            {activeTab === 'creative-services' && <View style={styles.navActiveBullet} />}
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'performance-services' && styles.navItemActive]}
-          onPress={() => setActiveTab('performance-services')}
-        >
-          <View style={styles.navContent}>
-            <Ionicons name="trending-up" size={24} color={activeTab === 'performance-services' ? '#430B92' : '#999'} />
-            <Text style={[styles.navLabel, activeTab === 'performance-services' && styles.navLabelActive]}>Services</Text>
-            {activeTab === 'performance-services' && <View style={styles.navActiveBullet} />}
-          </View>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.navItem, activeTab === 'my-network' && styles.navItemActive]}
-          onPress={() => setActiveTab('my-network')}
-        >
-          <View style={styles.navContent}>
-            <FontAwesome5 name="network-wired" size={20} color={activeTab === 'my-network' ? '#430B92' : '#999'} />
-            <Text style={[styles.navLabel, activeTab === 'my-network' && styles.navLabelActive]}>Network</Text>
-            {activeTab === 'my-network' && <View style={styles.navActiveBullet} />}
-          </View>
-        </TouchableOpacity>
-      </View>
-    </View>
+        {/* Quick Actions */}
+        <View style={styles.quickActions}>
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={() => router.push('/campaigns/create')}
+          >
+            <LinearGradient
+              colors={['#430B92', '#6B3AAC']}
+              style={styles.quickActionGradient}
+            >
+              <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.quickActionText}>New Campaign</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={() => router.push('/discover')}
+          >
+            <LinearGradient
+              colors={['#10B981', '#34D399']}
+              style={styles.quickActionGradient}
+            >
+              <MaterialCommunityIcons name="account-search" size={24} color="#FFFFFF" />
+              <Text style={styles.quickActionText}>Find Creators</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#FFFFFF',
   },
-  mainContent: {
+  scrollView: {
     flex: 1,
   },
-  searchContent: {
-    flex: 1,
-    backgroundColor: '#ffffff',
+  scrollContent: {
+    paddingBottom: 100,
   },
-  searchSection: {
-    padding: 16,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+  header: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
   },
-  searchBar: {
-    backgroundColor: '#f8f9fa',
-    padding: 12,
-    borderRadius: 12,
+  userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginBottom: 20,
   },
-  searchIcon: {
+  avatar: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     marginRight: 12,
+  },
+  userDetails: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    fontFamily: DesignSystem.Typography.h3.fontFamily,
+  },
+  userRole: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
+    fontFamily: DesignSystem.Typography.caption.fontFamily,
+  },
+  notificationButton: {
+    position: 'relative',
+    padding: 8,
+  },
+  notificationBadge: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: '#EF4444',
+    borderRadius: 8,
+    width: 16,
+    height: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  notificationBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: '600',
+  },
+  statsContainer: {
+    marginHorizontal: -20,
+  },
+  statsContent: {
+    paddingHorizontal: 20,
+  },
+  statCard: {
+    padding: 16,
+    borderRadius: 12,
+    marginRight: 12,
+    minWidth: 100,
+    alignItems: 'center',
+  },
+  statValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#111827',
+    marginTop: 8,
+    fontFamily: DesignSystem.Typography.h3.fontFamily,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginTop: 4,
+    fontFamily: DesignSystem.Typography.caption.fontFamily,
+  },
+  searchSection: {
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 12,
+    fontFamily: DesignSystem.Typography.h3.fontFamily,
+  },
+  searchBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   searchInput: {
     flex: 1,
+    marginLeft: 12,
     fontSize: 16,
-    color: '#333',
+    color: '#111827',
+    fontFamily: DesignSystem.Typography.body.fontFamily,
   },
-  clearButton: {
-    padding: 4,
+  menuSection: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
-  batchSelectionBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#f8f9fa',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    minHeight: 72, // Consistent section height
-  },
-  batchLabel: {
-    ...DesignSystem.Typography.captionMedium,
-    marginRight: 16,
-    minWidth: 120, // Slightly wider for consistent label alignment
-    alignSelf: 'center', // Vertical centering with pills
-  },
-  batchOptions: {
-    flexDirection: 'row',
-    flex: 1,
-    alignItems: 'center', // Baseline alignment for pills
-    justifyContent: 'space-evenly', // Equal distribution
-    marginRight: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Consistent spacing
-  },
-  batchButton: {
-    ...DesignSystem.PillStyles.default,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    minWidth: 48, // Slightly larger for better touch targets
-    borderRadius: 16,
-    backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: DesignSystem.AccessibleColors.borderMedium,
-    alignItems: 'center', // Center text baseline
-    justifyContent: 'center',
-  },
-  batchButtonActive: {
-    backgroundColor: '#430B92',
-    borderColor: '#430B92',
-  },
-  batchButtonText: {
-    ...DesignSystem.PillTextStyles.default,
-    textAlign: 'center',
-  },
-  batchButtonTextActive: {
-    ...DesignSystem.PillTextStyles.counter,
-  },
-  selectBatchButton: {
-    ...DesignSystem.ButtonStyles.small,
-    paddingHorizontal: 16,
-    borderRadius: 16,
-    marginRight: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Prevent edge overflow
-    alignSelf: 'center', // Vertical center with pills
-  },
-  selectBatchButtonText: {
-    ...DesignSystem.ButtonTextStyles.small,
-  },
-  resultsSummary: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  resultsText: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  resultsSubtext: {
-    fontSize: 14,
-    color: '#666',
-  },
-  creatorGrid: {
-    flex: 1,
-  },
-  creatorsContainer: {
-    padding: 16,
-  },
-  creatorCard: {
-    backgroundColor: '#ffffff',
-    padding: 16,
-    marginBottom: 12,
-    borderRadius: 12,
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
-    position: 'relative',
-  },
-  creatorCardSelected: {
-    borderColor: '#430B92',
-    borderWidth: 2,
-  },
-  selectionCheckbox: {
-    position: 'absolute',
-    top: 12,
-    right: 12,
-    zIndex: 1,
-  },
-  creatorAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    marginRight: 16,
-  },
-  creatorInfo: {
-    flex: 1,
-  },
-  creatorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 2,
-  },
-  creatorHandle: {
-    fontSize: 14,
-    color: '#666',
-    marginBottom: 4,
-  },
-  creatorStats: {
-    fontSize: 13,
-    color: '#666',
-    marginBottom: 4,
-  },
-  creatorTier: {
-    fontSize: 13,
-    color: '#430B92',
-    fontWeight: '500',
-    marginBottom: 8,
-  },
-  creatorTags: {
+  menuGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    alignItems: 'flex-start', // Proper baseline alignment for text
-    marginTop: 6, // Consistent spacing from content above
-    minHeight: 28, // Consistent row height
+    marginHorizontal: -6,
   },
-  tag: {
-    ...DesignSystem.PillStyles.tag,
-    backgroundColor: DesignSystem.AccessibleColors.purpleSubtle,
-    paddingHorizontal: 10, // Increased for better visual balance
-    paddingVertical: 6, // Increased for better touch targets
-    marginRight: 8, // More spacing between tags
-    marginBottom: 4,
-    alignItems: 'center', // Center text within pill
+  menuCard: {
+    width: '50%',
+    paddingHorizontal: 6,
+    marginBottom: 12,
   },
-  tagText: {
-    ...DesignSystem.PillTextStyles.tag,
+  menuCardGradient: {
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
-  filtersContainer: {
-    backgroundColor: '#ffffff',
-    borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
-  },
-  filtersToggle: {
-    padding: 16,
-  },
-  filtersToggleContent: {
-    flexDirection: 'row',
+  menuIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
     alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
   },
-  filtersToggleText: {
+  menuTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#430B92',
-    marginLeft: 8,
-    flex: 1,
+    color: '#111827',
+    marginBottom: 4,
+    fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
-  filtersBadge: {
-    backgroundColor: '#430B92',
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    minWidth: 24,
-    alignItems: 'center',
-  },
-  filtersBadgeText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  bottomNav: {
-    flexDirection: 'row',
-    backgroundColor: '#ffffff',
-    borderTopWidth: 1,
-    borderTopColor: DesignSystem.AccessibleColors.borderLight,
-    paddingBottom: Platform.OS === 'ios' ? 20 : 0,
-    paddingHorizontal: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Consistent edge spacing
-    paddingTop: 8, // Top padding for visual balance
-  },
-  navItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8, // Reduced for tighter layout
-    paddingHorizontal: 4,
-    borderRadius: 12, // Consistent with design system
-    minHeight: 64, // Increased for better touch targets
-  },
-  navItemActive: {
-    backgroundColor: DesignSystem.AccessibleColors.purpleSubtle,
-  },
-  navContent: {
-    ...DesignSystem.IconAlignment.verticalIconText,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 4, // Prevent content from touching edges
-  },
-  navLabel: {
-    fontSize: 12, // Slightly larger for better readability
-    color: DesignSystem.AccessibleColors.textSecondary, // Better contrast
-    marginTop: 4, // More spacing for cleaner separation
-    textAlign: 'center',
-    lineHeight: 16, // Improved line height
+  menuSubtitle: {
+    fontSize: 13,
+    color: '#6B7280',
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
-  navLabelActive: {
+  activitySection: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  viewAllLink: {
+    fontSize: 14,
     color: '#430B92',
-    fontWeight: '600',
+    fontWeight: '500',
     fontFamily: DesignSystem.Typography.captionMedium.fontFamily,
   },
-  navActiveBullet: {
-    width: 6, // Slightly larger for better visibility
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#430B92',
-    marginTop: 4, // Consistent spacing from label
-    alignSelf: 'center', // Ensure perfect centering
+  activityItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+  },
+  activityIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  activityContent: {
+    flex: 1,
+  },
+  activityTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#111827',
+    marginBottom: 2,
+    fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
+  },
+  activitySubtitle: {
+    fontSize: 13,
+    color: '#6B7280',
+    fontFamily: DesignSystem.Typography.caption.fontFamily,
+  },
+  activityTime: {
+    fontSize: 12,
+    color: '#9CA3AF',
+    fontFamily: DesignSystem.Typography.small.fontFamily,
+  },
+  quickActions: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    gap: 12,
+  },
+  quickActionButton: {
+    flex: 1,
+  },
+  quickActionGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 8,
+  },
+  quickActionText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
 });
 

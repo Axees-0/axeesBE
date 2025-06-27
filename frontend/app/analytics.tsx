@@ -1,518 +1,393 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   ScrollView,
+  StyleSheet,
+  TouchableOpacity,
   SafeAreaView,
+  Dimensions,
   Platform,
-  useWindowDimensions,
-} from "react-native";
-import { useAuth } from "@/contexts/AuthContext";
-import { DEMO_MODE, demoLog } from "@/demo/DemoMode";
-import { DemoData } from "@/demo/DemoData";
-import Navbar from "@/components/web/navbar";
-import { BREAKPOINTS, isMobile, isWideScreen } from "@/constants/breakpoints";
-import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/performance";
+} from 'react-native';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
+import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
+import DesignSystem from '@/styles/DesignSystem';
+import { LinearGradient } from 'expo-linear-gradient';
 
-export default function Analytics() {
-  const { width } = useWindowDimensions();
-  const { user } = useAuth();
-  const isWide = isWideScreen(width);
-  const isMobileDevice = isMobile(width);
-  const [isLoading, setIsLoading] = useState(true);
-  const [chartsReady, setChartsReady] = useState(false);
+const { width: screenWidth } = Dimensions.get('window');
 
-  // Demo analytics data
-  const [analyticsData] = useState({
-    totalEarnings: 45600,
-    thisMonth: 12800,
-    totalDeals: 47,
-    activeDeals: 12,
-    successRate: 89,
-    avgDealValue: 2710,
-    topPerformingPlatform: "Instagram",
-    platformBreakdown: {
-      instagram: 65,
-      tiktok: 25,
-      youtube: 10,
+const AnalyticsPage = () => {
+  const [selectedPeriod, setSelectedPeriod] = useState<'7d' | '30d' | '90d'>('30d');
+
+  // Mock analytics data
+  const analyticsData = {
+    overview: {
+      totalReach: 2456789,
+      totalEngagement: 145623,
+      totalConversions: 3421,
+      roi: 324,
     },
-    monthlyGrowth: [
-      { month: "Jan", earnings: 8900 },
-      { month: "Feb", earnings: 12400 },
-      { month: "Mar", earnings: 15800 },
-      { month: "Apr", earnings: 18200 },
-      { month: "May", earnings: 22600 },
-      { month: "Jun", earnings: 12800 },
+    campaigns: [
+      { name: 'Summer Fashion', reach: 450000, engagement: 34000, conversions: 890 },
+      { name: 'Tech Launch', reach: 780000, engagement: 56000, conversions: 1200 },
+      { name: 'Food Festival', reach: 320000, engagement: 28000, conversions: 650 },
     ],
-    recentDeals: [
-      { brand: "Fashion Nova", amount: 5000, status: "Completed", platform: "Instagram" },
-      { brand: "Nike", amount: 8500, status: "In Progress", platform: "TikTok" },
-      { brand: "Samsung", amount: 3200, status: "Completed", platform: "YouTube" },
-    ]
-  });
+    topPerformers: [
+      { name: 'Alex Chen', platform: 'Instagram', engagement: 8.5 },
+      { name: 'Sophia Style', platform: 'TikTok', engagement: 7.2 },
+      { name: 'Mike Tech', platform: 'YouTube', engagement: 6.8 },
+    ],
+    platformBreakdown: [
+      { platform: 'Instagram', percentage: 45, color: '#E1306C' },
+      { platform: 'TikTok', percentage: 30, color: '#000000' },
+      { platform: 'YouTube', percentage: 20, color: '#FF0000' },
+      { platform: 'Twitter', percentage: 5, color: '#1DA1F2' },
+    ],
+  };
 
-  useEffect(() => {
-    if (DEMO_MODE) {
-      demoLog('Loading analytics dashboard with impressive demo data');
-      
-      // Start performance measurement
-      const flowTimer = DemoPerformance.measureDemoFlow('analytics-dashboard');
-      flowTimer.start();
-      
-      // Initialize demo optimizations
-      DemoPerformance.initializeDemo();
-      
-      // Simulate fast loading for demo
-      setTimeout(() => {
-        setIsLoading(false);
-        
-        // Defer chart rendering for smooth experience
-        DemoPerformance.optimizeAnalyticsDashboard().then(() => {
-          setChartsReady(true);
-          flowTimer.end();
-        });
-      }, 800); // Fast load for demo
-    }
-  }, []);
-
-  const MetricCard = ({ title, value, subtitle, trend }: any) => (
-    <View style={[styles.metricCard, isWide && styles.metricCardWide]}>
-      <Text style={styles.metricTitle}>{title}</Text>
-      <Text style={styles.metricValue}>{value}</Text>
-      {subtitle && <Text style={styles.metricSubtitle}>{subtitle}</Text>}
-      {trend && (
-        <View style={styles.trendContainer}>
-          <Text style={[styles.trendText, trend > 0 ? styles.trendPositive : styles.trendNegative]}>
-            {trend > 0 ? '↗️' : '↘️'} {Math.abs(trend)}%
-          </Text>
-        </View>
-      )}
-    </View>
-  );
-
-  const PlatformBar = ({ platform, percentage }: any) => (
-    <View style={styles.platformRow}>
-      <Text style={styles.platformName}>{platform}</Text>
-      <View style={styles.progressBar}>
-        <View style={[styles.progressFill, { width: `${percentage}%` }]} />
-      </View>
-      <Text style={styles.platformPercentage}>{percentage}%</Text>
-    </View>
-  );
+  const formatNumber = (num: number) => {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  };
 
   return (
-    <>
-      <Navbar pageTitle="Analytics Dashboard" />
-      <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-          <View style={[styles.content, isWide && styles.wideContent]}>
-            
-            {/* Header */}
-            <View style={styles.header}>
-              <Text style={styles.pageTitle}>Analytics Dashboard</Text>
-              <Text style={styles.pageSubtitle}>Track your business performance and earnings</Text>
-            </View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <UniversalBackButton fallbackRoute="/" />
+        <Text style={styles.headerTitle}>Analytics</Text>
+        <TouchableOpacity style={styles.exportButton}>
+          <Ionicons name="download-outline" size={24} color="#430B92" />
+        </TouchableOpacity>
+      </View>
 
-            {/* Key Metrics Row */}
-            <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
-              <MetricCard
-                title="Total Earnings"
-                value={`$${analyticsData.totalEarnings.toLocaleString()}`}
-                subtitle="All time"
-                trend={24}
-              />
-              <MetricCard
-                title="This Month"
-                value={`$${analyticsData.thisMonth.toLocaleString()}`}
-                subtitle="June 2024"
-                trend={18}
-              />
-              <MetricCard
-                title="Success Rate"
-                value={`${analyticsData.successRate}%`}
-                subtitle="Deal completion"
-                trend={5}
-              />
-            </View>
-
-            {/* Secondary Metrics */}
-            <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
-              <MetricCard
-                title="Total Deals"
-                value={analyticsData.totalDeals}
-                subtitle="Completed campaigns"
-              />
-              <MetricCard
-                title="Active Deals"
-                value={analyticsData.activeDeals}
-                subtitle="In progress"
-              />
-              <MetricCard
-                title="Avg Deal Value"
-                value={`$${analyticsData.avgDealValue}`}
-                subtitle="Per campaign"
-              />
-            </View>
-
-            {/* Monthly Growth Chart */}
-            <View style={styles.chartSection}>
-              <Text style={styles.sectionTitle}>Monthly Earnings Growth</Text>
-              <View style={[styles.chartContainer, LayoutStability.createStableContainer(200)]}>
-                {isLoading ? (
-                  // Loading placeholder
-                  <View style={styles.chartLoadingContainer}>
-                    <View style={styles.loadingShimmer} />
-                    <Text style={styles.loadingText}>Loading growth data...</Text>
-                  </View>
-                ) : chartsReady ? (
-                  analyticsData.monthlyGrowth.map((month, index) => {
-                    const maxEarnings = Math.max(...analyticsData.monthlyGrowth.map(m => m.earnings));
-                    const height = (month.earnings / maxEarnings) * 120;
-                    
-                    return (
-                      <View key={month.month} style={styles.chartBar}>
-                        <View style={[styles.bar, { height }]} />
-                        <Text style={styles.barLabel}>{month.month}</Text>
-                        <Text style={styles.barValue}>${(month.earnings / 1000).toFixed(1)}K</Text>
-                      </View>
-                    );
-                  })
-                ) : (
-                  // Chart skeleton while preparing
-                  <View style={styles.chartSkeletonContainer}>
-                    {Array.from({ length: 6 }).map((_, index) => (
-                      <View key={index} style={styles.chartBarSkeleton}>
-                        <View style={styles.barSkeleton} />
-                        <View style={styles.barLabelSkeleton} />
-                      </View>
-                    ))}
-                  </View>
-                )}
-              </View>
-            </View>
-
-            {/* Platform Performance */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Platform Performance</Text>
-              <View style={styles.platformBreakdown}>
-                <PlatformBar platform="Instagram" percentage={analyticsData.platformBreakdown.instagram} />
-                <PlatformBar platform="TikTok" percentage={analyticsData.platformBreakdown.tiktok} />
-                <PlatformBar platform="YouTube" percentage={analyticsData.platformBreakdown.youtube} />
-              </View>
-            </View>
-
-            {/* Recent Deals */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Recent Deals</Text>
-              <View style={styles.dealsContainer}>
-                {analyticsData.recentDeals.map((deal, index) => (
-                  <View key={index} style={styles.dealCard}>
-                    <View style={styles.dealInfo}>
-                      <Text style={styles.dealBrand}>{deal.brand}</Text>
-                      <Text style={styles.dealPlatform}>{deal.platform}</Text>
-                    </View>
-                    <View style={styles.dealAmount}>
-                      <Text style={styles.dealPrice}>${deal.amount.toLocaleString()}</Text>
-                      <View style={[
-                        styles.dealStatus,
-                        deal.status === 'Completed' ? styles.statusCompleted : styles.statusProgress
-                      ]}>
-                        <Text style={[
-                          styles.statusText,
-                          deal.status === 'Completed' ? styles.statusTextCompleted : styles.statusTextProgress
-                        ]}>
-                          {deal.status}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                ))}
-              </View>
-            </View>
-
-            {/* Footer Highlight */}
-            <View style={styles.highlightSection}>
-              <Text style={styles.highlightTitle}>🚀 Growing Fast!</Text>
-              <Text style={styles.highlightText}>
-                You're in the top 5% of creators on Axees with a 89% success rate and $45.6K total earnings!
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Period Selector */}
+        <View style={styles.periodSelector}>
+          {(['7d', '30d', '90d'] as const).map((period) => (
+            <TouchableOpacity
+              key={period}
+              style={[styles.periodButton, selectedPeriod === period && styles.periodButtonActive]}
+              onPress={() => setSelectedPeriod(period)}
+            >
+              <Text style={[styles.periodText, selectedPeriod === period && styles.periodTextActive]}>
+                {period === '7d' ? 'Last 7 days' : period === '30d' ? 'Last 30 days' : 'Last 90 days'}
               </Text>
-            </View>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* Overview Cards */}
+        <View style={styles.overviewGrid}>
+          <View style={styles.overviewCard}>
+            <LinearGradient
+              colors={['#3B82F6', '#2563EB']}
+              style={styles.overviewGradient}
+            >
+              <Ionicons name="eye-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.overviewValue}>{formatNumber(analyticsData.overview.totalReach)}</Text>
+              <Text style={styles.overviewLabel}>Total Reach</Text>
+            </LinearGradient>
           </View>
-        </ScrollView>
-      </SafeAreaView>
-    </>
+
+          <View style={styles.overviewCard}>
+            <LinearGradient
+              colors={['#10B981', '#059669']}
+              style={styles.overviewGradient}
+            >
+              <Ionicons name="heart-outline" size={24} color="#FFFFFF" />
+              <Text style={styles.overviewValue}>{formatNumber(analyticsData.overview.totalEngagement)}</Text>
+              <Text style={styles.overviewLabel}>Engagement</Text>
+            </LinearGradient>
+          </View>
+
+          <View style={styles.overviewCard}>
+            <LinearGradient
+              colors={['#F59E0B', '#D97706']}
+              style={styles.overviewGradient}
+            >
+              <MaterialCommunityIcons name="target" size={24} color="#FFFFFF" />
+              <Text style={styles.overviewValue}>{formatNumber(analyticsData.overview.totalConversions)}</Text>
+              <Text style={styles.overviewLabel}>Conversions</Text>
+            </LinearGradient>
+          </View>
+
+          <View style={styles.overviewCard}>
+            <LinearGradient
+              colors={['#8B5CF6', '#7C3AED']}
+              style={styles.overviewGradient}
+            >
+              <MaterialCommunityIcons name="trending-up" size={24} color="#FFFFFF" />
+              <Text style={styles.overviewValue}>{analyticsData.overview.roi}%</Text>
+              <Text style={styles.overviewLabel}>ROI</Text>
+            </LinearGradient>
+          </View>
+        </View>
+
+        {/* Platform Breakdown */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Platform Performance</Text>
+          <View style={styles.platformBreakdown}>
+            {analyticsData.platformBreakdown.map((platform) => (
+              <View key={platform.platform} style={styles.platformRow}>
+                <View style={styles.platformInfo}>
+                  <Text style={styles.platformName}>{platform.platform}</Text>
+                  <Text style={styles.platformPercentage}>{platform.percentage}%</Text>
+                </View>
+                <View style={styles.platformBarContainer}>
+                  <View
+                    style={[
+                      styles.platformBar,
+                      {
+                        width: `${platform.percentage}%`,
+                        backgroundColor: platform.color,
+                      },
+                    ]}
+                  />
+                </View>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        {/* Campaign Performance */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Campaign Performance</Text>
+          {analyticsData.campaigns.map((campaign, index) => (
+            <View key={index} style={styles.campaignCard}>
+              <Text style={styles.campaignName}>{campaign.name}</Text>
+              <View style={styles.campaignStats}>
+                <View style={styles.campaignStat}>
+                  <Text style={styles.campaignStatValue}>{formatNumber(campaign.reach)}</Text>
+                  <Text style={styles.campaignStatLabel}>Reach</Text>
+                </View>
+                <View style={styles.campaignStat}>
+                  <Text style={styles.campaignStatValue}>{formatNumber(campaign.engagement)}</Text>
+                  <Text style={styles.campaignStatLabel}>Engagement</Text>
+                </View>
+                <View style={styles.campaignStat}>
+                  <Text style={styles.campaignStatValue}>{campaign.conversions}</Text>
+                  <Text style={styles.campaignStatLabel}>Conversions</Text>
+                </View>
+              </View>
+            </View>
+          ))}
+        </View>
+
+        {/* Top Performers */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Top Performing Creators</Text>
+          {analyticsData.topPerformers.map((performer, index) => (
+            <View key={index} style={styles.performerCard}>
+              <View style={styles.performerInfo}>
+                <Text style={styles.performerName}>{performer.name}</Text>
+                <Text style={styles.performerPlatform}>{performer.platform}</Text>
+              </View>
+              <View style={styles.performerEngagement}>
+                <Text style={styles.engagementValue}>{performer.engagement}%</Text>
+                <Text style={styles.engagementLabel}>Engagement</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    padding: 20,
-  },
-  wideContent: {
-    marginHorizontal: "10%",
+    backgroundColor: '#FFFFFF',
   },
   header: {
-    marginBottom: 30,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
   },
-  pageTitle: {
-    fontSize: 28,
-    fontWeight: "700",
-    color: "#000000",
-    marginBottom: 8,
-  },
-  pageSubtitle: {
-    fontSize: 16,
-    color: "#6C6C6C",
-  },
-  metricsRow: {
-    flexDirection: "row",
-    gap: 16,
-    marginBottom: 20,
-  },
-  metricsColumn: {
-    flexDirection: "column",
-  },
-  metricCard: {
+  headerTitle: {
     flex: 1,
-    backgroundColor: "#F8F9FD",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#E2D0FB",
-    minHeight: 100,
-  },
-  metricCardWide: {
-    minHeight: 120,
-  },
-  metricTitle: {
-    fontSize: 14,
-    color: "#6C6C6C",
-    marginBottom: 8,
-  },
-  metricValue: {
-    fontSize: Platform.OS === "web" ? 24 : 20,
-    fontWeight: "700",
-    color: "#430B92",
-    marginBottom: 4,
-  },
-  metricSubtitle: {
-    fontSize: 12,
-    color: "#6C6C6C",
-  },
-  trendContainer: {
-    marginTop: 8,
-  },
-  trendText: {
-    fontSize: 12,
-    fontWeight: "600",
-  },
-  trendPositive: {
-    color: "#22C55E",
-  },
-  trendNegative: {
-    color: "#EF4444",
-  },
-  chartSection: {
-    marginVertical: 30,
-  },
-  sectionTitle: {
     fontSize: 20,
-    fontWeight: "600",
-    color: "#000000",
-    marginBottom: 20,
+    fontWeight: '600',
+    color: '#111827',
+    marginLeft: 16,
+    fontFamily: DesignSystem.Typography.h2.fontFamily,
   },
-  chartContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    backgroundColor: "#F8F9FD",
-    borderRadius: 16,
-    padding: Platform.OS === "web" ? 20 : 16,
-    height: Platform.OS === "web" ? 200 : 180,
-    overflow: "hidden",
+  exportButton: {
+    padding: 8,
   },
-  chartBar: {
-    alignItems: "center",
+  content: {
     flex: 1,
   },
-  bar: {
-    backgroundColor: "#430B92",
-    width: Platform.OS === "web" ? 30 : 24,
-    borderRadius: 4,
-    marginBottom: 8,
-    minHeight: 20,
+  periodSelector: {
+    flexDirection: 'row',
+    padding: 16,
+    gap: 8,
   },
-  barLabel: {
-    fontSize: 12,
-    color: "#6C6C6C",
+  periodButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+    alignItems: 'center',
+  },
+  periodButtonActive: {
+    backgroundColor: '#430B92',
+  },
+  periodText: {
+    fontSize: 14,
+    color: '#6B7280',
+    fontFamily: DesignSystem.Typography.caption.fontFamily,
+  },
+  periodTextActive: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  overviewGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    paddingHorizontal: 16,
+    gap: 12,
+  },
+  overviewCard: {
+    width: (screenWidth - 44) / 2,
+  },
+  overviewGradient: {
+    padding: 20,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+  overviewValue: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginTop: 12,
     marginBottom: 4,
+    fontFamily: DesignSystem.Typography.h1.fontFamily,
   },
-  barValue: {
-    fontSize: 11,
-    color: "#430B92",
-    fontWeight: "600",
+  overviewLabel: {
+    fontSize: 14,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   section: {
-    marginBottom: 30,
+    padding: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 16,
+    fontFamily: DesignSystem.Typography.h3.fontFamily,
   },
   platformBreakdown: {
-    backgroundColor: "#F8F9FD",
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: '#F9FAFB',
+    padding: 16,
+    borderRadius: 12,
   },
   platformRow: {
-    flexDirection: "row",
-    alignItems: "center",
     marginBottom: 16,
+  },
+  platformInfo: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
   platformName: {
     fontSize: 14,
-    color: "#000000",
-    fontWeight: "500",
-    width: 80,
-  },
-  progressBar: {
-    flex: 1,
-    height: 8,
-    backgroundColor: "#E2D0FB",
-    borderRadius: 4,
-    marginHorizontal: 12,
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#430B92",
-    borderRadius: 4,
+    color: '#374151',
+    fontFamily: DesignSystem.Typography.body.fontFamily,
   },
   platformPercentage: {
     fontSize: 14,
-    color: "#430B92",
-    fontWeight: "600",
-    width: 40,
-    textAlign: "right",
+    fontWeight: '600',
+    color: '#111827',
+    fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
-  dealsContainer: {
-    gap: 12,
-  },
-  dealCard: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    backgroundColor: "#F8F9FD",
-    borderRadius: 12,
-    padding: 16,
-  },
-  dealInfo: {
-    flex: 1,
-  },
-  dealBrand: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000000",
-    marginBottom: 4,
-  },
-  dealPlatform: {
-    fontSize: 12,
-    color: "#6C6C6C",
-  },
-  dealAmount: {
-    alignItems: "flex-end",
-  },
-  dealPrice: {
-    fontSize: 16,
-    fontWeight: "700",
-    color: "#430B92",
-    marginBottom: 4,
-  },
-  dealStatus: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  statusCompleted: {
-    backgroundColor: "#DCFCE7",
-  },
-  statusProgress: {
-    backgroundColor: "#FEF3C7",
-  },
-  statusText: {
-    fontSize: 10,
-    fontWeight: "600",
-  },
-  statusTextCompleted: {
-    color: "#15803D",
-  },
-  statusTextProgress: {
-    color: "#B45309",
-  },
-  highlightSection: {
-    backgroundColor: "#430B92",
-    borderRadius: 16,
-    padding: 24,
-    marginTop: 20,
-    alignItems: "center",
-  },
-  highlightTitle: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#FFFFFF",
-    marginBottom: 8,
-  },
-  highlightText: {
-    fontSize: 14,
-    color: "#FFFFFF",
-    textAlign: "center",
-    lineHeight: 20,
-  },
-  // Loading and skeleton styles
-  chartLoadingContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 40,
-  },
-  loadingShimmer: {
-    width: "80%",
-    height: 80,
-    backgroundColor: "#E2D0FB",
-    borderRadius: 8,
-    marginBottom: 16,
-  },
-  loadingText: {
-    fontSize: 14,
-    color: "#6C6C6C",
-    fontStyle: "italic",
-  },
-  chartSkeletonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    flex: 1,
-    paddingHorizontal: 10,
-  },
-  chartBarSkeleton: {
-    alignItems: "center",
-    flex: 1,
-  },
-  barSkeleton: {
-    backgroundColor: "#E2D0FB",
-    width: Platform.OS === "web" ? 30 : 24,
-    height: 60,
+  platformBarContainer: {
+    height: 8,
+    backgroundColor: '#E5E7EB',
     borderRadius: 4,
-    marginBottom: 8,
+    overflow: 'hidden',
   },
-  barLabelSkeleton: {
-    backgroundColor: "#E2D0FB",
-    width: 20,
-    height: 12,
-    borderRadius: 2,
+  platformBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  campaignCard: {
+    backgroundColor: '#F9FAFB',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  campaignName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    marginBottom: 12,
+    fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
+  },
+  campaignStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  campaignStat: {
+    alignItems: 'center',
+  },
+  campaignStatValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#374151',
+    fontFamily: DesignSystem.Typography.h3.fontFamily,
+  },
+  campaignStatLabel: {
+    fontSize: 12,
+    color: '#6B7280',
     marginTop: 4,
+    fontFamily: DesignSystem.Typography.small.fontFamily,
+  },
+  performerCard: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  performerInfo: {
+    flex: 1,
+  },
+  performerName: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+    fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
+  },
+  performerPlatform: {
+    fontSize: 14,
+    color: '#6B7280',
+    marginTop: 2,
+    fontFamily: DesignSystem.Typography.caption.fontFamily,
+  },
+  performerEngagement: {
+    alignItems: 'center',
+  },
+  engagementValue: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#10B981',
+    fontFamily: DesignSystem.Typography.h3.fontFamily,
+  },
+  engagementLabel: {
+    fontSize: 12,
+    color: '#6B7280',
+    fontFamily: DesignSystem.Typography.small.fontFamily,
   },
 });
+
+export default AnalyticsPage;

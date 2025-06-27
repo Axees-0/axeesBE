@@ -12,6 +12,7 @@ import {
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -37,12 +38,7 @@ const RegisterPreviewScreen: React.FC = () => {
       
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <ArrowLeft width={24} height={24} />
-        </TouchableOpacity>
+        <UniversalBackButton fallbackRoute="/" />
         
         <Text style={styles.headerTitle}>Join Axees</Text>
         <View style={styles.headerSpacer} />

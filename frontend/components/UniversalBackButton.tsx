@@ -3,6 +3,53 @@ import { TouchableOpacity, StyleSheet, Platform, ViewStyle } from 'react-native'
 import { useRouter, usePathname } from 'expo-router';
 import ArrowLeft from '@/assets/arrowleft021.svg';
 
+// Navigation hierarchy mapping - defines where each route should go back to
+const NAVIGATION_HIERARCHY: Record<string, string> = {
+  // Main dashboard routes go back to dashboard
+  '/analytics': '/',
+  '/campaigns': '/',
+  '/discover': '/',
+  '/payments': '/',
+  '/creative': '/',
+  '/network': '/',
+  
+  // Sub-routes go back to their parent
+  '/campaigns/create': '/campaigns',
+  '/payments/index': '/',
+  '/payments/marketer': '/payments',
+  '/payments/creator': '/payments',
+  '/earnings/index': '/',
+  '/earnings/withdraw': '/earnings',
+  
+  // Offer flow - updated to match actual usage
+  '/offers/details': '/offers',
+  '/offers/custom': '/offers', 
+  '/offers/premade': '/offers',
+  '/offers/preview': '/offers',
+  '/offers/review': '/offers',
+  '/offers/counter': '/offers/review',
+  '/offers/handle-counter': '/deals',
+  
+  // Deal flow
+  '/deals/submit': '/deals',
+  '/deals/proof': '/deals',
+  '/milestones/setup': '/deals',
+  
+  // Authentication flow - updated to match actual usage
+  '/register': '/',
+  '/register-phone': '/register',
+  '/register-otp': '/register-phone', 
+  '/register-details': '/register-otp',
+  '/forgot-password': '/login',
+  '/reset-password-otp': '/forgot-password',
+  '/reset-password': '/login',
+  
+  // Other flows
+  '/notifications/center': '/',
+  '/payment/instant': '/',
+  '/qr/scan': '/',
+};
+
 interface UniversalBackButtonProps {
   style?: ViewStyle;
   iconSize?: number;
@@ -19,6 +66,30 @@ export const UniversalBackButton: React.FC<UniversalBackButtonProps> = ({
   const router = useRouter();
   const pathname = usePathname();
 
+  const getBackRoute = () => {
+    // Check if we have a specific route mapping
+    if (NAVIGATION_HIERARCHY[pathname]) {
+      return NAVIGATION_HIERARCHY[pathname];
+    }
+    
+    // Handle dynamic routes (like /deals/[id], /chat/[id], /profile/[id])
+    if (pathname.includes('/deals/') && pathname !== '/deals/submit' && pathname !== '/deals/proof') {
+      return '/deals';
+    }
+    if (pathname.includes('/chat/')) {
+      return '/'; // Go to dashboard from chat
+    }
+    if (pathname.includes('/profile/')) {
+      return '/discover'; // Go back to discover from profile
+    }
+    if (pathname.includes('/channel/')) {
+      return '/discover'; // Go back to discover from channel
+    }
+    
+    // Default fallback
+    return fallbackRoute;
+  };
+
   const handleBackPress = () => {
     // Prevent multiple rapid clicks with a much shorter timeout
     if ((window as any).__navigating) {
@@ -34,42 +105,44 @@ export const UniversalBackButton: React.FC<UniversalBackButtonProps> = ({
       return;
     }
 
-    // Determine best navigation method based on route
-    const isModalRoute = pathname.includes('counter') || pathname.includes('verification');
-    const isChatRoute = pathname.includes('/chat/');
+    const targetRoute = getBackRoute();
     
-    // For web platform
-    if (Platform.OS === 'web') {
-      // For chat routes, always go back to messages
-      if (isChatRoute) {
-        router.push(fallbackRoute);
-        return;
-      }
-      
-      // For modal-like routes, use router.back()
-      if (isModalRoute || router.canGoBack()) {
-        router.back();
-      } else if (window.history.length > 1) {
-        window.history.back();
-      } else {
-        router.push(fallbackRoute);
-      }
+    // For critical navigation paths, always use direct routing to avoid glitches
+    const shouldUseDirectRouting = 
+      pathname.includes('/analytics') ||
+      pathname.includes('/campaigns') ||
+      pathname.includes('/discover') ||
+      pathname.includes('/payments') ||
+      pathname.includes('/creative') ||
+      pathname.includes('/network') ||
+      pathname.includes('/chat/') ||
+      pathname.includes('/offers/') ||
+      pathname.includes('/deals/');
+    
+    if (shouldUseDirectRouting) {
+      router.push(targetRoute);
       return;
     }
-
-    // For native platforms
-    try {
-      // For chat routes, always go back to messages
-      if (isChatRoute) {
-        router.push(fallbackRoute);
-      } else if (router.canGoBack()) {
+    
+    // For other routes, try router.back() first, then fallback to direct routing
+    if (Platform.OS === 'web') {
+      if (router.canGoBack() && window.history.length > 1) {
         router.back();
       } else {
-        router.push(fallbackRoute);
+        router.push(targetRoute);
       }
-    } catch (error) {
-      console.warn('Navigation error:', error);
-      router.push(fallbackRoute);
+    } else {
+      // Native platforms
+      try {
+        if (router.canGoBack()) {
+          router.back();
+        } else {
+          router.push(targetRoute);
+        }
+      } catch (error) {
+        // Fallback to direct navigation if error occurs
+        router.push(targetRoute);
+      }
     }
   };
 

@@ -15,6 +15,7 @@ import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
 import { useAuth } from '@/contexts/AuthContext';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -247,12 +248,16 @@ const RegisterDetailsScreen: React.FC = () => {
       
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => step > 1 ? setStep(step - 1) : router.back()}
-        >
-          <ArrowLeft width={24} height={24} />
-        </TouchableOpacity>
+        {step > 1 ? (
+          <TouchableOpacity 
+            style={styles.backButton}
+            onPress={() => setStep(step - 1)}
+          >
+            <ArrowLeft width={24} height={24} />
+          </TouchableOpacity>
+        ) : (
+          <UniversalBackButton fallbackRoute="/register-otp" />
+        )}
         
         <Text style={styles.headerTitle}>Create Account</Text>
         <View style={styles.headerSpacer} />
