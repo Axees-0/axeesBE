@@ -68,12 +68,9 @@ export const AvatarWithFallback: React.FC<AvatarWithFallbackProps> = ({
           },
           style,
         ]}
-<<<<<<< HEAD
-=======
         accessible={true}
         accessibilityRole="image"
         accessibilityLabel={accessibilityLabel || `${name}'s profile picture`}
->>>>>>> galaxies-features-implementation
       >
         <Text 
           style={[
@@ -88,16 +85,12 @@ export const AvatarWithFallback: React.FC<AvatarWithFallbackProps> = ({
   }
 
   return (
-<<<<<<< HEAD
-    <View style={[{ width: size, height: size }, style]}>
-=======
     <View 
       style={[{ width: size, height: size }, style]}
       accessible={true}
       accessibilityRole="image"
       accessibilityLabel={accessibilityLabel || `${name}'s profile picture`}
     >
->>>>>>> galaxies-features-implementation
       {loading && (
         <View style={[styles.loadingContainer, { borderRadius: size / 2 }]}>
           <ActivityIndicator size="small" color={Color.cSK430B92500} />
@@ -123,11 +116,8 @@ export const AvatarWithFallback: React.FC<AvatarWithFallbackProps> = ({
           setLoading(false);
           setError(true);
         }}
-<<<<<<< HEAD
-=======
         alt={accessibilityLabel || `${name}'s profile picture`}
         accessibilityLabel={accessibilityLabel || `${name}'s profile picture`}
->>>>>>> galaxies-features-implementation
       />
     </View>
   );
@@ -160,10 +150,7 @@ export const AvatarGroup: React.FC<{
             name={avatar.name}
             size={size}
             style={styles.avatarGroupBorder}
-<<<<<<< HEAD
-=======
             accessibilityLabel={`${avatar.name}'s profile picture`}
->>>>>>> galaxies-features-implementation
           />
         </View>
       ))}
@@ -181,12 +168,9 @@ export const AvatarGroup: React.FC<{
               zIndex: 0,
             },
           ]}
-<<<<<<< HEAD
-=======
           accessible={true}
           accessibilityRole="text"
           accessibilityLabel={`${remaining} more member${remaining > 1 ? 's' : ''}`}
->>>>>>> galaxies-features-implementation
         >
           <Text style={styles.remainingText}>+{remaining}</Text>
         </View>
