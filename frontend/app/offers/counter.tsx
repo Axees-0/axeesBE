@@ -13,6 +13,7 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { notificationService } from '@/services/notificationService';
@@ -545,7 +546,7 @@ const CounterOfferPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -553,7 +554,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   backButton: {
     padding: 8,
@@ -582,9 +583,9 @@ const styles = StyleSheet.create({
   },
   originalOfferSection: {
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   sectionTitle: {
     fontSize: 18,
@@ -593,11 +594,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   originalOfferCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: BrandColors.neutral[200],
   },
   offerRow: {
     flexDirection: 'row',
@@ -606,12 +607,12 @@ const styles = StyleSheet.create({
   },
   offerLabel: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     fontWeight: '500',
   },
   offerValue: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[800],
     fontWeight: '600',
   },
   counterOfferSection: {
@@ -628,14 +629,14 @@ const styles = StyleSheet.create({
   },
   inputHint: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 8,
   },
   amountInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     paddingHorizontal: 12,
   },
@@ -655,7 +656,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     paddingHorizontal: 12,
   },
@@ -668,7 +669,7 @@ const styles = StyleSheet.create({
   },
   daysLabel: {
     fontSize: 16,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   changeIndicator: {
     fontSize: 12,
@@ -676,10 +677,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   increaseText: {
-    color: '#059669',
+    color: BrandColors.semantic.successDark,
   },
   decreaseText: {
-    color: '#DC2626',
+    color: BrandColors.semantic.errorDark,
   },
   deliverableRow: {
     flexDirection: 'row',
@@ -689,7 +690,7 @@ const styles = StyleSheet.create({
   deliverableInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
@@ -700,14 +701,14 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#EF4444',
+    backgroundColor: BrandColors.semantic.error,
     alignItems: 'center',
     justifyContent: 'center',
     marginLeft: 8,
     marginTop: 6,
   },
   removeButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 18,
     fontWeight: 'bold',
   },
@@ -727,7 +728,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
@@ -739,16 +740,16 @@ const styles = StyleSheet.create({
   },
   guidelinesSection: {
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
   },
   guidelinesCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 12,
     padding: 16,
   },
   guidelineItem: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     lineHeight: 20,
     marginBottom: 8,
   },
@@ -756,7 +757,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: BrandColors.neutral[100],
     gap: 12,
   },
   draftActionButton: {
@@ -780,23 +781,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: BrandColors.neutral[400],
   },
   submitButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },
   disabledButtonText: {
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   inputError: {
-    borderColor: '#dc2626',
+    borderColor: BrandColors.semantic.errorDark,
     borderWidth: 2,
   },
   errorText: {
     fontSize: 12,
-    color: '#dc2626',
+    color: BrandColors.semantic.errorDark,
     marginTop: 8,
     lineHeight: 16,
     fontWeight: '500',

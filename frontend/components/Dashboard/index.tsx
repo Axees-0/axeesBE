@@ -26,6 +26,7 @@ import {
   Octicons
 } from '@expo/vector-icons';
 import DesignSystem from '@/styles/DesignSystem';
+import { BrandColors } from '@/constants/Colors';
 
 const Dashboard = () => {
   const { width: screenWidth } = useWindowDimensions();
@@ -51,49 +52,49 @@ const Dashboard = () => {
       id: 'discover',
       title: 'Discover Creators',
       subtitle: 'Find perfect matches for your brand',
-      icon: <Feather name="search" size={24} color="#430B92" />,
+      icon: <Feather name="search" size={24} color={BrandColors.primary[500]} />,
       route: '/discover',
-      color: '#430B92'
+      color: BrandColors.primary[500]
     },
     {
       id: 'campaigns',
       title: 'My Campaigns',
       subtitle: 'Manage active collaborations',
-      icon: <MaterialCommunityIcons name="rocket-launch" size={24} color="#10B981" />,
+      icon: <MaterialCommunityIcons name="rocket-launch" size={24} color={BrandColors.semantic.success} />,
       route: '/campaigns',
-      color: '#10B981'
+      color: BrandColors.semantic.success
     },
     {
       id: 'analytics',
       title: 'Analytics',
       subtitle: 'Track performance metrics',
-      icon: <Ionicons name="analytics" size={24} color="#F59E0B" />,
+      icon: <Ionicons name="analytics" size={24} color={BrandColors.semantic.warning} />,
       route: '/analytics',
-      color: '#F59E0B'
+      color: BrandColors.semantic.warning
     },
     {
       id: 'payments',
       title: 'Payments',
       subtitle: 'Manage transactions',
-      icon: <MaterialIcons name="payment" size={24} color="#3B82F6" />,
+      icon: <MaterialIcons name="payment" size={24} color={BrandColors.semantic.info} />,
       route: '/payments',
-      color: '#3B82F6'
+      color: BrandColors.semantic.info
     },
     {
       id: 'creative',
       title: 'Creative Tools',
       subtitle: 'Content creation resources',
-      icon: <MaterialCommunityIcons name="palette" size={24} color="#8B5CF6" />,
+      icon: <MaterialCommunityIcons name="palette" size={24} color={BrandColors.primary[400]} />,
       route: '/creative',
-      color: '#8B5CF6'
+      color: BrandColors.primary[400]
     },
     {
       id: 'network',
       title: 'My Network',
       subtitle: 'Saved creators & contacts',
-      icon: <MaterialCommunityIcons name="account-group" size={24} color="#EC4899" />,
+      icon: <MaterialCommunityIcons name="account-group" size={24} color={BrandColors.primary[300]} />,
       route: '/network',
-      color: '#EC4899'
+      color: BrandColors.primary[300]
     }
   ];
 
@@ -105,7 +106,7 @@ const Dashboard = () => {
       title: 'Summer Fashion Campaign',
       subtitle: '12 creators responded',
       time: '2 hours ago',
-      icon: <MaterialCommunityIcons name="tshirt-crew" size={20} color="#10B981" />
+      icon: <MaterialCommunityIcons name="tshirt-crew" size={20} color={BrandColors.semantic.success} />
     },
     {
       id: '2',
@@ -113,7 +114,7 @@ const Dashboard = () => {
       title: 'Payment sent to @alexcreates',
       subtitle: '$2,500 for Tech Review',
       time: '5 hours ago',
-      icon: <MaterialIcons name="attach-money" size={20} color="#3B82F6" />
+      icon: <MaterialIcons name="attach-money" size={20} color={BrandColors.semantic.info} />
     },
     {
       id: '3',
@@ -121,7 +122,7 @@ const Dashboard = () => {
       title: 'New message from @sophiastyle',
       subtitle: 'Interested in beauty collab',
       time: '1 day ago',
-      icon: <Ionicons name="chatbubble-ellipses" size={20} color="#8B5CF6" />
+      icon: <Ionicons name="chatbubble-ellipses" size={20} color={BrandColors.primary[400]} />
     }
   ];
 
@@ -132,7 +133,7 @@ const Dashboard = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
+      <StatusBar barStyle="dark-content" backgroundColor={BrandColors.neutral[0]} />
       
       <ScrollView 
         style={styles.scrollView}
@@ -152,7 +153,7 @@ const Dashboard = () => {
               <Text style={styles.userRole}>{userData.role}</Text>
             </View>
             <TouchableOpacity style={styles.notificationButton}>
-              <Ionicons name="notifications-outline" size={24} color="#333" />
+              <Ionicons name="notifications-outline" size={24} color={BrandColors.neutral[800]} />
               <View style={styles.notificationBadge}>
                 <Text style={styles.notificationBadgeText}>3</Text>
               </View>
@@ -166,26 +167,26 @@ const Dashboard = () => {
             style={styles.statsContainer}
             contentContainerStyle={styles.statsContent}
           >
-            <View style={[styles.statCard, { backgroundColor: '#F3F4F6' }]}>
-              <MaterialCommunityIcons name="briefcase-outline" size={20} color="#6B7280" />
+            <View style={[styles.statCard, { backgroundColor: BrandColors.neutral[100] }]}>
+              <MaterialCommunityIcons name="briefcase-outline" size={20} color={BrandColors.neutral[500]} />
               <Text style={styles.statValue}>{userData.stats.totalCampaigns}</Text>
               <Text style={styles.statLabel}>Campaigns</Text>
             </View>
             
-            <View style={[styles.statCard, { backgroundColor: '#EDE9FE' }]}>
-              <MaterialCommunityIcons name="account-group-outline" size={20} color="#8B5CF6" />
+            <View style={[styles.statCard, { backgroundColor: BrandColors.primary[100] }]}>
+              <MaterialCommunityIcons name="account-group-outline" size={20} color={BrandColors.primary[400]} />
               <Text style={styles.statValue}>{userData.stats.activeInfluencers}</Text>
               <Text style={styles.statLabel}>Influencers</Text>
             </View>
             
-            <View style={[styles.statCard, { backgroundColor: '#DBEAFE' }]}>
-              <MaterialIcons name="attach-money" size={20} color="#3B82F6" />
+            <View style={[styles.statCard, { backgroundColor: BrandColors.semantic.infoLight }]}>
+              <MaterialIcons name="attach-money" size={20} color={BrandColors.semantic.info} />
               <Text style={styles.statValue}>{userData.stats.totalSpend}</Text>
               <Text style={styles.statLabel}>Total Spend</Text>
             </View>
             
-            <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-              <Ionicons name="trending-up" size={20} color="#10B981" />
+            <View style={[styles.statCard, { backgroundColor: BrandColors.semantic.successLight }]}>
+              <Ionicons name="trending-up" size={20} color={BrandColors.semantic.success} />
               <Text style={styles.statValue}>{userData.stats.avgEngagement}</Text>
               <Text style={styles.statLabel}>Avg Engagement</Text>
             </View>
@@ -196,17 +197,17 @@ const Dashboard = () => {
         <View style={styles.searchSection}>
           <Text style={styles.sectionTitle}>Quick Search</Text>
           <View style={styles.searchBar}>
-            <Feather name="search" size={20} color="#6B7280" />
+            <Feather name="search" size={20} color={BrandColors.neutral[500]} />
             <TextInput
               style={styles.searchInput}
               placeholder="Search creators, campaigns, or analytics..."
-              placeholderTextColor="#9CA3AF"
+              placeholderTextColor={BrandColors.neutral[400]}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={() => setSearchQuery('')}>
-                <Ionicons name="close-circle" size={20} color="#9CA3AF" />
+                <Ionicons name="close-circle" size={20} color={BrandColors.neutral[400]} />
               </TouchableOpacity>
             )}
           </View>
@@ -249,7 +250,7 @@ const Dashboard = () => {
           
           {recentActivity.map((activity) => (
             <TouchableOpacity key={activity.id} style={styles.activityItem}>
-              <View style={[styles.activityIcon, { backgroundColor: '#F3F4F6' }]}>
+              <View style={[styles.activityIcon, { backgroundColor: BrandColors.neutral[100] }]}>
                 {activity.icon}
               </View>
               <View style={styles.activityContent}>
@@ -268,10 +269,10 @@ const Dashboard = () => {
             onPress={() => router.push('/campaigns/create')}
           >
             <LinearGradient
-              colors={['#430B92', '#6B3AAC']}
+              colors={[BrandColors.primary[500], BrandColors.primary[400]]}
               style={styles.quickActionGradient}
             >
-              <Ionicons name="add-circle-outline" size={24} color="#FFFFFF" />
+              <Ionicons name="add-circle-outline" size={24} color={BrandColors.neutral[0]} />
               <Text style={styles.quickActionText}>New Campaign</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -281,10 +282,10 @@ const Dashboard = () => {
             onPress={() => router.push('/discover')}
           >
             <LinearGradient
-              colors={['#10B981', '#34D399']}
+              colors={[BrandColors.semantic.success, BrandColors.semantic.successDark]}
               style={styles.quickActionGradient}
             >
-              <MaterialCommunityIcons name="account-search" size={24} color="#FFFFFF" />
+              <MaterialCommunityIcons name="account-search" size={24} color={BrandColors.neutral[0]} />
               <Text style={styles.quickActionText}>Find Creators</Text>
             </LinearGradient>
           </TouchableOpacity>
@@ -297,7 +298,7 @@ const Dashboard = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
   },
   scrollView: {
     flex: 1,
@@ -306,7 +307,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   header: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 10,
@@ -328,12 +329,12 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     fontFamily: DesignSystem.Typography.h3.fontFamily,
   },
   userRole: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     marginTop: 2,
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
@@ -345,7 +346,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 6,
     right: 6,
-    backgroundColor: '#EF4444',
+    backgroundColor: BrandColors.semantic.error,
     borderRadius: 8,
     width: 16,
     height: 16,
@@ -353,7 +354,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   notificationBadgeText: {
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     fontSize: 10,
     fontWeight: '600',
   },
@@ -373,13 +374,13 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     marginTop: 8,
     fontFamily: DesignSystem.Typography.h3.fontFamily,
   },
   statLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     marginTop: 4,
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
@@ -390,25 +391,25 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     marginBottom: 12,
     fontFamily: DesignSystem.Typography.h3.fontFamily,
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
   },
   searchInput: {
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
-    color: '#111827',
+    color: BrandColors.neutral[900],
     fontFamily: DesignSystem.Typography.body.fontFamily,
   },
   menuSection: {
@@ -429,7 +430,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
   },
   menuIconContainer: {
     width: 48,
@@ -442,13 +443,13 @@ const styles = StyleSheet.create({
   menuTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     marginBottom: 4,
     fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
   menuSubtitle: {
     fontSize: 13,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   activitySection: {
@@ -463,7 +464,7 @@ const styles = StyleSheet.create({
   },
   viewAllLink: {
     fontSize: 14,
-    color: '#430B92',
+    color: BrandColors.primary[500],
     fontWeight: '500',
     fontFamily: DesignSystem.Typography.captionMedium.fontFamily,
   },
@@ -472,7 +473,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: BrandColors.neutral[100],
   },
   activityIcon: {
     width: 40,
@@ -488,18 +489,18 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     marginBottom: 2,
     fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
   activitySubtitle: {
     fontSize: 13,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   activityTime: {
     fontSize: 12,
-    color: '#9CA3AF',
+    color: BrandColors.neutral[400],
     fontFamily: DesignSystem.Typography.small.fontFamily,
   },
   quickActions: {
@@ -520,7 +521,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   quickActionText: {
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
     fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,

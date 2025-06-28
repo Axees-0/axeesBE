@@ -754,7 +754,7 @@ const styles = StyleSheet.create({
     width: Platform.select({ default: 40, web: 48 }),
     height: Platform.select({ default: 40, web: 48 }),
     borderRadius: Platform.select({ default: 20, web: 24 }),
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: Platform.select({ default: 0, web: 16 }),

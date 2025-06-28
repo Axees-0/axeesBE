@@ -5,27 +5,28 @@
 
 import { Platform } from 'react-native';
 import { Color, Border, Padding, FontSize, FontFamily } from '@/GlobalStyles';
+import { BrandColors, Colors, withOpacity } from '@/constants/Colors';
 
 // WCAG AA Compliant Colors
 export const AccessibleColors = {
   // Updated colors for better contrast ratios
-  textSecondary: '#4A4A4A', // Improved from #8A8A8A for better contrast
-  textMuted: '#6B7280', // WCAG AA compliant grey
-  backgroundSubtle: '#F9FAFB',
-  borderLight: '#E5E7EB',
-  borderMedium: '#D1D5DB',
+  textSecondary: BrandColors.neutral[500], // #6B7280
+  textMuted: BrandColors.neutral[400], // #9CA3AF
+  backgroundSubtle: BrandColors.neutral[50], // #F9FAFB
+  borderLight: BrandColors.neutral[200], // #E5E7EB
+  borderMedium: BrandColors.neutral[300], // #D1D5DB
   
   // Status colors with proper contrast
-  success: '#059669',
-  warning: '#D97706',
-  error: '#DC2626',
-  info: '#2563EB',
+  success: BrandColors.semantic.success, // #10B981
+  warning: BrandColors.semantic.warning, // #F59E0B
+  error: BrandColors.semantic.error, // #EF4444
+  info: BrandColors.semantic.info, // #3B82F6
   
   // Purple variants with proper contrast
-  purplePrimary: Color.cSK430B92500, // #430b92
-  purpleLight: '#8B5CF6',
-  purpleLighter: '#A78BFA',
-  purpleSubtle: '#EDE9FE',
+  purplePrimary: BrandColors.primary[500], // #430B92
+  purpleLight: BrandColors.primary[400], // #7E3FD3
+  purpleLighter: BrandColors.primary[300], // #A979E6
+  purpleSubtle: BrandColors.primary[50], // #F3EBFC
 };
 
 // Standardized Button Styles
@@ -35,7 +36,7 @@ export const ButtonStyles = {
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 12,
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
@@ -85,7 +86,7 @@ export const ButtonStyles = {
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 10,
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
@@ -96,7 +97,7 @@ export const ButtonStyles = {
     paddingHorizontal: 24,
     paddingVertical: 16,
     borderRadius: 14,
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
@@ -119,7 +120,7 @@ export const ButtonTextStyles = {
   },
   
   secondary: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.interSemiBold,
     fontWeight: '600' as const,
@@ -172,7 +173,7 @@ export const PillStyles = {
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 12,
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     flexDirection: 'row' as const,
     alignItems: 'center' as const,
     justifyContent: 'center' as const,
@@ -231,7 +232,7 @@ export const PillTextStyles = {
   },
   
   tag: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontSize: FontSize.size_xs,
     fontFamily: FontFamily.interMedium,
     fontWeight: '500' as const,
@@ -353,7 +354,7 @@ export const StatCardStyles = {
     fontSize: FontSize.size_5xl,
     fontFamily: FontFamily.interBold,
     fontWeight: '700' as const,
-    color: Color.labelsPrimary,
+    color: BrandColors.neutral[900],
     marginBottom: 4,
   },
   
@@ -386,7 +387,7 @@ export const Typography = {
     fontSize: FontSize.size_13xl,
     fontFamily: FontFamily.interBold,
     fontWeight: '700' as const,
-    color: Color.labelsPrimary,
+    color: BrandColors.neutral[900],
     lineHeight: 40,
   },
   
@@ -394,7 +395,7 @@ export const Typography = {
     fontSize: FontSize.size_5xl,
     fontFamily: FontFamily.interBold,
     fontWeight: '700' as const,
-    color: Color.labelsPrimary,
+    color: BrandColors.neutral[900],
     lineHeight: 32,
   },
   
@@ -402,7 +403,7 @@ export const Typography = {
     fontSize: FontSize.size_xl,
     fontFamily: FontFamily.interSemiBold,
     fontWeight: '600' as const,
-    color: Color.labelsPrimary,
+    color: BrandColors.neutral[900],
     lineHeight: 28,
   },
   
@@ -410,7 +411,7 @@ export const Typography = {
     fontSize: FontSize.size_lg,
     fontFamily: FontFamily.interSemiBold,
     fontWeight: '600' as const,
-    color: Color.labelsPrimary,
+    color: BrandColors.neutral[900],
     lineHeight: 24,
   },
   
@@ -418,7 +419,7 @@ export const Typography = {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.interRegular,
     fontWeight: '400' as const,
-    color: Color.labelsPrimary,
+    color: BrandColors.neutral[900],
     lineHeight: 24,
   },
   
@@ -426,7 +427,7 @@ export const Typography = {
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.interMedium,
     fontWeight: '500' as const,
-    color: Color.labelsPrimary,
+    color: BrandColors.neutral[900],
     lineHeight: 24,
   },
   
@@ -555,13 +556,13 @@ export const InputStyles = {
     backgroundColor: '#ffffff',
     fontSize: FontSize.size_base,
     fontFamily: FontFamily.interRegular,
-    color: Color.labelsPrimary,
+    color: BrandColors.neutral[900],
   },
   
   focused: {
-    borderColor: Color.cSK430B92500,
+    borderColor: BrandColors.primary[500],
     borderWidth: 2,
-    shadowColor: Color.cSK430B92500,
+    shadowColor: BrandColors.primary[500],
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.1,
     shadowRadius: 4,

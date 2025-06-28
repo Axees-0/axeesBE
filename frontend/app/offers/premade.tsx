@@ -11,6 +11,7 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
@@ -113,12 +114,12 @@ const PreMadeOffersPage: React.FC = () => {
 
   const getCategoryColor = (category: string) => {
     const colors: Record<string, string> = {
-      'Social Media': '#E91E63',
-      'Video Content': '#9C27B0',
-      'Package Deal': '#FF9800',
-      'Live Content': '#4CAF50',
+      'Social Media': BrandColors.social.instagram,
+      'Video Content': BrandColors.primary[400],
+      'Package Deal': BrandColors.semantic.warning,
+      'Live Content': BrandColors.semantic.success,
     };
-    return colors[category] || '#757575';
+    return colors[category] || BrandColors.neutral[500];
   };
 
   return (
@@ -247,7 +248,7 @@ const PreMadeOffersPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -255,7 +256,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   backButton: {
     padding: 8,
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
   descriptionSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   descriptionTitle: {
     fontSize: 20,
@@ -287,7 +288,7 @@ const styles = StyleSheet.create({
   },
   descriptionText: {
     fontSize: 16,
-    color: '#666',
+    color: BrandColors.neutral[500],
     lineHeight: 24,
   },
   offersGrid: {
@@ -295,11 +296,11 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   offerCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 12,
     padding: 20,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: BrandColors.neutral[200],
     position: 'relative',
   },
   selectedOfferCard: {
@@ -310,13 +311,13 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: 16,
-    backgroundColor: '#FF4444',
+    backgroundColor: BrandColors.semantic.error,
     paddingHorizontal: 12,
     paddingVertical: 4,
     borderRadius: 12,
   },
   popularText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 12,
     fontWeight: '600',
   },
@@ -339,13 +340,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   categoryText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 12,
     fontWeight: '500',
   },
   offerDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -356,14 +357,14 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     paddingBottom: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   priceSection: {
     alignItems: 'flex-start',
   },
   priceLabel: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 2,
   },
   priceValue: {
@@ -376,7 +377,7 @@ const styles = StyleSheet.create({
   },
   deliveryText: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     fontWeight: '500',
   },
   includesSection: {
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
   },
   includeItem: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 4,
   },
   moreItems: {
@@ -406,14 +407,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },
   customOfferSection: {
     margin: 20,
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     alignItems: 'center',
   },
@@ -425,7 +426,7 @@ const styles = StyleSheet.create({
   },
   customOfferDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     textAlign: 'center',
     lineHeight: 20,
     marginBottom: 16,

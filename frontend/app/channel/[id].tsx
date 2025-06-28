@@ -15,11 +15,13 @@ import { Image } from 'expo-image';
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Video, ResizeMode, AVPlaybackStatus } from 'expo-av';
+import { LinearGradient } from 'expo-linear-gradient';
 
 // Components
 import { UniversalBackButton } from '@/components/UniversalBackButton';
 import { WebSEO } from '../web-seo';
 import { Color, FontFamily, FontSize } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import DesignSystem from '@/styles/DesignSystem';
 import { DemoData } from '@/demo/DemoData';
 import { DEMO_MODE } from '@/demo/DemoMode';
@@ -220,7 +222,7 @@ const ChannelPage: React.FC = () => {
               style={styles.headerButton}
               onPress={() => setShowCart(!showCart)}
             >
-              <MaterialIcons name="shopping-cart" size={24} color={Color.cSK430B92500} />
+              <MaterialIcons name="shopping-cart" size={24} color={BrandColors.primary[500]} />
               {cart.length > 0 && (
                 <View style={styles.cartBadge}>
                   <Text style={styles.cartBadgeText}>{cart.length}</Text>
@@ -282,7 +284,7 @@ const ChannelPage: React.FC = () => {
             {showBuyNow && videoContent.products.length > 0 && (
               <View style={styles.buyNowOverlay}>
                 <LinearGradient
-                  colors={['rgba(67, 11, 146, 0.95)', 'rgba(139, 92, 246, 0.95)']}
+                  colors={[`${BrandColors.primary[600]}F2`, `${BrandColors.primary[400]}F2`]}
                   style={styles.buyNowGradient}
                 >
                   <View style={styles.buyNowContent}>
@@ -324,7 +326,7 @@ const ChannelPage: React.FC = () => {
                 <MaterialIcons 
                   name={likedVideos.includes(videoContent.id) ? "thumb-up" : "thumb-up-off-alt"} 
                   size={24} 
-                  color={likedVideos.includes(videoContent.id) ? Color.cSK430B92500 : "#666"} 
+                  color={likedVideos.includes(videoContent.id) ? BrandColors.primary[500] : "#666"} 
                 />
                 <Text style={styles.actionText}>{formatViews(videoContent.likes)}</Text>
               </TouchableOpacity>
@@ -374,7 +376,7 @@ const ChannelPage: React.FC = () => {
                   <View style={styles.sponsoredBrands}>
                     {videoContent.sponsoredBrands.map((brand, index) => (
                       <View key={index} style={styles.brandChip}>
-                        <MaterialIcons name="verified" size={14} color={Color.cSK430B92500} />
+                        <MaterialIcons name="verified" size={14} color={BrandColors.primary[500]} />
                         <Text style={styles.brandName}>{brand}</Text>
                       </View>
                     ))}
@@ -504,7 +506,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -8,
     right: -8,
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -596,7 +598,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
   },
   buyNowButtonText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontWeight: '600',
   },
   videoInfo: {
@@ -663,7 +665,7 @@ const styles = StyleSheet.create({
     color: DesignSystem.AccessibleColors.textMuted,
   },
   subscribeButton: {
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
@@ -735,11 +737,11 @@ const styles = StyleSheet.create({
   },
   productPrice: {
     ...DesignSystem.Typography.h3,
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     marginBottom: 8,
   },
   addToCartButton: {
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     paddingVertical: 8,
     borderRadius: 8,
     alignItems: 'center',
@@ -848,7 +850,7 @@ const styles = StyleSheet.create({
   },
   cartItemPrice: {
     ...DesignSystem.Typography.h3,
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
   },
   cartFooter: {
     padding: 16,
@@ -861,7 +863,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   checkoutButton: {
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',

@@ -1,0 +1,19 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "🔍 Running pre-push build check..."
+
+# Check if package.json was modified
+if git diff --cached --name-only | grep -q "package.json"; then
+  echo "⚠️  package.json modified - next build will be a clean build"
+  echo "This may take 50-60 seconds instead of the usual 8-10 seconds"
+fi
+
+# Warn about large files
+large_files=$(find . -path ./node_modules -prune -o -path ./.git -prune -o -type f -size +10M -print)
+if [ ! -z "$large_files" ]; then
+  echo "⚠️  Warning: Large files detected that may slow builds:"
+  echo "$large_files"
+fi
+
+echo "✅ Pre-push check complete"

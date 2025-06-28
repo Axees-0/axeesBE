@@ -14,6 +14,7 @@ import {
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { useAuth } from '@/contexts/AuthContext';
 import { DEMO_MODE } from '@/demo/DemoMode';
 
@@ -178,7 +179,7 @@ const LoginScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   keyboardView: {
     flex: 1,
@@ -196,25 +197,25 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     borderRadius: 20,
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 24,
   },
   logoText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 24,
     fontWeight: 'bold',
   },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   form: {
     marginBottom: 32,
@@ -225,29 +226,29 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
     marginBottom: 8,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 12,
     fontSize: 16,
-    color: '#333',
+    color: BrandColors.neutral[800],
   },
   forgotButton: {
     alignSelf: 'flex-end',
     marginBottom: 24,
   },
   forgotText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontSize: 14,
     fontWeight: '600',
   },
   loginButton: {
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
@@ -256,12 +257,12 @@ const styles = StyleSheet.create({
     opacity: 0.6,
   },
   loginButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },
   demoInfo: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 8,
     padding: 16,
     marginTop: 24,
@@ -269,7 +270,7 @@ const styles = StyleSheet.create({
   demoTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#333',
+    color: BrandColors.neutral[800],
     marginBottom: 8,
   },
   demoCredential: {
@@ -278,12 +279,12 @@ const styles = StyleSheet.create({
   },
   demoLabel: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[500],
     width: 80,
   },
   demoValue: {
     fontSize: 12,
-    color: '#333',
+    color: BrandColors.neutral[800],
     fontFamily: Platform.OS === 'ios' ? 'Courier' : 'monospace',
   },
   registerContainer: {
@@ -293,11 +294,11 @@ const styles = StyleSheet.create({
   },
   registerText: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   registerLink: {
     fontSize: 14,
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontWeight: '600',
   },
 });

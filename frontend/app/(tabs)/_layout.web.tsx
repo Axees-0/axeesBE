@@ -16,6 +16,7 @@ import { Indicator } from "@/components/Indicator";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useBrowserHistory } from "@/hooks/useBrowserHistory";
 import { BREAKPOINTS } from "@/constants/breakpoints";
+import { BrandColors } from '@/constants/Colors';
 
 // Import tab icons
 import Discoveryiconlypro from "../../assets/discovery--iconly-pro.svg";
@@ -113,7 +114,7 @@ export default function TabLayout() {
       <Tabs
         screenOptions={({ route }) => ({
           tabBarStyle: {
-            backgroundColor: "#430B92",
+            backgroundColor: BrandColors.primary[500],
             borderTopWidth: 0,
             height: Platform.select({
               ios: 65 + insets.bottom,

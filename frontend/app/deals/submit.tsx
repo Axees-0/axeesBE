@@ -16,6 +16,7 @@ import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAlertModal, useConfirmModal } from '@/components/ConfirmModal';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
+import { BrandColors } from '@/constants/Colors';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -288,7 +289,7 @@ const WorkSubmissionPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -296,7 +297,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   backButton: {
     padding: 8,
@@ -305,7 +306,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     textAlign: 'center',
   },
   draftButton: {
@@ -313,10 +314,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: Color.cSK430B92500,
+    borderColor: BrandColors.primary[500],
   },
   draftButtonText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontSize: 14,
     fontWeight: '500',
   },
@@ -326,28 +327,28 @@ const styles = StyleSheet.create({
   milestoneSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 12,
   },
   milestoneCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
   },
   milestoneTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 8,
   },
   milestoneDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -358,21 +359,21 @@ const styles = StyleSheet.create({
   infoItem: {},
   infoLabel: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 4,
   },
   infoValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
   },
   deliverablesSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   deliverablesCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
   },
@@ -381,7 +382,7 @@ const styles = StyleSheet.create({
   },
   deliverableText: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   submissionSection: {
     padding: 20,
@@ -392,17 +393,17 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 4,
   },
   inputHint: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 8,
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -413,9 +414,9 @@ const styles = StyleSheet.create({
     minHeight: 120,
   },
   uploadButton: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     borderStyle: 'dashed',
     paddingVertical: 16,
@@ -423,7 +424,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   uploadButtonText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontSize: 16,
     fontWeight: '500',
   },
@@ -434,42 +435,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: BrandColors.neutral[200],
   },
   fileName: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[700],
     flex: 1,
   },
   removeFileButton: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#dc3545',
+    backgroundColor: BrandColors.semantic.error,
     alignItems: 'center',
     justifyContent: 'center',
   },
   removeFileText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: 'bold',
   },
   guidelinesSection: {
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
   },
   guidelinesCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 12,
     padding: 16,
   },
   guidelineItem: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     lineHeight: 20,
     marginBottom: 8,
   },
@@ -477,39 +478,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: BrandColors.neutral[200],
     gap: 12,
   },
   draftActionButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: Color.cSK430B92500,
+    borderColor: BrandColors.primary[500],
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   draftActionText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontSize: 16,
     fontWeight: '600',
   },
   submitButton: {
     flex: 2,
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: BrandColors.neutral[300],
   },
   submitButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },
   disabledButtonText: {
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
 });
 

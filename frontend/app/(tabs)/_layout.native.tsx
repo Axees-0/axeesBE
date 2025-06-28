@@ -9,6 +9,7 @@ import { StatusBar } from "expo-status-bar";
 import React, { useEffect } from "react";
 import { Platform, useWindowDimensions } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BrandColors } from '@/constants/Colors';
 
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { TabButton } from "@/components/TabButton";
@@ -57,7 +58,7 @@ export default function TabLayout() {
       <Tabs
         screenOptions={({ route }) => ({
           tabBarStyle: {
-            backgroundColor: "#430B92",
+            backgroundColor: BrandColors.primary[500],
             borderTopWidth: 0,
             height: Platform.select({
               ios: 65 + insets.bottom,

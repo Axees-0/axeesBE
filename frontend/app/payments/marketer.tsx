@@ -17,6 +17,7 @@ import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
 import { CreditCardModal } from '@/components/CreditCardModal';
 import { useConfirmModal } from '@/components/ConfirmModal';
+import { BrandColors } from '@/constants/Colors';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -561,17 +562,17 @@ const MarketerPaymentsPage: React.FC = () => {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'completed': return '#10B981';
-    case 'pending': return '#F59E0B';
-    case 'failed': return '#EF4444';
-    default: return '#6B7280';
+    case 'completed': return BrandColors.semantic.success;
+    case 'pending': return BrandColors.semantic.warning;
+    case 'failed': return BrandColors.semantic.error;
+    default: return BrandColors.neutral[500];
   }
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -579,7 +580,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   backButton: {
     padding: 8,
@@ -588,7 +589,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     textAlign: 'center',
   },
   headerSpacer: {
@@ -598,7 +599,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   tab: {
     flex: 1,
@@ -610,12 +611,12 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     borderBottomWidth: 4, // Increased thickness for better visibility
-    borderBottomColor: Color.cSK430B92500,
-    backgroundColor: 'rgba(67, 11, 146, 0.08)', // Slightly more prominent background
+    borderBottomColor: BrandColors.primary[500],
+    backgroundColor: BrandColors.primary[50], // Slightly more prominent background
     position: 'relative',
     transform: [{ scale: 1.02 }], // Subtle scale effect for active state
     // Add a subtle shadow for depth
-    shadowColor: Color.cSK430B92500,
+    shadowColor: BrandColors.primary[500],
     shadowOffset: {
       width: 0,
       height: 2,
@@ -627,14 +628,14 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#666',
+    color: BrandColors.neutral[600],
     textAlign: 'center',
   },
   activeTabText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontWeight: '700', // Increased weight
     fontSize: 15, // Slightly larger font size for active tab
-    textShadowColor: 'rgba(67, 11, 146, 0.3)',
+    textShadowColor: BrandColors.primary[300],
     textShadowOffset: { width: 0, height: 1 },
     textShadowRadius: 2,
   },
@@ -651,7 +652,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -659,12 +660,12 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   section: {
     marginBottom: 24,
@@ -672,13 +673,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 16,
   },
   actionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -693,16 +694,16 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: BrandColors.neutral[700],
     marginBottom: 4,
   },
   actionDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   actionArrow: {
     fontSize: 18,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   transactionItem: {
     flexDirection: 'row',
@@ -710,32 +711,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   transactionInfo: {
     flex: 1,
   },
   transactionDescription: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[700],
     marginBottom: 4,
   },
   transactionDate: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   transactionAmount: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#EF4444',
+    color: BrandColors.semantic.error,
   },
   positiveAmount: {
-    color: '#10B981',
+    color: BrandColors.semantic.success,
   },
   methodCard: {
     flexDirection: Platform.select({ default: 'column', web: 'row' }),
     alignItems: Platform.select({ default: 'stretch', web: 'center' }),
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: Platform.select({ default: 12, web: 16 }),
     borderRadius: 12,
     marginBottom: 12,
@@ -745,7 +746,7 @@ const styles = StyleSheet.create({
     width: Platform.select({ default: 40, web: 48 }),
     height: Platform.select({ default: 40, web: 48 }),
     borderRadius: Platform.select({ default: 20, web: 24 }),
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: Platform.select({ default: 0, web: 16 }),
@@ -763,16 +764,16 @@ const styles = StyleSheet.create({
   methodName: {
     fontSize: Platform.select({ default: 14, web: 16 }),
     fontWeight: '600',
-    color: '#333',
+    color: BrandColors.neutral[700],
     marginBottom: Platform.select({ default: 0, web: 4 }),
     flex: Platform.select({ default: 1, web: 0 }),
   },
   methodDetail: {
     fontSize: Platform.select({ default: 12, web: 14 }),
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   defaultBadge: {
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     paddingHorizontal: Platform.select({ default: 6, web: 8 }),
     paddingVertical: 2,
     borderRadius: 4,
@@ -780,7 +781,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   defaultText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: Platform.select({ default: 9, web: 10 }),
     fontWeight: '600',
   },
@@ -792,25 +793,25 @@ const styles = StyleSheet.create({
   methodAction: {
     paddingHorizontal: Platform.select({ default: 8, web: 12 }),
     paddingVertical: Platform.select({ default: 4, web: 6 }),
-    backgroundColor: Platform.select({ default: '#fff', web: 'transparent' }),
+    backgroundColor: Platform.select({ default: BrandColors.neutral[0], web: 'transparent' }),
     borderRadius: Platform.select({ default: 4, web: 0 }),
     borderWidth: Platform.select({ default: 1, web: 0 }),
-    borderColor: Platform.select({ default: '#e0e0e0', web: 'transparent' }),
+    borderColor: Platform.select({ default: BrandColors.neutral[200], web: 'transparent' }),
   },
   methodActionText: {
     fontSize: Platform.select({ default: 12, web: 14 }),
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontWeight: '500',
   },
   removeText: {
-    color: '#EF4444',
+    color: BrandColors.semantic.error,
   },
   addMethodButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: Color.cSK430B92500,
+    borderColor: BrandColors.primary[500],
     borderStyle: 'dashed',
     borderRadius: 12,
     padding: Platform.select({ default: 12, web: 16 }),
@@ -819,12 +820,12 @@ const styles = StyleSheet.create({
   },
   addMethodIcon: {
     fontSize: Platform.select({ default: 18, web: 20 }),
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     marginRight: 8,
   },
   addMethodText: {
     fontSize: Platform.select({ default: 14, web: 16 }),
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontWeight: '600',
     textAlign: 'center',
     flex: Platform.select({ default: 1, web: 0 }),
@@ -836,11 +837,11 @@ const styles = StyleSheet.create({
   methodOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     padding: Platform.select({ default: 12, web: 16 }),
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: BrandColors.neutral[200],
     minHeight: Platform.select({ default: 44, web: 52 }),
   },
   methodOptionIcon: {
@@ -849,7 +850,7 @@ const styles = StyleSheet.create({
   },
   methodOptionText: {
     fontSize: Platform.select({ default: 14, web: 16 }),
-    color: '#333',
+    color: BrandColors.neutral[700],
     flex: 1,
   },
   historyItem: {
@@ -857,7 +858,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   historyDate: {
     alignItems: 'center',
@@ -866,20 +867,20 @@ const styles = StyleSheet.create({
   },
   historyMonth: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
     textTransform: 'uppercase',
   },
   historyDay: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
   },
   historyInfo: {
     flex: 1,
   },
   historyDescription: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[700],
     marginBottom: 4,
   },
   historyMeta: {
@@ -899,13 +900,13 @@ const styles = StyleSheet.create({
   },
   historyType: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
     textTransform: 'capitalize',
   },
   historyAmount: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#EF4444',
+    color: BrandColors.semantic.error,
   },
 });
 

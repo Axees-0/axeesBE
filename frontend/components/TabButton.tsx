@@ -1,6 +1,7 @@
 import type React from "react";
 import { View, Text, StyleSheet, Pressable, Platform } from "react-native";
 import { Color, FontFamily, FontSize, Padding, Gap, Focus } from "../GlobalStyles";
+import { BrandColors } from "@/constants/Colors";
 import { useWindowDimensions } from "react-native";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
   },
   activeTab: {
     opacity: 1,
-    borderColor: Color.backgroundsPrimary,
+    borderColor: BrandColors.primary[500],
     borderBottomWidth: 3,
     borderStyle: "solid",
   },
@@ -142,7 +143,7 @@ const styles = StyleSheet.create({
     transform: [{ scale: 0.98 }],
   },
   label: {
-    color: Color.backgroundsPrimary,
+    color: BrandColors.neutral[700],
     textAlign: "center",
     fontFamily: FontFamily.inter,
     fontSize: FontSize.size_xs,
@@ -158,7 +159,7 @@ const styles = StyleSheet.create({
   notificationBadge: {
     position: "absolute",
     top: 0,
-    backgroundColor: "#FF0000",
+    backgroundColor: BrandColors.semantic.error,
     borderRadius: 15,
     width: 25,
     height: 25,
@@ -169,6 +170,6 @@ const styles = StyleSheet.create({
   notificationBadgeText: {
     fontFamily: FontFamily.inter,
     textTransform: "capitalize",
-    color: "#FFFFFF",
+    color: BrandColors.neutral[0],
   },
 });

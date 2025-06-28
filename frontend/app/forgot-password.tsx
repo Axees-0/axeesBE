@@ -13,6 +13,7 @@ import {
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import UniversalBackButton from '@/components/UniversalBackButton';
 
 // Icons
@@ -104,7 +105,7 @@ const ForgotPasswordScreen: React.FC = () => {
               keyboardType="email-address"
               autoCapitalize="none"
               autoCorrect={false}
-              placeholderTextColor="#999"
+              placeholderTextColor={BrandColors.neutral[400]}
             />
           </View>
 
@@ -148,7 +149,7 @@ const ForgotPasswordScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   keyboardView: {
     flex: 1,
@@ -160,12 +161,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
   },
   headerSpacer: {
     width: 40,
@@ -194,13 +195,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
     marginBottom: 12,
     textAlign: 'center',
   },
   description: {
     fontSize: 16,
-    color: '#666',
+    color: BrandColors.neutral[500],
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
     marginBottom: 8,
   },
   emailInput: {
@@ -220,8 +221,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 16,
     fontSize: 16,
-    color: Color.cSK430B92950,
-    backgroundColor: '#f8f9fa',
+    color: BrandColors.primary[900],
+    backgroundColor: BrandColors.neutral[50],
   },
   demoInfo: {
     backgroundColor: '#e7f3ff',
@@ -242,20 +243,20 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sendButtonActive: {
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
   },
   sendButtonInactive: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: BrandColors.neutral[100],
   },
   sendButtonText: {
     fontSize: 16,
     fontWeight: '600',
   },
   sendButtonTextActive: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
   },
   sendButtonTextInactive: {
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   backToLoginSection: {
     flexDirection: 'row',
@@ -264,11 +265,11 @@ const styles = StyleSheet.create({
   },
   backToLoginText: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   backToLoginLink: {
     fontSize: 14,
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontWeight: '600',
   },
 });

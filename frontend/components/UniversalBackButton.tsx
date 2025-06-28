@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, Platform, ViewStyle } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import ArrowLeft from '@/assets/arrowleft021.svg';
+import { BrandColors } from '@/constants/Colors';
 
 // Navigation hierarchy mapping - defines where each route should go back to
 const NAVIGATION_HIERARCHY: Record<string, string> = {
@@ -174,7 +175,7 @@ const styles = StyleSheet.create({
         cursor: 'pointer' as any,
         ':focus': {
           backgroundColor: 'rgba(0, 0, 0, 0.05)',
-          outline: '2px solid #430B92',
+          outline: `2px solid ${BrandColors.primary[500]}`,
           outlineOffset: '2px',
         },
         ':hover': {

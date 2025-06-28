@@ -13,6 +13,7 @@ import { UniversalBackButton } from '@/components/UniversalBackButton';
 import { Ionicons, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import DesignSystem from '@/styles/DesignSystem';
 import { LinearGradient } from 'expo-linear-gradient';
+import { BrandColors } from '@/constants/Colors';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -38,10 +39,10 @@ const AnalyticsPage = () => {
       { name: 'Mike Tech', platform: 'YouTube', engagement: 6.8 },
     ],
     platformBreakdown: [
-      { platform: 'Instagram', percentage: 45, color: '#E1306C' },
-      { platform: 'TikTok', percentage: 30, color: '#000000' },
-      { platform: 'YouTube', percentage: 20, color: '#FF0000' },
-      { platform: 'Twitter', percentage: 5, color: '#1DA1F2' },
+      { platform: 'Instagram', percentage: 45, color: BrandColors.social.instagram },
+      { platform: 'TikTok', percentage: 30, color: BrandColors.social.tiktok },
+      { platform: 'YouTube', percentage: 20, color: BrandColors.social.youtube },
+      { platform: 'Twitter', percentage: 5, color: BrandColors.social.twitter },
     ],
   };
 
@@ -57,7 +58,7 @@ const AnalyticsPage = () => {
         <UniversalBackButton fallbackRoute="/" />
         <Text style={styles.headerTitle}>Analytics</Text>
         <TouchableOpacity style={styles.exportButton}>
-          <Ionicons name="download-outline" size={24} color="#430B92" />
+          <Ionicons name="download-outline" size={24} color={BrandColors.primary[500]} />
         </TouchableOpacity>
       </View>
 
@@ -81,10 +82,10 @@ const AnalyticsPage = () => {
         <View style={styles.overviewGrid}>
           <View style={styles.overviewCard}>
             <LinearGradient
-              colors={['#3B82F6', '#2563EB']}
+              colors={[BrandColors.primary[400], BrandColors.primary[500]]}
               style={styles.overviewGradient}
             >
-              <Ionicons name="eye-outline" size={24} color="#FFFFFF" />
+              <Ionicons name="eye-outline" size={24} color={BrandColors.neutral[0]} />
               <Text style={styles.overviewValue}>{formatNumber(analyticsData.overview.totalReach)}</Text>
               <Text style={styles.overviewLabel}>Total Reach</Text>
             </LinearGradient>
@@ -92,10 +93,10 @@ const AnalyticsPage = () => {
 
           <View style={styles.overviewCard}>
             <LinearGradient
-              colors={['#10B981', '#059669']}
+              colors={[BrandColors.primary[500], BrandColors.primary[600]]}
               style={styles.overviewGradient}
             >
-              <Ionicons name="heart-outline" size={24} color="#FFFFFF" />
+              <Ionicons name="heart-outline" size={24} color={BrandColors.neutral[0]} />
               <Text style={styles.overviewValue}>{formatNumber(analyticsData.overview.totalEngagement)}</Text>
               <Text style={styles.overviewLabel}>Engagement</Text>
             </LinearGradient>
@@ -103,10 +104,10 @@ const AnalyticsPage = () => {
 
           <View style={styles.overviewCard}>
             <LinearGradient
-              colors={['#F59E0B', '#D97706']}
+              colors={[BrandColors.primary[600], BrandColors.primary[700]]}
               style={styles.overviewGradient}
             >
-              <MaterialCommunityIcons name="target" size={24} color="#FFFFFF" />
+              <MaterialCommunityIcons name="target" size={24} color={BrandColors.neutral[0]} />
               <Text style={styles.overviewValue}>{formatNumber(analyticsData.overview.totalConversions)}</Text>
               <Text style={styles.overviewLabel}>Conversions</Text>
             </LinearGradient>
@@ -114,10 +115,10 @@ const AnalyticsPage = () => {
 
           <View style={styles.overviewCard}>
             <LinearGradient
-              colors={['#8B5CF6', '#7C3AED']}
+              colors={[BrandColors.primary[400], BrandColors.primary[600]]}
               style={styles.overviewGradient}
             >
-              <MaterialCommunityIcons name="trending-up" size={24} color="#FFFFFF" />
+              <MaterialCommunityIcons name="trending-up" size={24} color={BrandColors.neutral[0]} />
               <Text style={styles.overviewValue}>{analyticsData.overview.roi}%</Text>
               <Text style={styles.overviewLabel}>ROI</Text>
             </LinearGradient>
@@ -198,7 +199,7 @@ const AnalyticsPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -206,13 +207,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: BrandColors.neutral[100],
   },
   headerTitle: {
     flex: 1,
     fontSize: 20,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     marginLeft: 16,
     fontFamily: DesignSystem.Typography.h2.fontFamily,
   },
@@ -231,19 +232,19 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 10,
     borderRadius: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: BrandColors.neutral[100],
     alignItems: 'center',
   },
   periodButtonActive: {
-    backgroundColor: '#430B92',
+    backgroundColor: BrandColors.primary[500],
   },
   periodText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   periodTextActive: {
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     fontWeight: '600',
   },
   overviewGrid: {
@@ -263,14 +264,14 @@ const styles = StyleSheet.create({
   overviewValue: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     marginTop: 12,
     marginBottom: 4,
     fontFamily: DesignSystem.Typography.h1.fontFamily,
   },
   overviewLabel: {
     fontSize: 14,
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     opacity: 0.9,
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
@@ -280,12 +281,12 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     marginBottom: 16,
     fontFamily: DesignSystem.Typography.h3.fontFamily,
   },
   platformBreakdown: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 12,
   },
@@ -299,18 +300,18 @@ const styles = StyleSheet.create({
   },
   platformName: {
     fontSize: 14,
-    color: '#374151',
+    color: BrandColors.neutral[700],
     fontFamily: DesignSystem.Typography.body.fontFamily,
   },
   platformPercentage: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
   platformBarContainer: {
     height: 8,
-    backgroundColor: '#E5E7EB',
+    backgroundColor: BrandColors.neutral[200],
     borderRadius: 4,
     overflow: 'hidden',
   },
@@ -319,7 +320,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   campaignCard: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -327,7 +328,7 @@ const styles = StyleSheet.create({
   campaignName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     marginBottom: 12,
     fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
@@ -341,12 +342,12 @@ const styles = StyleSheet.create({
   campaignStatValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#374151',
+    color: BrandColors.neutral[700],
     fontFamily: DesignSystem.Typography.h3.fontFamily,
   },
   campaignStatLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     marginTop: 4,
     fontFamily: DesignSystem.Typography.small.fontFamily,
   },
@@ -354,7 +355,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -365,12 +366,12 @@ const styles = StyleSheet.create({
   performerName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
   performerPlatform: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     marginTop: 2,
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
@@ -380,12 +381,12 @@ const styles = StyleSheet.create({
   engagementValue: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#10B981',
+    color: BrandColors.primary[500],
     fontFamily: DesignSystem.Typography.h3.fontFamily,
   },
   engagementLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     fontFamily: DesignSystem.Typography.small.fontFamily,
   },
 });

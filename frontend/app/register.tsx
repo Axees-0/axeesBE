@@ -12,6 +12,7 @@ import {
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 // Icons
@@ -196,7 +197,7 @@ const RegisterPreviewScreen: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   backButton: {
     padding: 8,
@@ -213,7 +214,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
     textAlign: 'center',
   },
   headerSpacer: {
@@ -234,12 +235,12 @@ const styles = StyleSheet.create({
   welcomeTitle: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
     marginBottom: 8,
   },
   welcomeSubtitle: {
     fontSize: 16,
-    color: '#666',
+    color: BrandColors.neutral[500],
     textAlign: 'center',
     lineHeight: 24,
   },
@@ -249,11 +250,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
     marginBottom: 16,
   },
   roleCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 20,
     marginBottom: 16,
@@ -263,14 +264,14 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   selectedRoleCard: {
-    borderColor: Color.cSK430B92500,
-    backgroundColor: Color.cSK430B92500 + '10',
+    borderColor: BrandColors.primary[500],
+    backgroundColor: BrandColors.primary[50],
   },
   roleIconContainer: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 16,
@@ -284,12 +285,12 @@ const styles = StyleSheet.create({
   roleTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
     marginBottom: 4,
   },
   roleDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 12,
     lineHeight: 20,
   },
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
   },
   roleFeature: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[500],
     lineHeight: 18,
   },
   selectedBadge: {
@@ -308,12 +309,12 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     alignItems: 'center',
     justifyContent: 'center',
   },
   checkmark: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: 'bold',
   },
@@ -323,7 +324,7 @@ const styles = StyleSheet.create({
   benefitsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[900],
     marginBottom: 16,
   },
   benefitsList: {
@@ -343,12 +344,12 @@ const styles = StyleSheet.create({
   benefitTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: BrandColors.neutral[800],
     marginBottom: 2,
   },
   benefitDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     lineHeight: 20,
   },
   bottomSection: {
@@ -356,30 +357,30 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 32,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: BrandColors.neutral[100],
   },
   continueButton: {
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     borderRadius: 8,
     paddingVertical: 16,
     alignItems: 'center',
     marginBottom: 16,
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: BrandColors.neutral[400],
   },
   continueButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },
   disabledButtonText: {
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   loginLinkContainer: {
     flexDirection: 'row',
@@ -388,11 +389,11 @@ const styles = StyleSheet.create({
   },
   loginText: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   loginLink: {
     fontSize: 14,
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontWeight: '600',
   },
 });

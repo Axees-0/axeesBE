@@ -12,6 +12,7 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { notificationService } from '@/services/notificationService';
@@ -434,7 +435,7 @@ const OfferReviewPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -442,7 +443,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   backButton: {
     padding: 8,
@@ -466,8 +467,8 @@ const styles = StyleSheet.create({
   overviewSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    backgroundColor: '#f8f9fa',
+    borderBottomColor: BrandColors.neutral[100],
+    backgroundColor: BrandColors.neutral[50],
   },
   offerHeader: {
     flexDirection: 'row',
@@ -486,7 +487,7 @@ const styles = StyleSheet.create({
   },
   platformTag: {
     backgroundColor: Color.cSK430B92500,
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 12,
     fontWeight: '600',
     paddingHorizontal: 8,
@@ -505,7 +506,7 @@ const styles = StyleSheet.create({
   },
   timeline: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   marketerInfo: {
     flexDirection: 'row',
@@ -517,12 +518,12 @@ const styles = StyleSheet.create({
   marketerName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: BrandColors.neutral[800],
     marginBottom: 2,
   },
   companyName: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 4,
   },
   marketerStats: {
@@ -531,16 +532,16 @@ const styles = StyleSheet.create({
   },
   rating: {
     fontSize: 12,
-    color: '#333',
+    color: BrandColors.neutral[800],
   },
   deals: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   section: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   sectionTitle: {
     fontSize: 16,
@@ -550,7 +551,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[800],
     lineHeight: 22,
   },
   listContainer: {
@@ -558,7 +559,7 @@ const styles = StyleSheet.create({
   },
   listItem: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[800],
     lineHeight: 20,
   },
   termItem: {
@@ -572,19 +573,19 @@ const styles = StyleSheet.create({
   },
   termValue: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[800],
     lineHeight: 20,
   },
   notesContainer: {
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 8,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: BrandColors.neutral[200],
   },
   notes: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[800],
     lineHeight: 20,
     fontStyle: 'italic',
   },
@@ -594,40 +595,40 @@ const styles = StyleSheet.create({
   },
   metadataText: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   actionSection: {
     flexDirection: 'row',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: BrandColors.neutral[100],
     gap: 10,
   },
   rejectButton: {
     flex: 1,
-    backgroundColor: '#FEE2E2',
+    backgroundColor: BrandColors.semantic.errorLight,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: BrandColors.semantic.errorLight,
   },
   rejectButtonText: {
-    color: '#DC2626',
+    color: BrandColors.semantic.errorDark,
     fontSize: 16,
     fontWeight: '600',
   },
   counterButton: {
     flex: 1,
-    backgroundColor: '#F3E8FF',
+    backgroundColor: BrandColors.primary[100],
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E9D5FF',
+    borderColor: BrandColors.primary[200],
   },
   counterButtonText: {
-    color: '#7C3AED',
+    color: BrandColors.primary[600],
     fontSize: 16,
     fontWeight: '600',
   },
@@ -641,7 +642,7 @@ const styles = StyleSheet.create({
     borderColor: Color.cSK430B92500,
   },
   acceptButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },

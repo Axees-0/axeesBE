@@ -22,6 +22,7 @@ import {
   MaterialCommunityIcons
 } from '@expo/vector-icons';
 import DesignSystem from '@/styles/DesignSystem';
+import { BrandColors } from '@/constants/Colors';
 
 const PaymentsPage = () => {
   const [activeTab, setActiveTab] = useState('all');
@@ -76,10 +77,10 @@ const PaymentsPage = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'completed': return '#10B981';
-      case 'pending': return '#F59E0B';
-      case 'processing': return '#3B82F6';
-      default: return '#6B7280';
+      case 'completed': return BrandColors.semantic.success;
+      case 'pending': return BrandColors.semantic.warning;
+      case 'processing': return BrandColors.semantic.info;
+      default: return BrandColors.neutral[500];
     }
   };
 
@@ -97,7 +98,7 @@ const PaymentsPage = () => {
         <UniversalBackButton fallbackRoute="/" />
         <Text style={styles.headerTitle}>Payments</Text>
         <TouchableOpacity style={styles.exportButton}>
-          <Feather name="download" size={20} color="#430B92" />
+          <Feather name="download" size={20} color={BrandColors.primary[500]} />
         </TouchableOpacity>
       </View>
 
@@ -108,26 +109,26 @@ const PaymentsPage = () => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.statsContainer}
         >
-          <View style={[styles.statCard, { backgroundColor: '#DBEAFE' }]}>
-            <MaterialIcons name="paid" size={24} color="#3B82F6" />
+          <View style={[styles.statCard, { backgroundColor: BrandColors.semantic.infoLight }]}>
+            <MaterialIcons name="paid" size={24} color={BrandColors.semantic.info} />
             <Text style={styles.statAmount}>{stats.totalPaid}</Text>
             <Text style={styles.statLabel}>Total Paid</Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
-            <MaterialIcons name="pending" size={24} color="#F59E0B" />
+          <View style={[styles.statCard, { backgroundColor: BrandColors.semantic.warningLight }]}>
+            <MaterialIcons name="pending" size={24} color={BrandColors.semantic.warning} />
             <Text style={styles.statAmount}>{stats.pending}</Text>
             <Text style={styles.statLabel}>Pending</Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: '#D1FAE5' }]}>
-            <MaterialIcons name="calendar-today" size={24} color="#10B981" />
+          <View style={[styles.statCard, { backgroundColor: BrandColors.semantic.successLight }]}>
+            <MaterialIcons name="calendar-today" size={24} color={BrandColors.semantic.success} />
             <Text style={styles.statAmount}>{stats.thisMonth}</Text>
             <Text style={styles.statLabel}>This Month</Text>
           </View>
 
-          <View style={[styles.statCard, { backgroundColor: '#EDE9FE' }]}>
-            <MaterialCommunityIcons name="account-group" size={24} color="#8B5CF6" />
+          <View style={[styles.statCard, { backgroundColor: BrandColors.primary[100] }]}>
+            <MaterialCommunityIcons name="account-group" size={24} color={BrandColors.primary[400]} />
             <Text style={styles.statAmount}>{stats.activeCreators}</Text>
             <Text style={styles.statLabel}>Active Creators</Text>
           </View>
@@ -135,13 +136,13 @@ const PaymentsPage = () => {
 
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <Feather name="search" size={20} color="#9CA3AF" />
+          <Feather name="search" size={20} color={BrandColors.neutral[400]} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search transactions..."
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={BrandColors.neutral[400]}
           />
         </View>
 
@@ -208,10 +209,10 @@ const PaymentsPage = () => {
               </View>
               <View style={styles.transactionFooter}>
                 <Text style={styles.transactionDate}>
-                  <Ionicons name="calendar-outline" size={14} color="#6B7280" /> {transaction.date}
+                  <Ionicons name="calendar-outline" size={14} color={BrandColors.neutral[500]} /> {transaction.date}
                 </Text>
                 <TouchableOpacity>
-                  <MaterialIcons name="more-horiz" size={20} color="#6B7280" />
+                  <MaterialIcons name="more-horiz" size={20} color={BrandColors.neutral[500]} />
                 </TouchableOpacity>
               </View>
             </TouchableOpacity>
@@ -222,16 +223,16 @@ const PaymentsPage = () => {
         <View style={styles.actionButtons}>
           <TouchableOpacity style={styles.primaryButton}>
             <LinearGradient
-              colors={['#430B92', '#5A1BAB']}
+              colors={[BrandColors.primary[500], BrandColors.primary[400]]}
               style={styles.gradientButton}
             >
-              <FontAwesome5 name="file-invoice" size={18} color="#fff" />
+              <FontAwesome5 name="file-invoice" size={18} color={BrandColors.neutral[0]} />
               <Text style={styles.buttonText}>Generate Invoice</Text>
             </LinearGradient>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.secondaryButton}>
-            <MaterialIcons name="payment" size={20} color="#430B92" />
+            <MaterialIcons name="payment" size={20} color={BrandColors.primary[500]} />
             <Text style={styles.secondaryButtonText}>Payment Methods</Text>
           </TouchableOpacity>
         </View>
@@ -243,7 +244,7 @@ const PaymentsPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -252,7 +253,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: BrandColors.neutral[100],
   },
   backButton: {
     padding: 4,
@@ -260,11 +261,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
   },
   exportButton: {
     padding: 8,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: BrandColors.neutral[100],
     borderRadius: 8,
   },
   statsContainer: {
@@ -282,18 +283,18 @@ const styles = StyleSheet.create({
   statAmount: {
     fontSize: 24,
     fontWeight: '700',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     marginTop: 8,
   },
   statLabel: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     marginTop: 4,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
     marginHorizontal: 20,
     marginVertical: 16,
     paddingHorizontal: 16,
@@ -304,7 +305,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
-    color: '#111827',
+    color: BrandColors.neutral[900],
   },
   tabContainer: {
     flexDirection: 'row',
@@ -316,24 +317,24 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginRight: 12,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: BrandColors.neutral[100],
   },
   activeTab: {
-    backgroundColor: '#430B92',
+    backgroundColor: BrandColors.primary[500],
   },
   tabText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
   },
   activeTabText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
   },
   transactionsList: {
     paddingHorizontal: 20,
   },
   transactionCard: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
@@ -357,11 +358,11 @@ const styles = StyleSheet.create({
   creatorName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
   },
   campaignName: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     marginTop: 2,
   },
   transactionDetails: {
@@ -370,7 +371,7 @@ const styles = StyleSheet.create({
   transactionAmount: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#111827',
+    color: BrandColors.neutral[900],
   },
   statusBadge: {
     paddingHorizontal: 12,
@@ -390,7 +391,7 @@ const styles = StyleSheet.create({
   },
   transactionDate: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
   },
   actionButtons: {
     padding: 20,
@@ -410,7 +411,7 @@ const styles = StyleSheet.create({
   buttonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#fff',
+    color: BrandColors.neutral[0],
   },
   secondaryButton: {
     flexDirection: 'row',
@@ -419,13 +420,13 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#430B92',
+    borderColor: BrandColors.primary[500],
     gap: 8,
   },
   secondaryButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#430B92',
+    color: BrandColors.primary[500],
   },
 });
 

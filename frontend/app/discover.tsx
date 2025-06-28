@@ -19,6 +19,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Feather, MaterialIcons, Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import DesignSystem from '@/styles/DesignSystem';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
+import { BrandColors } from '@/constants/Colors';
 
 const DiscoverCreators = () => {
   const { width: screenWidth } = useWindowDimensions();
@@ -371,7 +372,7 @@ const DiscoverCreators = () => {
                     {category}
                   </Text>
                   {selectedCategories.includes(category) && (
-                    <Ionicons name="checkmark-circle" size={20} color="#10B981" style={styles.categoryCheck} />
+                    <Ionicons name="checkmark-circle" size={20} color={BrandColors.semantic.success} style={styles.categoryCheck} />
                   )}
                 </TouchableOpacity>
               ))}
@@ -390,7 +391,7 @@ const DiscoverCreators = () => {
         <UniversalBackButton />
         <Text style={styles.headerTitle}>Discover Influencers</Text>
         <TouchableOpacity style={styles.filterButton}>
-          <Feather name="sliders" size={20} color="#430B92" />
+          <Feather name="sliders" size={20} color={BrandColors.primary[500]} />
         </TouchableOpacity>
       </View>
 
@@ -404,7 +405,7 @@ const DiscoverCreators = () => {
             style={[styles.filterTab, activeFilterSection === 'type' && styles.filterTabActive]}
             onPress={() => setActiveFilterSection(activeFilterSection === 'type' ? null : 'type')}
           >
-            <View style={[styles.filterTabIcon, { backgroundColor: '#3B82F6' }]}>
+            <View style={[styles.filterTabIcon, { backgroundColor: BrandColors.semantic.info }]}>
               <MaterialIcons name="category" size={16} color="#FFFFFF" />
             </View>
             <Text style={[styles.filterTabText, activeFilterSection === 'type' && styles.filterTabTextActive]}>Type</Text>
@@ -414,7 +415,7 @@ const DiscoverCreators = () => {
             style={[styles.filterTab, activeFilterSection === 'location' && styles.filterTabActive]}
             onPress={() => setActiveFilterSection(activeFilterSection === 'location' ? null : 'location')}
           >
-            <View style={[styles.filterTabIcon, { backgroundColor: '#111827' }]}>
+            <View style={[styles.filterTabIcon, { backgroundColor: BrandColors.neutral[900] }]}>
               <Ionicons name="location" size={16} color="#FFFFFF" />
             </View>
             <Text style={[styles.filterTabText, activeFilterSection === 'location' && styles.filterTabTextActive]}>Location</Text>
@@ -424,7 +425,7 @@ const DiscoverCreators = () => {
             style={[styles.filterTab, activeFilterSection === 'demographic' && styles.filterTabActive]}
             onPress={() => setActiveFilterSection(activeFilterSection === 'demographic' ? null : 'demographic')}
           >
-            <View style={[styles.filterTabIcon, { backgroundColor: '#10B981' }]}>
+            <View style={[styles.filterTabIcon, { backgroundColor: BrandColors.semantic.success }]}>
               <Ionicons name="people" size={16} color="#FFFFFF" />
             </View>
             <Text style={[styles.filterTabText, activeFilterSection === 'demographic' && styles.filterTabTextActive]}>Demographic</Text>
@@ -434,7 +435,7 @@ const DiscoverCreators = () => {
             style={[styles.filterTab, activeFilterSection === 'category' && styles.filterTabActive]}
             onPress={() => setActiveFilterSection(activeFilterSection === 'category' ? null : 'category')}
           >
-            <View style={[styles.filterTabIcon, { backgroundColor: '#EF4444' }]}>
+            <View style={[styles.filterTabIcon, { backgroundColor: BrandColors.semantic.error }]}>
               <MaterialIcons name="bookmark" size={16} color="#FFFFFF" />
             </View>
             <Text style={[styles.filterTabText, activeFilterSection === 'category' && styles.filterTabTextActive]}>Category</Text>
@@ -507,7 +508,7 @@ const DiscoverCreators = () => {
                   <View style={styles.creatorHeader}>
                     <Text style={styles.creatorName}>{creator.name}</Text>
                     {isSelected && (
-                      <Ionicons name="checkmark-circle" size={20} color="#430B92" />
+                      <Ionicons name="checkmark-circle" size={20} color={BrandColors.primary[500]} />
                     )}
                   </View>
                   
@@ -576,7 +577,7 @@ function getTierColor(tier: string): string {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -584,13 +585,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: BrandColors.neutral[100],
   },
   headerTitle: {
     flex: 1,
     fontSize: 20,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     marginLeft: 16,
     fontFamily: DesignSystem.Typography.h2.fontFamily,
   },
@@ -604,9 +605,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: BrandColors.neutral[200],
   },
   filterTab: {
     flex: 1,
@@ -617,13 +618,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     marginHorizontal: 4,
     borderRadius: 8,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
   },
   filterTabActive: {
-    borderColor: '#430B92',
-    backgroundColor: '#F3F0FF',
+    borderColor: BrandColors.primary[500],
+    backgroundColor: BrandColors.primary[50],
   },
   filterTabIcon: {
     width: 24,
@@ -635,17 +636,17 @@ const styles = StyleSheet.create({
   },
   filterTabText: {
     fontSize: 13,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     fontWeight: '500',
     fontFamily: DesignSystem.Typography.captionMedium.fontFamily,
   },
   filterTabTextActive: {
-    color: '#430B92',
+    color: BrandColors.primary[500],
   },
   activeFilterSection: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: BrandColors.neutral[200],
     paddingVertical: 16,
   },
   filterContent: {
@@ -657,7 +658,7 @@ const styles = StyleSheet.create({
   filterLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#374151',
+    color: BrandColors.neutral[700],
     marginBottom: 8,
     fontFamily: DesignSystem.Typography.captionMedium.fontFamily,
   },
@@ -668,22 +669,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: BrandColors.neutral[100],
     marginRight: 8,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
   },
   filterChipActive: {
-    backgroundColor: '#430B92',
-    borderColor: '#430B92',
+    backgroundColor: BrandColors.primary[500],
+    borderColor: BrandColors.primary[500],
   },
   filterChipText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   filterChipTextActive: {
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
   },
   priceInputs: {
     flexDirection: 'row',
@@ -691,17 +692,17 @@ const styles = StyleSheet.create({
   },
   priceInput: {
     flex: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: BrandColors.neutral[100],
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
   },
   priceSeparator: {
     marginHorizontal: 12,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
   },
   locationTypeOptions: {
     flexDirection: 'row',
@@ -717,19 +718,19 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#D1D5DB',
+    borderColor: BrandColors.neutral[300],
     marginRight: 8,
   },
   radioButtonActive: {
-    borderColor: '#10B981',
-    backgroundColor: '#10B981',
+    borderColor: BrandColors.semantic.success,
+    backgroundColor: BrandColors.semantic.success,
   },
   locationTypeText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
   },
   locationTypeTextActive: {
-    color: '#111827',
+    color: BrandColors.neutral[900],
     fontWeight: '500',
   },
   genderRatio: {
@@ -738,7 +739,7 @@ const styles = StyleSheet.create({
   },
   genderText: {
     fontSize: 14,
-    color: '#4B5563',
+    color: BrandColors.neutral[600],
   },
   ageInputs: {
     flexDirection: 'row',
@@ -746,18 +747,18 @@ const styles = StyleSheet.create({
   },
   ageInput: {
     width: 60,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: BrandColors.neutral[100],
     borderRadius: 8,
     paddingHorizontal: 12,
     paddingVertical: 8,
     fontSize: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
     textAlign: 'center',
   },
   ageSeparator: {
     marginHorizontal: 12,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
   },
   categoryGrid: {
     flexDirection: 'row',
@@ -766,27 +767,27 @@ const styles = StyleSheet.create({
   },
   categoryCard: {
     width: '30%',
-    backgroundColor: '#F3F4F6',
+    backgroundColor: BrandColors.neutral[100],
     borderRadius: 12,
     paddingVertical: 16,
     paddingHorizontal: 12,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
     position: 'relative',
   },
   categoryCardActive: {
-    borderColor: '#10B981',
-    backgroundColor: '#D1FAE5',
+    borderColor: BrandColors.semantic.success,
+    backgroundColor: BrandColors.semantic.successLight,
   },
   categoryText: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     textAlign: 'center',
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   categoryTextActive: {
-    color: '#065F46',
+    color: BrandColors.semantic.successDark,
     fontWeight: '600',
   },
   categoryCheck: {
@@ -796,25 +797,25 @@ const styles = StyleSheet.create({
   },
   searchSection: {
     padding: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: BrandColors.neutral[100],
   },
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
   },
   searchInput: {
     flex: 1,
     marginLeft: 12,
     fontSize: 16,
-    color: '#111827',
+    color: BrandColors.neutral[900],
     fontFamily: DesignSystem.Typography.body.fontFamily,
   },
   resultsSummary: {
@@ -823,23 +824,23 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     paddingVertical: 12,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
   },
   resultsText: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
   clearSelectionButton: {
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
-    backgroundColor: '#EF4444',
+    backgroundColor: BrandColors.semantic.error,
   },
   clearSelectionText: {
     fontSize: 14,
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     fontWeight: '500',
     fontFamily: DesignSystem.Typography.captionMedium.fontFamily,
   },
@@ -847,12 +848,12 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   creatorCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
     padding: 16,
     marginBottom: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
     flexDirection: 'row',
     ...Platform.select({
       ios: {
@@ -867,7 +868,7 @@ const styles = StyleSheet.create({
     }),
   },
   creatorCardSelected: {
-    borderColor: '#430B92',
+    borderColor: BrandColors.primary[500],
     borderWidth: 2,
   },
   creatorAvatar: {
@@ -887,12 +888,12 @@ const styles = StyleSheet.create({
   creatorName: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#111827',
+    color: BrandColors.neutral[900],
     fontFamily: DesignSystem.Typography.h3.fontFamily,
   },
   creatorHandle: {
     fontSize: 14,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     marginTop: 2,
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
@@ -908,7 +909,7 @@ const styles = StyleSheet.create({
   },
   statText: {
     fontSize: 13,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   creatorTags: {
@@ -924,24 +925,24 @@ const styles = StyleSheet.create({
   },
   tierTagText: {
     fontSize: 12,
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     fontWeight: '600',
     fontFamily: DesignSystem.Typography.captionMedium.fontFamily,
   },
   platformTag: {
-    backgroundColor: '#E5E7EB',
+    backgroundColor: BrandColors.neutral[200],
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   platformTagText: {
     fontSize: 12,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   creatorLocation: {
     fontSize: 13,
-    color: '#6B7280',
+    color: BrandColors.neutral[500],
     marginTop: 6,
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
@@ -949,7 +950,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 24,
     right: 24,
-    backgroundColor: '#430B92',
+    backgroundColor: BrandColors.primary[500],
     borderRadius: 28,
     paddingHorizontal: 20,
     paddingVertical: 16,
@@ -969,7 +970,7 @@ const styles = StyleSheet.create({
     }),
   },
   fabText: {
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
     fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,

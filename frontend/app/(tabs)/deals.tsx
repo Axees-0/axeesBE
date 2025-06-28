@@ -23,6 +23,7 @@ import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/perf
 import { WebSEO } from "../web-seo";
 import { DealSkeleton, DealMetricsSkeleton, DealActivitySkeleton } from "@/components/DealSkeleton";
 import DesignSystem from "@/styles/DesignSystem";
+import { BrandColors } from '@/constants/Colors';
 
 const UOM08MarketerDealHistoryList = () => {
   const { width } = useWindowDimensions();
@@ -314,23 +315,23 @@ const UOM08MarketerDealHistoryList = () => {
 
     const getStatusColor = (status: string) => {
       switch (status) {
-        case 'Pending Response': return '#FFA726';
-        case 'Accepted': return '#66BB6A';
-        case 'In Progress': return '#42A5F5';
-        case 'Completed': return '#4CAF50';
-        case 'Declined': return '#EF5350';
-        default: return '#757575';
+        case 'Pending Response': return BrandColors.semantic.warning;
+        case 'Accepted': return BrandColors.semantic.success;
+        case 'In Progress': return BrandColors.semantic.info;
+        case 'Completed': return BrandColors.semantic.success;
+        case 'Declined': return BrandColors.semantic.error;
+        default: return BrandColors.neutral[500];
       }
     };
 
     const getStatusTextColor = (status: string) => {
       switch (status) {
-        case 'Pending Response': return '#FF8F00';
-        case 'Accepted': return '#388E3C';
-        case 'In Progress': return '#1976D2';
-        case 'Completed': return '#2E7D32';
-        case 'Declined': return '#C62828';
-        default: return '#424242';
+        case 'Pending Response': return BrandColors.semantic.warningDark;
+        case 'Accepted': return BrandColors.semantic.successDark;
+        case 'In Progress': return BrandColors.semantic.infoDark;
+        case 'Completed': return BrandColors.semantic.successDark;
+        case 'Declined': return BrandColors.semantic.errorDark;
+        default: return BrandColors.neutral[700];
       }
     };
 
@@ -669,15 +670,15 @@ const UOM08MarketerDealHistoryList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: BrandColors.neutral[0],
   },
   scrollView: {
     flex: 1,
   },
   counterOfferAlert: {
-    backgroundColor: '#FFF7ED',
+    backgroundColor: BrandColors.semantic.warningLight,
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: BrandColors.semantic.warning,
     borderRadius: 12,
     padding: DesignSystem.ResponsiveSpacing.cardPadding.paddingHorizontal,
     paddingVertical: DesignSystem.ResponsiveSpacing.cardPadding.paddingVertical + 4, // Extra vertical padding
@@ -691,16 +692,16 @@ const styles = StyleSheet.create({
       web: {
         cursor: 'pointer' as any,
         ':focus': {
-          borderColor: '#EA580C',
+          borderColor: BrandColors.semantic.warningDark,
           borderWidth: 2,
-          shadowColor: '#EA580C',
+          shadowColor: BrandColors.semantic.warningDark,
           shadowOpacity: 0.3,
           shadowRadius: 4,
-          backgroundColor: '#FFF7ED',
+          backgroundColor: BrandColors.semantic.warningLight,
         },
         ':hover': {
-          backgroundColor: '#FEF3C7',
-          borderColor: '#F59E0B',
+          backgroundColor: BrandColors.semantic.warningLight,
+          borderColor: BrandColors.semantic.warning,
         }
       }
     }),
@@ -723,13 +724,13 @@ const styles = StyleSheet.create({
   counterOfferTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#EA580C',
+    color: BrandColors.semantic.warningDark,
     marginBottom: 2,
     flexWrap: 'wrap',
   },
   counterOfferText: {
     fontSize: 14,
-    color: '#92400E',
+    color: BrandColors.semantic.warningDark,
     marginBottom: 4,
     flexWrap: 'wrap',
     flexShrink: 1,
@@ -737,13 +738,13 @@ const styles = StyleSheet.create({
   counterOfferAmount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#92400E',
+    color: BrandColors.semantic.warningDark,
     flexWrap: 'wrap',
   },
   counterOfferAction: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#EA580C',
+    color: BrandColors.semantic.warningDark,
     paddingLeft: 16,
     paddingVertical: 12, // Increased for better vertical centering
     textAlign: 'center',
@@ -751,15 +752,15 @@ const styles = StyleSheet.create({
     alignSelf: 'center', // Center arrow vertically
   },
   tabHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: BrandColors.neutral[0],
     borderBottomWidth: 1,
-    borderBottomColor: "#E2D0FB",
+    borderBottomColor: BrandColors.primary[200],
     paddingHorizontal: 20,
     paddingTop: 10,
   },
   tabContainer: {
     flexDirection: "row",
-    backgroundColor: "#F8F9FD",
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 4,
   },
@@ -771,15 +772,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#430B92",
+    backgroundColor: BrandColors.primary[500],
   },
   tabText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#6C6C6C",
+    color: BrandColors.neutral[500],
   },
   activeTabText: {
-    color: "#FFFFFF",
+    color: BrandColors.neutral[0],
   },
   content: {
     padding: 20,
@@ -837,10 +838,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   trendPositive: {
-    color: "#22C55E",
+    color: BrandColors.semantic.success,
   },
   trendNegative: {
-    color: "#EF4444",
+    color: BrandColors.semantic.error,
   },
   chartSection: {
     marginVertical: 30,
@@ -848,14 +849,14 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#000000",
+    color: BrandColors.neutral[1000],
     marginBottom: 20,
   },
   chartContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    backgroundColor: "#F8F9FD",
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 16,
     padding: Platform?.OS === "web" ? 20 : 16,
     height: Platform?.OS === "web" ? 200 : 180,
@@ -866,7 +867,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bar: {
-    backgroundColor: "#430B92",
+    backgroundColor: BrandColors.primary[500],
     width: Platform?.OS === "web" ? 30 : 24,
     borderRadius: 4,
     marginBottom: 8,
@@ -874,19 +875,19 @@ const styles = StyleSheet.create({
   },
   barLabel: {
     fontSize: 12,
-    color: "#6C6C6C",
+    color: BrandColors.neutral[500],
     marginBottom: 4,
   },
   barValue: {
     fontSize: 11,
-    color: "#430B92",
+    color: BrandColors.primary[500],
     fontWeight: "600",
   },
   section: {
     marginBottom: 30,
   },
   platformBreakdown: {
-    backgroundColor: "#F8F9FD",
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 16,
     padding: 20,
   },
@@ -897,25 +898,25 @@ const styles = StyleSheet.create({
   },
   platformName: {
     fontSize: 14,
-    color: "#000000",
+    color: BrandColors.neutral[1000],
     fontWeight: "500",
     width: 80,
   },
   progressBar: {
     flex: 1,
     height: 8,
-    backgroundColor: "#E2D0FB",
+    backgroundColor: BrandColors.primary[200],
     borderRadius: 4,
     marginHorizontal: 12,
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#430B92",
+    backgroundColor: BrandColors.primary[500],
     borderRadius: 4,
   },
   platformPercentage: {
     fontSize: 14,
-    color: "#430B92",
+    color: BrandColors.primary[500],
     fontWeight: "600",
     width: 40,
     textAlign: "right",
@@ -927,7 +928,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#F8F9FD",
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
   },
@@ -937,12 +938,12 @@ const styles = StyleSheet.create({
   dealBrand: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#000000",
+    color: BrandColors.neutral[1000],
     marginBottom: 4,
   },
   dealPlatform: {
     fontSize: 12,
-    color: "#6C6C6C",
+    color: BrandColors.neutral[500],
   },
   dealAmount: {
     alignItems: "flex-end",
@@ -953,7 +954,7 @@ const styles = StyleSheet.create({
     ...DesignSystem.Typography.bodyMedium,
     fontSize: 16,
     fontWeight: "700",
-    color: "#430B92",
+    color: BrandColors.primary[500],
     marginBottom: 6,
     textAlign: 'right', // Right-align prices
   },
@@ -962,23 +963,23 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end', // Align pills to right edge
   },
   statusCompleted: {
-    backgroundColor: "#DCFCE7",
+    backgroundColor: BrandColors.semantic.successLight,
   },
   statusProgress: {
-    backgroundColor: "#FEF3C7",
+    backgroundColor: BrandColors.semantic.warningLight,
   },
   statusText: {
     fontSize: 10,
     fontWeight: "600",
   },
   statusTextCompleted: {
-    color: "#15803D",
+    color: BrandColors.semantic.successDark,
   },
   statusTextProgress: {
-    color: "#B45309",
+    color: BrandColors.semantic.warningDark,
   },
   highlightSection: {
-    backgroundColor: "#430B92",
+    backgroundColor: BrandColors.primary[500],
     borderRadius: 16,
     padding: 24,
     marginTop: 20,
@@ -987,12 +988,12 @@ const styles = StyleSheet.create({
   highlightTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: BrandColors.neutral[0],
     marginBottom: 8,
   },
   highlightText: {
     fontSize: 14,
-    color: "#FFFFFF",
+    color: BrandColors.neutral[0],
     textAlign: "center",
     lineHeight: 20,
   },
@@ -1006,13 +1007,13 @@ const styles = StyleSheet.create({
   loadingShimmer: {
     width: "80%",
     height: 80,
-    backgroundColor: "#E2D0FB",
+    backgroundColor: BrandColors.primary[200],
     borderRadius: 8,
     marginBottom: 16,
   },
   loadingText: {
     fontSize: 14,
-    color: "#6C6C6C",
+    color: BrandColors.neutral[500],
     fontStyle: "italic",
   },
   chartSkeletonContainer: {
@@ -1027,14 +1028,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   barSkeleton: {
-    backgroundColor: "#E2D0FB",
+    backgroundColor: BrandColors.primary[200],
     width: Platform?.OS === "web" ? 30 : 24,
     height: 60,
     borderRadius: 4,
     marginBottom: 8,
   },
   barLabelSkeleton: {
-    backgroundColor: "#E2D0FB",
+    backgroundColor: BrandColors.primary[200],
     width: 20,
     height: 12,
     borderRadius: 2,
@@ -1046,12 +1047,12 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   offerCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E2D0FB',
-    shadowColor: '#000',
+    borderColor: BrandColors.primary[200],
+    shadowColor: BrandColors.neutral[1000],
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
@@ -1061,7 +1062,7 @@ const styles = StyleSheet.create({
   offerCardPressed: {
     opacity: 0.8,
     transform: [{ scale: 0.98 }],
-    backgroundColor: '#F8F4FF',
+    backgroundColor: BrandColors.primary[50],
   },
   offerHeader: {
     flexDirection: 'row',
@@ -1076,17 +1077,17 @@ const styles = StyleSheet.create({
   offerTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#430B92',
+    color: BrandColors.primary[500],
     marginBottom: 4,
   },
   offerCreator: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 2,
   },
   offerPlatform: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   offerActions: {
     alignItems: 'flex-end',
@@ -1095,7 +1096,7 @@ const styles = StyleSheet.create({
   },
   offerAmount: {
     ...DesignSystem.Typography.h4,
-    color: '#430B92',
+    color: BrandColors.primary[500],
     marginBottom: 8,
     textAlign: 'right', // Right-align all prices to consistent gutter
   },
@@ -1112,15 +1113,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    borderTopColor: BrandColors.neutral[200],
   },
   offerDate: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   offerNumber: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
     fontFamily: 'monospace',
   },
   
@@ -1136,7 +1137,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: BrandColors.neutral[50],
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -1150,17 +1151,17 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#430B92',
+    color: BrandColors.primary[500],
     marginBottom: 2,
   },
   activityDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 4,
   },
   activityTime: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   
   // Action Button Styles
@@ -1169,13 +1170,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   exploreButton: {
-    backgroundColor: '#430B92',
+    backgroundColor: BrandColors.primary[500],
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 8,
   },
   exploreButtonText: {
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },

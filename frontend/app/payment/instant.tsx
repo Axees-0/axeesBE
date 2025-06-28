@@ -21,6 +21,7 @@ import { WebSEO } from '../web-seo';
 import { Color } from '@/GlobalStyles';
 import { Image } from 'expo-image';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
+import { BrandColors } from '@/constants/Colors';
 
 interface PaymentMethod {
   id: string;
@@ -198,14 +199,14 @@ const InstantPaymentPage: React.FC = () => {
           <MaterialIcons 
             name="chevron-right" 
             size={24} 
-            color={selectedMethod === method.id ? Color.cSK430B92500 : '#999'} 
+            color={selectedMethod === method.id ? BrandColors.primary[500] : BrandColors.neutral[400]} 
           />
         </TouchableOpacity>
       ))}
 
       {!hasGhostProfile && (
         <View style={styles.securityNote}>
-          <MaterialIcons name="lock" size={16} color="#10B981" />
+          <MaterialIcons name="lock" size={16} color={BrandColors.semantic.success} />
           <Text style={styles.securityText}>
             Your payment info is encrypted and never stored
           </Text>
@@ -220,7 +221,7 @@ const InstantPaymentPage: React.FC = () => {
         style={styles.backButton}
         onPress={() => setStep('select')}
       >
-        <MaterialIcons name="arrow-back" size={24} color="#333" />
+        <MaterialIcons name="arrow-back" size={24} color={BrandColors.neutral[700]} />
       </TouchableOpacity>
 
       <Text style={styles.sectionTitle}>Card Information</Text>
@@ -272,7 +273,7 @@ const InstantPaymentPage: React.FC = () => {
           <MaterialIcons 
             name={saveCard ? "check-box" : "check-box-outline-blank"} 
             size={24} 
-            color={Color.cSK430B92500} 
+            color={BrandColors.primary[500]} 
           />
           <Text style={styles.saveCardText}>
             Save card for future purchases
@@ -315,7 +316,7 @@ const InstantPaymentPage: React.FC = () => {
       </View>
 
       <View style={styles.paymentMethodSummary}>
-        <MaterialIcons name="credit-card" size={24} color="#666" />
+        <MaterialIcons name="credit-card" size={24} color={BrandColors.neutral[600]} />
         <View style={styles.methodSummaryInfo}>
           <Text style={styles.methodSummaryText}>
             {selectedMethod === 'new-card' ? 'Card' : paymentMethods.find(m => m.id === selectedMethod)?.name}
@@ -340,7 +341,7 @@ const InstantPaymentPage: React.FC = () => {
           <Text style={styles.primaryButtonText}>Processing...</Text>
         ) : (
           <>
-            <MaterialIcons name="lock" size={20} color="#fff" />
+            <MaterialIcons name="lock" size={20} color={BrandColors.neutral[0]} />
             <Text style={styles.primaryButtonText}>Pay ${amount.toFixed(2)}</Text>
           </>
         )}
@@ -348,15 +349,15 @@ const InstantPaymentPage: React.FC = () => {
 
       <View style={styles.securityBadges}>
         <View style={styles.badge}>
-          <MaterialIcons name="https" size={14} color="#10B981" />
+          <MaterialIcons name="https" size={14} color={BrandColors.semantic.success} />
           <Text style={styles.badgeText}>Secure</Text>
         </View>
         <View style={styles.badge}>
-          <MaterialIcons name="verified-user" size={14} color="#10B981" />
+          <MaterialIcons name="verified-user" size={14} color={BrandColors.semantic.success} />
           <Text style={styles.badgeText}>PCI Compliant</Text>
         </View>
         <View style={styles.badge}>
-          <FontAwesome5 name="shield-alt" size={14} color="#10B981" />
+          <FontAwesome5 name="shield-alt" size={14} color={BrandColors.semantic.success} />
           <Text style={styles.badgeText}>Encrypted</Text>
         </View>
       </View>
@@ -366,10 +367,10 @@ const InstantPaymentPage: React.FC = () => {
   const renderSuccess = () => (
     <View style={styles.successContainer}>
       <LinearGradient
-        colors={['#10B981', '#059669']}
+        colors={[BrandColors.semantic.success, BrandColors.semantic.successDark]}
         style={styles.successIcon}
       >
-        <MaterialIcons name="check" size={48} color="#fff" />
+        <MaterialIcons name="check" size={48} color={BrandColors.neutral[0]} />
       </LinearGradient>
 
       <Text style={styles.successTitle}>Payment Successful!</Text>
@@ -420,7 +421,7 @@ const InstantPaymentPage: React.FC = () => {
             );
           }}
         >
-          <MaterialIcons name="close" size={24} color="#666" />
+          <MaterialIcons name="close" size={24} color={BrandColors.neutral[600]} />
         </TouchableOpacity>
       </View>
 
@@ -445,7 +446,7 @@ const InstantPaymentPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -492,8 +493,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   methodCardSelected: {
-    borderColor: Color.cSK430B92500,
-    backgroundColor: 'rgba(67, 11, 146, 0.05)',
+    borderColor: BrandColors.primary[500],
+    backgroundColor: BrandColors.primary[50],
   },
   methodIcon: {
     fontSize: 24,
@@ -519,7 +520,7 @@ const styles = StyleSheet.create({
   },
   securityText: {
     ...DesignSystem.Typography.caption,
-    color: '#10B981',
+    color: BrandColors.semantic.success,
   },
   detailsContainer: {
     paddingVertical: 20,
@@ -590,7 +591,7 @@ const styles = StyleSheet.create({
   },
   totalValue: {
     ...DesignSystem.Typography.h2,
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
   },
   paymentMethodSummary: {
     flexDirection: 'row',
@@ -614,7 +615,7 @@ const styles = StyleSheet.create({
   },
   changeLink: {
     ...DesignSystem.Typography.caption,
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontWeight: '600',
   },
   securityBadges: {
@@ -630,7 +631,7 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     ...DesignSystem.Typography.small,
-    color: '#10B981',
+    color: BrandColors.semantic.success,
   },
   successContainer: {
     alignItems: 'center',
@@ -646,12 +647,12 @@ const styles = StyleSheet.create({
   },
   successTitle: {
     ...DesignSystem.Typography.h1,
-    color: '#10B981',
+    color: BrandColors.semantic.success,
     marginBottom: 8,
   },
   successAmount: {
     ...DesignSystem.Typography.h2,
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     marginBottom: 24,
   },
   successDetails: {
