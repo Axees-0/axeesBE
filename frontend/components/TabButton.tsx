@@ -1,10 +1,13 @@
 import type React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import { Color, FontFamily, FontSize, Padding, Gap } from "../GlobalStyles";
+import { View, Text, StyleSheet, Pressable, Platform } from "react-native";
+import { Color, FontFamily, FontSize, Padding, Gap, Focus } from "../GlobalStyles";
+import { BrandColors } from "@/constants/Colors";
 import { useWindowDimensions } from "react-native";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useUnreadMessages } from "@/hooks/messagesContext";
+import { BREAKPOINTS } from "@/constants/breakpoints";
 import axios from "axios";
 
 interface TabButtonProps {
@@ -20,9 +23,12 @@ export function TabButton({
   isActive = false,
   onPress,
 }: TabButtonProps) {
-  const window = useWindowDimensions();
+  const { width } = useWindowDimensions();
+  const isUltraWide = width >= BREAKPOINTS.ULTRA_WIDE;
+  const isWideScreen = width >= BREAKPOINTS.DESKTOP;
 
   const [notifications, setNotifications] = useState<any[]>([]);
+  const { unreadCount: messagesUnreadCount } = useUnreadMessages();
 
   const { user } = useAuth();
 
@@ -52,10 +58,34 @@ export function TabButton({
     (notification) => notification.unread === true
   );
 
+  // Create dynamic accessibility label based on notifications and messages
+  const getAccessibilityLabel = () => {
+    if (label.toLowerCase() === "notifications" && unreadNotifications.length > 0) {
+      return `${label} tab, ${unreadNotifications.length} unread`;
+    }
+    if (label.toLowerCase() === "messages" && messagesUnreadCount > 0) {
+      return `${label} tab, ${messagesUnreadCount} unread`;
+    }
+    return `${label} tab`;
+  };
+
   return (
     <Pressable
-      style={[styles.parentFlexBox, isActive && styles.activeTab]}
+      style={({ pressed, focused }) => [
+        styles.parentFlexBox, 
+        isUltraWide && styles.parentFlexBoxUltraWide,
+        isWideScreen && styles.parentFlexBoxWide,
+        isActive && styles.activeTab,
+        focused && styles.focusedTab,
+        pressed && styles.pressedTab
+      ]}
       onPress={onPress}
+      accessible={true}
+      accessibilityRole="tab"
+      accessibilityLabel={getAccessibilityLabel()}
+      accessibilityState={{ selected: isActive }}
+      accessibilityHint={`Navigate to ${label} page`}
+      {...(Platform.OS === 'web' && { tabIndex: -1 })}
     >
       {label.toLowerCase() === "notifications" &&
         unreadNotifications.length > 0 && (
@@ -68,7 +98,7 @@ export function TabButton({
           </View>
         )}
       {icon}
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label, isUltraWide && styles.labelUltraWide, isWideScreen && styles.labelWide]}>{label}</Text>
     </Pressable>
   );
 }
@@ -85,23 +115,51 @@ const styles = StyleSheet.create({
     minWidth: 0,
     opacity: 0.6,
   },
+  parentFlexBoxWide: {
+    height: 100,
+    paddingVertical: Padding.p_base,
+    gap: Gap.gap_2xs,
+    paddingHorizontal: 12,
+  },
+  parentFlexBoxUltraWide: {
+    height: 120,
+    paddingVertical: Padding.p_xl,
+    gap: Gap.gap_sm,
+    paddingHorizontal: 16,
+  },
   activeTab: {
     opacity: 1,
-    borderColor: Color.backgroundsPrimary,
+    borderColor: BrandColors.primary[500],
     borderBottomWidth: 3,
     borderStyle: "solid",
   },
+  focusedTab: {
+    ...Focus.primary,
+    borderRadius: 8,
+    opacity: 1,
+  },
+  pressedTab: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
+  },
   label: {
-    color: Color.backgroundsPrimary,
+    color: BrandColors.neutral[700],
     textAlign: "center",
     fontFamily: FontFamily.inter,
     fontSize: FontSize.size_xs,
     textTransform: "capitalize",
   },
+  labelWide: {
+    fontSize: FontSize.size_sm,
+  },
+  labelUltraWide: {
+    fontSize: FontSize.size_base,
+    fontWeight: "500",
+  },
   notificationBadge: {
     position: "absolute",
     top: 0,
-    backgroundColor: "#FF0000",
+    backgroundColor: BrandColors.semantic.error,
     borderRadius: 15,
     width: 25,
     height: 25,
@@ -112,6 +170,6 @@ const styles = StyleSheet.create({
   notificationBadgeText: {
     fontFamily: FontFamily.inter,
     textTransform: "capitalize",
-    color: "#FFFFFF",
+    color: BrandColors.neutral[0],
   },
 });

@@ -12,13 +12,12 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { notificationService } from '@/services/notificationService';
 import { useAuth } from '@/contexts/AuthContext';
-
-// Icons
-import ArrowLeft from '@/assets/arrowleft021.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface CounterOfferDetails {
   id: string;
@@ -51,7 +50,7 @@ interface CounterOfferDetails {
 
 const HandleCounterOfferPage: React.FC = () => {
   const { counterId } = useLocalSearchParams();
-  const isWeb = Platform.OS === 'web';
+  const isWeb = Platform?.OS === 'web';
   const { user } = useAuth();
   
   // Demo counter offer data
@@ -98,8 +97,6 @@ const HandleCounterOfferPage: React.FC = () => {
   });
 
   const handleAction = (action: 'accept' | 'reject' | 'negotiate') => {
-    const isWeb = Platform.OS === 'web';
-    
     switch (action) {
       case 'accept':
         if (isWeb) {
@@ -114,6 +111,13 @@ const HandleCounterOfferPage: React.FC = () => {
               actionParams: { dealId: `DEAL-${Date.now()}` }
             }).catch(console.error);
             
+            // Dispatch event to hide the banner
+            if (typeof window !== 'undefined') {
+              window.dispatchEvent(new CustomEvent('offerAccepted', {
+                detail: { offerId: counterOffer.id }
+              }));
+            }
+            
             window.alert('Counter Offer Accepted! Let\'s set up milestones for this deal.');
             router.replace({
               pathname: '/milestones/setup',
@@ -127,8 +131,8 @@ const HandleCounterOfferPage: React.FC = () => {
           }
         } else {
           Alert.alert(
-          'Accept Counter Offer',
-          `Accept the counter offer from ${counterOffer.creator.name} for $${counterOffer.counterOffer.amount}?`,
+            'Accept Counter Offer',
+            `Accept the counter offer from ${counterOffer.creator.name} for $${counterOffer.counterOffer.amount}?`,
           [
             { text: 'Cancel', style: 'cancel' },
             { 
@@ -142,6 +146,13 @@ const HandleCounterOfferPage: React.FC = () => {
                   actionType: 'view_deal',
                   actionParams: { dealId: `DEAL-${Date.now()}` }
                 });
+                
+                // Dispatch event to hide the banner
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('offerAccepted', {
+                    detail: { offerId: counterOffer.id }
+                  }));
+                }
                 
                 Alert.alert(
                   'Counter Offer Accepted!',
@@ -182,12 +193,12 @@ const HandleCounterOfferPage: React.FC = () => {
             }).catch(console.error);
             
             window.alert('Counter Offer Rejected. The creator has been notified.');
-            router.back();
+            router.push('/deals');
           }
         } else {
           Alert.alert(
-          'Reject Counter Offer',
-          'Are you sure you want to reject this counter offer?',
+            'Reject Counter Offer',
+            'Are you sure you want to reject this counter offer?',
           [
             { text: 'Cancel', style: 'cancel' },
             { 
@@ -207,7 +218,7 @@ const HandleCounterOfferPage: React.FC = () => {
                   'Counter Offer Rejected',
                   'The creator has been notified.',
                   [
-                    { text: 'OK', onPress: () => router.back() }
+                    { text: 'OK', onPress: () => router.push('/deals') }
                   ]
                 );
               }
@@ -247,8 +258,8 @@ const HandleCounterOfferPage: React.FC = () => {
           }
         } else {
           Alert.alert(
-          'Continue Negotiation',
-          'How would you like to proceed?',
+            'Continue Negotiation',
+            'How would you like to proceed?',
           [
             { text: 'Cancel', style: 'cancel' },
             { 
@@ -318,18 +329,21 @@ const HandleCounterOfferPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
+          <UniversalBackButton 
             style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+            fallbackRoute="/deals"
+            iconSize={24}
+          />
           
           <Text style={styles.headerTitle}>Counter Offer</Text>
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Creator Info */}
           <View style={styles.creatorSection}>
             <Text style={styles.creatorName}>{counterOffer.creator.name}</Text>
@@ -426,6 +440,10 @@ const HandleCounterOfferPage: React.FC = () => {
           <TouchableOpacity 
             style={styles.rejectButton}
             onPress={() => handleAction('reject')}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Reject counter offer from ${counterOffer.creator.name}`}
+            accessibilityHint="Declines the counter offer and notifies the creator"
           >
             <Text style={styles.rejectButtonText}>Reject</Text>
           </TouchableOpacity>
@@ -433,6 +451,10 @@ const HandleCounterOfferPage: React.FC = () => {
           <TouchableOpacity 
             style={styles.negotiateButton}
             onPress={() => handleAction('negotiate')}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Continue negotiating with ${counterOffer.creator.name}`}
+            accessibilityHint="Opens chat or allows making a counter offer"
           >
             <Text style={styles.negotiateButtonText}>Negotiate</Text>
           </TouchableOpacity>
@@ -440,6 +462,10 @@ const HandleCounterOfferPage: React.FC = () => {
           <TouchableOpacity 
             style={styles.acceptButton}
             onPress={() => handleAction('accept')}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Accept counter offer for $${counterOffer.counterOffer.amount}`}
+            accessibilityHint="Accepts the terms and starts setting up deal milestones"
           >
             <Text style={styles.acceptButtonText}>Accept</Text>
           </TouchableOpacity>
@@ -455,7 +481,7 @@ const HandleCounterOfferPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -463,7 +489,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   backButton: {
     padding: 8,
@@ -485,7 +511,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   creatorName: {
     fontSize: 20,
@@ -495,7 +521,7 @@ const styles = StyleSheet.create({
   },
   creatorHandle: {
     fontSize: 16,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   summarySection: {
     padding: 20,
@@ -507,7 +533,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   comparisonCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
@@ -520,7 +546,7 @@ const styles = StyleSheet.create({
   },
   comparisonLabel: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     fontWeight: '500',
   },
   comparisonValues: {
@@ -530,12 +556,12 @@ const styles = StyleSheet.create({
   },
   originalValue: {
     fontSize: 14,
-    color: '#999',
+    color: BrandColors.neutral[400],
     textDecorationLine: 'line-through',
   },
   arrow: {
     fontSize: 14,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   counterValue: {
     fontSize: 16,
@@ -543,8 +569,8 @@ const styles = StyleSheet.create({
     color: Color.cSK430B92950,
   },
   changeBadge: {
-    backgroundColor: '#FEF3C7',
-    color: '#B45309',
+    backgroundColor: BrandColors.semantic.warningLight,
+    color: BrandColors.semantic.warningDark,
     fontSize: 12,
     fontWeight: '600',
     paddingHorizontal: 8,
@@ -552,19 +578,19 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   changesSummary: {
-    backgroundColor: '#F0F9FF',
+    backgroundColor: BrandColors.semantic.infoLight,
     borderRadius: 8,
     padding: 12,
   },
   changesTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0369A1',
+    color: BrandColors.semantic.infoDark,
     marginBottom: 8,
   },
   changeItem: {
     fontSize: 14,
-    color: '#0369A1',
+    color: BrandColors.semantic.infoDark,
     marginBottom: 4,
   },
   messageSection: {
@@ -572,13 +598,13 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   messageCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
   },
   messageText: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[800],
     lineHeight: 22,
   },
   requirementsSection: {
@@ -586,13 +612,13 @@ const styles = StyleSheet.create({
     paddingTop: 0,
   },
   requirementsCard: {
-    backgroundColor: '#FEF3C7',
+    backgroundColor: BrandColors.semantic.warningLight,
     borderRadius: 8,
     padding: 12,
   },
   requirementsText: {
     fontSize: 14,
-    color: '#92400E',
+    color: BrandColors.semantic.warningDark,
     lineHeight: 20,
   },
   deliverablesSection: {
@@ -605,10 +631,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   newDeliverable: {
-    backgroundColor: '#F0FDF4',
+    backgroundColor: BrandColors.semantic.successLight,
     marginHorizontal: -12,
     paddingHorizontal: 12,
     borderRadius: 8,
@@ -618,12 +644,12 @@ const styles = StyleSheet.create({
   deliverableText: {
     flex: 1,
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[800],
     lineHeight: 20,
   },
   newBadge: {
-    backgroundColor: '#10B981',
-    color: '#fff',
+    backgroundColor: BrandColors.semantic.success,
+    color: BrandColors.neutral[0],
     fontSize: 10,
     fontWeight: '600',
     paddingHorizontal: 8,
@@ -634,7 +660,7 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   valueCard: {
-    backgroundColor: '#EBF8FF',
+    backgroundColor: BrandColors.semantic.infoLight,
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
@@ -646,12 +672,12 @@ const styles = StyleSheet.create({
   valueTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1E40AF',
+    color: BrandColors.semantic.infoDark,
     marginBottom: 8,
   },
   valueText: {
     fontSize: 14,
-    color: '#1E40AF',
+    color: BrandColors.semantic.infoDark,
     textAlign: 'center',
     lineHeight: 20,
   },
@@ -659,34 +685,58 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: BrandColors.neutral[100],
     gap: 10,
   },
   rejectButton: {
     flex: 1,
-    backgroundColor: '#FEE2E2',
+    backgroundColor: BrandColors.semantic.errorLight,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: BrandColors.semantic.errorLight,
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+        ':focus': {
+          borderColor: BrandColors.semantic.errorDark,
+          borderWidth: 2,
+          shadowColor: BrandColors.semantic.errorDark,
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+        }
+      }
+    }),
   },
   rejectButtonText: {
-    color: '#DC2626',
+    color: BrandColors.semantic.errorDark,
     fontSize: 16,
     fontWeight: '600',
   },
   negotiateButton: {
     flex: 1,
-    backgroundColor: '#E0E7FF',
+    backgroundColor: BrandColors.primary[200],
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#C7D2FE',
+    borderColor: BrandColors.primary[300],
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+        ':focus': {
+          borderColor: BrandColors.primary[700],
+          borderWidth: 2,
+          shadowColor: BrandColors.primary[700],
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+        }
+      }
+    }),
   },
   negotiateButtonText: {
-    color: '#4F46E5',
+    color: BrandColors.primary[700],
     fontSize: 16,
     fontWeight: '600',
   },
@@ -696,9 +746,23 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: Color.cSK430B92500,
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+        ':focus': {
+          borderColor: BrandColors.neutral[0],
+          borderWidth: 2,
+          shadowColor: Color.cSK430B92500,
+          shadowOpacity: 0.4,
+          shadowRadius: 4,
+        }
+      }
+    }),
   },
   acceptButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },

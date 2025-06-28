@@ -17,9 +17,11 @@ import WebBottomTabs from '@/components/WebBottomTabs';
 import { DemoData } from '@/demo/DemoData';
 import { useAuth } from '@/contexts/AuthContext';
 import { notificationService } from '@/services/notificationService';
+import { BrandColors } from '@/constants/Colors';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface Milestone {
   id: string;
@@ -60,7 +62,7 @@ interface Deal {
 
 const DealDetailPage: React.FC = () => {
   const { id } = useLocalSearchParams();
-  const isWeb = Platform.OS === 'web';
+  const isWeb = Platform?.OS === 'web';
   const [selectedMilestone, setSelectedMilestone] = useState<string | null>(null);
   const [milestoneStatuses, setMilestoneStatuses] = useState<{[key: string]: string}>({});
   const { user } = useAuth();
@@ -155,14 +157,14 @@ const DealDetailPage: React.FC = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'pending': return '#6B7280';
-      case 'funded': return '#3B82F6';
-      case 'in_progress': return '#F59E0B';
-      case 'submitted': return '#8B5CF6';
-      case 'approved': return '#10B981';
-      case 'completed': return '#059669';
-      case 'cancelled': return '#EF4444';
-      default: return '#6B7280';
+      case 'pending': return BrandColors.neutral[500];
+      case 'funded': return BrandColors.semantic.info;
+      case 'in_progress': return BrandColors.semantic.warning;
+      case 'submitted': return BrandColors.primary[400];
+      case 'approved': return BrandColors.semantic.success;
+      case 'completed': return BrandColors.semantic.successDark;
+      case 'cancelled': return BrandColors.semantic.error;
+      default: return BrandColors.neutral[500];
     }
   };
 
@@ -190,7 +192,6 @@ const DealDetailPage: React.FC = () => {
     switch (action) {
       case 'fund':
         // Use web-compatible confirmation
-        const isWeb = Platform.OS === 'web';
         const confirmed = isWeb 
           ? window.confirm(`Fund ${milestone.title} for $${milestone.amount}?`)
           : true; // Will show Alert.alert for mobile
@@ -240,7 +241,6 @@ const DealDetailPage: React.FC = () => {
       }
       
       // Use web-compatible success message
-      const isWeb = Platform.OS === 'web';
       if (isWeb) {
         const openChat = window.confirm('Milestone funded successfully! The creator has been notified and can start working.\n\nOpen chat?');
         if (openChat) {
@@ -285,7 +285,6 @@ const DealDetailPage: React.FC = () => {
       }
     } catch (error) {
       console.error('Error funding milestone:', error);
-      const isWeb = Platform.OS === 'web';
       if (isWeb) {
         window.alert('Failed to fund milestone. Please try again.');
       } else {
@@ -410,12 +409,9 @@ const DealDetailPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton 
+            fallbackRoute="/deals"
+          />
           
           <Text style={styles.headerTitle}>Deal Details</Text>
           
@@ -441,7 +437,11 @@ const DealDetailPage: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Deal Overview */}
           <View style={styles.dealOverview}>
             <Text style={styles.dealTitle}>{deal.offerTitle}</Text>
@@ -520,7 +520,7 @@ const DealDetailPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -528,7 +528,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   backButton: {
     padding: 8,
@@ -537,7 +537,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     textAlign: 'center',
     marginRight: 40,
   },
@@ -556,12 +556,12 @@ const styles = StyleSheet.create({
   dealOverview: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   dealTitle: {
     fontSize: 22,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 16,
   },
   dealParties: {
@@ -574,23 +574,23 @@ const styles = StyleSheet.create({
   },
   partyLabel: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
     fontWeight: '500',
     marginBottom: 4,
   },
   partyName: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 2,
   },
   partyHandle: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   partyCompany: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   dealMeta: {
     flexDirection: 'row',
@@ -601,13 +601,13 @@ const styles = StyleSheet.create({
   },
   metaLabel: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 4,
   },
   metaValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
   },
   milestonesSection: {
     padding: 20,
@@ -615,16 +615,16 @@ const styles = StyleSheet.create({
   sectionHeader: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 16,
   },
   milestoneCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: BrandColors.neutral[200],
   },
   milestoneHeader: {
     flexDirection: 'row',
@@ -639,18 +639,18 @@ const styles = StyleSheet.create({
   milestoneTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 4,
   },
   milestoneDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     lineHeight: 20,
     marginBottom: 6,
   },
   milestoneDue: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   milestoneStatus: {
     alignItems: 'flex-end',
@@ -658,7 +658,7 @@ const styles = StyleSheet.create({
   milestoneAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     marginBottom: 6,
   },
   statusBadge: {
@@ -676,31 +676,31 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 6,
   },
   deliverableItem: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 2,
   },
   workSubmissionSection: {
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
   },
   submissionContent: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[700],
     lineHeight: 20,
     marginBottom: 8,
   },
   submissionDate: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 8,
   },
   filesSection: {
@@ -709,12 +709,12 @@ const styles = StyleSheet.create({
   filesTitle: {
     fontSize: 12,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 4,
   },
   fileName: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 2,
   },
   milestoneActions: {
@@ -725,7 +725,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   actionButton: {
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderRadius: 8,
@@ -733,28 +733,28 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   secondaryButton: {
-    backgroundColor: '#6B7280',
+    backgroundColor: BrandColors.neutral[500],
   },
   approveButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: BrandColors.semantic.success,
   },
   rejectButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: BrandColors.semantic.error,
   },
   proofButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: BrandColors.primary[400],
   },
   actionButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 14,
     fontWeight: '600',
   },
   secondaryButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
   },
   progressSection: {
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
   },
   progressStats: {
     flexDirection: 'row',
@@ -766,12 +766,12 @@ const styles = StyleSheet.create({
   progressValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     marginBottom: 4,
   },
   progressLabel: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     textAlign: 'center',
   },
 });

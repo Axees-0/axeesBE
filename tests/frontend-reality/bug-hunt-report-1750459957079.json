@@ -1,0 +1,47 @@
+{
+  "timestamp": "2025-06-20T22:52:37.079Z",
+  "environment": {
+    "environment": "local",
+    "frontendUrl": "http://localhost:19006",
+    "hostname": "localhost",
+    "port": "19006",
+    "isLocal": true,
+    "isSecure": false
+  },
+  "duration": "0.03",
+  "summary": {
+    "totalBugs": 0,
+    "critical": 0,
+    "medium": 0,
+    "low": 0
+  },
+  "testResults": {
+    "authentication": {
+      "error": "Could not find Chrome (ver. 121.0.6167.85). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /root/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "totalBugs": 0,
+      "bugs": []
+    },
+    "forms": {
+      "error": "Could not find Chrome (ver. 121.0.6167.85). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /root/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "totalBugs": 0,
+      "bugs": []
+    },
+    "realtime": {
+      "error": "Could not find Chrome (ver. 121.0.6167.85). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /root/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "totalBugs": 0,
+      "bugs": []
+    },
+    "mobile": {
+      "error": "Could not find Chrome (ver. 121.0.6167.85). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /root/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "totalBugs": 0,
+      "bugs": []
+    },
+    "performance": {
+      "error": "Could not find Chrome (ver. 121.0.6167.85). This can occur if either\n 1. you did not perform an installation before running the script (e.g. `npx puppeteer browsers install chrome`) or\n 2. your cache path is incorrectly configured (which is: /root/.cache/puppeteer).\nFor (2), check out our guide on configuring puppeteer at https://pptr.dev/guides/configuration.",
+      "totalBugs": 0,
+      "bugs": []
+    }
+  },
+  "allBugs": [],
+  "recommendations": []
+}

@@ -20,7 +20,7 @@
    import { router, usePathname } from "expo-router";
    import { useAuth } from "@/contexts/AuthContext";
    import Search01 from "@/assets/search01.svg";
-   import { FontFamily, FontSize, Color, Padding } from "@/GlobalStyles";
+   import { FontFamily, FontSize, Color, Padding, Focus } from "@/GlobalStyles";
    
    /* ———————————————————————————————————————————————————————
       Props
@@ -41,7 +41,7 @@
      { name: "notifications", label: "Notifications" },
    ];
    
-   const BREAKPOINTS = { DESKTOP: 1280 };
+   const BREAKPOINTS = { DESKTOP: 1280, ULTRA_WIDE: 1440 };
    
    /* ———————————————————————————————————————————————————————
       Component
@@ -53,6 +53,7 @@
    }: NavbarProps) {
      const { width } = Dimensions.get("window");
      const isWide = width >= BREAKPOINTS.DESKTOP;
+     const isUltraWide = width >= BREAKPOINTS.ULTRA_WIDE;
      const { user, logout } = useAuth();
      const inputRef = useRef<RNTextInput>(null);
      const path = usePathname();
@@ -78,9 +79,9 @@
      /* ——— render ——— */
      return (
        <TouchableWithoutFeedback>
-         <View style={[styles.container, isWide && styles.containerWide]}>
+         <View style={[styles.container, isWide && styles.containerWide, isUltraWide && styles.containerUltraWide]}>
            {/* ─── Left: logo + tabs ─────────────────────────────── */}
-           <View style={styles.left}>
+           <View style={[styles.left, isUltraWide && styles.leftUltraWide]}>
              <TouchableOpacity onPress={() => router.push("/")}>
                <Image
                  source={require("@/assets/3.png")}
@@ -94,9 +95,16 @@
                  {TABS.map(t => (
                    <Pressable
                      key={t.name}
+                     style={({ focused }) => [
+                       styles.tabButton,
+                       focused && styles.tabButtonFocused,
+                     ]}
                      onPress={() =>
                        router.push(t.name === "/" ? "/" : `/${t.name}`)
                      }
+                     accessible={true}
+                     accessibilityRole="button"
+                     accessibilityLabel={`Navigate to ${t.label}`}
                    >
                      <Text
                        style={[
@@ -115,32 +123,52 @@
    
            {/* ─── Center: global search bar (Explore page only) ─── */}
            {path === "/" && (
-             <View style={[styles.searchBar, isWide && styles.searchBarWide]}>
-               <Search01 width={20} height={20} />
+             <View style={[styles.searchBar, isWide && styles.searchBarWide, isUltraWide && styles.searchBarUltraWide]}>
+               <Search01 width={isUltraWide ? 24 : 20} height={isUltraWide ? 24 : 20} />
                <TextInput
                 ref={inputRef}
                 value={searchText}
                 onChangeText={setSearchText}
                 returnKeyType="search"
-                blurOnSubmit={true}                     // ← blur automatically after submit
+                blurOnSubmit={true}
                 onSubmitEditing={() => {
-                  onSubmitSearch();                      // your existing search trigger
-                  inputRef.current?.blur();              // explicitly remove focus
+                  onSubmitSearch();
+                  inputRef.current?.blur();
                 }}
-                placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
+                placeholder={isUltraWide ? "Search by name, location, or category (e.g. Emma, Los Angeles, Fashion, #lifestyle)" : isWide ? "Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)" : "Search creators by name, location, or category"}
                 placeholderTextColor={Color.cSK430B92950}
                 style={styles.searchInput}
+                accessible={true}
+                accessibilityRole="searchbox"
+                accessibilityLabel="Search creators"
+                accessibilityHint="Search by name, location, or category"
+                tabIndex={1} // Ensure search gets focus priority
               />
+              {searchText.length > 0 && (
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={() => {
+                    setSearchText('');
+                    inputRef.current?.focus();
+                  }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Clear search"
+                  accessibilityHint="Clear the search text and refocus search input"
+                >
+                  <Text style={styles.clearButtonText}>×</Text>
+                </TouchableOpacity>
+              )}
             </View>
            )}
    
            {/* ─── Right: auth buttons / user dropdown ───────────── */}
            <View style={styles.right}>
-             {!user?._id ? (
+             {!user || !user._id ? (
                <View style={styles.authBtns}>
                  <TouchableOpacity
                    style={styles.signInBtn}
-                   onPress={() => router.push("/UAM001Login")}
+                   onPress={() => router.push("/login")}
                  >
                    <Text style={styles.signInTxt}>Sign In</Text>
                  </TouchableOpacity>
@@ -215,7 +243,7 @@
                    title: "Log Out",
                    onPress: async () => {
                      await logout();
-                     router.replace("/UAM001Login");
+                     router.replace("/login");
                    },
                    logout: true,
                  },
@@ -268,6 +296,11 @@ const styles = StyleSheet.create({
     maxWidth: 2030,
     alignSelf: "center",
   },
+  containerUltraWide: {
+    height: 80,
+    paddingHorizontal: 40,
+    maxWidth: 2200,
+  },
 
   /* —— left —— */
   left: {
@@ -276,9 +309,24 @@ const styles = StyleSheet.create({
     gap: 24,
     flexShrink: 0,                 // never shrink logo/tabs
   },
+  leftUltraWide: {
+    gap: 32,
+  },
   logo: { width: 160, height: 70, resizeMode: "contain" },
 
   tabs: { flexDirection: "row", gap: 24, flexWrap: "wrap" },
+  
+  tabButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  
+  tabButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 8,
+  },
+  
   tabLabel: {
     fontSize: FontSize.size_lg,
     fontFamily: FontFamily.inter,
@@ -307,6 +355,13 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   searchBarWide: { maxWidth: 960 },
+  searchBarUltraWide: { 
+    maxWidth: 1200,
+    height: 56,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    gap: 14,
+  },
 
   searchInput: {
     flex: 1,

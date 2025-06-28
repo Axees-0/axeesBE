@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   Pressable,
   StyleSheet,
   ScrollView,
+  Platform,
 } from "react-native";
 import Checkmarksquare01 from "@/assets/checkmarksquare01.svg";
 import EmptyCheckbox from "../assets/emptycheckbox.svg";
@@ -31,6 +32,20 @@ export default function CustomMultiSelect({
   const [showModal, setShowModal] = useState(false);
 
   const toggleModal = () => setShowModal(!showModal);
+
+  // Add ESC key support for web
+  useEffect(() => {
+    if (!showModal || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setShowModal(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [showModal]);
 
   const handleToggleValue = (val: string) => {
     let newValues = [...selectedValues];
@@ -66,7 +81,7 @@ export default function CustomMultiSelect({
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>{label ?? "Select Options"}</Text>
 
-            <ScrollView style={{ maxHeight: 300, marginVertical: 10 }}>
+            <ScrollView style={styles.optionsList}>
               {allOptions.map((option) => {
                 const checked = selectedValues.includes(option);
                 return (
@@ -142,6 +157,11 @@ const styles = StyleSheet.create({
     marginBottom: 4,
     color: "#430b92",
     fontWeight: "bold",
+  },
+  optionsList: {
+    maxHeight: 300,
+    marginVertical: 10,
+    paddingRight: 8, // Add padding to prevent scrollbar overlap
   },
   optionRow: {
     flexDirection: "row",

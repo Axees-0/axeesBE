@@ -12,9 +12,10 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Color } from '@/GlobalStyles';
+import { Color, Focus } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import { useAuth } from '@/contexts/AuthContext';
+import DesignSystem from '@/styles/DesignSystem';
 
 interface Notification {
   id: string;
@@ -33,6 +34,9 @@ const NotificationsPage: React.FC = () => {
   const { user } = useAuth();
   const { width } = useWindowDimensions();
   const [refreshing, setRefreshing] = useState(false);
+  const [markAllHovered, setMarkAllHovered] = useState(false);
+  const [markAllFocused, setMarkAllFocused] = useState(false);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 'notif-1',
@@ -120,6 +124,49 @@ const NotificationsPage: React.FC = () => {
     }
   };
 
+  const getDateGroup = (date: Date): string => {
+    const now = new Date();
+    const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfYesterday = new Date(startOfToday);
+    startOfYesterday.setDate(startOfYesterday.getDate() - 1);
+    const startOfWeek = new Date(startOfToday);
+    startOfWeek.setDate(startOfWeek.getDate() - 7);
+
+    if (date >= startOfToday) {
+      return 'Today';
+    } else if (date >= startOfYesterday) {
+      return 'Yesterday';
+    } else if (date >= startOfWeek) {
+      return 'This Week';
+    } else {
+      return 'Earlier';
+    }
+  };
+
+  const groupNotificationsByDate = (notifs: Notification[]) => {
+    const grouped: { [key: string]: Notification[] } = {};
+    
+    notifs.forEach(notif => {
+      const group = getDateGroup(notif.timestamp);
+      if (!grouped[group]) {
+        grouped[group] = [];
+      }
+      grouped[group].push(notif);
+    });
+
+    // Order the groups
+    const orderedGroups = ['Today', 'Yesterday', 'This Week', 'Earlier'];
+    const result: { group: string; notifications: Notification[] }[] = [];
+    
+    orderedGroups.forEach(group => {
+      if (grouped[group]) {
+        result.push({ group, notifications: grouped[group] });
+      }
+    });
+
+    return result;
+  };
+
   const handleNotificationPress = (notification: Notification) => {
     // Mark as read
     setNotifications(prev => 
@@ -156,7 +203,44 @@ const NotificationsPage: React.FC = () => {
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    const unreadCount = notifications.filter(n => !n.read).length;
+    
+    if (unreadCount === 0 || markingAllRead) {
+      return; // No unread notifications or already processing
+    }
+    
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(
+        `Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read?`
+      );
+      if (confirmed) {
+        setMarkingAllRead(true);
+        setTimeout(() => {
+          setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+          setMarkingAllRead(false);
+        }, 500); // Small delay for visual feedback
+      }
+    } else {
+      // For mobile, use Alert.alert
+      const { Alert } = require('react-native');
+      Alert.alert(
+        'Mark All Read',
+        `Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Mark Read', 
+            onPress: () => {
+              setMarkingAllRead(true);
+              setTimeout(() => {
+                setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+                setMarkingAllRead(false);
+              }, 500); // Small delay for visual feedback
+            }
+          }
+        ]
+      );
+    }
   };
 
   const onRefresh = () => {
@@ -186,10 +270,30 @@ const NotificationsPage: React.FC = () => {
           
           {unreadCount > 0 && (
             <TouchableOpacity 
-              style={styles.markAllButton}
+              style={[
+                styles.markAllButton,
+                markAllHovered && isWeb && styles.markAllButtonHovered,
+                markAllFocused && styles.markAllButtonFocused,
+                markingAllRead && styles.markAllButtonLoading
+              ]}
               onPress={markAllAsRead}
+              activeOpacity={0.7}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read`}
+              accessibilityHint="Marks all unread notifications as read"
+              onMouseEnter={isWeb ? () => setMarkAllHovered(true) : undefined}
+              onMouseLeave={isWeb ? () => setMarkAllHovered(false) : undefined}
+              onFocus={() => setMarkAllFocused(true)}
+              onBlur={() => setMarkAllFocused(false)}
+              {...(Platform.OS === 'web' && { tabIndex: 0 })}
             >
-              <Text style={styles.markAllText}>Mark all read</Text>
+              <Text style={[
+                styles.markAllText,
+                markAllFocused && styles.markAllTextFocused
+              ]}>
+                {markingAllRead ? 'Marking...' : 'Mark all read'}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
@@ -205,61 +309,50 @@ const NotificationsPage: React.FC = () => {
             />
           }
         >
-          {unreadCount > 0 && (
-            <View style={styles.unreadSection}>
-              <Text style={styles.sectionTitle}>New</Text>
-              {notifications.filter(n => !n.read).map(notification => (
-                <TouchableOpacity
-                  key={notification.id}
-                  style={[styles.notificationItem, styles.unreadItem]}
-                  onPress={() => handleNotificationPress(notification)}
-                >
-                  <View style={[styles.iconContainer, { backgroundColor: getNotificationColor(notification.type) + '20' }]}>
-                    <Text style={styles.icon}>{notification.icon}</Text>
-                  </View>
-                  
-                  <View style={styles.notificationContent}>
-                    <Text style={styles.notificationTitle}>{notification.title}</Text>
-                    <Text style={styles.notificationMessage} numberOfLines={2}>
-                      {notification.message}
-                    </Text>
-                    <Text style={styles.timestamp}>{formatTimestamp(notification.timestamp)}</Text>
-                  </View>
-                  
-                  <View style={[styles.unreadDot, { backgroundColor: getNotificationColor(notification.type) }]} />
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {notifications.filter(n => n.read).length > 0 && (
-            <View style={styles.readSection}>
-              <Text style={styles.sectionTitle}>Earlier</Text>
-              {notifications.filter(n => n.read).map(notification => (
-                <TouchableOpacity
-                  key={notification.id}
-                  style={styles.notificationItem}
-                  onPress={() => handleNotificationPress(notification)}
-                >
-                  <View style={[styles.iconContainer, { backgroundColor: '#f3f4f6' }]}>
-                    <Text style={styles.icon}>{notification.icon}</Text>
-                  </View>
-                  
-                  <View style={styles.notificationContent}>
-                    <Text style={[styles.notificationTitle, styles.readTitle]}>
-                      {notification.title}
-                    </Text>
-                    <Text style={[styles.notificationMessage, styles.readMessage]} numberOfLines={2}>
-                      {notification.message}
-                    </Text>
-                    <Text style={styles.timestamp}>{formatTimestamp(notification.timestamp)}</Text>
-                  </View>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
-
-          {notifications.length === 0 && (
+          {notifications.length > 0 ? (
+            groupNotificationsByDate(notifications).map(({ group, notifications: groupNotifs }) => (
+              <View key={group} style={styles.dateSection}>
+                <Text style={styles.dateSectionTitle}>{group}</Text>
+                {groupNotifs.map(notification => (
+                  <TouchableOpacity
+                    key={notification.id}
+                    style={[
+                      styles.notificationItem,
+                      !notification.read && styles.unreadItem
+                    ]}
+                    onPress={() => handleNotificationPress(notification)}
+                  >
+                    <View style={[
+                      styles.iconContainer, 
+                      { backgroundColor: notification.read ? '#f3f4f6' : getNotificationColor(notification.type) + '20' }
+                    ]}>
+                      <Text style={styles.icon}>{notification.icon}</Text>
+                    </View>
+                    
+                    <View style={styles.notificationContent}>
+                      <Text style={[
+                        styles.notificationTitle,
+                        notification.read && styles.readTitle
+                      ]}>
+                        {notification.title}
+                      </Text>
+                      <Text style={[
+                        styles.notificationMessage,
+                        notification.read && styles.readMessage
+                      ]} numberOfLines={width <= 375 ? undefined : 2}>
+                        {notification.message}
+                      </Text>
+                      <Text style={styles.timestamp}>{formatTimestamp(notification.timestamp)}</Text>
+                    </View>
+                    
+                    {!notification.read && (
+                      <View style={[styles.unreadDot, { backgroundColor: getNotificationColor(notification.type) }]} />
+                    )}
+                  </TouchableOpacity>
+                ))}
+              </View>
+            ))
+          ) : (
             <View style={styles.emptyState}>
               <Text style={styles.emptyTitle}>No notifications yet</Text>
               <Text style={styles.emptyText}>
@@ -293,16 +386,42 @@ const styles = StyleSheet.create({
     color: Color.cSK430B92950,
   },
   markAllButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    ...DesignSystem.ButtonStyles.secondary,
+    paddingHorizontal: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal,
+    height: DesignSystem.ButtonStyles.secondary.height,
+    borderRadius: 8,
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+      },
+    }),
   },
   markAllText: {
-    color: Color.cSK430B92500,
+    ...DesignSystem.ButtonTextStyles.secondary,
     fontSize: 14,
-    fontWeight: '600',
+    ...Platform.select({
+      web: {
+        userSelect: 'none',
+      },
+    }),
   },
   scrollContainer: {
     flex: 1,
+  },
+  dateSection: {
+    paddingTop: 20,
+  },
+  dateSectionTitle: {
+    ...DesignSystem.Typography.h4,
+    fontSize: 16, // Increased for better hierarchy
+    fontWeight: '700', // Increased weight
+    color: DesignSystem.AccessibleColors.textSecondary,
+    backgroundColor: DesignSystem.AccessibleColors.backgroundSubtle, // Background for section distinction
+    paddingHorizontal: 20,
+    paddingVertical: 12, // Added vertical padding
+    marginBottom: 0, // Remove bottom margin for cleaner sections
+    borderTopWidth: 1,
+    borderTopColor: DesignSystem.AccessibleColors.borderLight,
   },
   unreadSection: {
     paddingTop: 20,
@@ -325,6 +444,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
     alignItems: 'flex-start',
+    minHeight: 80, // Consistent row height for dot alignment
   },
   unreadItem: {
     backgroundColor: '#f8f9fa',
@@ -342,6 +462,7 @@ const styles = StyleSheet.create({
   },
   notificationContent: {
     flex: 1,
+    minWidth: 0, // Allow content to shrink below intrinsic width
   },
   notificationTitle: {
     fontSize: 16,
@@ -367,11 +488,15 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginLeft: 8,
-    marginTop: 6,
+    width: 10, // Slightly larger for better visibility
+    height: 10,
+    borderRadius: 5,
+    marginLeft: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal, // Consistent right margin
+    alignSelf: 'center', // Center vertically within notification item
+    position: 'absolute',
+    right: 20, // Consistent right positioning
+    top: '50%',
+    marginTop: -5, // Half height for perfect centering
   },
   emptyState: {
     flex: 1,
@@ -391,6 +516,33 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     lineHeight: 24,
+  },
+  markAllButtonHovered: {
+    backgroundColor: Color.cSK430B9250,
+    borderColor: Color.cSK430B92500,
+  },
+  markAllButtonFocused: {
+    ...Focus.primary,
+    backgroundColor: Color.cSK430B9250,
+  },
+  markAllButtonLoading: {
+    opacity: 0.6,
+    backgroundColor: Color.cSK430B92100,
+  },
+  markAllButtonDisabled: {
+    opacity: 0.5,
+    borderColor: '#ccc',
+    ...Platform.select({
+      web: {
+        cursor: 'not-allowed' as any,
+      },
+    }),
+  },
+  markAllTextDisabled: {
+    color: '#999',
+  },
+  markAllTextFocused: {
+    color: Color.cSK430B92950,
   },
 });
 

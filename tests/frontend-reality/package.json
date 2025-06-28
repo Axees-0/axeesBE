@@ -1,0 +1,35 @@
+{
+  "name": "frontend-bug-hunter",
+  "version": "1.0.0",
+  "description": "Frontend bug hunting tools that catch real user experience issues",
+  "scripts": {
+    "hunt": "./run-frontend-bug-hunt.sh",
+    "hunt:quick": "./run-frontend-bug-hunt.sh --quick",
+    "hunt:comprehensive": "./run-frontend-bug-hunt.sh --comprehensive",
+    "hunt:auth": "./run-frontend-bug-hunt.sh --test auth",
+    "hunt:chat": "./run-frontend-bug-hunt.sh --test chat",
+    "hunt:forms": "./run-frontend-bug-hunt.sh --test forms",
+    "hunt:mobile": "./run-frontend-bug-hunt.sh --test mobile",
+    "hunt:performance": "./run-frontend-bug-hunt.sh --test performance",
+    "hunt:headless": "./run-frontend-bug-hunt.sh --headless",
+    "test:auth": "node specific-bug-tests/authentication-flow-bugs.js",
+    "test:chat": "node specific-bug-tests/chat-realtime-bugs.js",
+    "test:forms": "node specific-bug-tests/form-data-bugs.js",
+    "comprehensive": "node frontend-bug-hunter.js"
+  },
+  "dependencies": {
+    "puppeteer": "^21.11.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [
+    "frontend",
+    "testing",
+    "bugs",
+    "user-experience",
+    "automation",
+    "puppeteer",
+    "e2e"
+  ]
+}

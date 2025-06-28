@@ -24,11 +24,14 @@ import { usePayment } from "@/contexts/PaymentContext";
 import { format } from "date-fns";
 import ProfileInfo from "@/components/ProfileInfo";
 import Navbar from "@/components/web/navbar";
+import { isTablet, isDesktop, isMobile } from "@/constants/breakpoints";
+import { WebSEO } from "./web-seo";
 
 // Demo Mode Imports
 import { DEMO_MODE, DemoConfig, demoLog } from "@/demo/DemoMode";
 import { DemoAPI } from "@/demo/DemoAPI";
 import { DemoData } from "@/demo/DemoData";
+import { getPlatformIcon, PLATFORMS } from "@/constants/platforms";
 import { DemoPolish } from "@/utils/demoPolish";
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/marketer/offers";
@@ -220,7 +223,7 @@ export default function CreatorOfferDetails() {
       return response.data;
     },
     onSuccess: () => {
-      router.back();
+      router.push('/offers');
     },
   });
 
@@ -239,6 +242,27 @@ export default function CreatorOfferDetails() {
         demoLog('Handling offer acceptance in demo mode');
       }
       
+      // Add confirmation dialog
+      if (Platform.OS === 'web') {
+        const confirmed = window.confirm(
+          `Accept the offer "${displayData?.offerName}" for ${displayData?.proposedAmount?.toLocaleString("en-US", { currency: "USD", style: "currency" })}?`
+        );
+        if (!confirmed) return;
+      } else {
+        // For mobile, use Alert.alert
+        const { Alert } = require('react-native');
+        await new Promise((resolve, reject) => {
+          Alert.alert(
+            'Accept Offer',
+            `Accept the offer "${displayData?.offerName}" for ${displayData?.proposedAmount?.toLocaleString("en-US", { currency: "USD", style: "currency" })}?`,
+            [
+              { text: 'Cancel', style: 'cancel', onPress: () => reject(new Error('User cancelled')) },
+              { text: 'Accept', onPress: () => resolve(true) }
+            ]
+          );
+        });
+      }
+      
       const result = await acceptMutation.mutateAsync();
       
       if (!DEMO_MODE) {
@@ -252,6 +276,9 @@ export default function CreatorOfferDetails() {
       }
       // Demo mode navigation handled in mutation onSuccess
     } catch (error) {
+      if (error.message === 'User cancelled') {
+        return; // User cancelled, do nothing
+      }
       console.error("Error accepting offer:", error);
       if (DEMO_MODE) {
         // Even if there's an error in demo, show success
@@ -269,6 +296,27 @@ export default function CreatorOfferDetails() {
   // Reject
   const handleReject = async () => {
     try {
+      // Add confirmation dialog
+      if (Platform.OS === 'web') {
+        const confirmed = window.confirm(
+          `Are you sure you want to reject the offer "${displayData?.offerName}"?`
+        );
+        if (!confirmed) return;
+      } else {
+        // For mobile, use Alert.alert
+        const { Alert } = require('react-native');
+        await new Promise((resolve, reject) => {
+          Alert.alert(
+            'Reject Offer',
+            `Are you sure you want to reject the offer "${displayData?.offerName}"?`,
+            [
+              { text: 'Cancel', style: 'cancel', onPress: () => reject(new Error('User cancelled')) },
+              { text: 'Reject', style: 'destructive', onPress: () => resolve(true) }
+            ]
+          );
+        });
+      }
+      
       const result = await rejectMutation.mutateAsync();
       router.push({
         pathname: "/UOM15OfferRejectMessage",
@@ -278,6 +326,9 @@ export default function CreatorOfferDetails() {
         },
       });
     } catch (error) {
+      if (error.message === 'User cancelled') {
+        return; // User cancelled, do nothing
+      }
       console.error("Error rejecting offer:", error);
     }
   };
@@ -288,7 +339,7 @@ export default function CreatorOfferDetails() {
       await axios.delete(`${API_URL}/${offerId}`);
     },
     onSuccess: () => {
-      router.back();
+      router.push('/offers');
     },
     onError: (error) => {
       console.error("Error deleting offer:", error);
@@ -301,6 +352,68 @@ export default function CreatorOfferDetails() {
       await deleteOfferMutation.mutateAsync();
     } catch (error) {
       console.error("Error deleting offer:", error);
+    }
+  };
+
+  // Get responsive styles for the offer card
+  const getOfferCardStyles = () => {
+    if (Platform.OS !== 'web') {
+      return styles.offerCard;
+    }
+
+    if (isMobile(window.width)) {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          padding: 16,
+        }
+      ];
+    } else if (isTablet(window.width)) {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          maxWidth: '100%', // Fluid width on tablet
+          padding: 20, // More padding for better readability
+        }
+      ];
+    } else {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          maxWidth: 800, // Max width for desktop
+        }
+      ];
+    }
+  };
+
+  // Get responsive styles for action buttons
+  const getActionButtonsStyles = () => {
+    if (Platform.OS !== 'web') {
+      return styles.actionButtons;
+    }
+
+    if (isMobile(window.width)) {
+      return [
+        styles.actionButtons,
+        {
+          flexDirection: 'column',
+          gap: 12,
+        }
+      ];
+    } else if (isTablet(window.width)) {
+      return [
+        styles.actionButtons,
+        {
+          flexDirection: 'row',
+          gap: 16,
+          flexWrap: 'wrap',
+        }
+      ];
+    } else {
+      return styles.actionButtons;
     }
   };
 
@@ -370,6 +483,11 @@ export default function CreatorOfferDetails() {
 
   return (
     <>
+      <WebSEO 
+        title="Offer Details | Axees"
+        description="Review offer details and manage collaboration opportunities"
+        keywords="offer details, creator collaboration, brand partnership, counter offer"
+      />
       <Navbar pageTitle="Offer Details" />
       <SafeAreaView style={styles.container}>
         <StatusBar style="auto" />
@@ -387,7 +505,7 @@ export default function CreatorOfferDetails() {
             </TouchableOpacity> */}
             </View>
             {/* Offer Card */}
-            <View style={styles.offerCard}>
+            <View style={getOfferCardStyles()}>
               <Text style={styles.offerName}>{displayData?.offerName}</Text>
               <Text style={styles.offerAmount}>
                 {displayData?.proposedAmount?.toLocaleString("en-US", {
@@ -513,10 +631,7 @@ export default function CreatorOfferDetails() {
               displayData?.status !== "Accepted" &&
               displayData?.status !== "Cancelled" && (
                 <View
-                  style={[
-                    styles.actionButtons,
-                    isMobile && { flexDirection: "column" },
-                  ]}
+                  style={getActionButtonsStyles()}
                 >
                   {isMarketerOwner ? (
                     // If user is a marketer, they can only see action buttons if the creator countered
@@ -675,7 +790,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#FFFFFF",
-    marginHorizontal: "15%",
+    marginHorizontal: Platform.OS === 'web' ? "10%" : "5%", // More responsive margins
   },
   loadingContainer: {
     flex: 1,
@@ -825,7 +940,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     width: "100%",
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
   },
   acceptButton: {
     backgroundColor: "#430B92",
@@ -834,7 +949,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    maxWidth: "30%",
   },
   acceptButtonText: {
     color: "#FFFFFF",
@@ -849,7 +963,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    maxWidth: "30%",
   },
   counterButtonText: {
     color: "#6C6C6C",
@@ -864,7 +977,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
-    maxWidth: "30%",
   },
   rejectButtonText: {
     color: "#ED0006",
@@ -902,22 +1014,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// Helper function
-function getPlatformIcon(platform: string) {
-  switch (platform.toLowerCase()) {
-    case "instagram":
-      return require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("@/assets/png-clipart-youtube-play-button-computer-icons-youtube-youtube-logo-angle-rectangle-thumbnail.png");
-    case "tiktok":
-      return require("@/assets/tiktok-icon.png");
-    case "facebook":
-      return require("@/assets/facebook-icon.png");
-    case "twitter":
-      return require("@/assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("@/assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      return require("@/assets/letter-s.png");
-  }
-}
+// Removed duplicate getPlatformIcon function - now using centralized version from @/constants/platforms

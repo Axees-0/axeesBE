@@ -86,7 +86,7 @@ export default function ConnectionStatus({ onRetry }: ConnectionStatusProps) {
         <Text style={styles.icon}>📶</Text>
         <View style={styles.content}>
           <Text style={styles.title}>Connection Issue</Text>
-          <Text style={styles.message}>
+          <Text style={styles.message} numberOfLines={undefined}>
             Unable to connect to server. Some features may not work properly.
           </Text>
         </View>
@@ -127,17 +127,21 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+    minWidth: 0, // Allow content to shrink below intrinsic width
   },
   title: {
     fontSize: 14,
     fontWeight: '600',
     color: '#92400E',
     marginBottom: 2,
+    flexWrap: 'wrap',
   },
   message: {
     fontSize: 12,
     color: '#B45309',
     lineHeight: 16,
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
   retryButton: {
     backgroundColor: '#F59E0B',

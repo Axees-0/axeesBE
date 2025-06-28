@@ -14,6 +14,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import { TabButton } from "@/components/TabButton";
 import { Indicator } from "@/components/Indicator";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BrandColors } from '@/constants/Colors';
 
 // Import tab icons
 import Discoveryiconlypro from "../../assets/discovery--iconly-pro.svg";
@@ -40,33 +41,60 @@ export default function TabLayout() {
   const currentPath = usePathname();
   const isMobile = width <= 768;
 
-  // Sync activeIndex with current path
+  // Sync activeIndex with current path and handle browser history
   React.useEffect(() => {
     let matchedIndex = -1;
     
     // Check for exact match first
-    if (currentPath === "/" || currentPath === "/(tabs)") {
+    if (currentPath === "/" || currentPath === "/(tabs)" || currentPath === "/(tabs)/index") {
       matchedIndex = 0; // Explore tab
     } else {
-      // Check other tabs
-      const currentTabIndex = TABS.findIndex(tab => 
-        currentPath === tab.route || 
-        currentPath === `/(tabs)/${tab.name}`
-      );
+      // Check other tabs with more comprehensive matching
+      const currentTabIndex = TABS.findIndex(tab => {
+        const tabRoutes = [
+          tab.route,
+          `/(tabs)/${tab.name}`,
+          `/${tab.name}`,
+          tab.name === "index" ? "/" : null
+        ].filter(Boolean);
+        
+        return tabRoutes.some(route => currentPath === route || currentPath.startsWith(route + "/"));
+      });
+      
       if (currentTabIndex !== -1) {
         matchedIndex = currentTabIndex;
       }
     }
     
-    if (matchedIndex !== -1 && matchedIndex !== activeIndex) {
+    // Always update activeIndex to match current path, including when navigating from non-tab routes
+    if (matchedIndex !== -1) {
       setActiveIndex(matchedIndex);
+    } else {
+      // If currentPath doesn't match any tab, but we're in a browser back/forward scenario,
+      // reset to explore tab to ensure content syncs with bottom navigation
+      if (currentPath.startsWith("/") && !currentPath.includes("payments") && !currentPath.includes("settings")) {
+        setActiveIndex(0);
+      }
     }
-  }, [currentPath, activeIndex]);
+  }, [currentPath]);
 
   const handleTabPress = (index: number) => {
     const tab = TABS[index];
     setActiveIndex(index);
-    router.push(tab.route);
+    
+    // Use replace for better browser history behavior when coming from non-tab routes
+    const isCurrentlyOnTabRoute = TABS.some(t => 
+      currentPath === t.route || 
+      currentPath === `/(tabs)/${t.name}` || 
+      currentPath === `/${t.name}`
+    );
+    
+    if (isCurrentlyOnTabRoute) {
+      router.push(tab.route);
+    } else {
+      // Coming from a non-tab route (like payments), use replace for better UX
+      router.replace(tab.route);
+    }
   };
 
 
@@ -75,7 +103,7 @@ export default function TabLayout() {
       <Tabs
         screenOptions={({ route }) => ({
           tabBarStyle: {
-            backgroundColor: "#430B92",
+            backgroundColor: BrandColors.primary[500],
             borderTopWidth: 0,
             height: Platform.select({
               ios: 65 + insets.bottom,

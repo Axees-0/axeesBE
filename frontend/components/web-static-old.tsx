@@ -1,24 +1,14 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Pressable } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, TextInput, Pressable, Platform, useWindowDimensions } from 'react-native';
 import { Image } from 'expo-image';
-import { Color } from '@/GlobalStyles';
+import { Color, Focus } from '@/GlobalStyles';
 import { router } from 'expo-router';
 import { DemoData } from '@/demo/DemoData';
-import { EmptyState } from '@/components/ErrorState';
-import { AvatarWithFallback } from '@/components/AvatarWithFallback';
-import { CreatorCardSkeleton } from '@/components/LoadingIndicator';
-import { StatsDashboard, StatsBar } from '@/components/StatsDashboard';
+import { AccessibleFilters } from './AccessibleFilters';
+import { EmptyState } from './EmptyState';
 
 const Web = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Simulate initial loading for demo
-  React.useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800); // Quick loading for demo polish
-    return () => clearTimeout(timer);
-  }, []);
+  const { width: screenWidth } = useWindowDimensions();
   
   // Creator data - Using DemoData.creators with mapped structure for explore page
   const creators = DemoData.creators.map(creator => {
@@ -55,6 +45,30 @@ const Web = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedFilters, setSelectedFilters] = useState<string[]>([]);
   const [filteredCreators, setFilteredCreators] = useState(creators);
+  
+  // Store filter state in ref to preserve it across errors
+  const filterStateRef = React.useRef({
+    searchText: '',
+    selectedFilters: [] as string[]
+  });
+  
+  // Update ref whenever state changes
+  React.useEffect(() => {
+    filterStateRef.current = {
+      searchText,
+      selectedFilters
+    };
+  }, [searchText, selectedFilters]);
+  
+  // Restore filter state on mount (e.g., after error recovery)
+  React.useEffect(() => {
+    const savedState = filterStateRef.current;
+    if (savedState.searchText || savedState.selectedFilters.length > 0) {
+      setSearchText(savedState.searchText);
+      setSelectedFilters(savedState.selectedFilters);
+      applyFilters(savedState.searchText, savedState.selectedFilters);
+    }
+  }, []); // Only run on mount
 
   // Extract unique categories from DemoData.creators for filters
   const availableFilters = Array.from(new Set(
@@ -102,66 +116,161 @@ const Web = () => {
     applyFilters(text, selectedFilters);
   };
 
+  // Calculate dynamic styles based on screen width
+  const dynamicStyles = React.useMemo(() => {
+    const isMobile = screenWidth < 768;
+    const isSmallMobile = screenWidth <= 320;
+    
+    return StyleSheet.create({
+      creatorCard: {
+        backgroundColor: 'white',
+        padding: isSmallMobile ? 16 : isMobile ? 20 : 24,
+        borderRadius: 16,
+        width: isSmallMobile ? '100%' : isMobile ? (screenWidth - 52) / 2 : 350, // 52 = padding (32) + gap (20)
+        minWidth: isSmallMobile ? 'auto' : 280,
+        maxWidth: isSmallMobile ? '100%' : 350,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 3,
+        overflow: 'hidden', // Prevent content overflow
+      },
+      mainContent: {
+        padding: isSmallMobile ? 12 : isMobile ? 16 : 24,
+      },
+      creatorsGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: isSmallMobile ? 12 : isMobile ? 16 : 20,
+        justifyContent: isSmallMobile ? 'center' : 'flex-start',
+      },
+      creatorName: {
+        fontSize: isSmallMobile ? 18 : 20,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 4,
+      },
+      creatorBio: {
+        fontSize: isSmallMobile ? 13 : 14,
+        color: '#555',
+        lineHeight: isSmallMobile ? 18 : 20,
+        marginBottom: isSmallMobile ? 12 : 16,
+      },
+      creatorTags: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: isSmallMobile ? 6 : 8,
+      },
+      title: {
+        fontSize: isSmallMobile ? 24 : isMobile ? 28 : 32,
+        fontWeight: 'bold',
+        color: Color.cSK430B92500,
+        marginBottom: 8,
+      },
+      subtitle: {
+        fontSize: isSmallMobile ? 16 : 18,
+        color: '#666',
+      },
+      searchBar: {
+        backgroundColor: 'white',
+        padding: isSmallMobile ? 12 : 16,
+        borderRadius: 12,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+        flexDirection: 'row',
+        alignItems: 'center',
+      },
+    });
+  }, [screenWidth]);
+
   return (
-    <View style={styles.container}>
-      <View style={styles.sidebar}>
-        <Text style={styles.sidebarTitle}>Filters</Text>
-        {availableFilters.map((filter) => (
-          <TouchableOpacity
-            key={filter}
-            style={[
-              styles.filterItem,
-              selectedFilters.includes(filter) && styles.filterItemActive
-            ]}
-            onPress={() => toggleFilter(filter)}
-          >
-            <Text style={[
-              styles.filterText,
-              selectedFilters.includes(filter) && styles.filterTextActive
-            ]}>
-              {selectedFilters.includes(filter) ? '✓' : '○'} {filter}
-            </Text>
-          </TouchableOpacity>
-        ))}
-        {selectedFilters.length > 0 && (
-          <TouchableOpacity
-            style={styles.clearFiltersButton}
-            onPress={() => {
-              setSelectedFilters([]);
-              applyFilters(searchText, []);
-            }}
-          >
-            <Text style={styles.clearFiltersText}>Clear All Filters</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-      
-      <ScrollView style={styles.mainContent}>
+    <ScrollView style={styles.container} showsHorizontalScrollIndicator={false}>
+      <View style={[styles.mainContent, dynamicStyles.mainContent]}>
         <View style={styles.header}>
-          <Text style={styles.title}>Explore Creators & Influencers</Text>
-          <Text style={styles.subtitle}>Connect with top creators for your brand campaigns</Text>
+          <Text style={[styles.title, dynamicStyles.title]}>Explore Creators & Influencers</Text>
+          <Text style={[styles.subtitle, dynamicStyles.subtitle]}>Connect with top creators for your brand campaigns</Text>
         </View>
         
-        {/* Stats Dashboard for investors */}
-        <StatsDashboard style={styles.statsSection} />
-        
-        {/* Compact stats bar */}
-        <StatsBar style={styles.statsBar} />
-        
         <View style={styles.searchSection}>
-          <View style={styles.searchBar}>
-            <Text style={styles.searchIcon}>🔍</Text>
+          <View style={[styles.searchBar, dynamicStyles.searchBar]} role="search">
+            <Text style={styles.searchIcon} aria-hidden="true">🔍</Text>
             <TextInput
               style={styles.searchInput}
-              placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
+              placeholder="Search creators by name, location, or category"
               placeholderTextColor="#999"
               value={searchText}
               onChangeText={handleSearch}
               returnKeyType="search"
+              accessibilityLabel="Search creators"
+              accessibilityHint="Enter name, location, or category to filter results"
+              accessibilityRole="searchbox"
+              {...(Platform.OS === 'web' && { tabIndex: 0 })}
             />
             {searchText.length > 0 && (
-              <Pressable onPress={() => handleSearch('')} style={styles.clearButton}>
-                <Text style={styles.clearButtonText}>×</Text>
+              <Pressable 
+                onPress={() => handleSearch('')} 
+                style={({ pressed, focused }) => [
+                  styles.clearButton,
+                  (pressed || focused) && styles.clearButtonFocused
+                ]}
+                accessibilityLabel="Clear search"
+                accessibilityRole="button"
+              >
+                <Text style={styles.clearButtonText} aria-hidden="true">×</Text>
+              </Pressable>
+            )}
+          </View>
+        </View>
+        
+        {/* Filters Section - Now displayed horizontally */}
+        <View style={styles.filtersSection}>
+          <View style={styles.filtersContainer}>
+            {availableFilters.map((filter) => {
+              const isSelected = selectedFilters.includes(filter);
+              return (
+                <Pressable
+                  key={filter}
+                  style={({ pressed, focused }) => [
+                    styles.filterChip,
+                    isSelected && styles.filterChipActive,
+                    focused && styles.filterChipFocused,
+                    pressed && styles.filterChipPressed
+                  ]}
+                  onPress={() => toggleFilter(filter)}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: isSelected }}
+                  accessibilityLabel={`${filter} filter`}
+                  {...(Platform.OS === 'web' && { tabIndex: 0 })}
+                >
+                  <Text style={[
+                    styles.filterChipText,
+                    isSelected && styles.filterChipTextActive
+                  ]}>
+                    {filter}
+                  </Text>
+                </Pressable>
+              );
+            })}
+            {selectedFilters.length > 0 && (
+              <Pressable
+                style={({ pressed, focused }) => [
+                  styles.clearFiltersChip,
+                  focused && styles.clearFiltersFocused,
+                  pressed && styles.clearFiltersPressed
+                ]}
+                onPress={() => {
+                  setSelectedFilters([]);
+                  applyFilters(searchText, []);
+                }}
+                accessibilityRole="button"
+                accessibilityLabel="Clear all filters"
+                {...(Platform.OS === 'web' && { tabIndex: 0 })}
+              >
+                <Text style={styles.clearFiltersText}>Clear All</Text>
               </Pressable>
             )}
           </View>
@@ -181,112 +290,65 @@ const Web = () => {
           </View>
         )}
         
-        <View style={styles.creatorsGrid}>
-          {isLoading ? (
-            // Show skeleton loaders while loading
-            Array.from({ length: 6 }).map((_, index) => (
-              <View key={`skeleton-${index}`} style={styles.creatorCard}>
-                <CreatorCardSkeleton />
-              </View>
-            ))
-          ) : (
-            filteredCreators.map((creator) => (
-            <TouchableOpacity 
+        <View style={[styles.creatorsGrid, dynamicStyles.creatorsGrid]}>
+          {filteredCreators.map((creator) => (
+            <Pressable 
               key={creator.id}
-              style={styles.creatorCard}
+              style={({ pressed, focused }) => [
+                styles.creatorCard,
+                dynamicStyles.creatorCard,
+                focused && styles.creatorCardFocused,
+                pressed && styles.creatorCardPressed
+              ]}
               onPress={() => router.push(`/profile/${creator.id}`)}
+              accessibilityRole="button"
+              accessibilityLabel={`View ${creator.name}'s profile`}
+              {...(Platform.OS === 'web' && { tabIndex: 0 })}
             >
-              <AvatarWithFallback
-                source={creator.avatarUrl}
-                name={creator.name}
-                size={100}
+              <Image
                 style={styles.creatorAvatar}
+                source={creator.avatarUrl || require("@/assets/empty-image.png")}
+                placeholder={require("@/assets/empty-image.png")}
+                contentFit="cover"
               />
-              <Text style={styles.creatorName}>{creator.name}</Text>
-              <Text style={styles.creatorHandle}>{creator.handle}</Text>
-              <Text style={styles.creatorStats}>{creator.stats}</Text>
-              <Text style={styles.creatorBio}>{creator.bio}</Text>
-              <View style={styles.creatorTags}>
+              <Text style={[styles.creatorName, dynamicStyles.creatorName]}>{creator.name}</Text>
+              <Text style={styles.creatorHandle} numberOfLines={1} ellipsizeMode="tail">{creator.handle}</Text>
+              <Text style={styles.creatorStats} numberOfLines={2}>{creator.stats}</Text>
+              <Text style={[styles.creatorBio, dynamicStyles.creatorBio]} numberOfLines={3}>{creator.bio}</Text>
+              <View style={[styles.creatorTags, dynamicStyles.creatorTags]}>
                 {creator.tags.map((tag, index) => (
                   <Text key={index} style={styles.tag}>{tag}</Text>
                 ))}
               </View>
-            </TouchableOpacity>
-          ))
-          )}
-          {!isLoading && filteredCreators.length === 0 && (
+            </Pressable>
+          ))}
+          {filteredCreators.length === 0 && (
             <EmptyState
-              icon="🔍"
-              title={searchText || selectedFilters.length > 0 ? "No creators found" : "No creators available"}
-              message={
-                searchText 
-                  ? `No results for "${searchText}"${selectedFilters.length > 0 ? ` with filters: ${selectedFilters.join(', ')}` : ''}`
-                  : selectedFilters.length > 0
-                  ? `No creators found with filters: ${selectedFilters.join(', ')}`
-                  : "Start by searching or selecting a category"
-              }
-              actionText={searchText || selectedFilters.length > 0 ? "Clear search" : undefined}
-              onAction={searchText || selectedFilters.length > 0 ? () => {
-                setSearchText('');
+              searchText={searchText}
+              selectedFilters={selectedFilters}
+              onClearSearch={() => handleSearch('')}
+              onClearFilters={() => {
+                setSelectedFilters([]);
+                applyFilters(searchText, []);
+              }}
+              onClearAll={() => {
+                handleSearch('');
                 setSelectedFilters([]);
                 applyFilters('', []);
-              } : undefined}
+              }}
+              totalCreators={creators.length}
             />
           )}
         </View>
-      </ScrollView>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
     backgroundColor: '#f8f9fa',
-  },
-  sidebar: {
-    width: 250,
-    backgroundColor: 'white',
-    padding: 20,
-    borderRightWidth: 1,
-    borderRightColor: '#e0e0e0',
-  },
-  sidebarTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-  },
-  filterItem: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    marginVertical: 2,
-    borderRadius: 6,
-  },
-  filterItemActive: {
-    backgroundColor: Color.cSK430B92500,
-  },
-  filterText: {
-    fontSize: 14,
-    color: '#555',
-  },
-  filterTextActive: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  clearFiltersButton: {
-    marginTop: 16,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 6,
-    alignItems: 'center',
-  },
-  clearFiltersText: {
-    fontSize: 12,
-    color: '#666',
-    fontWeight: 'bold',
   },
   filterStatus: {
     marginBottom: 16,
@@ -298,8 +360,72 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   mainContent: {
-    flex: 1,
     padding: 24,
+  },
+  filtersSection: {
+    marginBottom: 24,
+  },
+  filtersContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    alignItems: 'center',
+  },
+  filterChip: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: 'white',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    marginBottom: 8,
+    flexShrink: 1,
+  },
+  filterChipActive: {
+    backgroundColor: Color.cSK430B92500,
+    borderColor: Color.cSK430B92500,
+  },
+  filterChipText: {
+    fontSize: 14,
+    color: '#555',
+    fontWeight: '500',
+  },
+  filterChipTextActive: {
+    color: 'white',
+  },
+  clearFiltersChip: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    marginBottom: 8,
+  },
+  clearFiltersText: {
+    fontSize: 14,
+    color: '#666',
+    fontWeight: '600',
+  },
+  filterChipFocused: {
+    ...Focus.primary,
+    borderRadius: 20,
+  },
+  filterChipPressed: {
+    opacity: 0.8,
+  },
+  creatorCardFocused: {
+    ...Focus.primary,
+    borderRadius: 12,
+  },
+  creatorCardPressed: {
+    transform: [{ scale: 0.98 }],
+    opacity: 0.9,
+  },
+  clearFiltersFocused: {
+    ...Focus.secondary,
+    borderRadius: 20,
+  },
+  clearFiltersPressed: {
+    opacity: 0.8,
   },
   header: {
     marginBottom: 24,
@@ -353,6 +479,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#666',
     fontWeight: 'bold',
+  },
+  clearButtonFocused: {
+    outlineWidth: 2,
+    outlineColor: Color.cSK430B92500,
+    outlineStyle: 'solid',
   },
   noResults: {
     flex: 1,
@@ -430,12 +561,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     fontSize: 12,
     fontWeight: '600',
-  },
-  statsSection: {
-    marginBottom: 24,
-  },
-  statsBar: {
-    marginBottom: 24,
+    flexShrink: 1,
   },
 });
 

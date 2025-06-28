@@ -32,6 +32,7 @@ import {
   formatOfferNotificationData,
   validateEmailFormat 
 } from "@/utils/emailNotificationService";
+import { getPlatformIcon, PLATFORMS } from "@/constants/platforms";
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/marketer/offers";
 
@@ -40,33 +41,6 @@ const BREAKPOINTS = {
   DESKTOP: 1280,
 };
 
-function getPlatformIcon(platform: string) {
-  switch (platform.toLowerCase()) {
-    case "instagram":
-      return require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("@/assets/png-clipart-youtube-play-button-computer-icons-youtube-youtube-logo-angle-rectangle-thumbnail.png");
-    case "tiktok":
-      return require("@/assets/tiktok-icon.png");
-    case "facebook":
-      return require("@/assets/facebook-icon.png");
-    case "twitter":
-      return require("@/assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("@/assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      return require("@/assets/letter-s.png");
-  }
-}
-
-const PLATFORMS = [
-  { id: "youtube", icon: getPlatformIcon("youtube") },
-  { id: "instagram", icon: getPlatformIcon("instagram") },
-  { id: "twitter", icon: getPlatformIcon("twitter") },
-  { id: "facebook", icon: getPlatformIcon("facebook") },
-  { id: "tiktok", icon: getPlatformIcon("tiktok") },
-  { id: "twitch", icon: getPlatformIcon("twitch") },
-];
 
 export default function CustomOfferEnhanced() {
   const window = useWindowDimensions();
@@ -570,7 +544,11 @@ export default function CustomOfferEnhanced() {
               onPress={handleSaveDraft}
               disabled={isSubmitting}
             >
-              <Text style={styles.draftButtonText}>
+              <Text 
+                style={styles.draftButtonText}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {isSubmitting ? "Saving..." : "Save Draft"}
               </Text>
             </TouchableOpacity>
@@ -586,7 +564,11 @@ export default function CustomOfferEnhanced() {
               {isCheckingEmails ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.sendButtonText}>
+                <Text 
+                  style={styles.sendButtonText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
                   {isSubmitting ? "Sending..." : "Send Offer"}
                 </Text>
               )}
@@ -871,11 +853,15 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#FFFFFF",
+    paddingHorizontal: 8,
+    minWidth: 120,
   },
   draftButtonText: {
     fontSize: 16,
     color: "#430B92",
     fontWeight: "500",
+    textAlign: "center",
+    flexShrink: 1,
   },
   sendButton: {
     flex: 1,
@@ -884,6 +870,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 8,
+    minWidth: 120,
   },
   webSendButton: {
     alignSelf: "center",
@@ -893,6 +881,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#FFFFFF",
     fontWeight: "500",
+    textAlign: "center",
+    flexShrink: 1,
   },
   modalOverlay: {
     flex: 1,

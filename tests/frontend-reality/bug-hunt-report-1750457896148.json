@@ -1,0 +1,79 @@
+{
+  "timestamp": "2025-06-20T22:18:16.148Z",
+  "environment": {
+    "environment": "local",
+    "frontendUrl": "http://localhost:19006",
+    "hostname": "localhost",
+    "port": "19006",
+    "isLocal": true,
+    "isSecure": false
+  },
+  "duration": "2.04",
+  "summary": {
+    "totalBugs": 2,
+    "critical": 2,
+    "medium": 0,
+    "low": 0
+  },
+  "testResults": {
+    "authentication": {
+      "totalBugs": 0,
+      "bugs": [],
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "forms": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Form Page Error",
+          "description": "Form page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/create-offer",
+          "timestamp": "2025-06-20T22:18:15.570Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "realtime": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Chat Page Load Failed",
+          "description": "Chat page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/chat",
+          "timestamp": "2025-06-20T22:18:15.986Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "mobile": null,
+    "performance": null
+  },
+  "allBugs": [
+    {
+      "severity": "CRITICAL",
+      "category": "Form Page Error",
+      "description": "Form page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/create-offer",
+      "timestamp": "2025-06-20T22:18:15.570Z",
+      "url": "about:blank"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Chat Page Load Failed",
+      "description": "Chat page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/chat",
+      "timestamp": "2025-06-20T22:18:15.986Z",
+      "url": "about:blank"
+    }
+  ],
+  "recommendations": []
+}

@@ -1,0 +1,123 @@
+{
+  "timestamp": "2025-06-20T23:19:07.302Z",
+  "environment": {
+    "environment": "local",
+    "frontendUrl": "http://localhost:19006",
+    "hostname": "localhost",
+    "port": "19006",
+    "isLocal": true,
+    "isSecure": false
+  },
+  "duration": "17.38",
+  "summary": {
+    "totalBugs": 4,
+    "critical": 4,
+    "medium": 0,
+    "low": 0
+  },
+  "testResults": {
+    "authentication": {
+      "totalBugs": 0,
+      "bugs": [],
+      "critical": 0,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "forms": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Form Page Error",
+          "description": "Form page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/create-offer",
+          "timestamp": "2025-06-20T23:18:51.946Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "realtime": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Chat Page Load Failed",
+          "description": "Chat page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/chat",
+          "timestamp": "2025-06-20T23:18:53.212Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "mobile": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Touch Target Test Failed",
+          "description": "Failed to test touch targets: net::ERR_CONNECTION_REFUSED at http://localhost:19006",
+          "timestamp": "2025-06-20T23:19:06.488Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    },
+    "performance": {
+      "totalBugs": 1,
+      "bugs": [
+        {
+          "severity": "CRITICAL",
+          "category": "Page Load Failed",
+          "description": "Failed to load page: net::ERR_CONNECTION_REFUSED at http://localhost:19006",
+          "timestamp": "2025-06-20T23:18:54.497Z",
+          "url": "about:blank"
+        }
+      ],
+      "critical": 1,
+      "high": 0,
+      "medium": 0,
+      "low": 0
+    }
+  },
+  "allBugs": [
+    {
+      "severity": "CRITICAL",
+      "category": "Form Page Error",
+      "description": "Form page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/create-offer",
+      "timestamp": "2025-06-20T23:18:51.946Z",
+      "url": "about:blank"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Chat Page Load Failed",
+      "description": "Chat page failed to load: net::ERR_CONNECTION_REFUSED at http://localhost:19006/chat",
+      "timestamp": "2025-06-20T23:18:53.212Z",
+      "url": "about:blank"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Page Load Failed",
+      "description": "Failed to load page: net::ERR_CONNECTION_REFUSED at http://localhost:19006",
+      "timestamp": "2025-06-20T23:18:54.497Z",
+      "url": "about:blank"
+    },
+    {
+      "severity": "CRITICAL",
+      "category": "Touch Target Test Failed",
+      "description": "Failed to test touch targets: net::ERR_CONNECTION_REFUSED at http://localhost:19006",
+      "timestamp": "2025-06-20T23:19:06.488Z",
+      "url": "about:blank"
+    }
+  ],
+  "recommendations": []
+}

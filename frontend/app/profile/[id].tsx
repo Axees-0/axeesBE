@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   View,
   Text,
@@ -18,7 +18,7 @@ import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
 // Assets and Components
-import { Color, FontFamily, FontSize, Gap, Padding } from '@/GlobalStyles';
+import { Color, FontFamily, FontSize, Gap, Padding, Focus } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -26,6 +26,11 @@ import { DemoData } from '@/demo/DemoData';
 import { DEMO_MODE } from '@/demo/DemoMode';
 import { DemoOfferFlow } from '@/components/DemoOfferFlow';
 import { AvatarWithFallback } from '@/components/AvatarWithFallback';
+import BrandsetBanner from '@/components/Brandset/BrandsetBanner';
+import RealTimeMetrics from '@/components/Metrics/RealTimeMetrics';
+import QRGenerator from '@/components/QR/QRGenerator';
+import DesignSystem from '@/styles/DesignSystem';
+import { getPlatformIcon } from '@/constants/platforms';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -34,6 +39,9 @@ import Heart from '@/assets/icons.png';
 import HeartFilled from '@/assets/heart-red.png';
 import Message from '@/assets/message01.svg';
 import CheckBadge from '@/assets/checkmarkbadge01.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
+import { MaterialIcons } from '@expo/vector-icons';
+import { BrandColors } from '@/constants/Colors';
 
 interface CreatorProfileProps {}
 
@@ -56,6 +64,8 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
   const [contactSubject, setContactSubject] = useState('Collaboration Opportunity');
   const [isFavorited, setIsFavorited] = useState(false);
   const [isOfferModalVisible, setIsOfferModalVisible] = useState(false);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const [showMetrics, setShowMetrics] = useState(true);
 
   // Find creator from demo data
   const creator = useMemo(() => {
@@ -71,26 +81,118 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
     );
   }
 
+  // Add Esc key support for contact modal (web only)
+  useEffect(() => {
+    if (!isContactModalVisible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsContactModalVisible(false);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [isContactModalVisible]);
+
   // Calculate total followers and engagement
   const totalFollowers = creator.creatorData?.totalFollowers || 0;
-  const avgEngagement = creator.creatorData?.platforms?.reduce((acc, p) => acc + (p.engagement || 0), 0) / (creator.creatorData?.platforms?.length || 1);
+  
+  // Safe calculation of average engagement
+  const platforms = creator.creatorData?.platforms || [];
+  const totalEngagement = platforms.reduce((acc, p) => {
+    const engagement = typeof p.engagement === 'number' && !isNaN(p.engagement) ? p.engagement : 0;
+    return acc + engagement;
+  }, 0);
+  const avgEngagement = platforms.length > 0 ? totalEngagement / platforms.length : 0;
 
-  // Format numbers
+  // Format numbers with safety checks
   const formatNumber = (num: number) => {
+    // Ensure num is a valid number
+    if (typeof num !== 'number' || isNaN(num) || !isFinite(num)) {
+      return '0';
+    }
+    
     if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
     if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
     return num.toString();
   };
 
-  // Simple working contact form - no fancy stuff
+  // Handle share profile
+  const handleShareProfile = async () => {
+    const profileUrl = `${Platform.OS === 'web' ? window.location.origin : 'https://axees.com'}/profile/${creator._id}`;
+    const shareText = `Check out ${creator.name}'s creator profile on Axees!`;
+    
+    if (Platform.OS === 'web' && navigator.share) {
+      try {
+        await navigator.share({
+          title: `${creator.name} - Axees Creator`,
+          text: shareText,
+          url: profileUrl,
+        });
+      } catch (error) {
+        // User cancelled share or share API not supported
+        // Fallback to copy to clipboard
+        if (navigator.clipboard) {
+          await navigator.clipboard.writeText(profileUrl);
+          Alert.alert('Success', 'Profile link copied to clipboard!');
+        }
+      }
+    } else if (Platform.OS === 'web') {
+      // Fallback for browsers without share API
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(profileUrl);
+        Alert.alert('Success', 'Profile link copied to clipboard!');
+      }
+    } else {
+      // Mobile share
+      const { Share: RNShare } = require('react-native');
+      try {
+        await RNShare.share({
+          message: `${shareText} ${profileUrl}`,
+          url: profileUrl,
+          title: shareText,
+        });
+      } catch (error) {
+        console.error('Error sharing:', error);
+      }
+    }
+  };
+
+  // Simple working contact form with Subject validation
   const handleSendMessage = () => {
-    const subject = (document.getElementById('contact-subject') as HTMLInputElement)?.value || 'Collaboration Opportunity';
+    const subject = (document.getElementById('contact-subject') as HTMLInputElement)?.value || '';
     const message = (document.getElementById('contact-message') as HTMLTextAreaElement)?.value || '';
     
-    if (!message.trim()) {
-      window.alert('Please enter a message before sending.');
+    // Validate Subject field
+    if (!subject.trim()) {
+      window.alert('Please enter a subject before sending.');
+      // Focus the subject field for better UX
+      const subjectField = document.getElementById('contact-subject') as HTMLInputElement;
+      if (subjectField) {
+        subjectField.focus();
+        subjectField.style.borderColor = '#ed0006'; // Red border for error state
+      }
       return;
     }
+    
+    // Validate Message field
+    if (!message.trim()) {
+      window.alert('Please enter a message before sending.');
+      // Focus the message field for better UX
+      const messageField = document.getElementById('contact-message') as HTMLTextAreaElement;
+      if (messageField) {
+        messageField.focus();
+        messageField.style.borderColor = '#ed0006'; // Red border for error state
+      }
+      return;
+    }
+    
+    // Reset border colors to normal if validation passes
+    const subjectField = document.getElementById('contact-subject') as HTMLInputElement;
+    const messageField = document.getElementById('contact-message') as HTMLTextAreaElement;
+    if (subjectField) subjectField.style.borderColor = '#ddd';
+    if (messageField) messageField.style.borderColor = '#ddd';
     
     // Create chat ID for this conversation
     const chatId = `chat-${id}-${Date.now()}`;
@@ -143,30 +245,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
     </Modal>
   );
 
-  // Platform Icons
-  const getPlatformIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'instagram':
-        return require('@/assets/instagram.png');
-      case 'tiktok':
-        return require('@/assets/transparenttiktoklogoblackandwhitelogotiktokappminimaminimalistblackandwhitetiktokapp1711004158896-1.png');
-      case 'youtube':
-        return require('@/assets/youtube-icon.png');
-      case 'twitter':
-      case 'x':
-        return require('@/assets/1707226109newtwitterlogopng-1.png');
-      case 'facebook':
-        return require('@/assets/facebook-icon.png');
-      case 'linkedin':
-        return require('@/assets/facebook-icon.png'); // Using facebook as placeholder
-      case 'twitch':
-        return require('@/assets/youtube-icon.png'); // Using youtube as placeholder
-      case 'pinterest':
-        return require('@/assets/instagram.png'); // Using instagram as placeholder
-      default:
-        return require('@/assets/icons.png');
-    }
-  };
+  // Using centralized platform icon function from @/constants/platforms
 
   // Render different tab content
   const renderTabContent = () => {
@@ -213,6 +292,8 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                     <Image 
                       source={getPlatformIcon(platform.platform)} 
                       style={styles.platformIcon}
+                      alt={`${platform.platform} icon`}
+                      accessibilityLabel={`${platform.platform} platform icon`}
                     />
                     <View>
                       <Text style={styles.platformName}>
@@ -226,7 +307,10 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                       {formatNumber(platform.followersCount || 0)}
                     </Text>
                     <Text style={styles.engagementText}>
-                      {platform.engagement?.toFixed(1)}% engagement
+                      {typeof platform.engagement === 'number' && !isNaN(platform.engagement) 
+                        ? `${platform.engagement.toFixed(1)}% engagement`
+                        : 'N/A engagement'
+                      }
                     </Text>
                   </View>
                 </View>
@@ -305,6 +389,8 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                       <Image 
                         source={getPlatformIcon(platform.platform)} 
                         style={styles.rateIcon}
+                        alt={`${platform.platform} icon`}
+                        accessibilityLabel={`${platform.platform} platform icon`}
                       />
                       <View>
                         <Text style={styles.ratePlatform}>
@@ -349,31 +435,99 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton 
+            fallbackRoute="/explore"
+          />
           
           <View style={styles.headerActions}>
             <TouchableOpacity 
-              style={styles.actionButton}
+              style={({ focused }) => [
+                styles.actionButton,
+                focused && styles.actionButtonFocused,
+              ]}
               onPress={() => setIsFavorited(!isFavorited)}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={isFavorited ? "Remove from favorites" : "Add to favorites"}
+              accessibilityHint={isFavorited ? "Remove this creator from your favorites list" : "Add this creator to your favorites list"}
+              accessibilityState={{ selected: isFavorited }}
             >
               <Image 
                 source={isFavorited ? HeartFilled : Heart} 
-                style={styles.actionIcon} 
+                style={styles.actionIcon}
+                alt={isFavorited ? "Remove from favorites" : "Add to favorites"}
+                accessibilityLabel={isFavorited ? "Remove from favorites" : "Add to favorites"}
               />
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.actionButton}>
-              <Image source={Share} style={styles.actionIcon} />
+            <TouchableOpacity 
+              style={({ focused }) => [
+                styles.actionButton,
+                focused && styles.actionButtonFocused,
+              ]}
+              onPress={() => handleShareProfile()}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel="Share creator profile"
+              accessibilityHint="Share this creator's profile with others via link or social media"
+            >
+              <Image 
+                source={Share} 
+                style={styles.actionIcon}
+                alt="Share profile"
+                accessibilityLabel="Share profile"
+              />
             </TouchableOpacity>
           </View>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Brandset Banner */}
+          <BrandsetBanner
+            brands={[
+              {
+                id: '1',
+                name: 'Nike',
+                color: '#111111',
+                sponsorshipType: 'premium',
+                ctaText: 'Send Offer Now',
+                ctaAction: () => setIsOfferModalVisible(true),
+              },
+              {
+                id: '2',
+                name: 'Adidas',
+                color: '#000000',
+                sponsorshipType: 'featured',
+                ctaText: 'Collaborate',
+                ctaAction: () => setIsOfferModalVisible(true),
+              },
+            ]}
+            creatorId={creator._id}
+            onBrandClick={(brand) => console.log('Brand clicked:', brand)}
+          />
+
+          {/* Real-Time Metrics */}
+          {showMetrics && (
+            <RealTimeMetrics
+              creatorId={creator._id}
+              initialData={{
+                networkValue: totalFollowers,
+                brandValue: Math.round(totalFollowers * 0.05),
+                appInfluence: !isNaN(avgEngagement) && isFinite(avgEngagement) ? avgEngagement * 10 : 0,
+                reachScore: !isNaN(avgEngagement) && isFinite(avgEngagement) 
+                  ? Math.round(totalFollowers * avgEngagement / 100) 
+                  : Math.round(totalFollowers * 0.087), // Default to 8.7% engagement
+                engagementTrend: 'up',
+                lastUpdated: new Date(),
+              }}
+              onMetricClick={(metric) => console.log('Metric clicked:', metric)}
+            />
+          )}
+
           {/* Profile Hero */}
           <View style={styles.heroSection}>
             <AvatarWithFallback 
@@ -386,25 +540,55 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
               <View style={styles.nameRow}>
                 <Text style={styles.creatorName}>{creator.name}</Text>
                 {creator.verified && (
-                  <CheckBadge width={20} height={20} />
+                  <CheckBadge 
+                    width={20} 
+                    height={20} 
+                    accessibilityLabel="Verified creator"
+                    accessibilityRole="image" 
+                  />
                 )}
               </View>
               
               <Text style={styles.username}>{creator.userName}</Text>
               
-              <View style={styles.statsRow}>
-                <View style={styles.statItem}>
+              <View style={[styles.statsRow, isMobileScreen && styles.statsRowMobile]}>
+                <View 
+                  style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
+                  accessible={true}
+                  accessibilityLabel={`Total followers: ${formatNumber(totalFollowers)}`}
+                  accessibilityHint="Combined follower count across all social media platforms"
+                >
                   <Text style={styles.statNumber}>{formatNumber(totalFollowers)}</Text>
                   <Text style={styles.statLabel}>Total Followers</Text>
                 </View>
                 
-                <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{avgEngagement.toFixed(1)}%</Text>
+                <View 
+                  style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
+                  accessible={true}
+                  accessibilityLabel={`Average engagement rate: ${!isNaN(avgEngagement) ? avgEngagement.toFixed(1) : '0'} percent`}
+                  accessibilityHint="Average percentage of followers who interact with posts"
+                >
+                  <Text style={styles.statNumber}>
+                    {!isNaN(avgEngagement) && isFinite(avgEngagement) 
+                      ? `${avgEngagement.toFixed(1)}%` 
+                      : '0.0%'
+                    }
+                  </Text>
                   <Text style={styles.statLabel}>Avg Engagement</Text>
                 </View>
                 
-                <View style={styles.statItem}>
-                  <Text style={styles.statNumber}>{creator.rating?.toFixed(1)}</Text>
+                <View 
+                  style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
+                  accessible={true}
+                  accessibilityLabel={`Rating: ${typeof creator.rating === 'number' && !isNaN(creator.rating) ? creator.rating.toFixed(1) : '0.0'} out of 5 stars`}
+                  accessibilityHint="Average rating from completed collaborations"
+                >
+                  <Text style={styles.statNumber}>
+                    {typeof creator.rating === 'number' && !isNaN(creator.rating) && isFinite(creator.rating)
+                      ? `${creator.rating.toFixed(1)}/5`
+                      : '0.0/5'
+                    }
+                  </Text>
                   <Text style={styles.statLabel}>Rating</Text>
                 </View>
               </View>
@@ -418,36 +602,112 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                 ))}
               </View>
 
-              {/* Action Buttons */}
+              {/* Enhanced Action Buttons with Connect/Share/Verify */}
+              <View style={styles.actionButtonsContainer}>
+                <View style={styles.primaryActionButtons}>
+                  <TouchableOpacity 
+                    style={[styles.primaryActionButton, styles.connectButton]}
+                    onPress={() => setShowQRCode(!showQRCode)}
+                  >
+                    <MaterialIcons name="qr-code" size={20} color="#fff" />
+                    <Text style={styles.primaryActionText}>Connect</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={[styles.primaryActionButton, styles.verifyButton]}
+                    onPress={() => {
+                      Alert.alert('Verification', `${creator.name} is a verified creator with authentic metrics`);
+                    }}
+                  >
+                    <MaterialIcons name="verified" size={20} color="#fff" />
+                    <Text style={styles.primaryActionText}>Verify</Text>
+                  </TouchableOpacity>
+                </View>
+
+                {/* QR Code Generator */}
+                {showQRCode && (
+                  <View style={styles.qrContainer}>
+                    <QRGenerator
+                      value={`axees://profile/${creator._id}?instant=true`}
+                      creatorName={creator.name}
+                      profileUrl={`${Platform.OS === 'web' ? window.location.origin : 'https://axees.com'}/profile/${creator._id}`}
+                      onScan={() => router.push('/qr/scan')}
+                      customMessage="Scan to instantly send offers - no login required!"
+                    />
+                  </View>
+                )}
+
               <View style={styles.actionButtons}>
                 <TouchableOpacity 
-                  style={styles.contactButton}
+                  style={({ focused }) => [
+                    styles.contactButton,
+                    focused && styles.contactButtonFocused,
+                  ]}
                   onPress={() => {
                     console.log('📞 Contact button pressed, opening modal');
                     setIsContactModalVisible(true);
                   }}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Contact creator"
+                  accessibilityHint="Open contact form to send a message"
                 >
-                  <Message width={20} height={20} />
+                  <Message 
+                    width={20} 
+                    height={20} 
+                    accessibilityLabel="Send message icon"
+                    accessibilityRole="image"
+                    aria-label="Send message icon"
+                  />
                   <Text style={styles.contactText}>Contact</Text>
                 </TouchableOpacity>
                 
                 <TouchableOpacity 
-                  style={styles.collaborateButton}
+                  style={({ focused }) => [
+                    styles.collaborateButton,
+                    focused && styles.collaborateButtonFocused,
+                  ]}
                   onPress={() => setIsOfferModalVisible(true)}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Create offer for creator"
+                  accessibilityHint="Open form to create a collaboration offer"
                 >
-                  <Text style={styles.collaborateText}>Create Offer</Text>
+                  <Text 
+                    style={styles.collaborateText}
+                    numberOfLines={1}
+                    ellipsizeMode="tail"
+                  >
+                    Create Offer
+                  </Text>
                 </TouchableOpacity>
+              </View>
               </View>
             </View>
           </View>
 
           {/* Tab Navigation */}
-          <View style={styles.tabContainer}>
-            {['about', 'portfolio', 'rates'].map((tab) => (
+          <View 
+            style={styles.tabContainer}
+            accessible={true}
+            accessibilityRole="tablist"
+            accessibilityLabel="Profile navigation tabs"
+          >
+            {['about', 'portfolio', 'rates'].map((tab, index) => (
               <TouchableOpacity
                 key={tab}
-                style={[styles.tabButton, activeTab === tab && styles.activeTabButton]}
+                style={({ focused }) => [
+                  styles.tabButton, 
+                  activeTab === tab && styles.activeTabButton,
+                  focused && styles.tabButtonFocused
+                ]}
                 onPress={() => setActiveTab(tab as any)}
+                accessible={true}
+                accessibilityRole="tab"
+                accessibilityState={{ selected: activeTab === tab }}
+                accessibilityLabel={`${tab.charAt(0).toUpperCase() + tab.slice(1)} tab`}
+                accessibilityHint={`Shows ${tab} information for ${creator.name}`}
+                tabIndex={activeTab === tab ? 0 : -1} // Proper tab navigation
               >
                 <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
                   {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -538,7 +798,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                     padding: '12px',
                     borderRadius: '8px',
                     border: 'none',
-                    backgroundColor: Color.cSK430B92500,
+                    backgroundColor: BrandColors.primary[500],
                     color: 'white',
                     fontWeight: 600,
                     cursor: 'pointer'
@@ -584,6 +844,14 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     padding: 8,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    borderStyle: 'solid',
+  },
+  actionButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 8,
   },
   actionIcon: {
     width: 24,
@@ -626,11 +894,25 @@ const styles = StyleSheet.create({
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 40,
+    justifyContent: 'space-evenly',
+    gap: 40, // Default desktop gap
     marginBottom: 20,
+    flexWrap: 'wrap',
+    paddingHorizontal: 0, // Default desktop padding
+  },
+  statsRowMobile: {
+    gap: 20, // Mobile gap
+    paddingHorizontal: 10, // Mobile padding
   },
   statItem: {
     alignItems: 'center',
+    minWidth: 100, // Default desktop width
+    flex: 1,
+    maxWidth: 140, // Default desktop max width
+  },
+  statItemMobile: {
+    minWidth: 80, // Mobile width
+    maxWidth: 120, // Mobile max width
   },
   statNumber: {
     fontSize: 20,
@@ -650,7 +932,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   categoryChip: {
-    backgroundColor: '#f0e7fd',
+    backgroundColor: '#e6d5ff',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
@@ -677,6 +959,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Color.cSK430B92500,
   },
+  contactButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 8,
+  },
   contactText: {
     color: Color.cSK430B92500,
     fontSize: 16,
@@ -687,32 +973,58 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
+    paddingHorizontal: 8,
     borderRadius: 8,
     backgroundColor: Color.cSK430B92500,
+    minHeight: 44,
+    borderWidth: 2,
+    borderColor: 'transparent',
+    borderStyle: 'solid',
+  },
+  collaborateButtonFocused: {
+    ...Focus.secondary,
+    borderRadius: 8,
   },
   collaborateText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600',
+    textAlign: 'center',
+    flexShrink: 1,
   },
   tabContainer: {
     flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
     marginTop: 20,
+    paddingHorizontal: 4, // Add horizontal padding to prevent edge concatenation
+    gap: 4, // Add gap between tabs for modern browsers
   },
   tabButton: {
     flex: 1,
     paddingVertical: 16,
+    paddingHorizontal: 16, // Increased horizontal padding for better spacing
     alignItems: 'center',
+    marginHorizontal: 8, // Increased margin between tabs to prevent concatenation
+    minWidth: 90, // Increased minimum width for better layout
+    borderRadius: 8, // Add border radius for better visual separation
   },
   activeTabButton: {
     borderBottomWidth: 2,
     borderBottomColor: Color.cSK430B92500,
   },
+  tabButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 8,
+  },
   tabText: {
     fontSize: 16,
     color: '#666',
+    textAlign: 'center',
+    letterSpacing: 0.8, // Increased letter spacing for better readability and separation
+    fontWeight: '500',
+    lineHeight: 20, // Add line height for better vertical spacing
+    paddingHorizontal: 4, // Add horizontal padding to prevent text truncation
   },
   activeTabText: {
     color: Color.cSK430B92500,
@@ -759,14 +1071,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   specialtyChip: {
-    backgroundColor: '#e7f3ff',
+    backgroundColor: '#d1ecf1',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   specialtyText: {
     fontSize: 12,
-    color: '#007bff',
+    color: '#0c5460',
     fontWeight: '500',
   },
   platformRow: {
@@ -911,6 +1223,40 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     marginTop: 50,
+  },
+  
+  // New Galaxies Features Styles
+  actionButtonsContainer: {
+    width: '100%',
+    paddingHorizontal: 20,
+  },
+  primaryActionButtons: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 16,
+  },
+  primaryActionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    borderRadius: 8,
+  },
+  connectButton: {
+    backgroundColor: BrandColors.primary[400],
+  },
+  verifyButton: {
+    backgroundColor: BrandColors.semantic.success,
+  },
+  primaryActionText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  qrContainer: {
+    marginVertical: 16,
   },
   
   // Modal styles

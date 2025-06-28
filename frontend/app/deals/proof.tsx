@@ -16,6 +16,8 @@ import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
+import { BrandColors } from '@/constants/Colors';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -136,12 +138,7 @@ const ProofUploadPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton fallbackRoute="/deals" />
           
           <Text style={styles.headerTitle}>Upload Proof</Text>
           
@@ -153,7 +150,11 @@ const ProofUploadPage: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Milestone Overview */}
           <View style={styles.milestoneSection}>
             <Text style={styles.sectionTitle}>Milestone Details</Text>
@@ -393,7 +394,7 @@ const ProofUploadPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -401,7 +402,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   backButton: {
     padding: 8,
@@ -410,7 +411,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     textAlign: 'center',
   },
   draftButton: {
@@ -418,10 +419,10 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: Color.cSK430B92500,
+    borderColor: BrandColors.primary[500],
   },
   draftButtonText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontSize: 14,
     fontWeight: '500',
   },
@@ -431,28 +432,28 @@ const styles = StyleSheet.create({
   milestoneSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 12,
   },
   milestoneCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
   },
   milestoneTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 8,
   },
   milestoneDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     lineHeight: 20,
     marginBottom: 16,
   },
@@ -463,37 +464,37 @@ const styles = StyleSheet.create({
   infoItem: {},
   infoLabel: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 4,
   },
   infoValue: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
   },
   approvedContentSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    backgroundColor: '#f8f9fa',
+    borderBottomColor: BrandColors.neutral[200],
+    backgroundColor: BrandColors.neutral[50],
   },
   approvedContentCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: BrandColors.neutral[200],
   },
   approvedContentLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 4,
     marginTop: 8,
   },
   approvedContentText: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     lineHeight: 20,
     marginBottom: 8,
   },
@@ -506,17 +507,17 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 16,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 4,
   },
   inputHint: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 8,
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -527,9 +528,9 @@ const styles = StyleSheet.create({
     minHeight: 100,
   },
   uploadButton: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     borderStyle: 'dashed',
     paddingVertical: 16,
@@ -537,7 +538,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   uploadButtonText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontSize: 16,
     fontWeight: '500',
   },
@@ -548,11 +549,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 12,
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e9ecef',
+    borderColor: BrandColors.neutral[200],
   },
   screenshotPreview: {
     flexDirection: 'row',
@@ -565,34 +566,34 @@ const styles = StyleSheet.create({
   },
   screenshotName: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[700],
     flex: 1,
   },
   removeButton: {
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#dc3545',
+    backgroundColor: BrandColors.semantic.error,
     alignItems: 'center',
     justifyContent: 'center',
   },
   removeButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: 'bold',
   },
   guidelinesSection: {
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
   },
   guidelinesCard: {
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 12,
     padding: 16,
   },
   guidelineItem: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     lineHeight: 20,
     marginBottom: 8,
   },
@@ -600,39 +601,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: BrandColors.neutral[200],
     gap: 12,
   },
   draftActionButton: {
     flex: 1,
     borderWidth: 1,
-    borderColor: Color.cSK430B92500,
+    borderColor: BrandColors.primary[500],
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   draftActionText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[500],
     fontSize: 16,
     fontWeight: '600',
   },
   submitButton: {
     flex: 2,
-    backgroundColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.primary[500],
     paddingVertical: 16,
     borderRadius: 8,
     alignItems: 'center',
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: BrandColors.neutral[300],
   },
   submitButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },
   disabledButtonText: {
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   // Visual gallery styles
   screenshotsGrid: {
@@ -650,16 +651,16 @@ const styles = StyleSheet.create({
     height: Platform.OS === 'web' ? 150 : 100,
     borderRadius: 8,
     overflow: 'hidden',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: BrandColors.neutral[200],
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     position: 'relative',
   },
   placeholderImage: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
   },
   placeholderIcon: {
     fontSize: 32,
@@ -667,7 +668,7 @@ const styles = StyleSheet.create({
   },
   placeholderText: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   thumbnailRemoveButton: {
     position: 'absolute',
@@ -676,20 +677,20 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(220, 53, 69, 0.9)',
+    backgroundColor: BrandColors.semantic.error,
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1,
   },
   thumbnailFileName: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginTop: 4,
     textAlign: 'center',
     width: '100%',
   },
   proofSummary: {
-    backgroundColor: '#E8F5E9',
+    backgroundColor: BrandColors.semantic.successLight,
     padding: 12,
     borderRadius: 8,
     marginTop: 12,
@@ -698,12 +699,12 @@ const styles = StyleSheet.create({
   proofSummaryText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2E7D32',
+    color: BrandColors.semantic.successDark,
     marginBottom: 4,
   },
   proofSummaryHint: {
     fontSize: 12,
-    color: '#388E3C',
+    color: BrandColors.semantic.successDark,
   },
 });
 

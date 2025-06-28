@@ -11,10 +11,11 @@ import {
 } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Color } from '@/GlobalStyles';
+import { Color, Focus } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
+import UniversalBackButton from '@/components/UniversalBackButton';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -36,6 +37,9 @@ const NotificationCenterPage: React.FC = () => {
   const isWeb = Platform.OS === 'web';
   const { user } = useAuth();
   const [refreshing, setRefreshing] = useState(false);
+  const [markAllHovered, setMarkAllHovered] = useState(false);
+  const [markAllFocused, setMarkAllFocused] = useState(false);
+  const [markingAllRead, setMarkingAllRead] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([
     {
       id: 'notif-1',
@@ -159,7 +163,44 @@ const NotificationCenterPage: React.FC = () => {
   };
 
   const markAllAsRead = () => {
-    setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    const unreadCount = notifications.filter(n => !n.read).length;
+    
+    if (unreadCount === 0 || markingAllRead) {
+      return; // No unread notifications or already processing
+    }
+    
+    if (Platform.OS === 'web') {
+      const confirmed = window.confirm(
+        `Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read?`
+      );
+      if (confirmed) {
+        setMarkingAllRead(true);
+        setTimeout(() => {
+          setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+          setMarkingAllRead(false);
+        }, 500); // Small delay for visual feedback
+      }
+    } else {
+      // For mobile, use Alert.alert
+      const { Alert } = require('react-native');
+      Alert.alert(
+        'Mark All Read',
+        `Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read?`,
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Mark Read', 
+            onPress: () => {
+              setMarkingAllRead(true);
+              setTimeout(() => {
+                setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+                setMarkingAllRead(false);
+              }, 500); // Small delay for visual feedback
+            }
+          }
+        ]
+      );
+    }
   };
 
   const onRefresh = () => {
@@ -185,27 +226,43 @@ const NotificationCenterPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton fallbackRoute="/" />
           
           <Text style={styles.headerTitle}>Notifications</Text>
           
           {unreadCount > 0 && (
             <TouchableOpacity 
-              style={styles.markAllButton}
+              style={[
+                styles.markAllButton,
+                markAllHovered && isWeb && styles.markAllButtonHovered,
+                markAllFocused && styles.markAllButtonFocused,
+                markingAllRead && styles.markAllButtonLoading
+              ]}
               onPress={markAllAsRead}
+              activeOpacity={0.7}
+              accessible={true}
+              accessibilityRole="button"
+              accessibilityLabel={`Mark all ${unreadCount} notification${unreadCount > 1 ? 's' : ''} as read`}
+              accessibilityHint="Marks all unread notifications as read"
+              onMouseEnter={isWeb ? () => setMarkAllHovered(true) : undefined}
+              onMouseLeave={isWeb ? () => setMarkAllHovered(false) : undefined}
+              onFocus={() => setMarkAllFocused(true)}
+              onBlur={() => setMarkAllFocused(false)}
+              {...(Platform.OS === 'web' && { tabIndex: 0 })}
             >
-              <Text style={styles.markAllText}>Mark all read</Text>
+              <Text style={[
+                styles.markAllText,
+                markAllFocused && styles.markAllTextFocused
+              ]}>
+                {markingAllRead ? 'Marking...' : 'Mark all read'}
+              </Text>
             </TouchableOpacity>
           )}
         </View>
 
         <ScrollView 
           style={styles.scrollContainer}
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
           showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
@@ -225,7 +282,7 @@ const NotificationCenterPage: React.FC = () => {
                   onPress={() => handleNotificationPress(notification)}
                 >
                   <View style={[styles.iconContainer, { backgroundColor: getNotificationColor(notification.type) + '20' }]}>
-                    <Text style={styles.icon}>{notification.icon}</Text>
+                    <Text style={styles.icon} aria-hidden="true">{notification.icon}</Text>
                   </View>
                   
                   <View style={styles.notificationContent}>
@@ -252,7 +309,7 @@ const NotificationCenterPage: React.FC = () => {
                   onPress={() => handleNotificationPress(notification)}
                 >
                   <View style={[styles.iconContainer, { backgroundColor: '#f3f4f6' }]}>
-                    <Text style={styles.icon}>{notification.icon}</Text>
+                    <Text style={styles.icon} aria-hidden="true">{notification.icon}</Text>
                   </View>
                   
                   <View style={styles.notificationContent}>
@@ -300,9 +357,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
   },
-  backButton: {
-    padding: 8,
-  },
   headerTitle: {
     flex: 1,
     fontSize: 18,
@@ -311,13 +365,31 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   markAllButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Color.cSK430B92500,
+    minHeight: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+      },
+    }),
   },
   markAllText: {
     color: Color.cSK430B92500,
     fontSize: 14,
     fontWeight: '600',
+    textAlign: 'center',
+    ...Platform.select({
+      web: {
+        userSelect: 'none',
+      },
+    }),
   },
   scrollContainer: {
     flex: 1,
@@ -413,6 +485,33 @@ const styles = StyleSheet.create({
     color: '#666',
     textAlign: 'center',
     lineHeight: 24,
+  },
+  markAllButtonHovered: {
+    backgroundColor: Color.cSK430B9250,
+    borderColor: Color.cSK430B92500,
+  },
+  markAllButtonFocused: {
+    ...Focus.primary,
+    backgroundColor: Color.cSK430B9250,
+  },
+  markAllButtonLoading: {
+    opacity: 0.6,
+    backgroundColor: Color.cSK430B92100,
+  },
+  markAllButtonDisabled: {
+    opacity: 0.5,
+    borderColor: '#ccc',
+    ...Platform.select({
+      web: {
+        cursor: 'not-allowed' as any,
+      },
+    }),
+  },
+  markAllTextDisabled: {
+    color: '#999',
+  },
+  markAllTextFocused: {
+    color: Color.cSK430B92950,
   },
 });
 

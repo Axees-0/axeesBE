@@ -36,6 +36,7 @@ import {
 } from 'lucide-react-native';
 import { useOfferNegotiation } from '@/utils/offerNegotiationService';
 import Toast from 'react-native-toast-message';
+import { BrandColors } from '@/constants/Colors';
 
 export interface NegotiationOffer {
   id: string;
@@ -296,22 +297,22 @@ export default function OfferNegotiation({
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'accepted': return '#10B981';
-      case 'rejected': return '#EF4444';
-      case 'pending': return '#F59E0B';
-      case 'countered': return '#3B82F6';
-      case 'expired': return '#6B7280';
-      default: return '#430B92';
+      case 'accepted': return BrandColors.semantic.success;
+      case 'rejected': return BrandColors.semantic.error;
+      case 'pending': return BrandColors.semantic.warning;
+      case 'countered': return BrandColors.semantic.info;
+      case 'expired': return BrandColors.neutral[500];
+      default: return BrandColors.primary[500];
     }
   };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'urgent': return '#EF4444';
-      case 'high': return '#F59E0B';
-      case 'medium': return '#3B82F6';
-      case 'low': return '#6B7280';
-      default: return '#430B92';
+      case 'urgent': return BrandColors.semantic.error;
+      case 'high': return BrandColors.semantic.warning;
+      case 'medium': return BrandColors.semantic.info;
+      case 'low': return BrandColors.neutral[500];
+      default: return BrandColors.primary[500];
     }
   };
 
@@ -348,14 +349,14 @@ export default function OfferNegotiation({
             style={styles.historyButton}
             onPress={() => setShowHistory(true)}
           >
-            <History width={16} height={16} color="#430B92" />
+            <History width={16} height={16} color={BrandColors.primary[500]} />
             <Text style={styles.historyButtonText}>History</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.offerDetails}>
           <View style={styles.offerAmount}>
-            <DollarSign width={20} height={20} color="#10B981" />
+            <DollarSign width={20} height={20} color={BrandColors.semantic.success} />
             <Text style={styles.amountText}>
               ${service.formatCurrency(currentOffer.terms.amount)}
             </Text>
@@ -363,18 +364,18 @@ export default function OfferNegotiation({
 
           <View style={styles.offerMeta}>
             <View style={styles.metaItem}>
-              <Clock width={16} height={16} color="#6B7280" />
+              <Clock width={16} height={16} color={BrandColors.neutral[500]} />
               <Text style={styles.metaText}>{currentOffer.terms.timeline} days</Text>
             </View>
 
             <View style={styles.metaItem}>
-              <Target width={16} height={16} color="#6B7280" />
+              <Target width={16} height={16} color={BrandColors.neutral[500]} />
               <Text style={styles.metaText}>{currentOffer.terms.revisions} revisions</Text>
             </View>
 
             {currentOffer.terms.exclusivity && (
               <View style={styles.metaItem}>
-                <Star width={16} height={16} color="#F59E0B" />
+                <Star width={16} height={16} color={BrandColors.semantic.warning} />
                 <Text style={styles.metaText}>Exclusive</Text>
               </View>
             )}
@@ -383,7 +384,7 @@ export default function OfferNegotiation({
 
         {currentOffer.message && (
           <View style={styles.offerMessage}>
-            <MessageSquare width={16} height={16} color="#430B92" />
+            <MessageSquare width={16} height={16} color={BrandColors.primary[500]} />
             <Text style={styles.messageText}>{currentOffer.message}</Text>
           </View>
         )}
@@ -415,7 +416,7 @@ export default function OfferNegotiation({
 
         {currentOffer.expiresAt && (
           <View style={styles.expiration}>
-            <AlertCircle width={14} height={14} color="#F59E0B" />
+            <AlertCircle width={14} height={14} color={BrandColors.semantic.warning} />
             <Text style={styles.expirationText}>
               Expires: {currentOffer.expiresAt.toLocaleDateString()} at {currentOffer.expiresAt.toLocaleTimeString()}
             </Text>
@@ -763,11 +764,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   offerCard: {
-    backgroundColor: '#F9FAFB',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: BrandColors.neutral[200],
     marginBottom: 16,
   },
   offerCardCompact: {
@@ -934,30 +935,34 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   rejectButton: {
-    backgroundColor: '#EF4444',
+    backgroundColor: BrandColors.semantic.error,
+    borderWidth: 1,
+    borderColor: BrandColors.semantic.error,
   },
   rejectButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
   },
   counterButton: {
     borderWidth: 1,
-    borderColor: '#430B92',
-    backgroundColor: '#FFFFFF',
+    borderColor: BrandColors.primary[500],
+    backgroundColor: BrandColors.neutral[0],
   },
   counterButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#430B92',
+    color: BrandColors.primary[500],
   },
   acceptButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: BrandColors.semantic.success,
+    borderWidth: 1,
+    borderColor: BrandColors.semantic.success,
   },
   acceptButtonText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
   },
   modalContainer: {
     flex: 1,
@@ -991,12 +996,12 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#D1D5DB',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: '#111827',
-    backgroundColor: '#FFFFFF',
+    color: BrandColors.neutral[900],
+    backgroundColor: BrandColors.neutral[0],
   },
   textArea: {
     height: 80,

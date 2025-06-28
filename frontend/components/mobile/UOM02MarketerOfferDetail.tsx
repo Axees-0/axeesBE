@@ -12,11 +12,13 @@ import {
   ScrollView,
   TouchableOpacity,
 } from "react-native";
+import { Image } from "expo-image";
 import { StatusBar } from "expo-status-bar";
 import { router, useLocalSearchParams } from "expo-router";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useAuth } from "@/contexts/AuthContext";
+import { getPlatformIcon } from "@/constants/platforms";
 
 import Arrowleft022 from "../../assets/arrowleft022.svg";
 import Fileuploadicon from "../../assets/-file-upload-icon.svg";
@@ -210,24 +212,6 @@ export default function MarketerOfferDetail() {
   );
 }
 
-function getPlatformIcon(platform: string) {
-  switch (platform.toLowerCase()) {
-    case "instagram":
-      return require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("@/assets/png-clipart-youtube-play-button-computer-icons-youtube-youtube-logo-angle-rectangle-thumbnail.png");
-    case "tiktok":
-      return require("@/assets/tiktok-icon.png");
-    case "facebook":
-      return require("@/assets/facebook-icon.png");
-    case "twitter":
-      return require("@/assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("@/assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      return require("@/assets/letter-s.png");
-  }
-}
 
 const styles = StyleSheet.create({
   container: {

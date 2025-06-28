@@ -12,6 +12,7 @@ import {
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import UniversalBackButton from '@/components/UniversalBackButton';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -128,12 +129,7 @@ const ResetPasswordOTPScreen: React.FC = () => {
       
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity 
-          style={styles.backButton}
-          onPress={() => router.back()}
-        >
-          <ArrowLeft width={24} height={24} />
-        </TouchableOpacity>
+        <UniversalBackButton fallbackRoute="/forgot-password" />
         
         <Text style={styles.headerTitle}>Enter Reset Code</Text>
         <View style={styles.headerSpacer} />
@@ -234,9 +230,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: '#f0f0f0',
-  },
-  backButton: {
-    padding: 8,
   },
   headerTitle: {
     fontSize: 18,

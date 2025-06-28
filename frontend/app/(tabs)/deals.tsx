@@ -18,22 +18,35 @@ import { DemoData } from "@/demo/DemoData";
 import { useAuth } from "@/contexts/AuthContext";
 import CreatorDealsView from "@/components/CreatorDealsView";
 import Navbar from "@/components/web/navbar";
-import { BREAKPOINTS, isMobile, isWideScreen } from "@/constants/breakpoints";
+import { BREAKPOINTS, isMobile, isWideScreen, isTablet, isDesktop, isUltraWide } from "@/constants/breakpoints";
 import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/performance";
 import { WebSEO } from "../web-seo";
+import { DealSkeleton, DealMetricsSkeleton, DealActivitySkeleton } from "@/components/DealSkeleton";
+import DesignSystem from "@/styles/DesignSystem";
+import { BrandColors } from '@/constants/Colors';
 
 const UOM08MarketerDealHistoryList = () => {
   const { width } = useWindowDimensions();
   const { user } = useAuth();
   const router = useRouter();
-  const isWeb = Platform.OS === "web";
+  const isWeb = Platform?.OS === "web";
   const isWide = isWideScreen(width);
+  const isUltraWideScreen = isUltraWide(width);
   const isMobileDevice = isMobile(width);
   const isMobileScreen = width <= 768;
+  const isVeryNarrow = width <= 380; // Very narrow screens need special handling
   
   // const [activeTab, setActiveTab] = useState('deals');
   const [isLoading, setIsLoading] = useState(true);
   const [chartsReady, setChartsReady] = useState(false);
+  
+  // Navbar search state
+  const [searchText, setSearchText] = useState('');
+  const handleSubmitSearch = () => {
+    if (searchText.trim()) {
+      router.push(`/?search=${encodeURIComponent(searchText.trim())}`);
+    }
+  };
 
   // Demo analytics data
   const [analyticsData] = useState({
@@ -65,7 +78,7 @@ const UOM08MarketerDealHistoryList = () => {
   });
 
   // Demo counter-offers for marketers
-  const [counterOffers] = useState([
+  const [counterOffers, setCounterOffers] = useState([
     {
       id: 'counter-001',
       creatorName: 'Emma Thompson',
@@ -76,6 +89,95 @@ const UOM08MarketerDealHistoryList = () => {
       submittedDate: new Date(Date.now() - 7200000), // 2 hours ago
     }
   ]);
+  
+  // Track accepted offer IDs to hide their banners
+  const [acceptedOfferIds, setAcceptedOfferIds] = useState<string[]>(
+    // Check localStorage for previously accepted offers
+    typeof window !== 'undefined' 
+      ? JSON.parse(localStorage.getItem('acceptedOfferIds') || '[]')
+      : []
+  );
+  
+  // Filter out accepted offers
+  const pendingCounterOffers = counterOffers.filter(
+    offer => offer.status === 'pending' && !acceptedOfferIds.includes(offer.id)
+  );
+  
+  // Listen for offer acceptance events
+  useEffect(() => {
+    const handleOfferAccepted = (event: any) => {
+      const offerId = event.detail?.offerId;
+      if (offerId) {
+        const newAcceptedIds = [...acceptedOfferIds, offerId];
+        setAcceptedOfferIds(newAcceptedIds);
+        // Persist to localStorage
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('acceptedOfferIds', JSON.stringify(newAcceptedIds));
+        }
+      }
+    };
+    
+    if (typeof window !== 'undefined') {
+      window.addEventListener('offerAccepted', handleOfferAccepted);
+      return () => {
+        window.removeEventListener('offerAccepted', handleOfferAccepted);
+      };
+    }
+  }, [acceptedOfferIds]);
+
+  // Responsive styles for metric cards
+  const getMetricsRowStyles = () => {
+    if (isMobileDevice || isVeryNarrow) {
+      return styles.metricsColumn;
+    } else if (isTablet(width)) {
+      return [
+        styles.metricsRow,
+        {
+          gap: 20,
+          flexWrap: 'wrap',
+          justifyContent: 'space-between',
+        }
+      ];
+    } else {
+      return styles.metricsRow;
+    }
+  };
+
+  // Responsive styles for offer cards
+  const getOfferCardStyles = () => {
+    if (Platform.OS !== 'web') {
+      return styles.offerCard;
+    }
+
+    if (isMobile(width)) {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          marginHorizontal: 0,
+        }
+      ];
+    } else if (isTablet(width)) {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          maxWidth: '100%', // Fluid width on tablet
+          marginHorizontal: 0,
+          padding: 18, // Slightly more padding for tablet
+        }
+      ];
+    } else {
+      return [
+        styles.offerCard,
+        {
+          width: '100%',
+          maxWidth: 800, // Max width for desktop
+          marginHorizontal: 0,
+        }
+      ];
+    }
+  };
 
   useEffect(() => {
     if (DEMO_MODE) {
@@ -131,6 +233,26 @@ const UOM08MarketerDealHistoryList = () => {
       return isMobileScreen ? <Mobile /> : <Web />;
     }
     
+    // Show skeleton loading for demo mode
+    if (isLoading) {
+      return (
+        <View style={[styles.content, isWide && styles.wideContent]}>
+          {/* Summary skeleton */}
+          <DealMetricsSkeleton count={4} />
+          
+          {/* Main content skeleton */}
+          <View style={styles.section}>
+            <DealSkeleton variant="card" count={3} />
+          </View>
+          
+          {/* Activity skeleton */}
+          <View style={styles.section}>
+            <DealActivitySkeleton count={3} />
+          </View>
+        </View>
+      );
+    }
+    
     // Check user role to determine which view to show
     const userRole = user?.role || 'marketer'; // Default to marketer for backward compatibility
     
@@ -138,7 +260,7 @@ const UOM08MarketerDealHistoryList = () => {
     if (userRole === 'creator') {
       return (
         <View style={[styles.content, isWide && styles.wideContent]}>
-          <CreatorDealsView userRole="creator" />
+          <CreatorDealsView userRole="creator" isLoading={isLoading} />
         </View>
       );
     }
@@ -193,30 +315,30 @@ const UOM08MarketerDealHistoryList = () => {
 
     const getStatusColor = (status: string) => {
       switch (status) {
-        case 'Pending Response': return '#FFA726';
-        case 'Accepted': return '#66BB6A';
-        case 'In Progress': return '#42A5F5';
-        case 'Completed': return '#4CAF50';
-        case 'Declined': return '#EF5350';
-        default: return '#757575';
+        case 'Pending Response': return BrandColors.semantic.warning;
+        case 'Accepted': return BrandColors.semantic.success;
+        case 'In Progress': return BrandColors.semantic.info;
+        case 'Completed': return BrandColors.semantic.success;
+        case 'Declined': return BrandColors.semantic.error;
+        default: return BrandColors.neutral[500];
       }
     };
 
     const getStatusTextColor = (status: string) => {
       switch (status) {
-        case 'Pending Response': return '#FF8F00';
-        case 'Accepted': return '#388E3C';
-        case 'In Progress': return '#1976D2';
-        case 'Completed': return '#2E7D32';
-        case 'Declined': return '#C62828';
-        default: return '#424242';
+        case 'Pending Response': return BrandColors.semantic.warningDark;
+        case 'Accepted': return BrandColors.semantic.successDark;
+        case 'In Progress': return BrandColors.semantic.infoDark;
+        case 'Completed': return BrandColors.semantic.successDark;
+        case 'Declined': return BrandColors.semantic.errorDark;
+        default: return BrandColors.neutral[700];
       }
     };
 
     return (
       <View style={[styles.content, isWide && styles.wideContent]}>
         {/* Summary Cards */}
-        <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
+        <View style={getMetricsRowStyles()}>
           <MetricCard
             title="Total Offers"
             value={demoOffers.length}
@@ -241,20 +363,32 @@ const UOM08MarketerDealHistoryList = () => {
         </View>
 
         {/* Counter Offers Alert */}
-        {counterOffers.length > 0 && (
+        {pendingCounterOffers.length > 0 && (
           <TouchableOpacity 
             style={styles.counterOfferAlert}
-            onPress={() => router.push('/offers/handle-counter')}
+            onPress={() => {
+              router.push({
+                pathname: '/offers/handle-counter',
+                params: { 
+                  counterId: pendingCounterOffers[0].id,
+                  from: 'deals'
+                }
+              });
+            }}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Review counter offer from ${pendingCounterOffers[0].creatorName}`}
+            accessibilityHint={`Opens counter offer details for ${pendingCounterOffers[0].offerType}`}
           >
             <View style={styles.counterOfferContent}>
               <Text style={styles.counterOfferIcon}>🔔</Text>
               <View style={styles.counterOfferInfo}>
-                <Text style={styles.counterOfferTitle}>Counter Offer Received</Text>
-                <Text style={styles.counterOfferText}>
-                  {counterOffers[0].creatorName} sent a counter offer for {counterOffers[0].offerType}
+                <Text style={styles.counterOfferTitle} numberOfLines={undefined}>Counter Offer Received</Text>
+                <Text style={styles.counterOfferText} numberOfLines={undefined}>
+                  {pendingCounterOffers[0].creatorName} sent a counter offer for {pendingCounterOffers[0].offerType}
                 </Text>
-                <Text style={styles.counterOfferAmount}>
-                  ${counterOffers[0].originalAmount} → ${counterOffers[0].counterAmount}
+                <Text style={styles.counterOfferAmount} numberOfLines={undefined}>
+                  ${pendingCounterOffers[0].originalAmount} → ${pendingCounterOffers[0].counterAmount}
                 </Text>
               </View>
             </View>
@@ -270,7 +404,7 @@ const UOM08MarketerDealHistoryList = () => {
               <TouchableOpacity 
                 key={offer.id} 
                 style={({ pressed }) => [
-                  styles.offerCard,
+                  ...Array.isArray(getOfferCardStyles()) ? getOfferCardStyles() : [getOfferCardStyles()],
                   pressed && styles.offerCardPressed
                 ]} 
                 data-testid="deal-card"
@@ -360,7 +494,7 @@ const UOM08MarketerDealHistoryList = () => {
   const renderAnalyticsTab = () => (
     <View style={[styles.content, isWide && styles.wideContent]}>
       {/* Key Metrics Row */}
-      <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
+      <View style={getMetricsRowStyles()}>
         <MetricCard
           title="Total Earnings"
           value={`$${analyticsData.totalEarnings.toLocaleString()}`}
@@ -382,7 +516,7 @@ const UOM08MarketerDealHistoryList = () => {
       </View>
 
       {/* Secondary Metrics */}
-      <View style={[styles.metricsRow, isMobileDevice && styles.metricsColumn]}>
+      <View style={getMetricsRowStyles()}>
         <MetricCard
           title="Total Deals"
           value={analyticsData.totalDeals}
@@ -492,7 +626,11 @@ const UOM08MarketerDealHistoryList = () => {
           description="Manage your deals and offers. High-value creator opportunities and brand partnerships."
           keywords="creator deals, brand partnerships, influencer opportunities, offers"
         />
-        <Navbar pageTitle="Deals & Offers" />
+        <Navbar 
+          searchText={searchText}
+          setSearchText={setSearchText}
+          onSubmitSearch={handleSubmitSearch}
+        />
         <SafeAreaView style={styles.container}>
           <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
             {/* Content */}
@@ -532,22 +670,41 @@ const UOM08MarketerDealHistoryList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: BrandColors.neutral[0],
   },
   scrollView: {
     flex: 1,
   },
   counterOfferAlert: {
-    backgroundColor: '#FFF7ED',
+    backgroundColor: BrandColors.semantic.warningLight,
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: BrandColors.semantic.warning,
     borderRadius: 12,
-    padding: 16,
-    marginHorizontal: 20,
+    padding: DesignSystem.ResponsiveSpacing.cardPadding.paddingHorizontal,
+    paddingVertical: DesignSystem.ResponsiveSpacing.cardPadding.paddingVertical + 4, // Extra vertical padding
+    marginHorizontal: DesignSystem.ResponsiveSpacing.containerHorizontal,
     marginBottom: 20,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    minHeight: 80, // Consistent height for banner
+    ...Platform.select({
+      web: {
+        cursor: 'pointer' as any,
+        ':focus': {
+          borderColor: BrandColors.semantic.warningDark,
+          borderWidth: 2,
+          shadowColor: BrandColors.semantic.warningDark,
+          shadowOpacity: 0.3,
+          shadowRadius: 4,
+          backgroundColor: BrandColors.semantic.warningLight,
+        },
+        ':hover': {
+          backgroundColor: BrandColors.semantic.warningLight,
+          borderColor: BrandColors.semantic.warning,
+        }
+      }
+    }),
   },
   counterOfferContent: {
     flexDirection: 'row',
@@ -560,38 +717,50 @@ const styles = StyleSheet.create({
   },
   counterOfferInfo: {
     flex: 1,
+    minWidth: 0, // Prevent text from pushing beyond container
+    paddingRight: 16, // Increased space before action button
+    justifyContent: 'center', // Center content vertically
   },
   counterOfferTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#EA580C',
+    color: BrandColors.semantic.warningDark,
     marginBottom: 2,
+    flexWrap: 'wrap',
   },
   counterOfferText: {
     fontSize: 14,
-    color: '#92400E',
+    color: BrandColors.semantic.warningDark,
     marginBottom: 4,
+    flexWrap: 'wrap',
+    flexShrink: 1,
   },
   counterOfferAmount: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#92400E',
+    color: BrandColors.semantic.warningDark,
+    flexWrap: 'wrap',
   },
   counterOfferAction: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#EA580C',
+    color: BrandColors.semantic.warningDark,
+    paddingLeft: 16,
+    paddingVertical: 12, // Increased for better vertical centering
+    textAlign: 'center',
+    minWidth: 90,
+    alignSelf: 'center', // Center arrow vertically
   },
   tabHeader: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: BrandColors.neutral[0],
     borderBottomWidth: 1,
-    borderBottomColor: "#E2D0FB",
+    borderBottomColor: BrandColors.primary[200],
     paddingHorizontal: 20,
     paddingTop: 10,
   },
   tabContainer: {
     flexDirection: "row",
-    backgroundColor: "#F8F9FD",
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 4,
   },
@@ -603,15 +772,15 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   activeTab: {
-    backgroundColor: "#430B92",
+    backgroundColor: BrandColors.primary[500],
   },
   tabText: {
     fontSize: 14,
     fontWeight: "600",
-    color: "#6C6C6C",
+    color: BrandColors.neutral[500],
   },
   activeTabText: {
-    color: "#FFFFFF",
+    color: BrandColors.neutral[0],
   },
   content: {
     padding: 20,
@@ -623,36 +792,43 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 16,
     marginBottom: 20,
+    flexWrap: "wrap", // Allow wrapping on very narrow screens
   },
   metricsColumn: {
     flexDirection: "column",
+    gap: 16,
+    alignItems: "stretch", // Ensure cards take full width when stacked
   },
   metricCard: {
+    ...DesignSystem.StatCardStyles.container,
     flex: 1,
-    backgroundColor: "#F8F9FD",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: "#E2D0FB",
-    minHeight: 100,
+    marginHorizontal: 4, // Equal spacing between stat cards
+    minWidth: 140, // Prevent cards from becoming too narrow
+    maxWidth: '100%', // Ensure cards don't overflow their container
   },
   metricCardWide: {
-    minHeight: 120,
+    ...DesignSystem.StatCardStyles.container,
+    flex: 1,
+    marginHorizontal: 4,
+    minWidth: 160, // Slightly wider on wide screens
+  },
+  metricCardMobile: {
+    ...DesignSystem.StatCardStyles.container,
+    flex: 0, // Don't flex when stacked vertically
+    width: '100%', // Take full width when stacked
+    marginHorizontal: 0,
   },
   metricTitle: {
-    fontSize: 14,
-    color: "#6C6C6C",
-    marginBottom: 8,
+    ...DesignSystem.StatCardStyles.label,
   },
   metricValue: {
-    fontSize: Platform.OS === "web" ? 24 : 20,
-    fontWeight: "700",
-    color: "#430B92",
-    marginBottom: 4,
+    ...DesignSystem.StatCardStyles.value,
+    fontSize: Platform?.OS === "web" ? 24 : 20, // Responsive sizing
   },
   metricSubtitle: {
-    fontSize: 12,
-    color: "#6C6C6C",
+    ...DesignSystem.StatCardStyles.label,
+    fontSize: 11, // Slightly smaller for subtitle
+    opacity: 0.8,
   },
   trendContainer: {
     marginTop: 8,
@@ -662,10 +838,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   trendPositive: {
-    color: "#22C55E",
+    color: BrandColors.semantic.success,
   },
   trendNegative: {
-    color: "#EF4444",
+    color: BrandColors.semantic.error,
   },
   chartSection: {
     marginVertical: 30,
@@ -673,17 +849,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: "600",
-    color: "#000000",
+    color: BrandColors.neutral[1000],
     marginBottom: 20,
   },
   chartContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-end",
-    backgroundColor: "#F8F9FD",
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 16,
-    padding: Platform.OS === "web" ? 20 : 16,
-    height: Platform.OS === "web" ? 200 : 180,
+    padding: Platform?.OS === "web" ? 20 : 16,
+    height: Platform?.OS === "web" ? 200 : 180,
     overflow: "hidden",
   },
   chartBar: {
@@ -691,27 +867,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   bar: {
-    backgroundColor: "#430B92",
-    width: Platform.OS === "web" ? 30 : 24,
+    backgroundColor: BrandColors.primary[500],
+    width: Platform?.OS === "web" ? 30 : 24,
     borderRadius: 4,
     marginBottom: 8,
     minHeight: 20,
   },
   barLabel: {
     fontSize: 12,
-    color: "#6C6C6C",
+    color: BrandColors.neutral[500],
     marginBottom: 4,
   },
   barValue: {
     fontSize: 11,
-    color: "#430B92",
+    color: BrandColors.primary[500],
     fontWeight: "600",
   },
   section: {
     marginBottom: 30,
   },
   platformBreakdown: {
-    backgroundColor: "#F8F9FD",
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 16,
     padding: 20,
   },
@@ -722,25 +898,25 @@ const styles = StyleSheet.create({
   },
   platformName: {
     fontSize: 14,
-    color: "#000000",
+    color: BrandColors.neutral[1000],
     fontWeight: "500",
     width: 80,
   },
   progressBar: {
     flex: 1,
     height: 8,
-    backgroundColor: "#E2D0FB",
+    backgroundColor: BrandColors.primary[200],
     borderRadius: 4,
     marginHorizontal: 12,
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#430B92",
+    backgroundColor: BrandColors.primary[500],
     borderRadius: 4,
   },
   platformPercentage: {
     fontSize: 14,
-    color: "#430B92",
+    color: BrandColors.primary[500],
     fontWeight: "600",
     width: 40,
     textAlign: "right",
@@ -752,7 +928,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "#F8F9FD",
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
     padding: 16,
   },
@@ -762,45 +938,48 @@ const styles = StyleSheet.create({
   dealBrand: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#000000",
+    color: BrandColors.neutral[1000],
     marginBottom: 4,
   },
   dealPlatform: {
     fontSize: 12,
-    color: "#6C6C6C",
+    color: BrandColors.neutral[500],
   },
   dealAmount: {
     alignItems: "flex-end",
+    minWidth: 100, // Consistent column width
+    paddingRight: DesignSystem.ResponsiveSpacing.containerHorizontal, // Consistent right gutter
   },
   dealPrice: {
+    ...DesignSystem.Typography.bodyMedium,
     fontSize: 16,
     fontWeight: "700",
-    color: "#430B92",
-    marginBottom: 4,
+    color: BrandColors.primary[500],
+    marginBottom: 6,
+    textAlign: 'right', // Right-align prices
   },
   dealStatus: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    ...DesignSystem.PillStyles.status,
+    alignSelf: 'flex-end', // Align pills to right edge
   },
   statusCompleted: {
-    backgroundColor: "#DCFCE7",
+    backgroundColor: BrandColors.semantic.successLight,
   },
   statusProgress: {
-    backgroundColor: "#FEF3C7",
+    backgroundColor: BrandColors.semantic.warningLight,
   },
   statusText: {
     fontSize: 10,
     fontWeight: "600",
   },
   statusTextCompleted: {
-    color: "#15803D",
+    color: BrandColors.semantic.successDark,
   },
   statusTextProgress: {
-    color: "#B45309",
+    color: BrandColors.semantic.warningDark,
   },
   highlightSection: {
-    backgroundColor: "#430B92",
+    backgroundColor: BrandColors.primary[500],
     borderRadius: 16,
     padding: 24,
     marginTop: 20,
@@ -809,12 +988,12 @@ const styles = StyleSheet.create({
   highlightTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: BrandColors.neutral[0],
     marginBottom: 8,
   },
   highlightText: {
     fontSize: 14,
-    color: "#FFFFFF",
+    color: BrandColors.neutral[0],
     textAlign: "center",
     lineHeight: 20,
   },
@@ -828,13 +1007,13 @@ const styles = StyleSheet.create({
   loadingShimmer: {
     width: "80%",
     height: 80,
-    backgroundColor: "#E2D0FB",
+    backgroundColor: BrandColors.primary[200],
     borderRadius: 8,
     marginBottom: 16,
   },
   loadingText: {
     fontSize: 14,
-    color: "#6C6C6C",
+    color: BrandColors.neutral[500],
     fontStyle: "italic",
   },
   chartSkeletonContainer: {
@@ -849,14 +1028,14 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   barSkeleton: {
-    backgroundColor: "#E2D0FB",
-    width: Platform.OS === "web" ? 30 : 24,
+    backgroundColor: BrandColors.primary[200],
+    width: Platform?.OS === "web" ? 30 : 24,
     height: 60,
     borderRadius: 4,
     marginBottom: 8,
   },
   barLabelSkeleton: {
-    backgroundColor: "#E2D0FB",
+    backgroundColor: BrandColors.primary[200],
     width: 20,
     height: 12,
     borderRadius: 2,
@@ -868,21 +1047,22 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   offerCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 12,
     padding: 16,
     borderWidth: 1,
-    borderColor: '#E2D0FB',
-    shadowColor: '#000',
+    borderColor: BrandColors.primary[200],
+    shadowColor: BrandColors.neutral[1000],
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
     shadowRadius: 4,
     elevation: 2,
+    ...(Platform?.OS === 'web' && { cursor: 'pointer' as any }),
   },
   offerCardPressed: {
     opacity: 0.8,
     transform: [{ scale: 0.98 }],
-    backgroundColor: '#F8F4FF',
+    backgroundColor: BrandColors.primary[50],
   },
   offerHeader: {
     flexDirection: 'row',
@@ -897,35 +1077,35 @@ const styles = StyleSheet.create({
   offerTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#430B92',
+    color: BrandColors.primary[500],
     marginBottom: 4,
   },
   offerCreator: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 2,
   },
   offerPlatform: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   offerActions: {
     alignItems: 'flex-end',
+    paddingRight: DesignSystem.ResponsiveSpacing.containerHorizontal, // Consistent right gutter
+    minWidth: 120, // Consistent column width for price alignment
   },
   offerAmount: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#430B92',
-    marginBottom: 6,
+    ...DesignSystem.Typography.h4,
+    color: BrandColors.primary[500],
+    marginBottom: 8,
+    textAlign: 'right', // Right-align all prices to consistent gutter
   },
   offerStatus: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
+    ...DesignSystem.PillStyles.status,
+    alignSelf: 'flex-end', // Align status pills to right edge
   },
   offerStatusText: {
-    fontSize: 12,
-    fontWeight: '600',
+    ...DesignSystem.PillTextStyles.status,
   },
   offerFooter: {
     flexDirection: 'row',
@@ -933,15 +1113,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+    borderTopColor: BrandColors.neutral[200],
   },
   offerDate: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   offerNumber: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
     fontFamily: 'monospace',
   },
   
@@ -957,7 +1137,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#F8F9FD',
+    backgroundColor: BrandColors.neutral[50],
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -971,17 +1151,17 @@ const styles = StyleSheet.create({
   activityTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#430B92',
+    color: BrandColors.primary[500],
     marginBottom: 2,
   },
   activityDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
     marginBottom: 4,
   },
   activityTime: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   
   // Action Button Styles
@@ -990,13 +1170,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   exploreButton: {
-    backgroundColor: '#430B92',
+    backgroundColor: BrandColors.primary[500],
     paddingVertical: 14,
     paddingHorizontal: 32,
     borderRadius: 8,
   },
   exploreButtonText: {
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },

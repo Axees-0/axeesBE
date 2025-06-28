@@ -6,8 +6,9 @@ import {
   StyleSheet,
   TouchableOpacity,
   TouchableWithoutFeedback,
+  Platform,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 const PRIVACY_POLICY_AND_GUIDELINES = `
  1. Terms and Conditions
@@ -23,6 +24,20 @@ const TermsModal = ({
   visible: boolean;
   onClose: () => void;
 }) => {
+  // Add ESC key support for web
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [visible, onClose]);
+
   return (
     <Modal transparent={true} visible={visible} onRequestClose={onClose}>
       <TouchableWithoutFeedback onPress={onClose}>

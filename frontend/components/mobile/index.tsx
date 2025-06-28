@@ -172,7 +172,7 @@ const SidebarMenu = ({
                 title: "Log Out",
                 onPress: async () => {
                   await logout();
-                  router.replace("/UAM001Login");
+                  router.replace("/login");
                 },
                 logout: true,
               },
@@ -435,6 +435,22 @@ useEffect(() => {
   sorted.sort((a, b) => (sort === "low-hi" ? a.p - b.p : b.p - a.p));
   return sorted.map((x) => x.u);
 }, [flat, sort]);
+
+// Calculate total count from API response
+const totalCreatorsCount = useMemo(() => {
+  // Get the total from the first page if available
+  const firstPage = data?.pages?.[0] as any;
+  if (firstPage?.total !== undefined) {
+    return firstPage.total;
+  }
+  // Otherwise count all unique creators across all pages
+  const allCreators = data?.pages?.flatMap((p: any) => p.items) ?? [];
+  const uniqueIds = new Set(allCreators.map((c: any) => c._id));
+  return uniqueIds.size;
+}, [data]);
+
+// Get filtered count
+const filteredCreatorsCount = list.length;
 
 
 
@@ -709,8 +725,8 @@ const chipTags = useMemo(() => {
             }}
             returnKeyType="search"
             style={styles.searchInput}
-            placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
-            placeholderTextColor="#888"
+            placeholder="Search creators by name, location, or category"
+            placeholderTextColor="#666"
           />
           {showClearButton && (
             <Pressable
@@ -731,24 +747,29 @@ const chipTags = useMemo(() => {
         {renderChips()}
 
         
-        <Pressable
-        style={styles.sortBar}
-        onPress={() =>
-          setSort((s) =>
-            s === 'hi-low' ? 'low-hi' : s === 'low-hi' ? 'none' : 'hi-low',
-          )
-        }>
-        {/* left --------------------- right */}
-        <Text style={styles.resultsLbl}>Results</Text>
-
-        <Text style={styles.categoryText}>
-          {sort === 'none'
-            ? 'Sort'
-            : sort === 'hi-low'
-            ? 'High → Low'
-            : 'Low → High'}
-        </Text>
-      </Pressable>
+        <View style={styles.sortBarContainer}>
+          <View style={styles.countContainer}>
+            <Text style={styles.resultsLbl}>Results</Text>
+            <Text style={styles.countText}>
+              Showing {filteredCreatorsCount} of {totalCreatorsCount || filteredCreatorsCount} creators
+            </Text>
+          </View>
+          <Pressable
+            style={styles.sortButton}
+            onPress={() =>
+              setSort((s) =>
+                s === 'hi-low' ? 'low-hi' : s === 'low-hi' ? 'none' : 'hi-low',
+              )
+            }>
+            <Text style={styles.categoryText}>
+              {sort === 'none'
+                ? 'Sort'
+                : sort === 'hi-low'
+                ? 'High → Low'
+                : 'Low → High'}
+            </Text>
+          </Pressable>
+        </View>
 
 
 
@@ -831,12 +852,40 @@ const makeStyles = (w: number) => {
     paddingHorizontal: 12,       // optional: give it some breathing room
     paddingVertical: 10,
   },
+    sortBarContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 20,
+      paddingBottom: 12,
+      width: '100%',
+    },
+    countContainer: {
+      flex: 1,
+    },
+    countText: {
+      fontSize: 14,
+      color: Color.cSK430B92950,
+      opacity: 0.7,
+      fontFamily: FontFamily.inter,
+      marginTop: 4,
+    },
+    sortButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 4,
+      borderWidth: 1,
+      borderColor: Color.cSK430B92500,
+      borderRadius: 8,
+      paddingHorizontal: 12,
+      paddingVertical: 6,
+    },
     searchInput: {
       flex: 1,
       fontSize: 15,
       color: "#0b0218",
       paddingVertical: 0,
-      opacity: 0.5,
+      minWidth: 0, // Prevents text overflow issues
     },
     clearButton: {
       width: 24,

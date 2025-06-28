@@ -25,6 +25,7 @@ import CustomBackButton from "@/components/CustomBackButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import ProfileInfo from "../ProfileInfo";
+import { getPlatformIcon } from "@/constants/platforms";
 
 const BREAKPOINTS = {
   TABLET: 768,
@@ -408,25 +409,6 @@ export default function MarketerOfferHistoryList() {
   );
 }
 
-// Helper function to get platform icon
-function getPlatformIcon(platform: string) {
-  switch (platform.toLowerCase()) {
-    case "instagram":
-      return require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("@/assets/png-clipart-youtube-play-button-computer-icons-youtube-youtube-logo-angle-rectangle-thumbnail.png");
-    case "tiktok":
-      return require("@/assets/tiktok-icon.png");
-    case "facebook":
-      return require("@/assets/facebook-icon.png");
-    case "twitter":
-      return require("@/assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("@/assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      return null;
-  }
-}
 
 // Helper function to get status color
 const getStatusColor = (status: string | undefined) => {

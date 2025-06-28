@@ -11,10 +11,12 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Color } from '@/GlobalStyles';
+import { Color, Focus } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { DemoData } from '@/demo/DemoData';
+import UniversalBackButton from '@/components/UniversalBackButton';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -72,6 +74,9 @@ const OfferDetailsPage: React.FC = () => {
     totalPrice: offerTemplate.basePrice,
   });
 
+  // State for keyboard navigation of radio buttons
+  const [focusedTimelineIndex, setFocusedTimelineIndex] = useState(1); // Default to 'standard' (index 1)
+
   const timelineOptions = [
     { id: 'rush', label: 'Rush (1-2 days)', multiplier: 1.5 },
     { id: 'standard', label: `Standard (${offerTemplate.deliveryDays} days)`, multiplier: 1.0 },
@@ -86,6 +91,36 @@ const OfferDetailsPage: React.FC = () => {
         timeline,
         totalPrice: Math.round(offerTemplate.basePrice * option.multiplier)
       }));
+      // Update focused index to match selected timeline
+      const newIndex = timelineOptions.findIndex(opt => opt.id === timeline);
+      if (newIndex !== -1) {
+        setFocusedTimelineIndex(newIndex);
+      }
+    }
+  };
+
+  // Keyboard navigation for radio buttons
+  const handleTimelineKeyPress = (event: any, index: number) => {
+    switch (event.nativeEvent.key) {
+      case 'ArrowUp':
+      case 'ArrowLeft':
+        event.preventDefault();
+        const prevIndex = index > 0 ? index - 1 : timelineOptions.length - 1;
+        setFocusedTimelineIndex(prevIndex);
+        handleTimelineChange(timelineOptions[prevIndex].id);
+        break;
+      case 'ArrowDown':
+      case 'ArrowRight':
+        event.preventDefault();
+        const nextIndex = index < timelineOptions.length - 1 ? index + 1 : 0;
+        setFocusedTimelineIndex(nextIndex);
+        handleTimelineChange(timelineOptions[nextIndex].id);
+        break;
+      case 'Enter':
+      case ' ':
+        event.preventDefault();
+        handleTimelineChange(timelineOptions[index].id);
+        break;
     }
   };
 
@@ -121,18 +156,17 @@ const OfferDetailsPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton fallbackRoute="/offers" />
           
           <Text style={styles.headerTitle}>Configure Offer</Text>
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Offer Summary */}
           <View style={styles.summarySection}>
             <Text style={styles.summaryTitle}>{offerTemplate.title}</Text>
@@ -193,14 +227,28 @@ const OfferDetailsPage: React.FC = () => {
             {/* Timeline Selection */}
             <View style={styles.inputGroup}>
               <Text style={styles.inputLabel}>Timeline & Pricing</Text>
-              {timelineOptions.map((option) => (
+              <Text style={styles.radioGroupInstructions}>
+                Use arrow keys to navigate between options
+              </Text>
+              {timelineOptions.map((option, index) => (
                 <TouchableOpacity
                   key={option.id}
-                  style={[
+                  style={({ focused }) => [
                     styles.timelineOption,
-                    config.timeline === option.id && styles.selectedTimelineOption
+                    config.timeline === option.id && styles.selectedTimelineOption,
+                    focused && styles.focusedTimelineOption,
+                    focusedTimelineIndex === index && styles.keyboardFocusedOption,
                   ]}
                   onPress={() => handleTimelineChange(option.id)}
+                  onKeyPress={(event) => handleTimelineKeyPress(event, index)}
+                  accessible={true}
+                  accessibilityRole="radio"
+                  accessibilityState={{ 
+                    selected: config.timeline === option.id,
+                    checked: config.timeline === option.id 
+                  }}
+                  accessibilityLabel={`${option.label} - $${Math.round(offerTemplate.basePrice * option.multiplier).toLocaleString()}`}
+                  accessibilityHint="Use arrow keys to navigate between timeline options"
                 >
                   <View style={styles.timelineContent}>
                     <Text style={[
@@ -291,7 +339,7 @@ const OfferDetailsPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -299,7 +347,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   backButton: {
     padding: 8,
@@ -321,7 +369,7 @@ const styles = StyleSheet.create({
   summarySection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   summaryTitle: {
     fontSize: 22,
@@ -331,12 +379,12 @@ const styles = StyleSheet.create({
   },
   summarySubtitle: {
     fontSize: 16,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 12,
   },
   summaryDescription: {
     fontSize: 16,
-    color: '#333',
+    color: BrandColors.neutral[800],
     lineHeight: 24,
     marginBottom: 16,
   },
@@ -351,7 +399,7 @@ const styles = StyleSheet.create({
   },
   includeItem: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 4,
   },
   formSection: {
@@ -372,9 +420,15 @@ const styles = StyleSheet.create({
     color: Color.cSK430B92950,
     marginBottom: 8,
   },
+  radioGroupInstructions: {
+    fontSize: 14,
+    color: BrandColors.neutral[500],
+    fontStyle: 'italic',
+    marginBottom: 12,
+  },
   textInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -386,13 +440,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     marginBottom: 12,
   },
   selectedTimelineOption: {
     borderColor: Color.cSK430B92500,
-    backgroundColor: '#f0e7fd',
+    backgroundColor: BrandColors.primary[50],
+  },
+  focusedTimelineOption: {
+    ...Focus.primary,
+    borderRadius: 8,
+  },
+  keyboardFocusedOption: {
+    ...Focus.primary,
+    borderRadius: 8,
   },
   timelineContent: {
     flex: 1,
@@ -400,7 +462,7 @@ const styles = StyleSheet.create({
   timelineLabel: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: BrandColors.neutral[800],
     marginBottom: 4,
   },
   selectedTimelineLabel: {
@@ -409,7 +471,7 @@ const styles = StyleSheet.create({
   timelinePrice: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   selectedTimelinePrice: {
     color: Color.cSK430B92500,
@@ -419,7 +481,7 @@ const styles = StyleSheet.create({
     height: 20,
     borderRadius: 10,
     borderWidth: 2,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     marginLeft: 16,
   },
   selectedRadioButton: {
@@ -429,7 +491,7 @@ const styles = StyleSheet.create({
   priceSummarySection: {
     margin: 20,
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
   },
   priceSummaryTitle: {
@@ -446,12 +508,12 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 16,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   priceValue: {
     fontSize: 16,
     fontWeight: '500',
-    color: '#333',
+    color: BrandColors.neutral[800],
   },
   totalPriceRow: {
     flexDirection: 'row',
@@ -459,7 +521,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 16,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: BrandColors.neutral[300],
     marginTop: 8,
   },
   totalPriceLabel: {
@@ -475,7 +537,7 @@ const styles = StyleSheet.create({
   bottomSection: {
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: BrandColors.neutral[100],
   },
   continueButton: {
     backgroundColor: Color.cSK430B92500,
@@ -484,15 +546,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: BrandColors.neutral[400],
   },
   continueButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 18,
     fontWeight: '600',
   },
   disabledButtonText: {
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
 });
 

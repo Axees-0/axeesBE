@@ -20,6 +20,7 @@ import { router, useLocalSearchParams } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
 import Toast from "react-native-toast-message";
 import ProfileInfo from "../ProfileInfo";
+import { getPlatformIcon } from "@/constants/platforms";
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/marketer/offers";
 const DRAFT_API_URL =
   process.env.EXPO_PUBLIC_BACKEND_URL + "/api/marketer/drafts";
@@ -29,24 +30,6 @@ const BREAKPOINTS = {
   DESKTOP: 1280,
 };
 
-function getPlatformIcon(platform: string) {
-  switch (platform.toLowerCase()) {
-    case "instagram":
-      return require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("@/assets/png-clipart-youtube-play-button-computer-icons-youtube-youtube-logo-angle-rectangle-thumbnail.png");
-    case "tiktok":
-      return require("@/assets/tiktok-icon.png");
-    case "facebook":
-      return require("@/assets/facebook-icon.png");
-    case "twitter":
-      return require("@/assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("@/assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      return require("@/assets/letter-s.png");
-  }
-}
 
 export default function MarketerOfferDetail({ id }: { id: string }) {
   const window = useWindowDimensions();

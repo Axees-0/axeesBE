@@ -7,7 +7,6 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Platform,
-  Alert,
   TextInput,
 } from 'react-native';
 import { router } from 'expo-router';
@@ -16,9 +15,13 @@ import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
+import { CreditCardModal } from '@/components/CreditCardModal';
+import { useConfirmModal } from '@/components/ConfirmModal';
+import { BrandColors } from '@/constants/Colors';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 interface PaymentMethod {
   id: string;
@@ -45,9 +48,23 @@ const MarketerPaymentsPage: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'overview' | 'methods' | 'history'>('overview');
   const [showAddMethod, setShowAddMethod] = useState(false);
+  const [showCreditCardModal, setShowCreditCardModal] = useState(false);
+  const { showConfirm, ConfirmModalComponent } = useConfirmModal();
+  
+  // Handle browser navigation on web platform
+  React.useEffect(() => {
+    if (isWeb && typeof window !== 'undefined') {
+      // Force router to recognize this page on mount
+      const currentPath = window.location.pathname;
+      if (currentPath === '/payments/marketer') {
+        // Ensure content is properly loaded
+        console.log('Payment page mounted:', currentPath);
+      }
+    }
+  }, [isWeb]);
   
   // Demo payment data
-  const [paymentMethods] = useState<PaymentMethod[]>([
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
     {
       id: 'pm-1',
       type: 'credit_card',
@@ -98,52 +115,134 @@ const MarketerPaymentsPage: React.FC = () => {
   const totalSpent = transactions
     .filter(t => t.type === 'escrow' && t.status === 'completed')
     .reduce((sum, t) => sum + Math.abs(t.amount), 0);
-
-  const activeDeals = 3;
-  const pendingPayments = transactions.filter(t => t.status === 'pending').length;
-
-  const handleAddPaymentMethod = (type: string) => {
-    Alert.alert(
-      'Add Payment Method',
-      `Add new ${type} payment method?`,
+  
+  // Payment method handlers
+  const handleSetDefault = (method: PaymentMethod) => {
+    showConfirm(
+      'Set Default Payment Method',
+      `Set ${method.name} as your default payment method?`,
       [
         { text: 'Cancel', style: 'cancel' },
         { 
-          text: 'Add', 
+          text: 'Set Default',
           onPress: () => {
-            Alert.alert('Success', 'Payment method added successfully');
-            setShowAddMethod(false);
+            // Update the state to set the new default method
+            setPaymentMethods(prevMethods => 
+              prevMethods.map(m => ({
+                ...m,
+                isDefault: m.id === method.id
+              }))
+            );
+            
+            // Show success message immediately
+            showConfirm(
+              'Success',
+              `${method.name} has been set as your default payment method.`,
+              [{ text: 'OK' }]
+            );
           }
         }
       ]
     );
   };
-
+  
   const handleRemoveMethod = (method: PaymentMethod) => {
     if (method.isDefault) {
-      Alert.alert('Cannot Remove', 'You cannot remove your default payment method. Please set another method as default first.');
+      showConfirm(
+        'Cannot Remove Default',
+        'Please set another payment method as default before removing this one.',
+        [{ text: 'OK' }]
+      );
       return;
     }
     
-    Alert.alert(
+    showConfirm(
       'Remove Payment Method',
-      `Remove ${method.name}?`,
+      `Are you sure you want to remove ${method.name}?`,
       [
         { text: 'Cancel', style: 'cancel' },
-        { text: 'Remove', style: 'destructive' }
+        { 
+          text: 'Remove', 
+          style: 'destructive',
+          onPress: () => {
+            // Remove the payment method from state
+            setPaymentMethods(prevMethods => 
+              prevMethods.filter(m => m.id !== method.id)
+            );
+            
+            // Show success message immediately
+            showConfirm(
+              'Success',
+              `${method.name} has been removed.`,
+              [{ text: 'OK' }]
+            );
+          }
+        }
       ]
     );
   };
+  
+  const handleAddPaymentMethod = (type: string) => {
+    setShowAddMethod(false);
+    
+    if (type === 'Credit Card') {
+      // Show the credit card modal
+      setShowCreditCardModal(true);
+    } else if (type === 'Bank Account') {
+      showConfirm(
+        'Add Bank Account',
+        'Bank account form would appear here with fields for:\n\n• Account Number\n• Routing Number\n• Account Type',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Add Account', 
+            onPress: () => {
+              setTimeout(() => {
+                showConfirm('Success', 'Bank account added successfully!', [{ text: 'OK' }]);
+              }, 100);
+            }
+          }
+        ]
+      );
+    } else if (type === 'PayPal') {
+      showConfirm(
+        'Connect PayPal',
+        'You would be redirected to PayPal to authorize the connection.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { 
+            text: 'Connect', 
+            onPress: () => {
+              setTimeout(() => {
+                showConfirm('Success', 'PayPal account connected successfully!', [{ text: 'OK' }]);
+              }, 100);
+            }
+          }
+        ]
+      );
+    }
+  };
 
-  const handleSetDefault = (method: PaymentMethod) => {
-    Alert.alert(
-      'Set Default',
-      `Set ${method.name} as your default payment method?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { text: 'Set Default' }
-      ]
-    );
+  const activeDeals = 3;
+  const pendingPayments = transactions.filter(t => t.status === 'pending').length;
+  
+  const handleAddCreditCard = (cardData: any) => {
+    // Create new payment method from card data
+    const newMethod: PaymentMethod = {
+      id: `pm-${Date.now()}`,
+      type: 'credit_card',
+      name: `${cardData.number.startsWith('4') ? 'Visa' : 'Card'} ending in ${cardData.last4}`,
+      last4: cardData.last4,
+      isDefault: paymentMethods.length === 0,
+      icon: '💳',
+    };
+    
+    // Add to payment methods
+    setPaymentMethods(prev => [...prev, newMethod]);
+    
+    // Close modal and show success
+    setShowCreditCardModal(false);
+    showConfirm('Success', 'Credit card added successfully!', [{ text: 'OK' }]);
   };
 
   const formatDate = (date: Date) => {
@@ -167,22 +266,27 @@ const MarketerPaymentsPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton 
+            fallbackRoute="/profile"
+          />
           
           <Text style={styles.headerTitle}>Payments</Text>
           <View style={styles.headerSpacer} />
         </View>
 
         {/* Tabs */}
-        <View style={styles.tabs}>
+        <View style={styles.tabs} role="tablist" aria-label="Payment navigation tabs">
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'overview' && styles.activeTab]}
             onPress={() => setActiveTab('overview')}
+            accessible={true}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: activeTab === 'overview' }}
+            accessibilityLabel="Overview tab"
+            accessibilityHint="Shows payment overview and statistics"
+            aria-selected={activeTab === 'overview'}
+            aria-controls="overview-panel"
+            {...(Platform.OS === 'web' && { tabIndex: 0 })}
           >
             <Text style={[styles.tabText, activeTab === 'overview' && styles.activeTabText]}>
               Overview
@@ -192,6 +296,14 @@ const MarketerPaymentsPage: React.FC = () => {
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'methods' && styles.activeTab]}
             onPress={() => setActiveTab('methods')}
+            accessible={true}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: activeTab === 'methods' }}
+            accessibilityLabel="Payment Methods tab"
+            accessibilityHint="Shows saved payment methods"
+            aria-selected={activeTab === 'methods'}
+            aria-controls="methods-panel"
+            {...(Platform.OS === 'web' && { tabIndex: 0 })}
           >
             <Text style={[styles.tabText, activeTab === 'methods' && styles.activeTabText]}>
               Payment Methods
@@ -201,6 +313,14 @@ const MarketerPaymentsPage: React.FC = () => {
           <TouchableOpacity 
             style={[styles.tab, activeTab === 'history' && styles.activeTab]}
             onPress={() => setActiveTab('history')}
+            accessible={true}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: activeTab === 'history' }}
+            accessibilityLabel="History tab"
+            accessibilityHint="Shows payment transaction history"
+            aria-selected={activeTab === 'history'}
+            aria-controls="history-panel"
+            {...(Platform.OS === 'web' && { tabIndex: 0 })}
           >
             <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
               History
@@ -208,10 +328,14 @@ const MarketerPaymentsPage: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Overview Tab */}
           {activeTab === 'overview' && (
-            <View style={styles.tabContent}>
+            <View style={styles.tabContent} role="tabpanel" id="overview-panel" aria-labelledby="overview-tab">
               {/* Stats */}
               <View style={styles.statsGrid}>
                 <View style={styles.statCard}>
@@ -233,7 +357,19 @@ const MarketerPaymentsPage: React.FC = () => {
               {/* Quick Actions */}
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Quick Actions</Text>
-                <TouchableOpacity style={styles.actionCard}>
+                <TouchableOpacity 
+                  style={styles.actionCard}
+                  onPress={() => {
+                    showConfirm(
+                      'Fund Escrow',
+                      'This would redirect you to select a deal and fund its escrow account.',
+                      [
+                        { text: 'Cancel', style: 'cancel' },
+                        { text: 'Continue', onPress: () => router.push('/deals') }
+                      ]
+                    );
+                  }}
+                >
                   <Text style={styles.actionIcon}>💰</Text>
                   <View style={styles.actionContent}>
                     <Text style={styles.actionTitle}>Fund Escrow</Text>
@@ -278,7 +414,7 @@ const MarketerPaymentsPage: React.FC = () => {
 
           {/* Payment Methods Tab */}
           {activeTab === 'methods' && (
-            <View style={styles.tabContent}>
+            <View style={styles.tabContent} role="tabpanel" id="methods-panel" aria-labelledby="methods-tab">
               {paymentMethods.map(method => (
                 <View key={method.id} style={styles.methodCard}>
                   <View style={styles.methodIcon}>
@@ -354,7 +490,7 @@ const MarketerPaymentsPage: React.FC = () => {
 
           {/* Transaction History Tab */}
           {activeTab === 'history' && (
-            <View style={styles.tabContent}>
+            <View style={styles.tabContent} role="tabpanel" id="history-panel" aria-labelledby="history-tab">
               {transactions.map(transaction => (
                 <TouchableOpacity 
                   key={transaction.id} 
@@ -409,6 +545,16 @@ const MarketerPaymentsPage: React.FC = () => {
         
         {/* Bottom Navigation for Web */}
         {isWeb && <WebBottomTabs activeIndex={4} />}
+        
+        {/* Credit Card Modal */}
+        <CreditCardModal 
+          visible={showCreditCardModal}
+          onClose={() => setShowCreditCardModal(false)}
+          onAdd={handleAddCreditCard}
+        />
+        
+        {/* Confirm Modal */}
+        <ConfirmModalComponent />
       </SafeAreaView>
     </>
   );
@@ -416,17 +562,17 @@ const MarketerPaymentsPage: React.FC = () => {
 
 const getStatusColor = (status: string) => {
   switch (status) {
-    case 'completed': return '#10B981';
-    case 'pending': return '#F59E0B';
-    case 'failed': return '#EF4444';
-    default: return '#6B7280';
+    case 'completed': return BrandColors.semantic.success;
+    case 'pending': return BrandColors.semantic.warning;
+    case 'failed': return BrandColors.semantic.error;
+    default: return BrandColors.neutral[500];
   }
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -434,7 +580,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   backButton: {
     padding: 8,
@@ -443,7 +589,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: '600',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     textAlign: 'center',
   },
   headerSpacer: {
@@ -453,25 +599,45 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   tab: {
     flex: 1,
     paddingVertical: 16,
     alignItems: 'center',
+    borderRadius: 8,
+    marginHorizontal: 4,
+    backgroundColor: 'transparent',
   },
   activeTab: {
-    borderBottomWidth: 2,
-    borderBottomColor: Color.cSK430B92500,
+    borderBottomWidth: 4, // Increased thickness for better visibility
+    borderBottomColor: BrandColors.primary[500],
+    backgroundColor: BrandColors.primary[50], // Slightly more prominent background
+    position: 'relative',
+    transform: [{ scale: 1.02 }], // Subtle scale effect for active state
+    // Add a subtle shadow for depth
+    shadowColor: BrandColors.primary[500],
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2, // For Android shadow
   },
   tabText: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#666',
+    color: BrandColors.neutral[600],
+    textAlign: 'center',
   },
   activeTabText: {
-    color: Color.cSK430B92500,
-    fontWeight: '600',
+    color: BrandColors.primary[500],
+    fontWeight: '700', // Increased weight
+    fontSize: 15, // Slightly larger font size for active tab
+    textShadowColor: BrandColors.primary[300],
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   scrollContainer: {
     flex: 1,
@@ -486,7 +652,7 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -494,12 +660,12 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   section: {
     marginBottom: 24,
@@ -507,13 +673,13 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
     marginBottom: 16,
   },
   actionCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -528,16 +694,16 @@ const styles = StyleSheet.create({
   actionTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: BrandColors.neutral[700],
     marginBottom: 4,
   },
   actionDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[600],
   },
   actionArrow: {
     fontSize: 18,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   transactionItem: {
     flexDirection: 'row',
@@ -545,137 +711,154 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   transactionInfo: {
     flex: 1,
   },
   transactionDescription: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[700],
     marginBottom: 4,
   },
   transactionDate: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
   transactionAmount: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#EF4444',
+    color: BrandColors.semantic.error,
   },
   positiveAmount: {
-    color: '#10B981',
+    color: BrandColors.semantic.success,
   },
   methodCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f8f9fa',
-    padding: 16,
+    flexDirection: Platform.select({ default: 'column', web: 'row' }),
+    alignItems: Platform.select({ default: 'stretch', web: 'center' }),
+    backgroundColor: BrandColors.neutral[50],
+    padding: Platform.select({ default: 12, web: 16 }),
     borderRadius: 12,
     marginBottom: 12,
+    gap: Platform.select({ default: 8, web: 0 }),
   },
   methodIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#fff',
+    width: Platform.select({ default: 40, web: 48 }),
+    height: Platform.select({ default: 40, web: 48 }),
+    borderRadius: Platform.select({ default: 20, web: 24 }),
+    backgroundColor: BrandColors.neutral[0],
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 16,
+    marginRight: Platform.select({ default: 0, web: 16 }),
+    alignSelf: Platform.select({ default: 'flex-start', web: 'auto' }),
   },
   methodEmoji: {
-    fontSize: 24,
+    fontSize: Platform.select({ default: 20, web: 24 }),
   },
   methodInfo: {
     flex: 1,
+    flexDirection: Platform.select({ default: 'row', web: 'column' }),
+    justifyContent: Platform.select({ default: 'space-between', web: 'flex-start' }),
+    alignItems: Platform.select({ default: 'center', web: 'flex-start' }),
   },
   methodName: {
-    fontSize: 16,
+    fontSize: Platform.select({ default: 14, web: 16 }),
     fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
+    color: BrandColors.neutral[700],
+    marginBottom: Platform.select({ default: 0, web: 4 }),
+    flex: Platform.select({ default: 1, web: 0 }),
   },
   methodDetail: {
-    fontSize: 14,
-    color: '#666',
+    fontSize: Platform.select({ default: 12, web: 14 }),
+    color: BrandColors.neutral[600],
   },
   defaultBadge: {
-    backgroundColor: Color.cSK430B92500,
-    paddingHorizontal: 8,
+    backgroundColor: BrandColors.primary[500],
+    paddingHorizontal: Platform.select({ default: 6, web: 8 }),
     paddingVertical: 2,
     borderRadius: 4,
-    marginTop: 4,
+    marginTop: Platform.select({ default: 0, web: 4 }),
     alignSelf: 'flex-start',
   },
   defaultText: {
-    color: '#fff',
-    fontSize: 10,
+    color: BrandColors.neutral[0],
+    fontSize: Platform.select({ default: 9, web: 10 }),
     fontWeight: '600',
   },
   methodActions: {
-    gap: 8,
+    gap: Platform.select({ default: 4, web: 8 }),
+    flexDirection: Platform.select({ default: 'row', web: 'column' }),
+    alignItems: Platform.select({ default: 'center', web: 'flex-end' }),
   },
   methodAction: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingHorizontal: Platform.select({ default: 8, web: 12 }),
+    paddingVertical: Platform.select({ default: 4, web: 6 }),
+    backgroundColor: Platform.select({ default: BrandColors.neutral[0], web: 'transparent' }),
+    borderRadius: Platform.select({ default: 4, web: 0 }),
+    borderWidth: Platform.select({ default: 1, web: 0 }),
+    borderColor: Platform.select({ default: BrandColors.neutral[200], web: 'transparent' }),
   },
   methodActionText: {
-    fontSize: 14,
-    color: Color.cSK430B92500,
+    fontSize: Platform.select({ default: 12, web: 14 }),
+    color: BrandColors.primary[500],
     fontWeight: '500',
   },
   removeText: {
-    color: '#EF4444',
+    color: BrandColors.semantic.error,
   },
   addMethodButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 2,
-    borderColor: Color.cSK430B92500,
+    borderColor: BrandColors.primary[500],
     borderStyle: 'dashed',
     borderRadius: 12,
-    padding: 16,
+    padding: Platform.select({ default: 12, web: 16 }),
     marginTop: 12,
+    minHeight: Platform.select({ default: 48, web: 56 }),
   },
   addMethodIcon: {
-    fontSize: 20,
-    color: Color.cSK430B92500,
+    fontSize: Platform.select({ default: 18, web: 20 }),
+    color: BrandColors.primary[500],
     marginRight: 8,
   },
   addMethodText: {
-    fontSize: 16,
-    color: Color.cSK430B92500,
+    fontSize: Platform.select({ default: 14, web: 16 }),
+    color: BrandColors.primary[500],
     fontWeight: '600',
+    textAlign: 'center',
+    flex: Platform.select({ default: 1, web: 0 }),
   },
   addMethodOptions: {
     marginTop: 16,
-    gap: 8,
+    gap: Platform.select({ default: 6, web: 8 }),
   },
   methodOption: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#fff',
-    padding: 16,
+    backgroundColor: BrandColors.neutral[0],
+    padding: Platform.select({ default: 12, web: 16 }),
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#e0e0e0',
+    borderColor: BrandColors.neutral[200],
+    minHeight: Platform.select({ default: 44, web: 52 }),
   },
   methodOptionIcon: {
-    fontSize: 24,
-    marginRight: 12,
+    fontSize: Platform.select({ default: 20, web: 24 }),
+    marginRight: Platform.select({ default: 8, web: 12 }),
   },
   methodOptionText: {
-    fontSize: 16,
-    color: '#333',
+    fontSize: Platform.select({ default: 14, web: 16 }),
+    color: BrandColors.neutral[700],
+    flex: 1,
   },
   historyItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[200],
   },
   historyDate: {
     alignItems: 'center',
@@ -684,20 +867,20 @@ const styles = StyleSheet.create({
   },
   historyMonth: {
     fontSize: 12,
-    color: '#999',
+    color: BrandColors.neutral[400],
     textTransform: 'uppercase',
   },
   historyDay: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.primary[500],
   },
   historyInfo: {
     flex: 1,
   },
   historyDescription: {
     fontSize: 14,
-    color: '#333',
+    color: BrandColors.neutral[700],
     marginBottom: 4,
   },
   historyMeta: {
@@ -717,13 +900,13 @@ const styles = StyleSheet.create({
   },
   historyType: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[600],
     textTransform: 'capitalize',
   },
   historyAmount: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#EF4444',
+    color: BrandColors.semantic.error,
   },
 });
 

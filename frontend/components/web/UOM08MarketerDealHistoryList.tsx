@@ -25,6 +25,8 @@ import Arrowdown01 from "../../assets/arrowdown01.svg";
 import CustomBackButton from "@/components/CustomBackButton";
 import { FontFamily } from "../../GlobalStyles";
 import ProfileInfo from "../ProfileInfo";
+import { DealListSkeleton } from "@/components/DealSkeleton";
+import { getPlatformIcon } from "@/constants/platforms";
 
 // For web layout breakpoints
 const BREAKPOINTS = {
@@ -47,30 +49,11 @@ const possibleStatuses = [
   "Completion Payment Issued",
 ];
 
-function getPlatformIcon(platform: string) {
-  switch (platform.toLowerCase()) {
-    case "instagram":
-      return require("../../assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("../../assets/pngclipartyoutubeplaybuttoncomputericonsyoutubeyoutubelogoanglerectanglethumbnail-13.png");
-    case "tiktok":
-      return require("../../assets/tiktok-icon.png");
-    case "facebook":
-      return require("../../assets/facebook-icon.png");
-    case "twitter":
-      return require("../../assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("../../assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      // Fallback if unknown platform
-      return require("@/assets/letter-s.png");
-  }
-}
 
 export default function MarketerDealHistoryList() {
   const { user } = useAuth();
   const windowSize = useWindowDimensions();
-  const isWeb = Platform.OS === "web";
+  const isWeb = Platform?.OS === "web";
   const isWideScreen = windowSize.width >= BREAKPOINTS.TABLET;
 
   const [filterStatus, setFilterStatus] = useState("");
@@ -100,9 +83,31 @@ export default function MarketerDealHistoryList() {
   // If isLoading
   if (isLoading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#430B92" />
-      </View>
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          {!isWideScreen && <CustomBackButton />}
+          <Text style={styles.headerTitle}>Deals</Text>
+          {!isWideScreen && <View style={{ width: 40 }} />}
+        </View>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <View style={styles.filterSection}>
+            <View style={styles.filterBar}>
+              <View style={styles.sortBy}>
+                <Text style={styles.sortByLabel}>Sort by:</Text>
+                <View style={styles.sortButton}>
+                  <Text style={styles.sortButtonText}>Brand</Text>
+                </View>
+              </View>
+              <View style={styles.filterButton}>
+                <Text style={styles.filterButtonText}>All Status</Text>
+              </View>
+            </View>
+          </View>
+          <View style={styles.content}>
+            <DealListSkeleton count={6} />
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 
@@ -444,5 +449,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginVertical: 20,
+  },
+  // Add missing styles for skeleton loading
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2D0FB',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#430B92',
+  },
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  filterSection: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2D0FB',
+  },
+  content: {
+    padding: 20,
   },
 });

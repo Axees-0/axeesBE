@@ -7,15 +7,16 @@ import {
   Text, 
   StyleSheet,
   TouchableOpacity,
-  Alert,
 } from "react-native";
 import { router } from 'expo-router';
 import { WebSEO } from "../web-seo";
-import { Color } from "@/GlobalStyles";
+import { Color, Focus } from "@/GlobalStyles";
 import { DEMO_MODE } from "@/demo/DemoMode";
 import { DemoData } from "@/demo/DemoData";
 import { useAuth } from "@/contexts/AuthContext";
 import RoleSwitcher from "@/components/RoleSwitcher";
+import { useConfirmModal } from "@/components/ConfirmModal";
+import DesignSystem from "@/styles/DesignSystem";
 
 const BREAKPOINTS = {
   mobile: 768,
@@ -23,10 +24,11 @@ const BREAKPOINTS = {
 
 const ProfilePage = () => {
   const window = useWindowDimensions();
-  const isWeb = Platform.OS === "web";
+  const isWeb = Platform?.OS === "web";
   const isMobileScreen = window.width <= BREAKPOINTS.mobile;
   const { user, logout } = useAuth();
   const [showRoleSwitcher, setShowRoleSwitcher] = useState(false);
+  const { showConfirm, ConfirmModalComponent } = useConfirmModal();
 
   const isCreator = user?.userType === 'creator';
 
@@ -156,53 +158,116 @@ const ProfilePage = () => {
             {isCreator ? (
               <>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/deals')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="View Offers"
+                  accessibilityHint="Navigate to offers and deals page"
                 >
                   <Text style={styles.actionIcon}>📋</Text>
                   <Text style={styles.actionText}>View Offers</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/earnings')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Earnings"
+                  accessibilityHint="Navigate to earnings page"
                 >
                   <Text style={styles.actionIcon}>💰</Text>
                   <Text style={styles.actionText}>Earnings</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/profile/edit')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Edit Profile"
+                  accessibilityHint="Navigate to profile editing page"
                 >
                   <Text style={styles.actionIcon}>✏️</Text>
                   <Text style={styles.actionText}>Edit Profile</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/profile/mediakit')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Media Kit"
+                  accessibilityHint="Navigate to media kit page"
                 >
                   <Text style={styles.actionIcon}>📊</Text>
                   <Text style={styles.actionText}>Media Kit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
+                  onPress={() => router.push('/payments/creator')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Payments"
+                  accessibilityHint="Navigate to payments page"
+                >
+                  <Text style={styles.actionIcon}>💳</Text>
+                  <Text style={styles.actionText}>Payments</Text>
                 </TouchableOpacity>
               </>
             ) : (
               <>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/(tabs)')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Find Creators"
+                  accessibilityHint="Navigate to creator discovery page"
                 >
                   <Text style={styles.actionIcon}>🔍</Text>
                   <Text style={styles.actionText}>Find Creators</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/deals')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Sent Offers"
+                  accessibilityHint="Navigate to sent offers page"
                 >
                   <Text style={styles.actionIcon}>📤</Text>
                   <Text style={styles.actionText}>Sent Offers</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.actionButton}
+                  style={({ focused }) => [
+                    styles.actionButton,
+                    focused && styles.actionButtonFocused,
+                  ]}
                   onPress={() => router.push('/payments/marketer')}
+                  accessible={true}
+                  accessibilityRole="button"
+                  accessibilityLabel="Payments"
+                  accessibilityHint="Navigate to payments page"
                 >
                   <Text style={styles.actionIcon}>💳</Text>
                   <Text style={styles.actionText}>Payments</Text>
@@ -274,7 +339,7 @@ const ProfilePage = () => {
         <TouchableOpacity 
           style={styles.logoutButton}
           onPress={() => {
-            Alert.alert(
+            showConfirm(
               'Logout',
               'Are you sure you want to logout?',
               [
@@ -315,6 +380,7 @@ const ProfilePage = () => {
         />
       )}
       
+      <ConfirmModalComponent />
     </>
   );
 };
@@ -337,15 +403,18 @@ const styles = StyleSheet.create({
     color: Color.cSK430B92500,
   },
   roleSwitchButton: {
-    backgroundColor: Color.cSK430B92500,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    ...DesignSystem.ButtonStyles.primary,
+    paddingHorizontal: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal + 8, // Increased horizontal padding
     borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 120, // Consistent minimum width
   },
   roleSwitchButtonText: {
-    color: '#FFFFFF',
+    ...DesignSystem.ButtonTextStyles.primary,
     fontSize: 14,
-    fontWeight: '600',
+    textAlign: 'center',
   },
   profileHeader: {
     flexDirection: 'row',
@@ -414,22 +483,26 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   tierBadge: {
+    ...DesignSystem.PillStyles.default,
     backgroundColor: '#FFD700',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 12, // Consistent 8px horizontal padding as requested
+    paddingVertical: 6,
+    borderRadius: DesignSystem.PillStyles.default.borderRadius, // Consistent radius
     alignSelf: 'flex-start',
   },
   tierText: {
+    ...DesignSystem.PillTextStyles.default,
     fontSize: 12,
     fontWeight: 'bold',
     color: '#333',
   },
   statsGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-evenly',
     marginBottom: 20,
-    gap: 10,
+    gap: 8,
+    flexWrap: 'wrap',
+    paddingHorizontal: 4,
   },
   statItem: {
     backgroundColor: 'white',
@@ -442,6 +515,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.05,
     shadowRadius: 2,
     elevation: 1,
+    minWidth: 75,
+    maxWidth: 120,
+    justifyContent: 'center',
   },
   statValue: {
     fontSize: 20,
@@ -504,42 +580,61 @@ const styles = StyleSheet.create({
   quickActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 12,
+    gap: DesignSystem.ResponsiveSpacing.rowSpacing.marginBottom,
+    justifyContent: 'space-between', // Equal distribution
   },
   actionButton: {
+    ...DesignSystem.ButtonStyles.secondary,
     backgroundColor: '#f8f9fa',
     borderRadius: 12,
     padding: 16,
     alignItems: 'center',
+    justifyContent: 'center', // Center icon/label pairs
     flex: 1,
-    minWidth: '45%',
+    minWidth: '30%', // Equal column width for 3 columns
+    maxWidth: '31%', // Ensure consistent sizing
     borderWidth: 1,
     borderColor: '#e0e0e0',
+    minHeight: 80, // Consistent height for all buttons
+  },
+  actionButtonFocused: {
+    ...Focus.primary,
+    borderRadius: 12,
   },
   actionIcon: {
     fontSize: 24,
     marginBottom: 8,
+    textAlign: 'center', // Center icons
   },
   actionText: {
+    ...DesignSystem.Typography.small,
     fontSize: 12,
     color: '#333',
     fontWeight: '600',
+    textAlign: 'center', // Center text labels
   },
   infoRow: {
+    ...DesignSystem.LayoutUtils.tableRow,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    alignItems: 'center', // Align values vertically
+    paddingVertical: 16, // Increased padding for better spacing
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: DesignSystem.AccessibleColors.borderLight,
+    minHeight: 56, // Consistent row height
   },
   infoLabel: {
+    ...DesignSystem.Typography.body,
     fontSize: 14,
-    color: '#666',
+    color: DesignSystem.AccessibleColors.textSecondary,
+    flex: 1, // Take up available space
   },
   infoValue: {
+    ...DesignSystem.Typography.bodyMedium,
     fontSize: 14,
     color: '#333',
-    fontWeight: '600',
+    textAlign: 'right', // Right-align values for neat column
+    minWidth: 100, // Consistent value column width
   },
   activeStatus: {
     color: '#10B981',

@@ -12,9 +12,11 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { DemoData } from '@/demo/DemoData';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -80,7 +82,7 @@ const PreviewPaymentPage: React.FC = () => {
   };
 
   const handleEditOffer = () => {
-    router.back();
+    router.push('/offers');
   };
 
   const getTimelineText = (timeline: string) => {
@@ -105,18 +107,17 @@ const PreviewPaymentPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton fallbackRoute="/offers" />
           
           <Text style={styles.headerTitle}>Review Offer</Text>
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Creator Info */}
           <View style={styles.creatorSection}>
             <Text style={styles.sectionTitle}>Collaboration With</Text>
@@ -269,7 +270,7 @@ const PreviewPaymentPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -277,7 +278,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   backButton: {
     padding: 8,
@@ -305,10 +306,10 @@ const styles = StyleSheet.create({
   creatorSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   creatorInfo: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 8,
   },
@@ -320,7 +321,7 @@ const styles = StyleSheet.create({
   },
   creatorHandle: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 4,
   },
   creatorStats: {
@@ -331,10 +332,10 @@ const styles = StyleSheet.create({
   offerSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   offerCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 8,
   },
@@ -346,7 +347,7 @@ const styles = StyleSheet.create({
   },
   offerDescription: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     lineHeight: 20,
     marginBottom: 12,
   },
@@ -361,16 +362,16 @@ const styles = StyleSheet.create({
   },
   includeItem: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 3,
   },
   configSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   configCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 8,
   },
@@ -385,16 +386,16 @@ const styles = StyleSheet.create({
   },
   configValue: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     lineHeight: 20,
   },
   paymentSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   paymentCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 8,
   },
@@ -406,12 +407,12 @@ const styles = StyleSheet.create({
   },
   paymentLabel: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   paymentValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: BrandColors.neutral[800],
   },
   totalRow: {
     flexDirection: 'row',
@@ -420,7 +421,7 @@ const styles = StyleSheet.create({
     paddingTop: 12,
     marginTop: 8,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: BrandColors.neutral[300],
   },
   totalLabel: {
     fontSize: 16,
@@ -435,25 +436,25 @@ const styles = StyleSheet.create({
   paymentNote: {
     marginTop: 12,
     padding: 12,
-    backgroundColor: '#e3f2fd',
+    backgroundColor: BrandColors.semantic.infoLight,
     borderRadius: 6,
   },
   paymentNoteText: {
     fontSize: 12,
-    color: '#1976d2',
+    color: BrandColors.semantic.info,
     textAlign: 'center',
   },
   termsSection: {
     padding: 20,
   },
   termsCard: {
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 8,
   },
   termsText: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     lineHeight: 20,
     marginBottom: 6,
   },
@@ -461,7 +462,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: BrandColors.neutral[100],
     gap: 12,
   },
   editButton: {
@@ -485,10 +486,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   processingButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: BrandColors.neutral[400],
   },
   payButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 16,
     fontWeight: '600',
   },

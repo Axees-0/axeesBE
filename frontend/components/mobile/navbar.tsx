@@ -73,8 +73,8 @@ export default function MobileNavbar({
           style={styles.searchInput}
           value={searchText}
           onChangeText={setSearchText}
-          placeholder="Search creators…"
-          placeholderTextColor="#888"
+          placeholder="Search creators"
+          placeholderTextColor="#666"
           returnKeyType="search"
           onSubmitEditing={onSubmitSearch}
         />

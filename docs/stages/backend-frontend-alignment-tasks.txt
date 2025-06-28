@@ -1,0 +1,145 @@
+- Backend-Frontend Alignment Tasks
+  - CRITICAL FIXES (App Breaking Issues)
+    - Fix WebSocket vs SSE Mismatch
+      - Replace SSE implementation with Socket.io in chat routes
+      - Update chat endpoints to support WebSocket connections
+      - Test real-time message delivery with frontend
+      - Ensure backward compatibility during transition
+    - Fix API Path Naming Mismatch (messages vs chats)
+      - Create route aliases for /api/messages/* pointing to /api/chats/*
+      - Update all chat controller references
+      - Test all messaging endpoints with both paths
+      - Document the migration path for frontend
+    - Implement Refresh Token Endpoint
+      - Create POST /api/auth/refresh endpoint
+      - Implement refresh token generation in login
+      - Store refresh tokens securely
+      - Add refresh token validation logic
+      - Test token refresh flow end-to-end
+    - Remove Duplicate Route Registration
+      - Remove duplicate negotiationRoutes registration in main.js
+      - Verify correct middleware order
+      - Test all negotiation endpoints still work
+  - API PATH ALIGNMENT
+    - Align Offer Routes
+      - Create aliases for /api/offers/* to /api/marketer/offers/*
+      - Test all offer endpoints with both paths
+      - Update documentation
+    - Align Deal Routes
+      - Create aliases for /api/deals/* to /api/marketer/deals/*
+      - Test all deal endpoints with both paths
+      - Update documentation
+    - Align User Routes
+      - Standardize /api/user/* vs /api/account/* vs /api/users/*
+      - Create consistent route structure
+      - Test all user-related endpoints
+    - Fix Notification Settings Path
+      - Create alias from /api/settings/email-notifications to /api/account/notification-settings
+      - Test notification settings with both paths
+  - IMPLEMENT MISSING ENDPOINTS
+    - Authentication Endpoints
+      - Implement POST /api/auth/logout
+        - Clear refresh tokens
+        - Invalidate sessions
+        - Return success response
+    - Earnings/Payment Endpoints
+      - Implement GET /api/earnings/withdraw/limits
+        - Define withdrawal limit logic
+        - Return user-specific limits
+        - Include daily/monthly limits
+      - Implement GET /api/earnings/analytics
+        - Create earnings analytics aggregation
+        - Include time-based analytics
+        - Return formatted analytics data
+      - Implement GET /api/earnings/transactions
+        - Query all transaction types
+        - Include pagination
+        - Format transaction history
+    - Notification Endpoints
+      - Implement POST /api/notifications/bulk-action
+        - Handle mark all as read
+        - Handle delete multiple
+        - Validate bulk operations
+      - Implement GET /api/notifications/all
+        - Return all notifications without pagination
+        - Include filtering options
+    - User Management Endpoints
+      - Implement POST /api/user/switch-role
+        - Validate role switching permissions
+        - Update user role
+        - Return updated user data
+      - Implement GET /api/user/social-links
+        - Return all social media links
+        - Format for frontend display
+      - Implement POST /api/user/social-links
+        - Validate social media URLs
+        - Update user social links
+        - Return success response
+      - Implement GET /api/user/stats
+        - Aggregate user statistics
+        - Include deals, offers, earnings
+        - Return formatted stats
+      - Implement GET /api/users/:id/portfolio
+        - Create public portfolio view
+        - Include completed projects
+        - Format for public display
+    - Legal/Sharing Endpoints
+      - Implement POST /api/share/generate-link
+        - Generate unique share links
+        - Track share analytics
+        - Return shareable URL
+      - Implement GET /api/legal/terms
+        - Return current terms of service
+        - Include version number
+      - Implement POST /api/legal/accept-terms
+        - Record user acceptance
+        - Update user record
+        - Return confirmation
+    - Chat File Upload
+      - Implement POST /api/chat/:id/upload
+        - Handle file uploads separately
+        - Validate file types and sizes
+        - Return file URLs
+  - UPDATE WEBSOCKET IMPLEMENTATION
+    - Modify Socket.io Server
+      - Add support for /api/messages/ws path
+      - Add support for /api/chat/:id/ws path
+      - Ensure proper room management
+      - Test connection handling
+    - Update Chat Routes
+      - Remove SSE implementation
+      - Add WebSocket upgrade handling
+      - Ensure message persistence
+      - Test real-time features
+  - DOCUMENTATION UPDATES
+    - Update FRONTEND_BACKEND_ANALYSIS.md
+      - Mark all implemented features as complete
+      - Update mismatch list
+      - Add new endpoint documentation
+      - Include migration notes
+    - Create API Migration Guide
+      - Document all path changes
+      - Provide code examples
+      - Include timeline
+    - Update Swagger Documentation
+      - Add all new endpoints
+      - Update existing endpoint docs
+      - Include request/response examples
+  - TESTING AND VALIDATION
+    - Test All Critical Paths
+      - Authentication flow with refresh tokens
+      - Real-time messaging with WebSocket
+      - Payment and withdrawal flows
+      - Notification system
+    - API Compatibility Testing
+      - Test all aliased routes
+      - Verify backward compatibility
+      - Check error handling
+    - Performance Testing
+      - Load test WebSocket connections
+      - Test concurrent API calls
+      - Monitor response times
+    - Integration Testing
+      - Test frontend-backend integration
+      - Verify all features work end-to-end
+      - Document any remaining issues

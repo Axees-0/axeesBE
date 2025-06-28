@@ -8,13 +8,14 @@ import {
   SafeAreaView,
   Platform,
   TextInput,
-  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
+import { useAlertModal, useConfirmModal } from '@/components/ConfirmModal';
+import { UniversalBackButton } from '@/components/UniversalBackButton';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -37,6 +38,8 @@ interface WithdrawalData {
 
 const WithdrawPage: React.FC = () => {
   const isWeb = Platform.OS === 'web';
+  const { showAlert, AlertModalComponent } = useAlertModal();
+  const { showConfirm, ConfirmModalComponent } = useConfirmModal();
   
   const availableBalance = 3280; // Demo balance
   
@@ -93,22 +96,22 @@ const WithdrawPage: React.FC = () => {
 
   const validateWithdrawal = () => {
     if (!withdrawalData.amount || withdrawalAmount <= 0) {
-      Alert.alert('Invalid Amount', 'Please enter a valid withdrawal amount.');
+      showAlert('Invalid Amount', 'Please enter a valid withdrawal amount.');
       return false;
     }
     
     if (withdrawalAmount < 50) {
-      Alert.alert('Minimum Amount', 'Minimum withdrawal amount is $50.');
+      showAlert('Minimum Amount', 'Minimum withdrawal amount is $50.');
       return false;
     }
     
     if (withdrawalAmount > availableBalance) {
-      Alert.alert('Insufficient Balance', 'Withdrawal amount cannot exceed your available balance.');
+      showAlert('Insufficient Balance', 'Withdrawal amount cannot exceed your available balance.');
       return false;
     }
     
     if (!withdrawalData.selectedMethod) {
-      Alert.alert('Select Payment Method', 'Please select a payment method for withdrawal.');
+      showAlert('Select Payment Method', 'Please select a payment method for withdrawal.');
       return false;
     }
     
@@ -121,7 +124,7 @@ const WithdrawPage: React.FC = () => {
     const method = paymentMethods.find(m => m.id === withdrawalData.selectedMethod);
     if (!method) return;
     
-    Alert.alert(
+    showConfirm(
       'Confirm Withdrawal',
       `Withdraw $${withdrawalAmount.toLocaleString()} to ${method.name} (${method.details})?\n\nProcessing time: ${method.processingTime}\nFee: $${feeAmount.toFixed(2)}\nYou'll receive: $${netAmount.toFixed(2)}`,
       [
@@ -129,15 +132,11 @@ const WithdrawPage: React.FC = () => {
         { 
           text: 'Confirm Withdrawal', 
           onPress: () => {
-            Alert.alert(
+            showAlert(
               'Withdrawal Initiated!',
               `Your withdrawal of $${withdrawalAmount.toLocaleString()} has been initiated. You'll receive a confirmation email shortly and the funds will be processed according to the selected method's timeline.`,
-              [
-                { 
-                  text: 'View Earnings', 
-                  onPress: () => router.replace('/earnings')
-                }
-              ]
+              'View Earnings',
+              () => router.replace('/earnings')
             );
           }
         }
@@ -151,7 +150,7 @@ const WithdrawPage: React.FC = () => {
   };
 
   const handleAddPaymentMethod = () => {
-    Alert.alert('Add Payment Method', 'This would open the payment method setup flow to add a new bank account, PayPal, or card.');
+    router.push('/payments/creator');
   };
 
   return (
@@ -167,18 +166,17 @@ const WithdrawPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton fallbackRoute="/earnings" />
           
           <Text style={styles.headerTitle}>Withdraw Funds</Text>
           <View style={styles.headerSpacer} />
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Available Balance */}
           <View style={styles.balanceSection}>
             <View style={styles.balanceCard}>
@@ -382,6 +380,9 @@ const WithdrawPage: React.FC = () => {
         {/* Bottom Navigation for Web */}
         {isWeb && <WebBottomTabs activeIndex={4} />}
       </SafeAreaView>
+      
+      <AlertModalComponent />
+      <ConfirmModalComponent />
     </>
   );
 };

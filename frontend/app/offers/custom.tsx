@@ -13,9 +13,11 @@ import {
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { DemoData } from '@/demo/DemoData';
+import UniversalBackButton from '@/components/UniversalBackButton';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -85,10 +87,28 @@ const CustomOfferPage: React.FC = () => {
   };
 
   const removeDeliverable = (index: number) => {
-    setOfferData(prev => ({
-      ...prev,
-      deliverables: prev.deliverables.filter((_, i) => i !== index)
-    }));
+    const deliverableToRemove = offerData.deliverables[index];
+    
+    Alert.alert(
+      'Remove Deliverable',
+      `Are you sure you want to remove "${deliverableToRemove}"? This action cannot be undone.`,
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel'
+        },
+        {
+          text: 'Remove',
+          style: 'destructive',
+          onPress: () => {
+            setOfferData(prev => ({
+              ...prev,
+              deliverables: prev.deliverables.filter((_, i) => i !== index)
+            }));
+          }
+        }
+      ]
+    );
   };
 
   const addSuggestedDeliverable = (suggestion: string) => {
@@ -150,12 +170,7 @@ const CustomOfferPage: React.FC = () => {
         
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity 
-            style={styles.backButton}
-            onPress={() => router.back()}
-          >
-            <ArrowLeft width={24} height={24} />
-          </TouchableOpacity>
+          <UniversalBackButton fallbackRoute="/offers" />
           
           <Text style={styles.headerTitle}>Custom Offer</Text>
           
@@ -167,7 +182,11 @@ const CustomOfferPage: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          style={styles.scrollContainer} 
+          contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Creator Info */}
           <View style={styles.creatorSection}>
             <Text style={styles.creatorLabel}>Creating offer for:</Text>
@@ -368,7 +387,11 @@ const CustomOfferPage: React.FC = () => {
             onPress={handleContinueToPreview}
             disabled={!isFormValid()}
           >
-            <Text style={[styles.continueButtonText, !isFormValid() && styles.disabledButtonText]}>
+            <Text 
+              style={[styles.continueButtonText, !isFormValid() && styles.disabledButtonText]}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
               Continue to Preview
             </Text>
           </TouchableOpacity>
@@ -384,7 +407,7 @@ const CustomOfferPage: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: BrandColors.neutral[0],
   },
   header: {
     flexDirection: 'row',
@@ -392,7 +415,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
   },
   backButton: {
     padding: 8,
@@ -422,12 +445,12 @@ const styles = StyleSheet.create({
   creatorSection: {
     padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    borderBottomColor: BrandColors.neutral[100],
     alignItems: 'center',
   },
   creatorLabel: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 4,
   },
   creatorName: {
@@ -438,7 +461,7 @@ const styles = StyleSheet.create({
   },
   creatorHandle: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   formSection: {
     padding: 20,
@@ -462,12 +485,12 @@ const styles = StyleSheet.create({
   },
   inputHint: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 8,
   },
   textInput: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: BrandColors.neutral[300],
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
@@ -492,7 +515,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   deliverableText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 14,
     fontWeight: '500',
     marginRight: 6,
@@ -506,7 +529,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   removeButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 14,
     fontWeight: 'bold',
   },
@@ -527,14 +550,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   addButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 14,
     fontWeight: '600',
   },
   suggestionsLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#666',
+    color: BrandColors.neutral[500],
     marginBottom: 8,
   },
   suggestionsContainer: {
@@ -547,25 +570,25 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#ddd',
-    backgroundColor: '#f8f9fa',
+    borderColor: BrandColors.neutral[300],
+    backgroundColor: BrandColors.neutral[50],
   },
   selectedSuggestion: {
-    backgroundColor: '#e3f2fd',
-    borderColor: '#1976d2',
+    backgroundColor: BrandColors.semantic.infoLight,
+    borderColor: BrandColors.semantic.info,
   },
   suggestionText: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   selectedSuggestionText: {
-    color: '#1976d2',
+    color: BrandColors.semantic.info,
     fontWeight: '500',
   },
   priceSummarySection: {
     margin: 20,
     padding: 20,
-    backgroundColor: '#f8f9fa',
+    backgroundColor: BrandColors.neutral[50],
     borderRadius: 12,
   },
   priceSummaryTitle: {
@@ -582,12 +605,12 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[500],
   },
   priceValue: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#333',
+    color: BrandColors.neutral[800],
   },
   totalPriceRow: {
     flexDirection: 'row',
@@ -595,7 +618,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingTop: 12,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
+    borderTopColor: BrandColors.neutral[300],
     marginTop: 8,
     marginBottom: 8,
   },
@@ -611,31 +634,36 @@ const styles = StyleSheet.create({
   },
   priceNote: {
     fontSize: 12,
-    color: '#666',
+    color: BrandColors.neutral[500],
     textAlign: 'center',
     fontStyle: 'italic',
   },
   bottomSection: {
     padding: 20,
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: BrandColors.neutral[100],
   },
   continueButton: {
     backgroundColor: Color.cSK430B92500,
     paddingVertical: 16,
+    paddingHorizontal: 16,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 54,
   },
   disabledButton: {
-    backgroundColor: '#ccc',
+    backgroundColor: BrandColors.neutral[400],
   },
   continueButtonText: {
-    color: '#fff',
+    color: BrandColors.neutral[0],
     fontSize: 18,
     fontWeight: '600',
+    textAlign: 'center',
+    flexShrink: 1,
   },
   disabledButtonText: {
-    color: '#999',
+    color: BrandColors.neutral[400],
   },
 });
 

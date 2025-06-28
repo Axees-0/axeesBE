@@ -6,6 +6,7 @@ import { WebSEO } from "../web-seo";
 import { Color } from "@/GlobalStyles";
 import { useAuth } from "@/contexts/AuthContext";
 import { router } from "expo-router";
+import DesignSystem from "@/styles/DesignSystem";
 
 const BREAKPOINTS = {
   mobile: 768,
@@ -218,15 +219,18 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   headerBadge: {
-    backgroundColor: '#EF4444',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    ...DesignSystem.PillStyles.unread,
+    backgroundColor: DesignSystem.AccessibleColors.error,
+    paddingHorizontal: 16, // Increased padding
+    paddingVertical: 8, // Increased for better vertical centering
+    borderRadius: 16,
+    minHeight: 32, // Consistent height
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   headerBadgeText: {
-    color: '#fff',
-    fontSize: 12,
-    fontWeight: '600',
+    ...DesignSystem.PillTextStyles.counter,
+    fontSize: 14, // Increased font size for better readability
   },
   emptyState: {
     flex: 1,
@@ -286,6 +290,7 @@ const styles = StyleSheet.create({
   chatHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-start', // Align to top for consistent positioning
     marginBottom: 4,
   },
   chatName: {
@@ -298,8 +303,10 @@ const styles = StyleSheet.create({
     color: '#999',
   },
   chatTime: {
-    fontSize: 12,
-    color: '#999',
+    ...DesignSystem.Typography.small,
+    minWidth: 60, // Consistent width for neat column alignment
+    textAlign: 'right', // Right-align timestamps
+    paddingRight: DesignSystem.ResponsiveSpacing.containerHorizontal, // Consistent gutter
   },
   chatDeal: {
     fontSize: 12,
@@ -310,6 +317,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    minHeight: 24, // Consistent row height for badge alignment
   },
   chatMessage: {
     fontSize: 14,
@@ -321,18 +329,17 @@ const styles = StyleSheet.create({
     color: '#333',
   },
   unreadBadge: {
+    ...DesignSystem.PillStyles.counter,
     backgroundColor: Color.cSK430B92500,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginLeft: 8,
+    minWidth: 24, // Slightly larger for better visibility
+    minHeight: 24,
+    borderRadius: 12,
+    marginLeft: 12, // Increased margin for better spacing
+    alignSelf: 'center', // Center vertically within row
   },
   unreadBadgeText: {
-    color: '#fff',
-    fontSize: 11,
-    fontWeight: '600',
+    ...DesignSystem.PillTextStyles.counter,
+    fontSize: 12, // Slightly larger for better readability
   },
 });
 

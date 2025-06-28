@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Modal, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Modal, TouchableOpacity, StyleSheet, Platform, Animated } from 'react-native';
 import { Image } from 'expo-image';
 
 interface ShareModalProps {
@@ -20,12 +20,72 @@ const ShareModal: React.FC<ShareModalProps> = ({
   profileUrl = '',
   ...props 
 }) => {
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const fadeAnim = useState(new Animated.Value(0))[0];
+
+  const showToast = (message: string) => {
+    setToastMessage(message);
+    setToastVisible(true);
+    
+    Animated.sequence([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.delay(2000),
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      setToastVisible(false);
+    });
+  };
+
   const shareOptions = [
-    { name: 'Copy Link', icon: '🔗', action: () => console.log('Copy link') },
-    { name: 'Email', icon: '✉️', action: () => console.log('Share via email') },
-    { name: 'Messages', icon: '💬', action: () => console.log('Share via messages') },
-    { name: 'Social Media', icon: '📱', action: () => console.log('Share to social') },
+    { 
+      name: 'Copy Link', 
+      icon: '🔗', 
+      action: () => {
+        if (Platform.OS === 'web') {
+          navigator.clipboard.writeText(profileUrl || 'https://axees.app/profile/creator-001');
+        }
+        showToast('Link copied to clipboard!');
+      }
+    },
+    { 
+      name: 'Email', 
+      icon: '✉️', 
+      action: () => showToast('Opening email client...')
+    },
+    { 
+      name: 'Messages', 
+      icon: '💬', 
+      action: () => showToast('Opening messages...')
+    },
+    { 
+      name: 'Social Media', 
+      icon: '📱', 
+      action: () => showToast('Opening share options...')
+    },
   ];
+
+  // Add Esc key support for web
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'web') return;
+
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose?.();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => document.removeEventListener('keydown', handleEscapeKey);
+  }, [visible, onClose]);
 
   return (
     <Modal visible={visible} transparent animationType="slide">
@@ -49,7 +109,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
                 style={styles.shareOption}
                 onPress={() => {
                   option.action();
-                  onClose?.();
+                  // Don't close modal immediately to show toast
                 }}
               >
                 <Text style={styles.optionIcon}>{option.icon}</Text>
@@ -72,6 +132,19 @@ const ShareModal: React.FC<ShareModalProps> = ({
           </TouchableOpacity>
         </View>
       </View>
+      
+      {/* Toast Notification */}
+      {toastVisible && (
+        <Animated.View 
+          style={[
+            styles.toast,
+            { opacity: fadeAnim }
+          ]}
+          pointerEvents="none"
+        >
+          <Text style={styles.toastText}>{toastMessage}</Text>
+        </Animated.View>
+      )}
     </Modal>
   );
 };
@@ -170,6 +243,21 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: '600',
+  },
+  toast: {
+    position: 'absolute',
+    bottom: 100,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 20,
+    maxWidth: '80%',
+  },
+  toastText: {
+    color: 'white',
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 

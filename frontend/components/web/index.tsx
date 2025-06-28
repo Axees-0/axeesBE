@@ -11,7 +11,8 @@ import {
   Dimensions,
   Platform,
   ViewStyle,
-  TextInput
+  TextInput,
+  Alert
 } from "react-native";
 import Arrowdown01 from "@/assets/arrowdown01.svg";
 import Search01 from "@/assets/search01.svg";
@@ -24,6 +25,7 @@ import {
   Gap,
   Color,
   FontSize,
+  Focus,
 } from "@/GlobalStyles";
 import { router } from "expo-router";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,6 +40,7 @@ import React from "react";
 import MainScene from "@/assets/main-scene.gif";   // ➊ new
 import { DEMO_MODE } from "@/demo/DemoMode";
 import { DemoData } from "@/demo/DemoData";
+import { BREAKPOINTS, isTablet, isDesktop, isMobile } from "@/constants/breakpoints";
 
 
 /* …imports stay exactly the same … */
@@ -81,11 +84,12 @@ interface FindPage {
   items: any[];
   nextCursor?: string | null;
   normalizedTags?: string[];
+  total?: number;
 }
 
 //  ─── constants you can re-use ──────────────────────────────────────────
 const CARD_GAP = 30;     // ↔ the value in columnWrapperStyle.gap
-const COLS     = 3;      // 3 columns on desktop
+const COLS     = 3;      // 3 columns on desktop (will be overridden by responsive logic)
 
 
 // ─── Type-writer helper ───────────────────────────────────────────
@@ -177,6 +181,17 @@ const AxeesMockup = () => {
   const [isShareModalVisible, setIsShareModalVisible] = useState(false);
   const [accountUrl, setAccountUrl] = useState("");
   
+  // Get window dimensions for responsive layout
+  const { width } = Dimensions.get('window');
+
+  // Responsive column logic for creator cards
+  const getNumColumns = () => {
+    if (isMobile(width)) return 1;
+    if (isTablet(width)) return 2; // Tablet gets 2 columns for fluid width
+    return 3; // Desktop gets 3 columns
+  };
+
+  const numColumns = getNumColumns();
 
   const { requestNotificationPermission } = useNotifications();
   const queryClient = useQueryClient();
@@ -188,6 +203,23 @@ const AxeesMockup = () => {
 
   /* NEW: value committed only after user hits Enter */
   const [submittedSearch, setSubmittedSearch] = useState("");
+  
+  // Store filter state in ref to preserve it across errors
+  const filterStateRef = React.useRef({
+    selectedTag: null as string | null,
+    searchText: "",
+    submittedSearch: ""
+  });
+  
+  // Restore filter state on mount (e.g., after error recovery)
+  React.useEffect(() => {
+    const savedState = filterStateRef.current;
+    if (savedState.searchText || savedState.selectedTag || savedState.submittedSearch) {
+      setSearchText(savedState.searchText);
+      setSelectedTag(savedState.selectedTag);
+      setSubmittedSearch(savedState.submittedSearch);
+    }
+  }, []); // Only run on mount
 
   // ───────── sorting (avg-price) ─────────
 type SortOrder = 'none' | 'low-hi' | 'hi-low';
@@ -198,7 +230,20 @@ const [sortOrder, setSortOrder] = useState<SortOrder>('none');
 const [aiFirstPagePending, setAiFirstPagePending] = useState(false);
 const [isDropDown,setIsDropDown] = useState(false)
 
+// Multi-select mode for marketers
+const [isSelectMode, setIsSelectMode] = useState(false);
+const [selectedCreators, setSelectedCreators] = useState<string[]>([]);
 
+
+
+  // Update ref whenever state changes to preserve it
+  React.useEffect(() => {
+    filterStateRef.current = {
+      selectedTag,
+      searchText,
+      submittedSearch
+    };
+  }, [selectedTag, searchText, submittedSearch]);
 
   const onSubmitSearch = () => {
     setSelectedTag(null);                       // clear chip
@@ -337,6 +382,39 @@ const {
   enabled                : !authLoading,
   refetchOnWindowFocus   : false,
   refetchOnMount         : false,
+  
+  // Keep previous data when error occurs to prevent UI from clearing
+  keepPreviousData: true,
+  
+  // Retry with exponential backoff
+  retry: (failureCount, error) => {
+    // Don't retry on 4xx errors except 429 (rate limit)
+    if (axios.isAxiosError(error) && error.response?.status && error.response.status >= 400 && error.response.status < 500 && error.response.status !== 429) {
+      return false;
+    }
+    return failureCount < 3;
+  },
+  retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+  
+  // Show error toast when query fails
+  onError: (error) => {
+    // Preserve filter state even on error
+    const currentState = filterStateRef.current;
+    setSearchText(currentState.searchText);
+    setSelectedTag(currentState.selectedTag);
+    setSubmittedSearch(currentState.submittedSearch);
+    
+    // Show error toast
+    Toast.show({
+      type: "customNotification",
+      text1: "Connection Error",
+      text2: "Unable to load creators. Your filters have been preserved.",
+      position: "top",
+      autoHide: true,
+      visibilityTime: 4000,
+      topOffset: 80,
+    });
+  },
 });
 
 
@@ -475,7 +553,7 @@ const sortedData = React.useMemo(() => {
 /* ───────────── toggle Favourite (with toast) ───────────── */
 const toggleFavorite = useMutation({
   mutationFn: async (creatorId: string) => {
-    if (!user?._id) { router.push("/UAM001Login"); throw new Error(); }
+    if (!user?._id) { router.push("/login"); throw new Error(); }
 
     const { data } = await axios.patch(
       `${API_URL}/users/${user._id}/favorites`,
@@ -535,6 +613,67 @@ const isAIRequestActive =
   hasUserQuery;  
   
 
+  // Calculate total count from API response
+  const totalCreatorsCount = React.useMemo(() => {
+    // Get the total from the first page if available
+    const firstPage = data?.pages?.[0] as any;
+    if (firstPage?.total !== undefined) {
+      return firstPage.total;
+    }
+    // Otherwise count all unique creators across all pages
+    const allCreators = data?.pages?.flatMap((p: any) => p.items) ?? [];
+    const uniqueIds = new Set(allCreators.map((c: any) => c._id));
+    return uniqueIds.size;
+  }, [data]);
+
+  // Get filtered count
+  const filteredCreatorsCount = sortedData.length;
+
+  // Get responsive card styles
+  const getCardStyles = () => {
+    const baseStyle = styles.rectangleParent;
+    
+    if (Platform.OS !== 'web') {
+      return [baseStyle, styles.parentFlexBox1];
+    }
+
+    // Responsive styles for web
+    if (isMobile(width)) {
+      return [
+        baseStyle,
+        styles.parentFlexBox1,
+        {
+          width: '100%',
+          minWidth: 280,
+          maxWidth: '100%',
+          flex: 1,
+        }
+      ];
+    } else if (isTablet(width)) {
+      return [
+        baseStyle,
+        styles.parentFlexBox1,
+        {
+          width: `calc((100% - ${(2 - 1) * CARD_GAP}px) / 2)`,
+          minWidth: 320,
+          maxWidth: 480,
+          flex: 1,
+        }
+      ];
+    } else {
+      return [
+        baseStyle,
+        styles.parentFlexBox1,
+        {
+          width: `calc((100% - ${(3 - 1) * CARD_GAP}px) / 3)`,
+          minWidth: 300,
+          maxWidth: 380,
+          flex: 1,
+        }
+      ];
+    }
+  };
+
   // Render each user card
   const renderUserCard = (usr: any, index: number) => {
     const creatorCategory = usr.creatorData?.categories?.slice(0, 2);
@@ -547,20 +686,46 @@ const isAIRequestActive =
     return (
       <Pressable
         key={usr._id}
-        style={({ pressed, hovered }) => [
-          styles.rectangleParent, 
-          styles.parentFlexBox1,
+        style={({ pressed, hovered, focused }) => [
+          ...getCardStyles(),
           pressed && styles.cardPressed,
           Platform.OS === 'web' && hovered && styles.cardHovered,
+          focused && styles.cardFocused,
+          isSelectMode && selectedCreators.includes(usr._id) && styles.cardSelected,
         ]}
+        accessible={true}
+        accessibilityRole={isSelectMode ? "checkbox" : "link"}
+        accessibilityLabel={`${usr.name || 'Creator'} - ${usr.creatorData?.totalFollowers ? usr.creatorData.totalFollowers + ' followers' : 'No followers'}`}
+        accessibilityState={isSelectMode ? { checked: selectedCreators.includes(usr._id) } : undefined}
+        accessibilityHint={isSelectMode ? "Tap to select or deselect this creator" : "Tap to view creator profile"}
+        {...(Platform.OS === 'web' && { tabIndex: 0 })}
         onPress={() => {
-          if (Platform.OS === 'web') {
-            window.open(`/profile/${usr._id}`, '_blank', 'noopener,noreferrer');
+          if (isSelectMode) {
+            // Toggle selection in multi-select mode
+            setSelectedCreators(prev => 
+              prev.includes(usr._id) 
+                ? prev.filter(id => id !== usr._id)
+                : [...prev, usr._id]
+            );
           } else {
-            router.push(`/profile/${usr._id}`);
+            // Normal navigation when not in select mode
+            if (Platform.OS === 'web') {
+              window.open(`/profile/${usr._id}`, '_blank', 'noopener,noreferrer');
+            } else {
+              router.push(`/profile/${usr._id}`);
+            }
           }
         }}
       >
+        {/* Selection checkbox for multi-select mode */}
+        {isSelectMode && (
+          <View style={styles.selectionCheckbox}>
+            {selectedCreators.includes(usr._id) ? (
+              <Text style={styles.checkboxIcon}>✓</Text>
+            ) : null}
+          </View>
+        )}
+        
         <Image
           style={styles.frameChild}
           contentFit="cover"
@@ -726,6 +891,15 @@ const isAIRequestActive =
   hitSlop={10}
   onPress={(e) => {
     e.stopPropagation?.();
+    if (!user?._id) {
+      // Show authentication required message
+      if (Platform.OS === 'web') {
+        alert('Please sign in to save favorites');
+      } else {
+        Alert.alert('Sign In Required', 'Please sign in to save favorites');
+      }
+      return;
+    }
     toggleFavorite.mutate(usr._id);
   }}
   style={styles.favoriteButton}
@@ -747,38 +921,116 @@ const isAIRequestActive =
 
   
 
-// ** UPDATED: ** use `apiTags` when rendering chips
-  const renderTagChips = () => (
-    <ScrollView
-      horizontal
-      showsHorizontalScrollIndicator={false}
-      contentContainerStyle={styles.tagChipsContainer as ViewStyle}
-    >
-      {chipTags.map(tag => (
-        <Pressable
-          key={tag}
+// ** UPDATED: ** use `apiTags` when rendering chips with keyboard accessibility
+  const renderTagChips = () => {
+    const { width } = Dimensions.get('window');
+    const isMobile = width <= 768;
+    
+    const handleChipPress = (tag: string) => {
+      setSelectedTag(selectedTag === tag ? null : tag);
+    };
+    
+    const handleChipKeyPress = (event: any, tag: string) => {
+      const key = event.nativeEvent.key;
+      
+      if (key === 'Enter' || key === ' ') {
+        event.preventDefault();
+        handleChipPress(tag);
+        return;
+      }
+      
+      // Handle arrow key navigation between chips
+      if (key === 'ArrowUp' || key === 'ArrowDown' || key === 'ArrowLeft' || key === 'ArrowRight') {
+        event.preventDefault();
+        
+        const currentIndex = chipTags.indexOf(tag);
+        let nextIndex;
+        
+        if (key === 'ArrowUp' || key === 'ArrowLeft') {
+          nextIndex = currentIndex > 0 ? currentIndex - 1 : chipTags.length - 1;
+        } else {
+          nextIndex = currentIndex < chipTags.length - 1 ? currentIndex + 1 : 0;
+        }
+        
+        // Focus the next chip
+        const nextTag = chipTags[nextIndex];
+        const nextElement = document.querySelector(`[data-filter-tag="${nextTag}"]`);
+        if (nextElement) {
+          (nextElement as HTMLElement).focus();
+        }
+      }
+    };
+    
+    const renderChip = (tag: string) => (
+      <Pressable
+        key={tag}
+        style={({ pressed, focused }) => [
+          styles.tagChip,
+          selectedTag === tag && styles.selectedTagChip,
+          focused && styles.tagChipFocused,
+          pressed && { opacity: 0.8 },
+        ]}
+        onPress={() => handleChipPress(tag)}
+        onKeyPress={(event) => handleChipKeyPress(event, tag)}
+        accessible={true}
+        accessibilityRole="button"
+        accessibilityLabel={`Filter by ${tag}`}
+        accessibilityState={{ selected: selectedTag === tag }}
+        accessibilityHint={selectedTag === tag ? "Double tap to remove filter" : "Double tap to apply filter"}
+        {...(Platform.OS === 'web' && { 'data-filter-tag': tag })}
+      >
+        <Text
           style={[
-            styles.tagChip,
-            selectedTag === tag && styles.selectedTagChip,
+            styles.tagChipText,
+            selectedTag === tag && styles.selectedTagChipText,
           ]}
-          onPress={() => setSelectedTag(selectedTag === tag ? null : tag)}
         >
-          <Text
-            style={[
-              styles.tagChipText,
-              selectedTag === tag && styles.selectedTagChipText,
-            ]}
-          >
-            {tag}
-          </Text>
-        </Pressable>
-      ))}
-    </ScrollView>
-  );
+          {tag}
+        </Text>
+      </Pressable>
+    );
+    
+    if (isMobile) {
+      // Mobile: Use wrapping container instead of horizontal scroll
+      return (
+        <View style={styles.tagChipsWrapContainer}>
+          {chipTags.map(renderChip)}
+        </View>
+      );
+    }
+    
+    // Desktop: Keep horizontal scrolling
+    return (
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.tagChipsContainer as ViewStyle}
+      >
+        {chipTags.map(renderChip)}
+      </ScrollView>
+    );
+  };
 
 
 const renderListHeader = () => (
   <View style={{ width: '100%', marginBottom: 20 }}>
+    
+    {/* Error banner when there's an error but we have cached data */}
+    {isError && data && (
+      <View style={styles.errorBanner}>
+        <Text style={styles.errorBannerText}>
+          Connection issue - showing cached results
+        </Text>
+        <Pressable
+          style={styles.errorBannerRetry}
+          onPress={() => {
+            queryClient.invalidateQueries({ queryKey: ['find'] });
+          }}
+        >
+          <Text style={styles.errorBannerRetryText}>Retry</Text>
+        </Pressable>
+      </View>
+    )}
     
     {/* Search input for better visibility */}
     <View style={styles.inlineSearchContainer}>
@@ -788,7 +1040,7 @@ const renderListHeader = () => (
           value={searchText}
           onChangeText={setSearchText}
           onSubmitEditing={onSubmitSearch}
-          placeholder="Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)"
+          placeholder={isDesktop(width) ? "Search by name, location, or category (e.g. Emma, Los Angeles, Fashion)" : "Search creators by name, location, or category"}
           placeholderTextColor={Color.cSK430B92950}
           style={styles.inlineSearchInput}
           returnKeyType="search"
@@ -801,6 +1053,10 @@ const renderListHeader = () => (
               setSelectedTag(null);
             }}
             style={styles.clearButton}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel="Clear search"
+            accessibilityHint="Clears the search field and resets filters"
           >
             <Text style={styles.clearButtonText}>×</Text>
           </Pressable>
@@ -810,6 +1066,74 @@ const renderListHeader = () => (
 
     {/* tag chips row */}
     {renderTagChips()}
+    
+    {/* Multi-select mode toggle for marketers */}
+    {user?.userType === "Marketer" && hasItems && (
+      <View style={styles.selectModeContainer}>
+        <Pressable
+          style={({ pressed, focused }) => [
+            styles.selectModeButton,
+            isSelectMode && styles.selectModeButtonActive,
+            focused && Focus.primary,
+            pressed && { opacity: 0.8 },
+          ]}
+          onPress={() => {
+            setIsSelectMode(!isSelectMode);
+            setSelectedCreators([]);
+          }}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel={isSelectMode ? "Exit selection mode" : "Enter selection mode"}
+          accessibilityHint={isSelectMode ? "Tap to exit multi-select mode" : "Tap to select multiple creators"}
+        >
+          <Text style={[
+            styles.selectModeButtonText,
+            isSelectMode && styles.selectModeButtonTextActive
+          ]}>
+            {isSelectMode ? "Cancel Selection" : "Select Multiple"}
+          </Text>
+        </Pressable>
+        
+        {isSelectMode && selectedCreators.length > 0 && (
+          <TouchableOpacity
+            style={styles.connectButton}
+            onPress={() => {
+              // Show feedback toast
+              Toast.show({
+                type: "customNotification",
+                text1: "Connecting...",
+                text2: `Sending connection requests to ${selectedCreators.length} creator${selectedCreators.length > 1 ? 's' : ''}`,
+                position: "top",
+                autoHide: true,
+                visibilityTime: 3000,
+                topOffset: 80,
+              });
+              
+              // Simulate success after delay
+              setTimeout(() => {
+                Toast.show({
+                  type: "customNotification",
+                  text1: "Success!",
+                  text2: `Connected with ${selectedCreators.length} creator${selectedCreators.length > 1 ? 's' : ''}`,
+                  position: "top",
+                  autoHide: true,
+                  visibilityTime: 3000,
+                  topOffset: 80,
+                });
+                setIsSelectMode(false);
+                setSelectedCreators([]);
+              }, 1500);
+            }}
+            accessible={true}
+            accessibilityRole="button"
+            accessibilityLabel={`Connect with ${selectedCreators.length} selected creators`}
+            accessibilityHint="Tap to send connection requests"
+          >
+            <Text style={styles.connectButtonText}>Connect ({selectedCreators.length})</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+    )}
     
     {/* Only show heading and filter when there are items */}
     {hasItems && (
@@ -822,16 +1146,28 @@ const renderListHeader = () => (
           marginBottom: 10,
         }}
       >
-        <Text
-          style={{
-            fontFamily : FontFamily.inter,
-            fontSize   : FontSize.size_5xl,
-            fontWeight : '600',
-            color      : Color.cSK430B92950,
-          }}
-        >
-          Search Results
-        </Text>
+        <View>
+          <Text
+            style={{
+              fontFamily : FontFamily.inter,
+              fontSize   : FontSize.size_5xl,
+              fontWeight : '600',
+              color      : Color.cSK430B92950,
+            }}
+          >
+            Search Results
+          </Text>
+          <Text
+            style={{
+              fontFamily : FontFamily.inter,
+              fontSize   : FontSize.size_base,
+              color      : Color.cSK430B92950,
+              marginTop  : 4,
+            }}
+          >
+            Showing {filteredCreatorsCount} of {totalCreatorsCount || filteredCreatorsCount} creators
+          </Text>
+        </View>
 
         {/* tiny pseudo-dropdown */}
         <Pressable
@@ -843,16 +1179,25 @@ const renderListHeader = () => (
                 ? 'none'
                 : 'hi-low')
           }
-          style={{
-            flexDirection     : 'row',
-            alignItems        : 'center',
-            borderWidth       : 1,
-            borderColor       : Color.cSK430B92500,
-            borderRadius      : 8,
-            paddingVertical   : 6,
-            paddingHorizontal : 12,
-            gap               : 6,
-          }}
+          style={({ focused }) => [
+            {
+              flexDirection     : 'row',
+              alignItems        : 'center',
+              borderWidth       : 1,
+              borderColor       : Color.cSK430B92500,
+              borderRadius      : 8,
+              paddingVertical   : 6,
+              paddingHorizontal : 12,
+              gap               : 6,
+            },
+            focused && styles.sortDropdownFocused
+          ]}
+          accessible={true}
+          accessibilityRole="button"
+          accessibilityLabel="Sort order"
+          accessibilityValue={{ text: sortOrder === 'none' ? 'No sorting' : sortOrder === 'hi-low' ? 'Highest to lowest price' : 'Lowest to highest price' }}
+          accessibilityHint="Tap to change sort order"
+          {...(Platform.OS === 'web' && { tabIndex: 0 })}
         >
           <Text
             style={{
@@ -884,10 +1229,7 @@ const isLoadingFirstPage =
 
 
 const renderEmpty = () => {
-  /* ①  first case: DB returned zero rows **and** the AI call is still running   */
-   return <AIBanner showSecond={isAIRequestActive} />;
-
-  /* ②  we’re still waiting for the very first DB page → skeleton cards          */
+  /* ①  we're still waiting for the very first DB page → skeleton cards          */
   if (isLoadingFirstPage) {
     return (
       <View style={{
@@ -899,13 +1241,44 @@ const renderEmpty = () => {
     );
   }
 
-  /* ③  network / server error                                                   */
-  if (isError) {
+  /* ②  network / server error - show error with retry, but keep data visible */
+  if (isError && !data) {
     return (
-      <Text style={{ color: 'red', marginTop: 40 }}>
-        {(error as any)?.response?.data?.message || (error as Error).message}
-      </Text>
+      <View style={{ 
+        backgroundColor: '#fee2e2', 
+        padding: 20, 
+        borderRadius: 8, 
+        marginTop: 20,
+        alignItems: 'center' 
+      }}>
+        <Text style={{ color: '#dc2626', fontSize: 16, marginBottom: 10 }}>
+          {(error as any)?.response?.data?.message || (error as Error).message || 'Failed to load creators'}
+        </Text>
+        <Pressable
+          style={{
+            backgroundColor: Color.cSK430B92500,
+            paddingHorizontal: 20,
+            paddingVertical: 10,
+            borderRadius: 8,
+          }}
+          onPress={() => {
+            // Restore filter state and retry
+            const savedState = filterStateRef.current;
+            setSearchText(savedState.searchText);
+            setSelectedTag(savedState.selectedTag);
+            setSubmittedSearch(savedState.submittedSearch);
+            queryClient.invalidateQueries({ queryKey: ['find'] });
+          }}
+        >
+          <Text style={{ color: 'white', fontWeight: '600' }}>Retry</Text>
+        </Pressable>
+      </View>
     );
+  }
+
+  /* ③  DB returned zero rows **and** the AI call is still running   */
+  if (isAIRequestActive) {
+    return <AIBanner showSecond={isAIRequestActive} />;
   }
 
   /* ④  genuine empty result                                                     */
@@ -937,17 +1310,17 @@ const renderEmpty = () => {
             ListHeaderComponent={renderListHeader}
             ListEmptyComponent={renderEmpty}
             renderItem={({ item, index }) => renderUserCard(item, index)}
-            numColumns={3}
-            columnWrapperStyle={{
+            numColumns={numColumns}
+            columnWrapperStyle={numColumns > 1 ? {
               flexDirection: 'row',
               flexWrap    : 'wrap',
               gap         : CARD_GAP,
               paddingHorizontal: 20,
               justifyContent: 'flex-start',
               alignItems: 'flex-start',
-            }}
+            } : undefined}
             contentContainerStyle={{ 
-              paddingBottom: 80, 
+              paddingBottom: Platform.OS === 'web' ? 120 : 80, 
               paddingTop: 20,
               paddingHorizontal: 20,
               flexGrow: 1,
@@ -982,6 +1355,17 @@ const renderEmpty = () => {
               //     {[1,2,3].map(i => <UserCardSkeleton key={i}/> )}
               //   </View>
               // );
+
+              /* 3️⃣ End of results indicator */
+              if (hasItems && !hasNextPage && !isFetchingNextPage && !aiPending) {
+                return (
+                  <View style={styles.endOfListContainer}>
+                    <View style={styles.endOfListLine} />
+                    <Text style={styles.endOfListText}>End of results</Text>
+                    <View style={styles.endOfListLine} />
+                  </View>
+                );
+              }
 
               return null;
             }}
@@ -1343,13 +1727,6 @@ skeletonFooter: {
     borderRadius: 16,
     padding: 24,
     backgroundColor: "white",
-    // ---- width -----------------------------------------------------------
-    // @ts-ignore
-    flexBasis : Platform.OS === 'web'
-      ? `calc((100% - ${(COLS - 1) * CARD_GAP}px) / ${COLS})`
-      : '33%',
-    minWidth  : 300,
-    maxWidth  : 380,
     marginBottom : 24,
     borderWidth: 1,
     borderColor: "#f1f5f9",
@@ -1359,6 +1736,7 @@ skeletonFooter: {
     shadowRadius: 12,
     elevation: 4,
     position: "relative", // Ensure proper stacking
+    // Base responsive styles will be applied dynamically
   },
   cardPressed: {
     opacity: 0.95,
@@ -1374,6 +1752,10 @@ skeletonFooter: {
     shadowRadius: 12,
     elevation: 8,
     transform: [{ translateY: -2 }],
+  },
+  cardFocused: {
+    ...Focus.primary,
+    borderRadius: 16,
   },
   twitterIconTransparent11: {
     height: 37,
@@ -1501,7 +1883,17 @@ skeletonFooter: {
     marginBottom: 16,
   },
 
-  // Tag chip - improved spacing
+  // Mobile tag chips container - wrapping layout
+  tagChipsWrapContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    marginBottom: 16,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+
+  // Tag chip - improved spacing with focus states
   tagChip: {
     backgroundColor: "#f8f9fa",
     paddingVertical: 8,
@@ -1513,10 +1905,16 @@ skeletonFooter: {
     borderColor: "#e9ecef",
   },
 
+  // Tag chip focused state
+  tagChipFocused: {
+    ...Focus.primary,
+    borderRadius: 20,
+  },
+
   // Selected tag chip - better contrast
   selectedTagChip: {
-    backgroundColor: Color.cSK430B92500,
-    borderColor: Color.cSK430B92500,
+    backgroundColor: Color.cSK430B92950,
+    borderColor: Color.cSK430B92950,
   },
 
   // Tag chip text - better readability
@@ -1586,14 +1984,17 @@ skeletonFooter: {
 
   statsContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     marginBottom: 16,
-    paddingHorizontal: 4,
+    paddingHorizontal: 8,
+    gap: 12,
   },
 
   statItem: {
     flex: 1,
     alignItems: "center",
+    minWidth: 60,
+    maxWidth: 100,
   },
 
   cardActions: {
@@ -1653,6 +2054,133 @@ skeletonFooter: {
   favoriteIcon: {
     width: 20,
     height: 20,
+  },
+
+  endOfListContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  endOfListLine: {
+    height: 1,
+    backgroundColor: '#e2e8f0',
+    flex: 1,
+  },
+  endOfListText: {
+    fontSize: 14,
+    color: '#94a3b8',
+    fontFamily: FontFamily.inter,
+  },
+  
+  // Multi-select mode styles
+  selectModeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 16,
+    gap: 12,
+  },
+  selectModeButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: Color.cSK430B92500,
+    backgroundColor: 'white',
+  },
+  selectModeButtonActive: {
+    backgroundColor: Color.cSK430B9250,
+    borderColor: Color.cSK430B92500,
+  },
+  selectModeButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Color.cSK430B92500,
+    fontFamily: FontFamily.inter,
+  },
+  selectModeButtonTextActive: {
+    color: Color.cSK430B92950,
+  },
+  connectButton: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 8,
+    backgroundColor: Color.cSK430B92500,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  connectButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: 'white',
+    fontFamily: FontFamily.inter,
+  },
+  cardSelected: {
+    borderWidth: 2,
+    borderColor: Color.cSK430B92500,
+    backgroundColor: Color.cSK430B9250,
+  },
+  selectionCheckbox: {
+    position: 'absolute',
+    top: 12,
+    left: 12,
+    width: 24,
+    height: 24,
+    borderRadius: 4,
+    borderWidth: 2,
+    borderColor: Color.cSK430B92500,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  checkboxIcon: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Color.cSK430B92500,
+  },
+  sortDropdownFocused: {
+    ...Focus.primary,
+    borderRadius: 8,
+  },
+  errorBanner: {
+    backgroundColor: '#fef3c7',
+    borderColor: '#f59e0b',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginHorizontal: 20,
+    marginBottom: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  errorBannerText: {
+    color: '#92400e',
+    fontSize: 14,
+    fontWeight: '500',
+    fontFamily: FontFamily.inter,
+    flex: 1,
+  },
+  errorBannerRetry: {
+    backgroundColor: '#f59e0b',
+    paddingHorizontal: 16,
+    paddingVertical: 6,
+    borderRadius: 6,
+    marginLeft: 12,
+  },
+  errorBannerRetryText: {
+    color: 'white',
+    fontSize: 14,
+    fontWeight: '600',
+    fontFamily: FontFamily.inter,
   },
 });
 
