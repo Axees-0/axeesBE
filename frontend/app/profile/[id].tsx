@@ -28,6 +28,7 @@ import BrandsetBanner from '@/components/Brandset/BrandsetBanner';
 import RealTimeMetrics from '@/components/Metrics/RealTimeMetrics';
 import QRGenerator from '@/components/QR/QRGenerator';
 import DesignSystem from '@/styles/DesignSystem';
+import { getPlatformIcon } from '@/constants/platforms';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -38,6 +39,7 @@ import Message from '@/assets/message01.svg';
 import CheckBadge from '@/assets/checkmarkbadge01.svg';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
 import { MaterialIcons } from '@expo/vector-icons';
+import { BrandColors } from '@/constants/Colors';
 
 interface CreatorProfileProps {}
 
@@ -265,30 +267,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
     </View>
   );
 
-  // Platform Icons
-  const getPlatformIcon = (platform: string) => {
-    switch (platform.toLowerCase()) {
-      case 'instagram':
-        return require('@/assets/instagram.png');
-      case 'tiktok':
-        return require('@/assets/transparenttiktoklogoblackandwhitelogotiktokappminimaminimalistblackandwhitetiktokapp1711004158896-1.png');
-      case 'youtube':
-        return require('@/assets/youtube-icon.png');
-      case 'twitter':
-      case 'x':
-        return require('@/assets/1707226109newtwitterlogopng-1.png');
-      case 'facebook':
-        return require('@/assets/facebook-icon.png');
-      case 'linkedin':
-        return require('@/assets/facebook-icon.png'); // Using facebook as placeholder
-      case 'twitch':
-        return require('@/assets/youtube-icon.png'); // Using youtube as placeholder
-      case 'pinterest':
-        return require('@/assets/instagram.png'); // Using instagram as placeholder
-      default:
-        return require('@/assets/icons.png');
-    }
-  };
+  // Using centralized platform icon function from @/constants/platforms
 
   // Render different tab content
   const renderTabContent = () => {
@@ -841,7 +820,7 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                     padding: '12px',
                     borderRadius: '8px',
                     border: 'none',
-                    backgroundColor: Color.cSK430B92500,
+                    backgroundColor: BrandColors.primary[500],
                     color: 'white',
                     fontWeight: 600,
                     cursor: 'pointer'
@@ -1288,10 +1267,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   connectButton: {
-    backgroundColor: '#8B5CF6',
+    backgroundColor: BrandColors.primary[400],
   },
   verifyButton: {
-    backgroundColor: '#10B981',
+    backgroundColor: BrandColors.semantic.success,
   },
   primaryActionText: {
     color: '#fff',
