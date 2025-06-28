@@ -24,6 +24,7 @@ import DocumentPicker from "expo-document-picker";
 import StripeCheckout from "../StripeCheckout";
 import { useAuth } from "@/contexts/AuthContext";
 import ProfileInfo from "../ProfileInfo";
+import { getPlatformIcon, PLATFORMS } from "@/constants/platforms";
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/marketer/offers";
 
@@ -32,33 +33,6 @@ const BREAKPOINTS = {
   DESKTOP: 1280,
 };
 
-function getPlatformIcon(platform: string) {
-  switch (platform.toLowerCase()) {
-    case "instagram":
-      return require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("@/assets/png-clipart-youtube-play-button-computer-icons-youtube-youtube-logo-angle-rectangle-thumbnail.png");
-    case "tiktok":
-      return require("@/assets/tiktok-icon.png");
-    case "facebook":
-      return require("@/assets/facebook-icon.png");
-    case "twitter":
-      return require("@/assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("@/assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      return require("@/assets/letter-s.png");
-  }
-}
-
-const PLATFORMS = [
-  { id: "youtube", icon: getPlatformIcon("youtube") },
-  { id: "instagram", icon: getPlatformIcon("instagram") },
-  { id: "twitter", icon: getPlatformIcon("twitter") },
-  { id: "facebook", icon: getPlatformIcon("facebook") },
-  { id: "tiktok", icon: getPlatformIcon("tiktok") },
-  { id: "twitch", icon: getPlatformIcon("twitch") },
-];
 
 export default function CustomOffer() {
   const window = useWindowDimensions();
