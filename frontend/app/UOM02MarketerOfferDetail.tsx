@@ -51,6 +51,7 @@ import { DEMO_MODE, DemoConfig, demoLog } from "@/demo/DemoMode";
 import { DemoAPI } from "@/demo/DemoAPI";
 import { DemoData } from "@/demo/DemoData";
 import { DemoPolish } from "@/utils/demoPolish";
+import { getPlatformIcon, PLATFORMS, formatFollowerCount, validateHandle } from "@/constants/platforms";
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/marketer/offers";
 const API_URL_PLATFORMS = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/account";
@@ -61,32 +62,7 @@ const BREAKPOINTS = {
   DESKTOP: 1280,
 };
 
-function getPlatformIcon(platform: string) {
-  switch (platform?.toLowerCase()) {
-    case "instagram":
-      return require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("@/assets/png-clipart-youtube-play-button-computer-icons-youtube-youtube-logo-angle-rectangle-thumbnail.png");
-    case "tiktok":
-      return require("@/assets/tiktok-icon.png");
-    case "facebook":
-      return require("@/assets/facebook-icon.png");
-    case "twitter":
-      return require("@/assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("@/assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      return require("@/assets/letter-s.png");
-  }
-}
-const formatFollowerCount = (count: number): string => {
-  if (count >= 1000000) {
-    return `${(count / 1000000).toFixed(1)}M`;
-  } else if (count >= 1000) {
-    return `${(count / 1000).toFixed(1)}K`;
-  }
-  return count?.toString() || "0";
-};
+// Removed duplicate getPlatformIcon and formatFollowerCount - now using centralized versions from @/constants/platforms
 
 const platformOptions = [
   { label: "YouTube", value: "youtube" },
@@ -118,32 +94,7 @@ const pickerSelectStyles = StyleSheet.create({
     paddingRight: 30,
   },
 });
-const PLATFORMS = [
-  { id: "youtube", icon: getPlatformIcon("youtube") },
-  { id: "instagram", icon: getPlatformIcon("instagram") },
-  { id: "twitter", icon: getPlatformIcon("twitter") },
-  { id: "facebook", icon: getPlatformIcon("facebook") },
-  { id: "tiktok", icon: getPlatformIcon("tiktok") },
-  { id: "twitch", icon: getPlatformIcon("twitch") },
-];
-const validateHandle = (handle: string) => {
-  const errors: string[] = [];
-
-  if (handle.length < 3) {
-    errors.push("At least 3 characters");
-  }
-
-  if (!/^[a-zA-Z_][a-zA-Z0-9_\.]*$/.test(handle)) {
-    errors.push("Only letters, numbers, dots, and underscores");
-    errors.push("Cannot start with a number");
-  }
-
-  if (handle.includes(" ")) {
-    errors.push("No spaces allowed");
-  }
-
-  return errors;
-};
+// Removed duplicate PLATFORMS array and validateHandle function - now using centralized versions from @/constants/platforms
 // Simplified PlatformsModal for demo (removed complex platform management)
 const PlatformsModal = React.memo(
   ({
