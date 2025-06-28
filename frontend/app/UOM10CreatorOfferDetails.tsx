@@ -31,6 +31,7 @@ import { WebSEO } from "./web-seo";
 import { DEMO_MODE, DemoConfig, demoLog } from "@/demo/DemoMode";
 import { DemoAPI } from "@/demo/DemoAPI";
 import { DemoData } from "@/demo/DemoData";
+import { getPlatformIcon, PLATFORMS } from "@/constants/platforms";
 import { DemoPolish } from "@/utils/demoPolish";
 
 const API_URL = process.env.EXPO_PUBLIC_BACKEND_URL + "/api/marketer/offers";
@@ -1013,22 +1014,4 @@ const styles = StyleSheet.create({
   },
 });
 
-// Helper function
-function getPlatformIcon(platform: string) {
-  switch (platform.toLowerCase()) {
-    case "instagram":
-      return require("@/assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("@/assets/png-clipart-youtube-play-button-computer-icons-youtube-youtube-logo-angle-rectangle-thumbnail.png");
-    case "tiktok":
-      return require("@/assets/tiktok-icon.png");
-    case "facebook":
-      return require("@/assets/facebook-icon.png");
-    case "twitter":
-      return require("@/assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("@/assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      return require("@/assets/letter-s.png");
-  }
-}
+// Removed duplicate getPlatformIcon function - now using centralized version from @/constants/platforms
