@@ -26,6 +26,7 @@ import CustomBackButton from "@/components/CustomBackButton";
 import { FontFamily } from "../../GlobalStyles";
 import ProfileInfo from "../ProfileInfo";
 import { DealListSkeleton } from "@/components/DealSkeleton";
+import { getPlatformIcon } from "@/constants/platforms";
 
 // For web layout breakpoints
 const BREAKPOINTS = {
@@ -48,25 +49,6 @@ const possibleStatuses = [
   "Completion Payment Issued",
 ];
 
-function getPlatformIcon(platform: string) {
-  switch (platform.toLowerCase()) {
-    case "instagram":
-      return require("../../assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png");
-    case "youtube":
-      return require("../../assets/pngclipartyoutubeplaybuttoncomputericonsyoutubeyoutubelogoanglerectanglethumbnail-13.png");
-    case "tiktok":
-      return require("../../assets/tiktok-icon.png");
-    case "facebook":
-      return require("../../assets/facebook-icon.png");
-    case "twitter":
-      return require("../../assets/1707226109newtwitterlogopng-1.png");
-    case "twitch":
-      return require("../../assets/twitchlogotwitchlogotransparenttwitchicontransparentfreefreepng-1.png");
-    default:
-      // Fallback if unknown platform
-      return require("@/assets/letter-s.png");
-  }
-}
 
 export default function MarketerDealHistoryList() {
   const { user } = useAuth();
