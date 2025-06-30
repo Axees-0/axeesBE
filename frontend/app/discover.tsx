@@ -15,7 +15,6 @@ import {
 import { Image } from 'expo-image';
 import { router } from 'expo-router';
 import { DemoData } from '@/demo/DemoData';
-import { useAuth } from '@/contexts/AuthContext';
 import { Feather, MaterialIcons, Ionicons, FontAwesome5, MaterialCommunityIcons } from '@expo/vector-icons';
 import DesignSystem from '@/styles/DesignSystem';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
@@ -23,16 +22,14 @@ import { BrandColors } from '@/constants/Colors';
 import { getPlatformIcon } from '@/constants/platforms';
 
 const DiscoverCreators = () => {
-  const { width: screenWidth } = useWindowDimensions();
-  const { user } = useAuth();
+  const { width } = useWindowDimensions();
   
   // Filter states
-  const [activeFilterSection, setActiveFilterSection] = useState<'type' | 'location' | 'demographic' | 'category' | null>(null);
+  const [activeFilterSection, setActiveFilterSection] = useState<'filters' | 'location' | 'demographic' | 'category' | null>(null);
   
-  // Type filters
-  const [selectedType, setSelectedType] = useState<string>('all');
+  // Filter options
   const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
-  const [selectedTier, setSelectedTier] = useState<string[]>([]);
+  const [selectedTier] = useState<string[]>([]);
   const [followerSize, setFollowerSize] = useState<string>('all');
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [postingFrequency, setPostingFrequency] = useState<string>('all');
@@ -43,7 +40,7 @@ const DiscoverCreators = () => {
   const [selectedCities, setSelectedCities] = useState<string[]>([]);
   
   // Demographic filters
-  const [genderRatio, setGenderRatio] = useState({ male: 50, female: 50 });
+  const [genderRatio] = useState({ male: 50, female: 50 });
   const [ageRange, setAgeRange] = useState({ min: 18, max: 65 });
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['English']);
   const [influencerAge, setInfluencerAge] = useState({ min: 18, max: 50 });
@@ -59,8 +56,6 @@ const DiscoverCreators = () => {
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
   
   // Filter options
-  const influencerTypes = ['All', 'Mega', 'Macro', 'Micro', 'Nano'];
-  const tiers = ['Premium', 'Standard', 'Budget'];
   const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'Facebook', 'LinkedIn', 'Pinterest', 'Twitch', 'Snapchat'];
   const frequencies = ['Daily', 'Weekly', 'Bi-weekly', 'Monthly'];
   const categories = ['Fashion', 'Beauty', 'Tech', 'Food', 'Travel', 'Fitness', 'Gaming', 'Lifestyle', 'Music', 'Art', 'Business', 'Education', 'Culture', 'Sustainability', 'Dance', 'Minimalism', 'Outdoor', 'Adventure', 'Pets', 'Plants', 'Motivation'];
@@ -155,11 +150,11 @@ const DiscoverCreators = () => {
       if (!matchesSearch) return false;
     }
 
-    // Type filters
-    if (selectedType !== 'all' && creator.tier.toLowerCase() !== selectedType) return false;
+    // Filter criteria
     if (creator.estimatedCost < priceRange.min || creator.estimatedCost > priceRange.max) return false;
     if (selectedTier.length > 0 && !selectedTier.includes(creator.tierCategory)) return false;
-    if (selectedPlatforms.length > 0 && !creator.platforms.some(p => selectedPlatforms.includes(p))) return false;
+    // Platform filter - case-insensitive comparison (UI uses "Instagram", data uses "instagram")
+    if (selectedPlatforms.length > 0 && !creator.platforms.some(p => selectedPlatforms.some(sp => sp.toLowerCase() === p.toLowerCase()))) return false;
     
     // Follower size filter
     if (followerSize !== 'all') {
@@ -233,26 +228,9 @@ const DiscoverCreators = () => {
 
   const renderFilterSection = () => {
     switch (activeFilterSection) {
-      case 'type':
+      case 'filters':
         return (
           <View style={styles.filterContent}>
-            <View style={styles.filterRow}>
-              <Text style={styles.filterLabel}>Type</Text>
-              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterOptions}>
-                {influencerTypes.map(type => (
-                  <TouchableOpacity
-                    key={type}
-                    style={[styles.filterChip, selectedType === type.toLowerCase() && styles.filterChipActive]}
-                    onPress={() => setSelectedType(type.toLowerCase())}
-                  >
-                    <Text style={[styles.filterChipText, selectedType === type.toLowerCase() && styles.filterChipTextActive]}>
-                      {type}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
-            </View>
-            
             <View style={styles.filterRow}>
               <Text style={styles.filterLabel}>Price Range</Text>
               <View style={styles.priceInputs}>
@@ -581,13 +559,13 @@ const DiscoverCreators = () => {
         {/* Filter Tabs */}
         <View style={styles.filterTabs}>
           <TouchableOpacity
-            style={[styles.filterTab, activeFilterSection === 'type' && styles.filterTabActive]}
-            onPress={() => setActiveFilterSection(activeFilterSection === 'type' ? null : 'type')}
+            style={[styles.filterTab, activeFilterSection === 'filters' && styles.filterTabActive]}
+            onPress={() => setActiveFilterSection(activeFilterSection === 'filters' ? null : 'filters')}
           >
             <View style={[styles.filterTabIcon, { backgroundColor: BrandColors.semantic.info }]}>
-              <MaterialIcons name="category" size={16} color="#FFFFFF" />
+              <MaterialIcons name="tune" size={16} color="#FFFFFF" />
             </View>
-            <Text style={[styles.filterTabText, activeFilterSection === 'type' && styles.filterTabTextActive]}>Type</Text>
+            <Text style={[styles.filterTabText, activeFilterSection === 'filters' && styles.filterTabTextActive]}>Filters</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
