@@ -31,10 +31,7 @@ Forces a clean build (clears cache) before deploying.
 
 ## 🔑 Authentication Setup
 
-### Option 1: Interactive Login (Default)
-The Netlify CLI will open a browser for authentication on first use.
-
-### Option 2: API Token (Recommended)
+### Recommended: Environment File (.env.local)
 
 1. **Get your token:**
    - Go to https://app.netlify.com/user/applications#personal-access-tokens
@@ -42,24 +39,34 @@ The Netlify CLI will open a browser for authentication on first use.
    - Name it (e.g., "Axees CLI Deployment")
    - Copy the token immediately (you won't see it again!)
 
-2. **Set the token:**
+2. **Add to .env.local:**
    ```bash
-   # Environment variable (temporary)
-   export NETLIFY_AUTH_TOKEN="your-token-here"
-   
-   # Or save to file (permanent)
-   echo "your-token-here" > ~/.netlify-token
-   chmod 600 ~/.netlify-token
+   # Create or edit .env.local (this file is gitignored)
+   echo "NETLIFY_AUTH_TOKEN=your-token-here" >> .env.local
    ```
 
-3. **Use in deployment:**
+3. **Deploy:**
    ```bash
-   # Automatic detection
    npm run deploy
-   
-   # Or explicit token
-   node scripts/deployment/unified-deploy.js --token YOUR_TOKEN --prod
    ```
+
+The deployment script automatically loads environment variables from `.env.local` and `.env` files.
+
+### Alternative Methods
+
+1. **System Environment Variable:**
+   ```bash
+   export NETLIFY_AUTH_TOKEN="your-token-here"
+   npm run deploy
+   ```
+
+2. **Command Line Parameter:**
+   ```bash
+   npm run deploy -- --token YOUR_TOKEN
+   ```
+
+3. **Interactive Login:**
+   If no token is found, the Netlify CLI will open a browser for authentication.
 
 ## 🛠️ Advanced Deployment Options
 
