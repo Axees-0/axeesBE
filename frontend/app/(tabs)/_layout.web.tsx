@@ -22,15 +22,13 @@ import { BrandColors } from '@/constants/Colors';
 import Discoveryiconlypro from "../../assets/discovery--iconly-pro.svg";
 import Hotprice from "../../assets/hotprice.svg";
 import Message01 from "../../assets/message01.svg";
-import Notification02 from "../../assets/user.svg";
-import User from "../../assets/user.svg";
+import Notification02 from "../../assets/bell-notification.svg";
 
 const TABS = [
   { name: "index", icon: Discoveryiconlypro, label: "Explore", route: "/" },
   { name: "deals", icon: Hotprice, label: "Deals/Offers", route: "/(tabs)/deals" },
   { name: "messages", icon: Message01, label: "Messages", route: "/(tabs)/messages" },
   { name: "notifications", icon: Notification02, label: "Notifications", route: "/(tabs)/notifications" },
-  { name: "profile", icon: User, label: "Profile", route: "/(tabs)/profile" },
 ];
 
 export default function TabLayout() {
