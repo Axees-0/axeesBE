@@ -20,21 +20,34 @@ import UniversalBackButton from '@/components/UniversalBackButton';
 import ArrowLeft from '@/assets/arrowleft021.svg';
 
 const ForgotPasswordScreen: React.FC = () => {
-  const [email, setEmail] = useState('');
+  const [countryCode, setCountryCode] = useState('+1');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const validateEmail = (email: string) => {
-    return email.includes('@') && email.includes('.');
+  const validatePhoneNumber = (phone: string) => {
+    const cleanPhone = phone.replace(/\D/g, '');
+    return cleanPhone.length === 10;
+  };
+
+  const formatPhoneNumber = (phone: string) => {
+    const cleanPhone = phone.replace(/\D/g, '');
+    if (cleanPhone.length >= 6) {
+      return `(${cleanPhone.slice(0, 3)}) ${cleanPhone.slice(3, 6)}-${cleanPhone.slice(6, 10)}`;
+    } else if (cleanPhone.length >= 3) {
+      return `(${cleanPhone.slice(0, 3)}) ${cleanPhone.slice(3)}`;
+    }
+    return cleanPhone;
   };
 
   const handleSendReset = async () => {
-    if (!email) {
-      Alert.alert('Missing Email', 'Please enter your email address.');
+    const fullPhoneNumber = countryCode + phoneNumber.replace(/\D/g, '');
+    if (!phoneNumber) {
+      Alert.alert('Missing Phone Number', 'Please enter your phone number.');
       return;
     }
 
-    if (!validateEmail(email)) {
-      Alert.alert('Invalid Email', 'Please enter a valid email address.');
+    if (!validatePhoneNumber(phoneNumber)) {
+      Alert.alert('Invalid Phone Number', 'Please enter a valid 10-digit phone number.');
       return;
     }
 
@@ -46,14 +59,14 @@ const ForgotPasswordScreen: React.FC = () => {
       
       Alert.alert(
         'Reset Code Sent',
-        `We've sent a password reset code to ${email}. Please check your email and enter the code on the next screen.`,
+        `We've sent a password reset code to ${fullPhoneNumber}. Please check your SMS messages and enter the code on the next screen.`,
         [
           {
             text: 'Continue',
             onPress: () => {
               router.push({
                 pathname: '/reset-password-otp',
-                params: { email: email }
+                params: { phone: fullPhoneNumber }
               });
             }
           }
@@ -90,29 +103,46 @@ const ForgotPasswordScreen: React.FC = () => {
             </View>
             <Text style={styles.title}>Forgot Password?</Text>
             <Text style={styles.description}>
-              No worries! Enter your email address and we'll send you a code to reset your password.
+              No worries! Enter your phone number and we'll send you a code to reset your password.
             </Text>
           </View>
 
-          {/* Email Input */}
+          {/* Phone Input */}
           <View style={styles.inputSection}>
-            <Text style={styles.inputLabel}>Email Address</Text>
-            <TextInput
-              style={styles.emailInput}
-              value={email}
-              onChangeText={setEmail}
-              placeholder="Enter your email address"
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              placeholderTextColor={BrandColors.neutral[400]}
-            />
+            <Text style={styles.inputLabel}>Phone Number</Text>
+            <View style={styles.phoneInputContainer}>
+              <View style={styles.countryCodeContainer}>
+                <TextInput
+                  style={styles.countryCodeInput}
+                  value={countryCode}
+                  onChangeText={setCountryCode}
+                  placeholder="+1"
+                  placeholderTextColor={BrandColors.neutral[400]}
+                  keyboardType="phone-pad"
+                />
+              </View>
+              <TextInput
+                style={styles.phoneInput}
+                value={phoneNumber}
+                onChangeText={(text) => {
+                  const formatted = formatPhoneNumber(text.replace(/\D/g, ''));
+                  if (text.replace(/\D/g, '').length <= 10) {
+                    setPhoneNumber(formatted);
+                  }
+                }}
+                placeholder="(555) 123-4567"
+                keyboardType="phone-pad"
+                autoCorrect={false}
+                placeholderTextColor={BrandColors.neutral[400]}
+                maxLength={14}
+              />
+            </View>
           </View>
 
           {/* Demo Info */}
           <View style={styles.demoInfo}>
             <Text style={styles.demoText}>
-              Demo Mode: Use any valid email format
+              Demo Mode: Use any valid 10-digit phone number
             </Text>
           </View>
 
@@ -120,14 +150,14 @@ const ForgotPasswordScreen: React.FC = () => {
           <TouchableOpacity 
             style={[
               styles.sendButton,
-              validateEmail(email) ? styles.sendButtonActive : styles.sendButtonInactive
+              validatePhoneNumber(phoneNumber) ? styles.sendButtonActive : styles.sendButtonInactive
             ]}
             onPress={handleSendReset}
-            disabled={isLoading || !validateEmail(email)}
+            disabled={isLoading || !validatePhoneNumber(phoneNumber)}
           >
             <Text style={[
               styles.sendButtonText,
-              validateEmail(email) ? styles.sendButtonTextActive : styles.sendButtonTextInactive
+              validatePhoneNumber(phoneNumber) ? styles.sendButtonTextActive : styles.sendButtonTextInactive
             ]}>
               {isLoading ? 'Sending...' : 'Send Reset Code'}
             </Text>
@@ -214,7 +244,26 @@ const styles = StyleSheet.create({
     color: BrandColors.primary[900],
     marginBottom: 8,
   },
-  emailInput: {
+  phoneInputContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  countryCodeContainer: {
+    width: 80,
+  },
+  countryCodeInput: {
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 16,
+    fontSize: 16,
+    color: BrandColors.primary[900],
+    backgroundColor: BrandColors.neutral[50],
+    textAlign: 'center',
+  },
+  phoneInput: {
+    flex: 1,
     borderWidth: 2,
     borderColor: '#e0e0e0',
     borderRadius: 12,

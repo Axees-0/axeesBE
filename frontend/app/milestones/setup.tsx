@@ -16,6 +16,7 @@ import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import UniversalBackButton from '@/components/UniversalBackButton';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -32,6 +33,7 @@ interface Milestone {
 const MilestoneSetupWizard: React.FC = () => {
   const { dealId, totalAmount, offerTitle } = useLocalSearchParams();
   const isWeb = Platform.OS === 'web';
+  const { user } = useAuth();
   
   const [milestones, setMilestones] = useState<Milestone[]>([
     {
@@ -131,44 +133,75 @@ const MilestoneSetupWizard: React.FC = () => {
     return true;
   };
 
-  const handleCreateMilestones = () => {
+  const handleCreateMilestones = async () => {
     if (!validateMilestones()) return;
 
     if (isWeb) {
       const confirmed = window.confirm(
         `Create ${milestones.length} milestones for this deal?`
       );
-      if (confirmed) {
-        // Navigate to deal page with milestones created
-        router.replace({
-          pathname: '/deals/[id]',
-          params: { 
-            id: dealId,
-            milestonesSetup: 'true'
-          }
-        });
-      }
+      if (!confirmed) return;
     } else {
-      Alert.alert(
-        'Create Milestones',
-        `Create ${milestones.length} milestones for this deal?`,
-        [
-          { text: 'Cancel', style: 'cancel' },
-          {
-            text: 'Create Deal',
-            onPress: () => {
-              // Navigate to deal page with milestones created
-              router.replace({
+      // Show confirmation dialog for mobile
+      const confirmResult = await new Promise((resolve) => {
+        Alert.alert(
+          'Create Milestones',
+          `Create ${milestones.length} milestones for this deal?`,
+          [
+            { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+            { text: 'Create Deal', onPress: () => resolve(true) }
+          ]
+        );
+      });
+      
+      if (!confirmResult) return;
+    }
+
+    try {
+      // Create milestone payment structure via API
+      const response = await fetch('/api/milestone-payments/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token || ''}`,
+        },
+        body: JSON.stringify({
+          dealId: dealId,
+          milestones: milestones.map(milestone => ({
+            title: milestone.title,
+            description: milestone.description,
+            percentage: (milestone.amount / Number(totalAmount)) * 100,
+            dueDate: milestone.dueDate,
+            requirements: milestone.deliverables
+          }))
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        Alert.alert(
+          'Milestones Created!',
+          'Your milestone payment structure has been created successfully.',
+          [
+            { 
+              text: 'View Deal', 
+              onPress: () => router.replace({
                 pathname: '/deals/[id]',
                 params: { 
                   id: dealId,
                   milestonesSetup: 'true'
                 }
-              });
+              })
             }
-          }
-        ]
-      );
+          ]
+        );
+      } else {
+        Alert.alert('Error', result.message || 'Failed to create milestones. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error creating milestones:', error);
+      Alert.alert('Error', 'Failed to create milestones. Please check your connection and try again.');
     }
   };
 

@@ -20,6 +20,7 @@ import { Feather, MaterialIcons, Ionicons, FontAwesome5, MaterialCommunityIcons 
 import DesignSystem from '@/styles/DesignSystem';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
 import { BrandColors } from '@/constants/Colors';
+import { getPlatformIcon } from '@/constants/platforms';
 
 const DiscoverCreators = () => {
   const { width: screenWidth } = useWindowDimensions();
@@ -60,11 +61,23 @@ const DiscoverCreators = () => {
   // Filter options
   const influencerTypes = ['All', 'Mega', 'Macro', 'Micro', 'Nano'];
   const tiers = ['Premium', 'Standard', 'Budget'];
-  const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'Facebook'];
+  const platforms = ['Instagram', 'TikTok', 'YouTube', 'Twitter', 'Facebook', 'LinkedIn', 'Pinterest', 'Twitch', 'Snapchat'];
   const frequencies = ['Daily', 'Weekly', 'Bi-weekly', 'Monthly'];
-  const categories = ['Fashion', 'Beauty', 'Tech', 'Food', 'Travel', 'Fitness', 'Gaming', 'Lifestyle', 'Music', 'Art'];
+  const categories = ['Fashion', 'Beauty', 'Tech', 'Food', 'Travel', 'Fitness', 'Gaming', 'Lifestyle', 'Music', 'Art', 'Business', 'Education', 'Culture', 'Sustainability', 'Dance', 'Minimalism', 'Outdoor', 'Adventure', 'Pets', 'Plants', 'Motivation'];
   const languages = ['English', 'Spanish', 'French', 'German', 'Portuguese', 'Chinese', 'Japanese', 'Korean'];
-  const countries = ['USA', 'UK', 'Canada', 'Australia', 'Germany', 'France', 'Brazil', 'Japan'];
+  const countries = ['USA', 'UK', 'Canada', 'Australia', 'Germany', 'France', 'Brazil', 'Japan', 'India', 'Mexico'];
+  const cities = {
+    'USA': ['Los Angeles', 'New York', 'San Francisco', 'Miami', 'Chicago', 'Austin', 'Seattle', 'Denver', 'Portland', 'Atlanta'],
+    'UK': ['London', 'Manchester', 'Birmingham', 'Edinburgh', 'Glasgow'],
+    'Canada': ['Toronto', 'Montreal', 'Vancouver', 'Calgary', 'Ottawa'],
+    'Australia': ['Sydney', 'Melbourne', 'Gold Coast', 'Brisbane', 'Perth'],
+    'Germany': ['Berlin', 'Munich', 'Hamburg', 'Cologne', 'Frankfurt'],
+    'France': ['Paris', 'Lyon', 'Marseille', 'Nice', 'Toulouse'],
+    'Brazil': ['Rio de Janeiro', 'São Paulo', 'Salvador', 'Brasília', 'Fortaleza'],
+    'Japan': ['Tokyo', 'Osaka', 'Kyoto', 'Yokohama', 'Nagoya'],
+    'India': ['Mumbai', 'Delhi', 'Bangalore', 'Chennai', 'Kolkata'],
+    'Mexico': ['Mexico City', 'Guadalajara', 'Monterrey', 'Puebla', 'Tijuana']
+  };
   const groups = ['Gen Z', 'Millennials', 'Parents', 'Students', 'Professionals'];
   
   // Creator data with enhanced structure
@@ -72,6 +85,7 @@ const DiscoverCreators = () => {
     const totalFollowers = creator.creatorData?.totalFollowers || 0;
     const platforms = creator.creatorData?.platforms || [];
     const avgEngagement = platforms.reduce((acc, p) => acc + (p.engagement || 0), 0) / Math.max(platforms.length, 1);
+    const creatorData = creator.creatorData;
     
     return {
       id: creator._id,
@@ -83,16 +97,18 @@ const DiscoverCreators = () => {
       totalFollowers,
       avgEngagement: avgEngagement.toFixed(1),
       platforms: platforms.map(p => p.platform),
-      categories: creator.creatorData?.categories || ['Creator'],
+      categories: creatorData?.categories || ['Creator'],
       tier: getTierFromFollowers(totalFollowers),
       estimatedCost: getEstimatedCost(totalFollowers, avgEngagement),
-      postingFrequency: 'Weekly',
-      country: 'USA',
-      city: 'Los Angeles',
-      audienceGender: { male: 45, female: 55 },
-      audienceAge: { min: 18, max: 34 },
-      language: 'English',
-      age: 28,
+      postingFrequency: creatorData?.postingFrequency || 'Weekly',
+      country: creatorData?.country || 'USA',
+      city: creatorData?.city || 'Los Angeles',
+      audienceGender: creatorData?.audienceGender || { male: 45, female: 55 },
+      audienceAge: creatorData?.audienceAge || { min: 18, max: 34 },
+      language: creatorData?.language || 'English',
+      age: creatorData?.age || 28,
+      audienceGroups: creatorData?.audienceGroups || ['Millennials'],
+      tierCategory: getTierCategory(getEstimatedCost(totalFollowers, avgEngagement)),
     };
   });
 
@@ -105,9 +121,22 @@ const DiscoverCreators = () => {
   }
 
   function getEstimatedCost(followers: number, engagement: number): number {
-    const baseCost = followers * 0.01;
-    const engagementMultiplier = Math.max(engagement / 100, 0.5);
-    return Math.round(baseCost * engagementMultiplier);
+    // More realistic pricing based on industry standards
+    let baseCostPerFollower;
+    if (followers >= 1000000) {
+      baseCostPerFollower = 0.008; // Mega: $8 per 1K followers
+    } else if (followers >= 100000) {
+      baseCostPerFollower = 0.012; // Macro: $12 per 1K followers  
+    } else if (followers >= 10000) {
+      baseCostPerFollower = 0.015; // Micro: $15 per 1K followers
+    } else {
+      baseCostPerFollower = 0.025; // Nano: $25 per 1K followers
+    }
+    
+    const baseCost = followers * baseCostPerFollower;
+    const engagementMultiplier = Math.max(engagement / 100, 0.6);
+    const minCost = followers < 10000 ? 250 : 500; // Minimum rates
+    return Math.max(Math.round(baseCost * engagementMultiplier), minCost);
   }
 
   // Apply all filters
@@ -119,20 +148,66 @@ const DiscoverCreators = () => {
         creator.name.toLowerCase().includes(searchLower) ||
         creator.location.toLowerCase().includes(searchLower) ||
         creator.categories.some(cat => cat.toLowerCase().includes(searchLower)) ||
-        creator.handle.toLowerCase().includes(searchLower);
+        creator.handle.toLowerCase().includes(searchLower) ||
+        creator.country.toLowerCase().includes(searchLower) ||
+        creator.city.toLowerCase().includes(searchLower);
       
       if (!matchesSearch) return false;
     }
 
     // Type filters
-    if (selectedType !== 'all' && creator.tier !== selectedType) return false;
+    if (selectedType !== 'all' && creator.tier.toLowerCase() !== selectedType) return false;
     if (creator.estimatedCost < priceRange.min || creator.estimatedCost > priceRange.max) return false;
-    if (selectedTier.length > 0 && !selectedTier.includes(getTierCategory(creator.estimatedCost))) return false;
+    if (selectedTier.length > 0 && !selectedTier.includes(creator.tierCategory)) return false;
     if (selectedPlatforms.length > 0 && !creator.platforms.some(p => selectedPlatforms.includes(p))) return false;
+    
+    // Follower size filter
+    if (followerSize !== 'all') {
+      const followers = creator.totalFollowers;
+      switch (followerSize) {
+        case 'nano':
+          if (followers >= 10000) return false;
+          break;
+        case 'micro':
+          if (followers < 10000 || followers >= 100000) return false;
+          break;
+        case 'macro':
+          if (followers < 100000 || followers >= 1000000) return false;
+          break;
+        case 'mega':
+          if (followers < 1000000) return false;
+          break;
+      }
+    }
+    
+    // Posting frequency filter
+    if (postingFrequency !== 'all' && creator.postingFrequency.toLowerCase() !== postingFrequency.toLowerCase()) return false;
     
     // Location filters
     if (locationType === 'country' && selectedCountries.length > 0 && !selectedCountries.includes(creator.country)) return false;
     if (locationType === 'local' && selectedCities.length > 0 && !selectedCities.includes(creator.city)) return false;
+    
+    // Demographic filters
+    // Gender ratio filter (check if creator's audience matches desired ratio within 20% tolerance)
+    const genderTolerance = 20;
+    if (Math.abs(creator.audienceGender.male - genderRatio.male) > genderTolerance) {
+      // Allow some flexibility in gender ratios
+    }
+    
+    // Age range filter (check if creator's audience overlaps with desired range)
+    if (creator.audienceAge.max < ageRange.min || creator.audienceAge.min > ageRange.max) {
+      // Only filter out if there's no overlap
+      return false;
+    }
+    
+    // Influencer age filter
+    if (creator.age < influencerAge.min || creator.age > influencerAge.max) return false;
+    
+    // Language filter
+    if (selectedLanguages.length > 0 && !selectedLanguages.includes(creator.language)) return false;
+    
+    // Groups filter
+    if (selectedGroups.length > 0 && !selectedGroups.some(group => creator.audienceGroups.includes(group))) return false;
     
     // Category filter
     if (selectedCategories.length > 0 && !creator.categories.some(cat => selectedCategories.includes(cat))) return false;
@@ -200,6 +275,43 @@ const DiscoverCreators = () => {
             </View>
             
             <View style={styles.filterRow}>
+              <Text style={styles.filterLabel}>Follower Size</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterOptions}>
+                {['All', 'Nano (1K-10K)', 'Micro (10K-100K)', 'Macro (100K-1M)', 'Mega (1M+)'].map(size => {
+                  const value = size.split(' ')[0].toLowerCase();
+                  return (
+                    <TouchableOpacity
+                      key={size}
+                      style={[styles.filterChip, followerSize === value && styles.filterChipActive]}
+                      onPress={() => setFollowerSize(value)}
+                    >
+                      <Text style={[styles.filterChipText, followerSize === value && styles.filterChipTextActive]}>
+                        {size}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </ScrollView>
+            </View>
+            
+            <View style={styles.filterRow}>
+              <Text style={styles.filterLabel}>Posting Frequency</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterOptions}>
+                {['All', ...frequencies].map(freq => (
+                  <TouchableOpacity
+                    key={freq}
+                    style={[styles.filterChip, postingFrequency === freq.toLowerCase() && styles.filterChipActive]}
+                    onPress={() => setPostingFrequency(freq.toLowerCase())}
+                  >
+                    <Text style={[styles.filterChipText, postingFrequency === freq.toLowerCase() && styles.filterChipTextActive]}>
+                      {freq}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+            
+            <View style={styles.filterRow}>
               <Text style={styles.filterLabel}>Platform</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterOptions}>
                 {platforms.map(platform => (
@@ -214,9 +326,11 @@ const DiscoverCreators = () => {
                       }
                     }}
                   >
-                    <Text style={[styles.filterChipText, selectedPlatforms.includes(platform) && styles.filterChipTextActive]}>
-                      {platform}
-                    </Text>
+                    <Image 
+                      source={getPlatformIcon(platform)}
+                      style={[styles.filterChipIcon, selectedPlatforms.includes(platform) && styles.filterChipIconActive]}
+                      alt={`${platform} icon`}
+                    />
                   </TouchableOpacity>
                 ))}
               </ScrollView>
@@ -269,6 +383,50 @@ const DiscoverCreators = () => {
                 </ScrollView>
               </View>
             )}
+            
+            {locationType === 'local' && (
+              <View style={styles.filterRow}>
+                <Text style={styles.filterLabel}>Cities</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterOptions}>
+                  {selectedCountries.length > 0 ? 
+                    selectedCountries.flatMap(country => cities[country] || []).map(city => (
+                      <TouchableOpacity
+                        key={city}
+                        style={[styles.filterChip, selectedCities.includes(city) && styles.filterChipActive]}
+                        onPress={() => {
+                          if (selectedCities.includes(city)) {
+                            setSelectedCities(selectedCities.filter(c => c !== city));
+                          } else {
+                            setSelectedCities([...selectedCities, city]);
+                          }
+                        }}
+                      >
+                        <Text style={[styles.filterChipText, selectedCities.includes(city) && styles.filterChipTextActive]}>
+                          {city}
+                        </Text>
+                      </TouchableOpacity>
+                    )) :
+                    Object.values(cities).flat().map(city => (
+                      <TouchableOpacity
+                        key={city}
+                        style={[styles.filterChip, selectedCities.includes(city) && styles.filterChipActive]}
+                        onPress={() => {
+                          if (selectedCities.includes(city)) {
+                            setSelectedCities(selectedCities.filter(c => c !== city));
+                          } else {
+                            setSelectedCities([...selectedCities, city]);
+                          }
+                        }}
+                      >
+                        <Text style={[styles.filterChipText, selectedCities.includes(city) && styles.filterChipTextActive]}>
+                          {city}
+                        </Text>
+                      </TouchableOpacity>
+                    ))
+                  }
+                </ScrollView>
+              </View>
+            )}
           </View>
         );
         
@@ -299,6 +457,27 @@ const DiscoverCreators = () => {
                   placeholder="Max"
                   value={ageRange.max.toString()}
                   onChangeText={(text) => setAgeRange({...ageRange, max: parseInt(text) || 65})}
+                  keyboardType="numeric"
+                />
+              </View>
+            </View>
+            
+            <View style={styles.filterRow}>
+              <Text style={styles.filterLabel}>Influencer Age Range</Text>
+              <View style={styles.ageInputs}>
+                <TextInput
+                  style={styles.ageInput}
+                  placeholder="Min"
+                  value={influencerAge.min.toString()}
+                  onChangeText={(text) => setInfluencerAge({...influencerAge, min: parseInt(text) || 18})}
+                  keyboardType="numeric"
+                />
+                <Text style={styles.ageSeparator}>-</Text>
+                <TextInput
+                  style={styles.ageInput}
+                  placeholder="Max"
+                  value={influencerAge.max.toString()}
+                  onChangeText={(text) => setInfluencerAge({...influencerAge, max: parseInt(text) || 50})}
                   keyboardType="numeric"
                 />
               </View>
@@ -512,7 +691,7 @@ const DiscoverCreators = () => {
                     )}
                   </View>
                   
-                  <Text style={styles.creatorHandle}>@{creator.handle}</Text>
+                  <Text style={styles.creatorHandle}>{creator.handle}</Text>
                   
                   <View style={styles.creatorStats}>
                     <View style={styles.statItem}>
@@ -525,8 +704,13 @@ const DiscoverCreators = () => {
                     </View>
                     <View style={styles.statItem}>
                       <MaterialIcons name="attach-money" size={12} color="#666" />
-                      <Text style={styles.statText}>{creator.estimatedCost}</Text>
+                      <Text style={styles.statText}>${creator.estimatedCost}</Text>
                     </View>
+                  </View>
+                  
+                  <View style={styles.creatorMeta}>
+                    <Text style={styles.metaText}>Age: {creator.age} • {creator.language}</Text>
+                    <Text style={styles.metaText}>Posts: {creator.postingFrequency}</Text>
                   </View>
                   
                   <View style={styles.creatorTags}>
@@ -535,13 +719,17 @@ const DiscoverCreators = () => {
                     </View>
                     {creator.platforms.slice(0, 2).map((platform, index) => (
                       <View key={index} style={styles.platformTag}>
-                        <Text style={styles.platformTagText}>{platform}</Text>
+                        <Image 
+                          source={getPlatformIcon(platform)}
+                          style={styles.platformTagIcon}
+                          alt={`${platform} icon`}
+                        />
                       </View>
                     ))}
                   </View>
                   
                   <Text style={styles.creatorLocation}>
-                    <Ionicons name="location-outline" size={12} color="#666" /> {creator.location}
+                    <Ionicons name="location-outline" size={12} color="#666" /> {creator.city}, {creator.country}
                   </Text>
                 </View>
               </Pressable>
@@ -685,6 +873,13 @@ const styles = StyleSheet.create({
   },
   filterChipTextActive: {
     color: BrandColors.neutral[0],
+  },
+  filterChipIcon: {
+    width: 20,
+    height: 20,
+  },
+  filterChipIconActive: {
+    // Can add tint or other effects if needed
   },
   priceInputs: {
     flexDirection: 'row',
@@ -940,10 +1135,23 @@ const styles = StyleSheet.create({
     color: BrandColors.neutral[500],
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
+  platformTagIcon: {
+    width: 16,
+    height: 16,
+  },
   creatorLocation: {
     fontSize: 13,
     color: BrandColors.neutral[500],
     marginTop: 6,
+    fontFamily: DesignSystem.Typography.caption.fontFamily,
+  },
+  creatorMeta: {
+    marginTop: 6,
+    gap: 2,
+  },
+  metaText: {
+    fontSize: 12,
+    color: BrandColors.neutral[400],
     fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   fab: {

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   SafeAreaView,
   Platform,
   Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -15,6 +17,7 @@ import { Color } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Icons
 import ArrowLeft from '@/assets/arrowleft021.svg';
@@ -41,68 +44,99 @@ interface Transaction {
 
 const EarningsPage: React.FC = () => {
   const isWeb = Platform.OS === 'web';
+  const { user } = useAuth();
   
-  // Demo earnings data
-  const [earningsData] = useState<EarningsData>({
-    totalEarnings: 12450,
-    availableBalance: 3280,
-    pendingPayments: 1850,
-    thisMonth: 2650,
-    lastMonth: 1890,
-    completedDeals: 23,
-    averageDealValue: 541,
-  });
+  // State for real data
+  const [earningsData, setEarningsData] = useState<EarningsData | null>(null);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  // Demo transaction history
-  const [transactions] = useState<Transaction[]>([
-    {
-      id: 'TXN-001',
-      type: 'earning',
-      amount: 1500,
-      description: 'Instagram Post Campaign - TechStyle Brand',
-      date: '2024-06-20',
-      status: 'completed',
-      dealId: 'DEAL-001',
-    },
-    {
-      id: 'TXN-002',
-      type: 'withdrawal',
-      amount: -800,
-      description: 'Withdrawal to Bank Account ****1234',
-      date: '2024-06-18',
-      status: 'completed',
-    },
-    {
-      id: 'TXN-003',
-      type: 'pending',
-      amount: 1200,
-      description: 'Product Review Video - FitTech Solutions',
-      date: '2024-06-15',
-      status: 'pending',
-      dealId: 'DEAL-002',
-    },
-    {
-      id: 'TXN-004',
-      type: 'earning',
-      amount: 750,
-      description: 'TikTok Series - Beauty Collective',
-      date: '2024-06-12',
-      status: 'completed',
-      dealId: 'DEAL-003',
-    },
-    {
-      id: 'TXN-005',
-      type: 'pending',
-      amount: 650,
-      description: 'Gaming Stream - GamerHub',
-      date: '2024-06-10',
-      status: 'pending',
-      dealId: 'DEAL-004',
-    },
-  ]);
+  useEffect(() => {
+    fetchEarningsData();
+  }, []);
+
+  const fetchEarningsData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch multiple endpoints in parallel
+      const [limitsResponse, analyticsResponse, transactionsResponse] = await Promise.all([
+        fetch('/api/earnings/withdraw/limits', {
+          headers: { 'Authorization': `Bearer ${user?.token || ''}` }
+        }),
+        fetch('/api/earnings/analytics?period=30d', {
+          headers: { 'Authorization': `Bearer ${user?.token || ''}` }
+        }),
+        fetch('/api/earnings/transactions?limit=10', {
+          headers: { 'Authorization': `Bearer ${user?.token || ''}` }
+        })
+      ]);
+
+      const [limitsData, analyticsData, transactionsData] = await Promise.all([
+        limitsResponse.json(),
+        analyticsResponse.json(),
+        transactionsResponse.json()
+      ]);
+
+      if (limitsData.success) {
+        const { data } = limitsData;
+        setEarningsData({
+          totalEarnings: data.totalEarnings || 0,
+          availableBalance: data.availableBalance || 0,
+          pendingPayments: data.totalEarnings - data.availableBalance - (data.totalWithdrawn || 0),
+          thisMonth: 0, // Will be calculated from analytics
+          lastMonth: 0, // Will be calculated from analytics
+          completedDeals: 0, // Will be calculated from analytics
+          averageDealValue: 0, // Will be calculated from analytics
+        });
+      }
+
+      if (analyticsData.success) {
+        setAnalytics(analyticsData.data);
+        
+        // Update earnings data with analytics info
+        if (earningsData) {
+          const summary = analyticsData.data.summary || {};
+          setEarningsData(prev => prev ? {
+            ...prev,
+            completedDeals: summary.totalDeals || 0,
+            averageDealValue: summary.avgDealValue || 0,
+            // thisMonth and lastMonth would need to be calculated from earningsOverTime
+          } : null);
+        }
+      }
+
+      if (transactionsData.success) {
+        const formattedTransactions = transactionsData.data.transactions.map((tx: any) => ({
+          id: tx.id,
+          type: tx.type === 'earning' ? 'earning' : tx.type === 'withdrawal' ? 'withdrawal' : 'pending',
+          amount: tx.amount,
+          description: tx.description || 'Transaction',
+          date: new Date(tx.createdAt).toISOString().split('T')[0],
+          status: tx.status,
+          dealId: tx.metadata?.dealId,
+        }));
+        setTransactions(formattedTransactions);
+      }
+
+    } catch (error) {
+      console.error('Error fetching earnings data:', error);
+      Alert.alert('Error', 'Failed to load earnings data. Please try again.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchEarningsData();
+  };
 
   const handleWithdraw = () => {
-    if (earningsData.availableBalance < 50) {
+    if (!earningsData || earningsData.availableBalance < 50) {
       Alert.alert('Minimum Withdrawal', 'Minimum withdrawal amount is $50.');
       return;
     }
@@ -148,6 +182,24 @@ const EarningsPage: React.FC = () => {
     }
   };
 
+  // Loading state
+  if (loading && !earningsData) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="auto" />
+        <View style={styles.header}>
+          <UniversalBackButton fallbackRoute="/" />
+          <Text style={styles.headerTitle}>Earnings & Payments</Text>
+          <View style={styles.headerSpacer} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Color.cSK430B92500} />
+          <Text style={styles.loadingText}>Loading earnings data...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <>
       <WebSEO 
@@ -171,25 +223,34 @@ const EarningsPage: React.FC = () => {
           style={styles.scrollContainer} 
           contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[Color.cSK430B92500]}
+            />
+          }
         >
           {/* Balance Overview */}
           <View style={styles.balanceSection}>
             <View style={styles.mainBalanceCard}>
               <Text style={styles.balanceLabel}>Available Balance</Text>
-              <Text style={styles.balanceAmount}>${earningsData.availableBalance.toLocaleString()}</Text>
+              <Text style={styles.balanceAmount}>
+                ${earningsData ? earningsData.availableBalance.toLocaleString() : '0'}
+              </Text>
               <Text style={styles.balanceSubtext}>Ready to withdraw</Text>
               
               <TouchableOpacity 
                 style={[
                   styles.withdrawButton,
-                  earningsData.availableBalance < 50 && styles.disabledWithdrawButton
+                  (!earningsData || earningsData.availableBalance < 50) && styles.disabledWithdrawButton
                 ]}
                 onPress={handleWithdraw}
-                disabled={earningsData.availableBalance < 50}
+                disabled={!earningsData || earningsData.availableBalance < 50}
               >
                 <Text style={[
                   styles.withdrawButtonText,
-                  earningsData.availableBalance < 50 && styles.disabledWithdrawButtonText
+                  (!earningsData || earningsData.availableBalance < 50) && styles.disabledWithdrawButtonText
                 ]}>
                   Withdraw Funds
                 </Text>
@@ -198,11 +259,15 @@ const EarningsPage: React.FC = () => {
 
             <View style={styles.statsRow}>
               <View style={styles.statCard}>
-                <Text style={styles.statValue}>${earningsData.pendingPayments.toLocaleString()}</Text>
+                <Text style={styles.statValue}>
+                  ${earningsData ? earningsData.pendingPayments.toLocaleString() : '0'}
+                </Text>
                 <Text style={styles.statLabel}>Pending</Text>
               </View>
               <View style={styles.statCard}>
-                <Text style={styles.statValue}>${earningsData.totalEarnings.toLocaleString()}</Text>
+                <Text style={styles.statValue}>
+                  ${earningsData ? earningsData.totalEarnings.toLocaleString() : '0'}
+                </Text>
                 <Text style={styles.statLabel}>Total Earned</Text>
               </View>
             </View>
@@ -215,28 +280,41 @@ const EarningsPage: React.FC = () => {
             <View style={styles.monthlyStats}>
               <View style={styles.monthCard}>
                 <Text style={styles.monthLabel}>This Month</Text>
-                <Text style={styles.monthValue}>${earningsData.thisMonth.toLocaleString()}</Text>
-                <View style={styles.monthChange}>
-                  <Text style={styles.monthChangeText}>
-                    +{Math.round(((earningsData.thisMonth - earningsData.lastMonth) / earningsData.lastMonth) * 100)}%
-                  </Text>
-                </View>
+                <Text style={styles.monthValue}>
+                  ${earningsData ? earningsData.thisMonth.toLocaleString() : '0'}
+                </Text>
+                {earningsData && earningsData.lastMonth > 0 && (
+                  <View style={styles.monthChange}>
+                    <Text style={styles.monthChangeText}>
+                      {earningsData.thisMonth > earningsData.lastMonth ? '+' : ''}
+                      {Math.round(((earningsData.thisMonth - earningsData.lastMonth) / earningsData.lastMonth) * 100)}%
+                    </Text>
+                  </View>
+                )}
               </View>
               
               <View style={styles.monthCard}>
                 <Text style={styles.monthLabel}>Last Month</Text>
-                <Text style={styles.monthValue}>${earningsData.lastMonth.toLocaleString()}</Text>
-                <Text style={styles.monthSubtext}>June 2024</Text>
+                <Text style={styles.monthValue}>
+                  ${earningsData ? earningsData.lastMonth.toLocaleString() : '0'}
+                </Text>
+                <Text style={styles.monthSubtext}>
+                  {new Date(new Date().setMonth(new Date().getMonth() - 1)).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+                </Text>
               </View>
             </View>
 
             <View style={styles.additionalStats}>
               <View style={styles.additionalStatCard}>
-                <Text style={styles.additionalStatValue}>{earningsData.completedDeals}</Text>
+                <Text style={styles.additionalStatValue}>
+                  {earningsData ? earningsData.completedDeals : 0}
+                </Text>
                 <Text style={styles.additionalStatLabel}>Completed Deals</Text>
               </View>
               <View style={styles.additionalStatCard}>
-                <Text style={styles.additionalStatValue}>${earningsData.averageDealValue}</Text>
+                <Text style={styles.additionalStatValue}>
+                  ${earningsData ? earningsData.averageDealValue.toLocaleString() : '0'}
+                </Text>
                 <Text style={styles.additionalStatLabel}>Avg Deal Value</Text>
               </View>
             </View>
@@ -324,6 +402,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#666',
   },
   header: {
     flexDirection: 'row',

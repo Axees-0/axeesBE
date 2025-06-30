@@ -7,16 +7,30 @@ import {
   Text, 
   StyleSheet,
   TouchableOpacity,
+  ImageBackground,
+  Dimensions,
 } from "react-native";
 import { router } from 'expo-router';
 import { WebSEO } from "../web-seo";
-import { Color, Focus } from "@/GlobalStyles";
 import { DEMO_MODE } from "@/demo/DemoMode";
 import { DemoData } from "@/demo/DemoData";
 import { useAuth } from "@/contexts/AuthContext";
 import RoleSwitcher from "@/components/RoleSwitcher";
 import { useConfirmModal } from "@/components/ConfirmModal";
-import DesignSystem from "@/styles/DesignSystem";
+import { BrandColors } from '@/constants/Colors';
+import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
+import { 
+  Feather, 
+  MaterialIcons, 
+  Ionicons, 
+  FontAwesome5, 
+  MaterialCommunityIcons,
+  AntDesign,
+  Entypo
+} from '@expo/vector-icons';
+
+const { width: screenWidth } = Dimensions.get('window');
 
 const BREAKPOINTS = {
   mobile: 768,
@@ -33,243 +47,269 @@ const ProfilePage = () => {
   const isCreator = user?.userType === 'creator';
 
   // Demo content based on role
-  const renderDemoProfile = () => {
-    const profile = isCreator ? {
-      fullName: 'Emma Thompson',
-      email: 'emma@creativestudio.com',
-      username: '@emmastyle',
-      followers: 45000,
-      engagementRate: 5.8,
-      completedDeals: 23,
-      activeDeals: 2,
-      totalEarnings: 12450,
-      availableBalance: 3280,
-      platforms: ['Instagram', 'TikTok'],
-      joinedDate: new Date('2023-03-15'),
-    } : DemoData.marketerProfile;
-    
+  const profile = isCreator ? {
+    fullName: 'Emma Thompson',
+    email: 'emma@creativestudio.com',
+    username: '@emmastyle',
+    bio: 'Fashion & Lifestyle Creator | Helping brands tell their story authentically',
+    followers: 45000,
+    following: 892,
+    posts: 324,
+    engagementRate: 5.8,
+    completedDeals: 23,
+    activeDeals: 2,
+    totalEarnings: 12450,
+    availableBalance: 3280,
+    platforms: ['Instagram', 'TikTok', 'YouTube'],
+    joinedDate: new Date('2023-03-15'),
+    location: 'Los Angeles, CA',
+    verified: true,
+    coverImage: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=400&fit=crop',
+    avatarUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop',
+  } : {
+    ...DemoData.marketerProfile,
+    coverImage: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&h=400&fit=crop',
+    avatarUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop',
+    followers: 156,
+    following: 89,
+    posts: 42,
+  };
+
+  const quickStats = isCreator ? [
+    { icon: 'users', label: 'Followers', value: formatNumber(profile.followers), color: BrandColors.primary[500] },
+    { icon: 'trending-up', label: 'Engagement', value: `${profile.engagementRate}%`, color: BrandColors.semantic.success },
+    { icon: 'briefcase', label: 'Deals', value: profile.completedDeals.toString(), color: BrandColors.semantic.info },
+    { icon: 'dollar-sign', label: 'Earnings', value: `$${formatNumber(profile.totalEarnings)}`, color: BrandColors.semantic.warning },
+  ] : [
+    { icon: 'users', label: 'Network', value: profile.followers.toString(), color: BrandColors.primary[500] },
+    { icon: 'briefcase', label: 'Campaigns', value: profile.completedDeals.toString(), color: BrandColors.semantic.success },
+    { icon: 'trending-up', label: 'Success', value: `${profile.successRate}%`, color: BrandColors.semantic.info },
+    { icon: 'dollar-sign', label: 'Spent', value: `$${formatNumber(profile.balance)}`, color: BrandColors.semantic.warning },
+  ];
+
+  function formatNumber(num: number): string {
+    if (num >= 1000000) return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1000) return `${(num / 1000).toFixed(1)}K`;
+    return num.toString();
+  }
+
+  const renderProfileContent = () => {
     return (
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Profile</Text>
-          {DEMO_MODE && (
-            <TouchableOpacity 
-              style={styles.roleSwitchButton}
-              onPress={() => setShowRoleSwitcher(true)}
-              testID="role-switcher-button"
-              accessibilityRole="button"
-              accessibilityLabel="Switch Role"
+        {/* Cover Image Section */}
+        <View style={styles.coverSection}>
+          <ImageBackground
+            source={{ uri: profile.coverImage }}
+            style={styles.coverImage}
+            resizeMode="cover"
+          >
+            <LinearGradient
+              colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.5)']}
+              style={styles.coverGradient}
             >
-              <Text style={styles.roleSwitchButtonText}>🔄 Switch Role</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-        
-        <View style={styles.profileHeader}>
-          <View style={styles.avatar}>
-            <Text style={styles.avatarText}>
-              {profile.fullName.split(' ').map(n => n[0]).join('')}
-            </Text>
-          </View>
-          <View style={styles.profileInfo}>
-            <Text style={styles.name}>{profile.fullName}</Text>
-            <Text style={styles.email}>{profile.email}</Text>
-            {isCreator ? (
-              <>
-                <Text style={styles.username}>{profile.username}</Text>
-                <View style={styles.platformTags}>
-                  {profile.platforms.map((platform, index) => (
-                    <View key={index} style={styles.platformTag}>
-                      <Text style={styles.platformTagText}>{platform}</Text>
-                    </View>
-                  ))}
-                </View>
-              </>
-            ) : (
-              <>
-                <Text style={styles.company}>{profile.company}</Text>
-                <View style={styles.tierBadge}>
-                  <Text style={styles.tierText}>{profile.tier} Member</Text>
-                </View>
-              </>
+              <View style={styles.coverActions}>
+                {DEMO_MODE && (
+                  <TouchableOpacity 
+                    style={styles.roleSwitchButton}
+                    onPress={() => setShowRoleSwitcher(true)}
+                  >
+                    <Ionicons name="swap-horizontal" size={20} color={BrandColors.neutral[0]} />
+                    <Text style={styles.roleSwitchText}>Switch Role</Text>
+                  </TouchableOpacity>
+                )}
+                <TouchableOpacity style={styles.editCoverButton}>
+                  <Feather name="camera" size={20} color={BrandColors.neutral[0]} />
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </ImageBackground>
+          
+          {/* Profile Avatar */}
+          <View style={styles.avatarContainer}>
+            <Image
+              source={{ uri: profile.avatarUrl }}
+              style={styles.avatar}
+              contentFit="cover"
+            />
+            {profile.verified && (
+              <View style={styles.verifiedBadge}>
+                <MaterialIcons name="verified" size={24} color={BrandColors.primary[500]} />
+              </View>
             )}
+            <TouchableOpacity style={styles.editAvatarButton}>
+              <Feather name="camera" size={16} color={BrandColors.neutral[0]} />
+            </TouchableOpacity>
           </View>
         </View>
 
-        <View style={styles.statsGrid}>
-          {isCreator ? (
-            <>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{(profile.followers / 1000).toFixed(1)}K</Text>
-                <Text style={styles.statLabel}>Followers</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{profile.engagementRate}%</Text>
-                <Text style={styles.statLabel}>Engagement</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{profile.completedDeals}</Text>
-                <Text style={styles.statLabel}>Completed</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{profile.activeDeals}</Text>
-                <Text style={styles.statLabel}>Active</Text>
-              </View>
-            </>
-          ) : (
-            <>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>${profile.balance.toLocaleString()}</Text>
-                <Text style={styles.statLabel}>Balance</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{profile.completedDeals}</Text>
-                <Text style={styles.statLabel}>Completed</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{profile.activeDeals}</Text>
-                <Text style={styles.statLabel}>Active</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{profile.successRate}%</Text>
-                <Text style={styles.statLabel}>Success</Text>
-              </View>
-            </>
+        {/* Profile Info */}
+        <View style={styles.profileInfoSection}>
+          <View style={styles.nameSection}>
+            <Text style={styles.fullName}>{profile.fullName}</Text>
+            <Text style={styles.username}>{profile.username}</Text>
+          </View>
+          
+          {profile.bio && (
+            <Text style={styles.bio}>{profile.bio}</Text>
           )}
+          
+          <View style={styles.metaInfo}>
+            <View style={styles.metaItem}>
+              <Ionicons name="location-outline" size={16} color={BrandColors.neutral[500]} />
+              <Text style={styles.metaText}>{profile.location}</Text>
+            </View>
+            <View style={styles.metaItem}>
+              <Ionicons name="calendar-outline" size={16} color={BrandColors.neutral[500]} />
+              <Text style={styles.metaText}>Joined {profile.joinedDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</Text>
+            </View>
+          </View>
+
+          {/* Social Stats */}
+          <View style={styles.socialStats}>
+            <View style={styles.socialStatItem}>
+              <Text style={styles.socialStatValue}>{formatNumber(profile.posts)}</Text>
+              <Text style={styles.socialStatLabel}>Posts</Text>
+            </View>
+            <View style={styles.socialStatDivider} />
+            <View style={styles.socialStatItem}>
+              <Text style={styles.socialStatValue}>{formatNumber(profile.followers)}</Text>
+              <Text style={styles.socialStatLabel}>Followers</Text>
+            </View>
+            <View style={styles.socialStatDivider} />
+            <View style={styles.socialStatItem}>
+              <Text style={styles.socialStatValue}>{formatNumber(profile.following)}</Text>
+              <Text style={styles.socialStatLabel}>Following</Text>
+            </View>
+          </View>
+
+          {/* Action Buttons */}
+          <View style={styles.profileActions}>
+            <TouchableOpacity 
+              style={styles.primaryButton}
+              onPress={() => router.push('/profile/edit')}
+            >
+              <Feather name="edit-2" size={16} color={BrandColors.neutral[0]} />
+              <Text style={styles.primaryButtonText}>Edit Profile</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.secondaryButton}
+              onPress={() => router.push('/settings')}
+            >
+              <Feather name="settings" size={16} color={BrandColors.primary[500]} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.secondaryButton}
+              onPress={() => router.push('/profile/share')}
+            >
+              <Feather name="share-2" size={16} color={BrandColors.primary[500]} />
+            </TouchableOpacity>
+          </View>
         </View>
 
+        {/* Quick Stats */}
+        <View style={styles.statsSection}>
+          <Text style={styles.sectionTitle}>Overview</Text>
+          <View style={styles.statsGrid}>
+            {quickStats.map((stat, index) => (
+              <TouchableOpacity key={index} style={styles.statCard}>
+                <View style={[styles.statIconContainer, { backgroundColor: `${stat.color}15` }]}>
+                  <Feather name={stat.icon as any} size={24} color={stat.color} />
+                </View>
+                <Text style={styles.statValue}>{stat.value}</Text>
+                <Text style={styles.statLabel}>{stat.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+
+        {/* Earnings Card for Creators */}
         {isCreator && (
           <TouchableOpacity 
             style={styles.earningsCard}
             onPress={() => router.push('/earnings')}
+            activeOpacity={0.9}
           >
-            <View style={styles.earningsInfo}>
-              <Text style={styles.earningsLabel}>Available Balance</Text>
-              <Text style={styles.earningsAmount}>${profile.availableBalance.toLocaleString()}</Text>
-              <Text style={styles.earningsSubtext}>Total Earned: ${profile.totalEarnings.toLocaleString()}</Text>
-            </View>
-            <Text style={styles.earningsArrow}>→</Text>
+            <LinearGradient
+              colors={[BrandColors.primary[500], BrandColors.primary[600]]}
+              style={styles.earningsGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={styles.earningsContent}>
+                <View style={styles.earningsInfo}>
+                  <Text style={styles.earningsLabel}>Available Balance</Text>
+                  <Text style={styles.earningsAmount}>${profile.availableBalance.toLocaleString()}</Text>
+                  <Text style={styles.earningsSubtext}>Total Earned: ${profile.totalEarnings.toLocaleString()}</Text>
+                </View>
+                <Ionicons name="arrow-forward-circle" size={40} color={BrandColors.neutral[0]} />
+              </View>
+            </LinearGradient>
           </TouchableOpacity>
         )}
 
-        <View style={styles.section}>
+        {/* Quick Actions */}
+        <View style={styles.quickActionsSection}>
           <Text style={styles.sectionTitle}>Quick Actions</Text>
-          <View style={styles.quickActions}>
+          <View style={styles.actionGrid}>
             {isCreator ? (
               <>
-                <TouchableOpacity 
-                  style={({ focused }) => [
-                    styles.actionButton,
-                    focused && styles.actionButtonFocused,
-                  ]}
-                  onPress={() => router.push('/deals')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="View Offers"
-                  accessibilityHint="Navigate to offers and deals page"
-                >
-                  <Text style={styles.actionIcon}>📋</Text>
-                  <Text style={styles.actionText}>View Offers</Text>
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push('/deals')}>
+                  <View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}>
+                    <MaterialIcons name="local-offer" size={24} color="#1976D2" />
+                  </View>
+                  <Text style={styles.actionText}>Offers</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={({ focused }) => [
-                    styles.actionButton,
-                    focused && styles.actionButtonFocused,
-                  ]}
-                  onPress={() => router.push('/earnings')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Earnings"
-                  accessibilityHint="Navigate to earnings page"
-                >
-                  <Text style={styles.actionIcon}>💰</Text>
+                
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push('/earnings')}>
+                  <View style={[styles.actionIcon, { backgroundColor: '#FFF3E0' }]}>
+                    <MaterialIcons name="account-balance-wallet" size={24} color="#F57C00" />
+                  </View>
                   <Text style={styles.actionText}>Earnings</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={({ focused }) => [
-                    styles.actionButton,
-                    focused && styles.actionButtonFocused,
-                  ]}
-                  onPress={() => router.push('/profile/edit')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Edit Profile"
-                  accessibilityHint="Navigate to profile editing page"
-                >
-                  <Text style={styles.actionIcon}>✏️</Text>
-                  <Text style={styles.actionText}>Edit Profile</Text>
-                </TouchableOpacity>
-                <TouchableOpacity 
-                  style={({ focused }) => [
-                    styles.actionButton,
-                    focused && styles.actionButtonFocused,
-                  ]}
-                  onPress={() => router.push('/profile/mediakit')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Media Kit"
-                  accessibilityHint="Navigate to media kit page"
-                >
-                  <Text style={styles.actionIcon}>📊</Text>
+                
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push('/profile/mediakit')}>
+                  <View style={[styles.actionIcon, { backgroundColor: '#F3E5F5' }]}>
+                    <MaterialIcons name="pie-chart" size={24} color="#7B1FA2" />
+                  </View>
                   <Text style={styles.actionText}>Media Kit</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={({ focused }) => [
-                    styles.actionButton,
-                    focused && styles.actionButtonFocused,
-                  ]}
-                  onPress={() => router.push('/payments/creator')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Payments"
-                  accessibilityHint="Navigate to payments page"
-                >
-                  <Text style={styles.actionIcon}>💳</Text>
+                
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push('/payments/creator')}>
+                  <View style={[styles.actionIcon, { backgroundColor: '#E8F5E9' }]}>
+                    <MaterialIcons name="payment" size={24} color="#388E3C" />
+                  </View>
                   <Text style={styles.actionText}>Payments</Text>
                 </TouchableOpacity>
               </>
             ) : (
               <>
-                <TouchableOpacity 
-                  style={({ focused }) => [
-                    styles.actionButton,
-                    focused && styles.actionButtonFocused,
-                  ]}
-                  onPress={() => router.push('/(tabs)')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Find Creators"
-                  accessibilityHint="Navigate to creator discovery page"
-                >
-                  <Text style={styles.actionIcon}>🔍</Text>
-                  <Text style={styles.actionText}>Find Creators</Text>
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push('/(tabs)')}>
+                  <View style={[styles.actionIcon, { backgroundColor: '#E3F2FD' }]}>
+                    <MaterialIcons name="search" size={24} color="#1976D2" />
+                  </View>
+                  <Text style={styles.actionText}>Find</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={({ focused }) => [
-                    styles.actionButton,
-                    focused && styles.actionButtonFocused,
-                  ]}
-                  onPress={() => router.push('/deals')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Sent Offers"
-                  accessibilityHint="Navigate to sent offers page"
-                >
-                  <Text style={styles.actionIcon}>📤</Text>
-                  <Text style={styles.actionText}>Sent Offers</Text>
+                
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push('/deals')}>
+                  <View style={[styles.actionIcon, { backgroundColor: '#FFF3E0' }]}>
+                    <MaterialIcons name="send" size={24} color="#F57C00" />
+                  </View>
+                  <Text style={styles.actionText}>Offers</Text>
                 </TouchableOpacity>
-                <TouchableOpacity 
-                  style={({ focused }) => [
-                    styles.actionButton,
-                    focused && styles.actionButtonFocused,
-                  ]}
-                  onPress={() => router.push('/payments/marketer')}
-                  accessible={true}
-                  accessibilityRole="button"
-                  accessibilityLabel="Payments"
-                  accessibilityHint="Navigate to payments page"
-                >
-                  <Text style={styles.actionIcon}>💳</Text>
+                
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push('/campaigns')}>
+                  <View style={[styles.actionIcon, { backgroundColor: '#F3E5F5' }]}>
+                    <MaterialIcons name="campaign" size={24} color="#7B1FA2" />
+                  </View>
+                  <Text style={styles.actionText}>Campaigns</Text>
+                </TouchableOpacity>
+                
+                <TouchableOpacity style={styles.actionItem} onPress={() => router.push('/payments/marketer')}>
+                  <View style={[styles.actionIcon, { backgroundColor: '#E8F5E9' }]}>
+                    <MaterialIcons name="payment" size={24} color="#388E3C" />
+                  </View>
                   <Text style={styles.actionText}>Payments</Text>
                 </TouchableOpacity>
               </>
@@ -277,87 +317,71 @@ const ProfilePage = () => {
           </View>
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account Information</Text>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Role</Text>
-            <Text style={styles.infoValue}>{isCreator ? 'Content Creator' : 'Brand Marketer'}</Text>
+        {/* Account Settings */}
+        <View style={styles.settingsSection}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          <View style={styles.settingsCard}>
+            <TouchableOpacity 
+              style={styles.settingItem}
+              onPress={() => router.push('/settings/notifications')}
+            >
+              <View style={styles.settingLeft}>
+                <Ionicons name="notifications-outline" size={22} color={BrandColors.neutral[700]} />
+                <Text style={styles.settingText}>Notifications</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={BrandColors.neutral[400]} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.settingItem}
+              onPress={() => router.push('/settings/privacy')}
+            >
+              <View style={styles.settingLeft}>
+                <Ionicons name="shield-checkmark-outline" size={22} color={BrandColors.neutral[700]} />
+                <Text style={styles.settingText}>Privacy & Security</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={BrandColors.neutral[400]} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.settingItem}
+              onPress={() => router.push('/settings/help')}
+            >
+              <View style={styles.settingLeft}>
+                <Ionicons name="help-circle-outline" size={22} color={BrandColors.neutral[700]} />
+                <Text style={styles.settingText}>Help & Support</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={BrandColors.neutral[400]} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={[styles.settingItem, styles.lastSettingItem]}
+              onPress={() => {
+                showConfirm(
+                  'Logout',
+                  'Are you sure you want to logout?',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    { 
+                      text: 'Logout', 
+                      style: 'destructive',
+                      onPress: () => {
+                        logout();
+                        router.replace('/login');
+                      }
+                    }
+                  ]
+                );
+              }}
+            >
+              <View style={styles.settingLeft}>
+                <Ionicons name="log-out-outline" size={22} color="#EF4444" />
+                <Text style={[styles.settingText, { color: '#EF4444' }]}>Logout</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#EF4444" />
+            </TouchableOpacity>
           </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Member Since</Text>
-            <Text style={styles.infoValue}>{profile.joinedDate.toLocaleDateString()}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Account Status</Text>
-            <Text style={[styles.infoValue, styles.activeStatus]}>Active</Text>
-          </View>
-          {isCreator ? (
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Avg. Response Time</Text>
-              <Text style={styles.infoValue}>2 hours</Text>
-            </View>
-          ) : (
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Avg. Deal Value</Text>
-              <Text style={styles.infoValue}>${profile.avgDealValue.toLocaleString()}</Text>
-            </View>
-          )}
         </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Settings</Text>
-          <TouchableOpacity 
-            style={styles.settingRow}
-            onPress={() => router.push('/settings/notifications')}
-          >
-            <Text style={styles.settingLabel}>Notification Preferences</Text>
-            <Text style={styles.settingArrow}>›</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.settingRow}
-            onPress={() => router.push('/settings/privacy')}
-          >
-            <Text style={styles.settingLabel}>Privacy Settings</Text>
-            <Text style={styles.settingArrow}>›</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.settingRow}
-            onPress={() => router.push('/settings/security')}
-          >
-            <Text style={styles.settingLabel}>Account Security</Text>
-            <Text style={styles.settingArrow}>›</Text>
-          </TouchableOpacity>
-          <TouchableOpacity 
-            style={styles.settingRow}
-            onPress={() => router.push('/settings/help')}
-          >
-            <Text style={styles.settingLabel}>Help & Support</Text>
-            <Text style={styles.settingArrow}>›</Text>
-          </TouchableOpacity>
-        </View>
-
-        <TouchableOpacity 
-          style={styles.logoutButton}
-          onPress={() => {
-            showConfirm(
-              'Logout',
-              'Are you sure you want to logout?',
-              [
-                { text: 'Cancel', style: 'cancel' },
-                { 
-                  text: 'Logout', 
-                  style: 'destructive',
-                  onPress: () => {
-                    logout();
-                    router.replace('/login');
-                  }
-                }
-              ]
-            );
-          }}
-        >
-          <Text style={styles.logoutButtonText}>Logout</Text>
-        </TouchableOpacity>
 
         <View style={{ height: 100 }} />
       </ScrollView>
@@ -371,7 +395,7 @@ const ProfilePage = () => {
         description={`Manage your Axees ${isCreator ? 'creator' : 'marketer'} profile, view performance metrics, and configure account settings.`}
         keywords={`profile, account settings, ${isCreator ? 'creator dashboard, earnings' : 'marketer dashboard, campaigns'}`}
       />
-      {renderDemoProfile()}
+      {renderProfileContent()}
       
       {DEMO_MODE && (
         <RoleSwitcher 
@@ -388,152 +412,223 @@ const ProfilePage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
-    padding: 20,
+    backgroundColor: BrandColors.neutral[50],
   },
-  header: {
+  coverSection: {
+    position: 'relative',
+    height: 200,
+    backgroundColor: BrandColors.neutral[200],
+  },
+  coverImage: {
+    width: '100%',
+    height: '100%',
+  },
+  coverGradient: {
+    flex: 1,
+    padding: 16,
+  },
+  coverActions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Color.cSK430B92500,
+    alignItems: 'flex-start',
   },
   roleSwitchButton: {
-    ...DesignSystem.ButtonStyles.primary,
-    paddingHorizontal: DesignSystem.ResponsiveSpacing.buttonMargin.marginHorizontal + 8, // Increased horizontal padding
-    borderRadius: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    minWidth: 120, // Consistent minimum width
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 6,
   },
-  roleSwitchButtonText: {
-    ...DesignSystem.ButtonTextStyles.primary,
+  roleSwitchText: {
+    color: BrandColors.neutral[0],
     fontSize: 14,
-    textAlign: 'center',
+    fontWeight: '500',
   },
-  profileHeader: {
-    flexDirection: 'row',
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 12,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
+  editCoverButton: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 8,
+    borderRadius: 20,
+  },
+  avatarContainer: {
+    position: 'absolute',
+    bottom: -60,
+    left: 24,
   },
   avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: Color.cSK430B92500,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    borderWidth: 4,
+    borderColor: BrandColors.neutral[0],
+    backgroundColor: BrandColors.neutral[200],
   },
-  avatarText: {
-    color: 'white',
-    fontSize: 24,
+  verifiedBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: BrandColors.neutral[0],
+    borderRadius: 12,
+    padding: 2,
+  },
+  editAvatarButton: {
+    position: 'absolute',
+    bottom: 4,
+    right: 4,
+    backgroundColor: BrandColors.primary[500],
+    padding: 8,
+    borderRadius: 20,
+  },
+  profileInfoSection: {
+    padding: 24,
+    paddingTop: 70,
+    backgroundColor: BrandColors.neutral[0],
+    borderBottomWidth: 1,
+    borderBottomColor: BrandColors.neutral[100],
+  },
+  nameSection: {
+    marginBottom: 12,
+  },
+  fullName: {
+    fontSize: 28,
     fontWeight: 'bold',
-  },
-  profileInfo: {
-    flex: 1,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 4,
-  },
-  email: {
-    fontSize: 14,
-    color: '#666',
+    color: BrandColors.neutral[900],
     marginBottom: 4,
   },
   username: {
-    fontSize: 14,
-    color: Color.cSK430B92500,
-    fontWeight: '600',
-    marginBottom: 8,
-  },
-  company: {
     fontSize: 16,
-    color: '#333',
-    marginBottom: 8,
+    color: BrandColors.neutral[500],
   },
-  platformTags: {
+  bio: {
+    fontSize: 15,
+    color: BrandColors.neutral[700],
+    lineHeight: 22,
+    marginBottom: 16,
+  },
+  metaInfo: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+    marginBottom: 20,
+  },
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metaText: {
+    fontSize: 14,
+    color: BrandColors.neutral[500],
+  },
+  socialStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+    borderColor: BrandColors.neutral[100],
+  },
+  socialStatItem: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  socialStatValue: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: BrandColors.neutral[900],
+    marginBottom: 4,
+  },
+  socialStatLabel: {
+    fontSize: 13,
+    color: BrandColors.neutral[500],
+  },
+  socialStatDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: BrandColors.neutral[200],
+  },
+  profileActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  primaryButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: BrandColors.primary[500],
+    paddingVertical: 12,
+    borderRadius: 8,
     gap: 8,
   },
-  platformTag: {
-    backgroundColor: '#E8D5FE',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  platformTagText: {
-    fontSize: 12,
-    color: Color.cSK430B92500,
+  primaryButtonText: {
+    color: BrandColors.neutral[0],
+    fontSize: 16,
     fontWeight: '600',
   },
-  tierBadge: {
-    ...DesignSystem.PillStyles.default,
-    backgroundColor: '#FFD700',
-    paddingHorizontal: 12, // Consistent 8px horizontal padding as requested
-    paddingVertical: 6,
-    borderRadius: DesignSystem.PillStyles.default.borderRadius, // Consistent radius
-    alignSelf: 'flex-start',
+  secondaryButton: {
+    padding: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: BrandColors.neutral[200],
+    backgroundColor: BrandColors.neutral[0],
   },
-  tierText: {
-    ...DesignSystem.PillTextStyles.default,
-    fontSize: 12,
+  statsSection: {
+    padding: 24,
+    backgroundColor: BrandColors.neutral[0],
+    marginTop: 8,
+  },
+  sectionTitle: {
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
+    color: BrandColors.neutral[900],
+    marginBottom: 16,
   },
   statsGrid: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    marginBottom: 20,
-    gap: 8,
     flexWrap: 'wrap',
-    paddingHorizontal: 4,
+    gap: 12,
   },
-  statItem: {
-    backgroundColor: 'white',
+  statCard: {
     flex: 1,
+    minWidth: '47%',
+    backgroundColor: BrandColors.neutral[50],
     padding: 16,
     borderRadius: 12,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-    minWidth: 75,
-    maxWidth: 120,
+    borderWidth: 1,
+    borderColor: BrandColors.neutral[100],
+  },
+  statIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 12,
   },
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Color.cSK430B92500,
+    color: BrandColors.neutral[900],
     marginBottom: 4,
   },
   statLabel: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 13,
+    color: BrandColors.neutral[500],
   },
   earningsCard: {
-    backgroundColor: Color.cSK430B92500,
+    marginHorizontal: 24,
+    marginTop: 8,
     borderRadius: 12,
+    overflow: 'hidden',
+  },
+  earningsGradient: {
     padding: 20,
-    marginBottom: 20,
+  },
+  earningsContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -543,131 +638,77 @@ const styles = StyleSheet.create({
   },
   earningsLabel: {
     fontSize: 14,
-    color: '#FFFFFF80',
+    color: 'rgba(255,255,255,0.8)',
     marginBottom: 4,
   },
   earningsAmount: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: BrandColors.neutral[0],
     marginBottom: 4,
   },
   earningsSubtext: {
-    fontSize: 12,
-    color: '#FFFFFF80',
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.7)',
   },
-  earningsArrow: {
-    fontSize: 24,
-    color: '#FFFFFF',
+  quickActionsSection: {
+    padding: 24,
+    backgroundColor: BrandColors.neutral[0],
+    marginTop: 8,
   },
-  section: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 1,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-  },
-  quickActions: {
+  actionGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: DesignSystem.ResponsiveSpacing.rowSpacing.marginBottom,
-    justifyContent: 'space-between', // Equal distribution
+    justifyContent: 'space-between',
   },
-  actionButton: {
-    ...DesignSystem.ButtonStyles.secondary,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 12,
-    padding: 16,
+  actionItem: {
+    width: '23%',
     alignItems: 'center',
-    justifyContent: 'center', // Center icon/label pairs
-    flex: 1,
-    minWidth: '30%', // Equal column width for 3 columns
-    maxWidth: '31%', // Ensure consistent sizing
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    minHeight: 80, // Consistent height for all buttons
-  },
-  actionButtonFocused: {
-    ...Focus.primary,
-    borderRadius: 12,
+    marginBottom: 16,
   },
   actionIcon: {
-    fontSize: 24,
+    width: 56,
+    height: 56,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginBottom: 8,
-    textAlign: 'center', // Center icons
   },
   actionText: {
-    ...DesignSystem.Typography.small,
-    fontSize: 12,
-    color: '#333',
-    fontWeight: '600',
-    textAlign: 'center', // Center text labels
+    fontSize: 13,
+    color: BrandColors.neutral[700],
+    textAlign: 'center',
   },
-  infoRow: {
-    ...DesignSystem.LayoutUtils.tableRow,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center', // Align values vertically
-    paddingVertical: 16, // Increased padding for better spacing
-    borderBottomWidth: 1,
-    borderBottomColor: DesignSystem.AccessibleColors.borderLight,
-    minHeight: 56, // Consistent row height
+  settingsSection: {
+    padding: 24,
+    paddingTop: 0,
   },
-  infoLabel: {
-    ...DesignSystem.Typography.body,
-    fontSize: 14,
-    color: DesignSystem.AccessibleColors.textSecondary,
-    flex: 1, // Take up available space
-  },
-  infoValue: {
-    ...DesignSystem.Typography.bodyMedium,
-    fontSize: 14,
-    color: '#333',
-    textAlign: 'right', // Right-align values for neat column
-    minWidth: 100, // Consistent value column width
-  },
-  activeStatus: {
-    color: '#10B981',
-  },
-  settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  settingLabel: {
-    fontSize: 16,
-    color: '#333',
-  },
-  settingArrow: {
-    fontSize: 20,
-    color: '#999',
-  },
-  logoutButton: {
-    backgroundColor: '#FEE2E2',
+  settingsCard: {
+    backgroundColor: BrandColors.neutral[0],
     borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 20,
+    overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: BrandColors.neutral[100],
   },
-  logoutButtonText: {
-    color: '#DC2626',
+  settingItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: BrandColors.neutral[100],
+  },
+  lastSettingItem: {
+    borderBottomWidth: 0,
+  },
+  settingLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  settingText: {
     fontSize: 16,
-    fontWeight: '600',
+    color: BrandColors.neutral[700],
   },
 });
 

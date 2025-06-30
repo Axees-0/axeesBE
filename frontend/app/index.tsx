@@ -1,7 +1,7 @@
-import { Redirect } from "expo-router";
+import SplashScreen from "./splash";
 
 const index = () => {
-  return <Redirect href="/(tabs)" />;
+  return <SplashScreen />;
 };
 
 export default index;

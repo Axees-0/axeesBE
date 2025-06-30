@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,14 @@ import {
   SafeAreaView,
   Platform,
   TextInput,
+  Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { Color } from '@/GlobalStyles';
+import { BrandColors } from '@/constants/Colors';
 import { WebSEO } from '../web-seo';
 import WebBottomTabs from '@/components/WebBottomTabs';
 import { useAuth } from '@/contexts/AuthContext';
@@ -50,6 +54,12 @@ const CreatorPaymentsPage: React.FC = () => {
   const [showCreditCardModal, setShowCreditCardModal] = useState(false);
   const { showConfirm, ConfirmModalComponent } = useConfirmModal();
   
+  // Payment methods state
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([]);
+  const [loadingMethods, setLoadingMethods] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+  
   // Handle browser navigation on web platform
   React.useEffect(() => {
     if (isWeb && typeof window !== 'undefined') {
@@ -61,26 +71,57 @@ const CreatorPaymentsPage: React.FC = () => {
       }
     }
   }, [isWeb]);
-  
-  // Demo payment data
-  const [paymentMethods, setPaymentMethods] = useState<PaymentMethod[]>([
-    {
-      id: 'pm-1',
-      type: 'bank_account',
-      name: 'Chase ending in 1234',
-      last4: '1234',
-      isDefault: true,
-      icon: '🏦',
-    },
-    {
-      id: 'pm-2',
-      type: 'paypal',
-      name: 'PayPal',
-      email: 'creator@example.com',
-      isDefault: false,
-      icon: '🅿️',
-    },
-  ]);
+
+  useEffect(() => {
+    fetchPaymentMethods();
+  }, []);
+
+  const fetchPaymentMethods = async () => {
+    try {
+      setLoadingMethods(true);
+      
+      const response = await fetch('/api/payment-persistence/methods', {
+        headers: { 'Authorization': `Bearer ${user?.token || ''}` }
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        const formattedMethods = result.data.methods.map((method: any) => ({
+          id: method.id,
+          type: method.type,
+          name: method.displayName || `${method.type.replace('_', ' ')} ending in ${method.last4 || '****'}`,
+          last4: method.last4,
+          email: method.email,
+          isDefault: method.isDefault,
+          icon: getPaymentMethodIcon(method.type),
+        }));
+        setPaymentMethods(formattedMethods);
+      } else {
+        console.error('Failed to fetch payment methods:', result.message);
+      }
+    } catch (error) {
+      console.error('Error fetching payment methods:', error);
+      Alert.alert('Error', 'Failed to load payment methods. Please try again.');
+    } finally {
+      setLoadingMethods(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchPaymentMethods();
+  };
+
+  const getPaymentMethodIcon = (type: string) => {
+    switch (type) {
+      case 'credit_card': return '💳';
+      case 'bank_account': return '🏦';
+      case 'paypal': return '🅿️';
+      default: return '💳';
+    }
+  };
 
   const [transactions] = useState<Transaction[]>([
     {
@@ -130,21 +171,39 @@ const CreatorPaymentsPage: React.FC = () => {
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Set Default',
-          onPress: () => {
-            // Update the state to set the new default method
-            setPaymentMethods(prevMethods => 
-              prevMethods.map(m => ({
-                ...m,
-                isDefault: m.id === method.id
-              }))
-            );
+          onPress: async () => {
+            setActionLoading(method.id);
             
-            // Show success message immediately
-            showConfirm(
-              'Success',
-              `${method.name} has been set as your default payment method.`,
-              [{ text: 'OK' }]
-            );
+            try {
+              const response = await fetch(`/api/payment-persistence/methods/${method.id}/default`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${user?.token || ''}`,
+                },
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                // Update local state to reflect the change
+                setPaymentMethods(prevMethods => 
+                  prevMethods.map(m => ({
+                    ...m,
+                    isDefault: m.id === method.id
+                  }))
+                );
+                
+                Alert.alert('Success', `${method.name} has been set as your default payment method.`);
+              } else {
+                Alert.alert('Error', result.message || 'Failed to set default payment method.');
+              }
+            } catch (error) {
+              console.error('Error setting default payment method:', error);
+              Alert.alert('Error', 'Failed to set default payment method. Please try again.');
+            } finally {
+              setActionLoading(null);
+            }
           }
         }
       ]
@@ -153,10 +212,9 @@ const CreatorPaymentsPage: React.FC = () => {
   
   const handleRemoveMethod = (method: PaymentMethod) => {
     if (method.isDefault) {
-      showConfirm(
+      Alert.alert(
         'Cannot Remove Default',
-        'Please set another payment method as default before removing this one.',
-        [{ text: 'OK' }]
+        'Please set another payment method as default before removing this one.'
       );
       return;
     }
@@ -169,18 +227,35 @@ const CreatorPaymentsPage: React.FC = () => {
         { 
           text: 'Remove', 
           style: 'destructive',
-          onPress: () => {
-            // Remove the payment method from state
-            setPaymentMethods(prevMethods => 
-              prevMethods.filter(m => m.id !== method.id)
-            );
+          onPress: async () => {
+            setActionLoading(method.id);
             
-            // Show success message immediately
-            showConfirm(
-              'Success',
-              `${method.name} has been removed.`,
-              [{ text: 'OK' }]
-            );
+            try {
+              const response = await fetch(`/api/payment-persistence/methods/${method.id}`, {
+                method: 'DELETE',
+                headers: {
+                  'Authorization': `Bearer ${user?.token || ''}`,
+                },
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                // Remove the payment method from state
+                setPaymentMethods(prevMethods => 
+                  prevMethods.filter(m => m.id !== method.id)
+                );
+                
+                Alert.alert('Success', `${method.name} has been removed.`);
+              } else {
+                Alert.alert('Error', result.message || 'Failed to remove payment method.');
+              }
+            } catch (error) {
+              console.error('Error removing payment method:', error);
+              Alert.alert('Error', 'Failed to remove payment method. Please try again.');
+            } finally {
+              setActionLoading(null);
+            }
           }
         }
       ]
@@ -232,23 +307,54 @@ const CreatorPaymentsPage: React.FC = () => {
     router.push('/earnings/withdraw');
   };
   
-  const handleAddCreditCard = (cardData: any) => {
-    // Create new payment method from card data
-    const newMethod: PaymentMethod = {
-      id: `pm-${Date.now()}`,
-      type: 'credit_card',
-      name: `${cardData.number.startsWith('4') ? 'Visa' : 'Card'} ending in ${cardData.last4}`,
-      last4: cardData.last4,
-      isDefault: paymentMethods.length === 0,
-      icon: '💳',
-    };
+  const handleAddCreditCard = async (cardData: any) => {
+    setActionLoading('adding-card');
     
-    // Add to payment methods
-    setPaymentMethods(prev => [...prev, newMethod]);
-    
-    // Close modal and show success
-    setShowCreditCardModal(false);
-    showConfirm('Success', 'Credit card added successfully!', [{ text: 'OK' }]);
+    try {
+      const response = await fetch('/api/payment-persistence/methods', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user?.token || ''}`,
+        },
+        body: JSON.stringify({
+          type: 'credit_card',
+          cardNumber: cardData.number,
+          expiryMonth: cardData.expiryMonth,
+          expiryYear: cardData.expiryYear,
+          cvv: cardData.cvv,
+          holderName: cardData.holderName,
+          isDefault: paymentMethods.length === 0, // First method becomes default
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Add new method to local state
+        const newMethod: PaymentMethod = {
+          id: result.data.paymentMethod.id,
+          type: 'credit_card',
+          name: `${cardData.number.startsWith('4') ? 'Visa' : 'Card'} ending in ${result.data.paymentMethod.last4}`,
+          last4: result.data.paymentMethod.last4,
+          isDefault: result.data.paymentMethod.isDefault,
+          icon: '💳',
+        };
+        
+        setPaymentMethods(prev => [...prev, newMethod]);
+        
+        // Close modal and show success
+        setShowCreditCardModal(false);
+        Alert.alert('Success', 'Credit card added successfully!');
+      } else {
+        Alert.alert('Error', result.message || 'Failed to add credit card.');
+      }
+    } catch (error) {
+      console.error('Error adding credit card:', error);
+      Alert.alert('Error', 'Failed to add credit card. Please try again.');
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const formatDate = (date: Date) => {
@@ -314,6 +420,13 @@ const CreatorPaymentsPage: React.FC = () => {
           style={styles.scrollContainer} 
           contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[Color.cSK430B92500]}
+            />
+          }
         >
           {/* Overview Tab */}
           {activeTab === 'overview' && (
@@ -395,47 +508,80 @@ const CreatorPaymentsPage: React.FC = () => {
           {/* Payment Methods Tab */}
           {activeTab === 'methods' && (
             <View style={styles.tabContent}>
-              {paymentMethods.map(method => (
-                <View key={method.id} style={styles.methodCard}>
-                  <View style={styles.methodIcon}>
-                    <Text style={styles.methodEmoji}>{method.icon}</Text>
-                  </View>
-                  
-                  <View style={styles.methodInfo}>
-                    <Text style={styles.methodName}>{method.name}</Text>
-                    {method.email && <Text style={styles.methodDetail}>{method.email}</Text>}
-                    {method.isDefault && (
-                      <View style={styles.defaultBadge}>
-                        <Text style={styles.defaultText}>Default</Text>
-                      </View>
-                    )}
-                  </View>
-                  
-                  <View style={styles.methodActions}>
-                    {!method.isDefault && (
-                      <TouchableOpacity 
-                        style={styles.methodAction}
-                        onPress={() => handleSetDefault(method)}
-                      >
-                        <Text style={styles.methodActionText}>Set Default</Text>
-                      </TouchableOpacity>
-                    )}
-                    <TouchableOpacity 
-                      style={styles.methodAction}
-                      onPress={() => handleRemoveMethod(method)}
-                    >
-                      <Text style={[styles.methodActionText, styles.removeText]}>Remove</Text>
-                    </TouchableOpacity>
-                  </View>
+              {loadingMethods ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color={Color.cSK430B92500} />
+                  <Text style={styles.loadingText}>Loading payment methods...</Text>
                 </View>
-              ))}
+              ) : (
+                <>
+                  {paymentMethods.map(method => (
+                    <View key={method.id} style={styles.methodCard}>
+                      <View style={styles.methodIcon}>
+                        <Text style={styles.methodEmoji}>{method.icon}</Text>
+                      </View>
+                      
+                      <View style={styles.methodInfo}>
+                        <Text style={styles.methodName}>{method.name}</Text>
+                        {method.email && <Text style={styles.methodDetail}>{method.email}</Text>}
+                        {method.isDefault && (
+                          <View style={styles.defaultBadge}>
+                            <Text style={styles.defaultText}>Default</Text>
+                          </View>
+                        )}
+                      </View>
+                      
+                      <View style={styles.methodActions}>
+                        {!method.isDefault && (
+                          <TouchableOpacity 
+                            style={styles.methodAction}
+                            onPress={() => handleSetDefault(method)}
+                            disabled={actionLoading === method.id}
+                          >
+                            {actionLoading === method.id ? (
+                              <ActivityIndicator size="small" color={Color.cSK430B92500} />
+                            ) : (
+                              <Text style={styles.methodActionText}>Set Default</Text>
+                            )}
+                          </TouchableOpacity>
+                        )}
+                        <TouchableOpacity 
+                          style={styles.methodAction}
+                          onPress={() => handleRemoveMethod(method)}
+                          disabled={actionLoading === method.id}
+                        >
+                          {actionLoading === method.id ? (
+                            <ActivityIndicator size="small" color="#EF4444" />
+                          ) : (
+                            <Text style={[styles.methodActionText, styles.removeText]}>Remove</Text>
+                          )}
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+
+                  {paymentMethods.length === 0 && !loadingMethods && (
+                    <View style={styles.emptyState}>
+                      <Text style={styles.emptyStateText}>No payment methods added</Text>
+                      <Text style={styles.emptyStateSubtext}>Add a payment method to receive payments</Text>
+                    </View>
+                  )}
+                </>
+              )}
 
               <TouchableOpacity 
                 style={styles.addMethodButton}
                 onPress={() => setShowAddMethod(true)}
+                disabled={actionLoading === 'adding-card'}
               >
-                <Text style={styles.addMethodIcon}>+</Text>
-                <Text style={styles.addMethodText}>Add Payment Method</Text>
+                {actionLoading === 'adding-card' ? (
+                  <ActivityIndicator size="small" color={Color.cSK430B92500} />
+                ) : (
+                  <>
+                    <Text style={styles.addMethodIcon}>+</Text>
+                    <Text style={styles.addMethodText}>Add Payment Method</Text>
+                  </>
+                )}
               </TouchableOpacity>
 
               {showAddMethod && (
@@ -553,6 +699,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#666',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyStateText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 4,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
   },
   header: {
     flexDirection: 'row',

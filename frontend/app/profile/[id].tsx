@@ -14,6 +14,7 @@ import {
   Modal,
 } from 'react-native';
 import { Image } from 'expo-image';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
@@ -26,8 +27,6 @@ import { DemoData } from '@/demo/DemoData';
 import { DEMO_MODE } from '@/demo/DemoMode';
 import { DemoOfferFlow } from '@/components/DemoOfferFlow';
 import { AvatarWithFallback } from '@/components/AvatarWithFallback';
-import BrandsetBanner from '@/components/Brandset/BrandsetBanner';
-import RealTimeMetrics from '@/components/Metrics/RealTimeMetrics';
 import QRGenerator from '@/components/QR/QRGenerator';
 import DesignSystem from '@/styles/DesignSystem';
 import { getPlatformIcon } from '@/constants/platforms';
@@ -65,7 +64,6 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isOfferModalVisible, setIsOfferModalVisible] = useState(false);
   const [showQRCode, setShowQRCode] = useState(false);
-  const [showMetrics, setShowMetrics] = useState(true);
 
   // Find creator from demo data
   const creator = useMemo(() => {
@@ -254,23 +252,40 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
         return (
           <View style={styles.tabContent}>
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>About</Text>
-              <Text style={styles.bioText}>{creator.bio}</Text>
-              
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Location</Text>
-                <Text style={styles.infoValue}>{creator.location}</Text>
+              <Text style={styles.sectionTitle}>Social Media Platforms</Text>
+              <View style={styles.socialPlatformsGrid}>
+                {creator.creatorData?.platforms?.map((platform, index) => (
+                  <TouchableOpacity key={index} style={styles.socialPlatformCard}>
+                    <View style={styles.socialPlatformIcon}>
+                      <Image 
+                        source={getPlatformIcon(platform.platform)} 
+                        style={styles.largePlatformIcon}
+                        accessibilityLabel={`${platform.platform} platform icon`}
+                      />
+                    </View>
+                    <View style={styles.socialPlatformInfo}>
+                      <Text style={styles.socialPlatformHandle}>{platform.handle}</Text>
+                      <Text style={styles.socialPlatformFollowers}>
+                        {formatNumber(platform.followersCount || 0)} followers
+                      </Text>
+                    </View>
+                    <View style={styles.socialPlatformEngagement}>
+                      <Text style={styles.engagementRate}>
+                        {typeof platform.engagement === 'number' && !isNaN(platform.engagement) 
+                          ? `${platform.engagement.toFixed(1)}%`
+                          : 'N/A'
+                        }
+                      </Text>
+                      <Text style={styles.engagementLabel}>engagement</Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
               </View>
-              
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Response Time</Text>
-                <Text style={styles.infoValue}>{creator.responseTime}</Text>
-              </View>
-              
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Member Since</Text>
-                <Text style={styles.infoValue}>{creator.joinedDate?.toLocaleDateString()}</Text>
-              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Response Time</Text>
+              <Text style={styles.infoValue}>{creator.responseTime}</Text>
             </View>
 
             <View style={styles.section}>
@@ -285,36 +300,13 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Platform Stats</Text>
-              {creator.creatorData?.platforms?.map((platform, index) => (
-                <View key={index} style={styles.platformRow}>
-                  <View style={styles.platformInfo}>
-                    <Image 
-                      source={getPlatformIcon(platform.platform)} 
-                      style={styles.platformIcon}
-                      alt={`${platform.platform} icon`}
-                      accessibilityLabel={`${platform.platform} platform icon`}
-                    />
-                    <View>
-                      <Text style={styles.platformName}>
-                        {platform.platform.charAt(0).toUpperCase() + platform.platform.slice(1)}
-                      </Text>
-                      <Text style={styles.platformHandle}>{platform.handle}</Text>
-                    </View>
-                  </View>
-                  <View style={styles.platformStats}>
-                    <Text style={styles.followersText}>
-                      {formatNumber(platform.followersCount || 0)}
-                    </Text>
-                    <Text style={styles.engagementText}>
-                      {typeof platform.engagement === 'number' && !isNaN(platform.engagement) 
-                        ? `${platform.engagement.toFixed(1)}% engagement`
-                        : 'N/A engagement'
-                      }
-                    </Text>
-                  </View>
-                </View>
-              ))}
+              <Text style={styles.sectionTitle}>Languages</Text>
+              <Text style={styles.infoValue}>English, Spanish</Text>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Working Hours</Text>
+              <Text style={styles.infoValue}>Mon-Fri 9AM-6PM EST</Text>
             </View>
           </View>
         );
@@ -389,15 +381,11 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                       <Image 
                         source={getPlatformIcon(platform.platform)} 
                         style={styles.rateIcon}
-                        alt={`${platform.platform} icon`}
                         accessibilityLabel={`${platform.platform} platform icon`}
                       />
                       <View>
                         <Text style={styles.ratePlatform}>
-                          {platform.platform.charAt(0).toUpperCase() + platform.platform.slice(1)} Post
-                        </Text>
-                        <Text style={styles.rateFollowers}>
-                          {formatNumber(platform.followersCount || 0)} followers
+                          {platform.platform} Post Rate
                         </Text>
                       </View>
                     </View>
@@ -455,7 +443,6 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
               <Image 
                 source={isFavorited ? HeartFilled : Heart} 
                 style={styles.actionIcon}
-                alt={isFavorited ? "Remove from favorites" : "Add to favorites"}
                 accessibilityLabel={isFavorited ? "Remove from favorites" : "Add to favorites"}
               />
             </TouchableOpacity>
@@ -474,7 +461,6 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
               <Image 
                 source={Share} 
                 style={styles.actionIcon}
-                alt="Share profile"
                 accessibilityLabel="Share profile"
               />
             </TouchableOpacity>
@@ -486,124 +472,94 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
           contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
           showsVerticalScrollIndicator={false}
         >
-          {/* Brandset Banner */}
-          <BrandsetBanner
-            brands={[
-              {
-                id: '1',
-                name: 'Nike',
-                color: '#111111',
-                sponsorshipType: 'premium',
-                ctaText: 'Send Offer Now',
-                ctaAction: () => setIsOfferModalVisible(true),
-              },
-              {
-                id: '2',
-                name: 'Adidas',
-                color: '#000000',
-                sponsorshipType: 'featured',
-                ctaText: 'Collaborate',
-                ctaAction: () => setIsOfferModalVisible(true),
-              },
-            ]}
-            creatorId={creator._id}
-            onBrandClick={(brand) => console.log('Brand clicked:', brand)}
-          />
+          {/* Container for absolute positioning */}
+          <View style={styles.contentContainer}>
+            {/* Modern Cover + Profile Section */}
+            <View style={styles.coverSection}>
+              <Image
+                source={{ uri: 'https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=1200&h=400&fit=crop' }}
+                style={styles.coverImage}
+                contentFit="cover"
+              />
+              <LinearGradient
+                colors={['rgba(0,0,0,0.3)', 'rgba(0,0,0,0.5)']}
+                style={styles.coverGradient}
+              />
+            </View>
 
-          {/* Real-Time Metrics */}
-          {showMetrics && (
-            <RealTimeMetrics
-              creatorId={creator._id}
-              initialData={{
-                networkValue: totalFollowers,
-                brandValue: Math.round(totalFollowers * 0.05),
-                appInfluence: !isNaN(avgEngagement) && isFinite(avgEngagement) ? avgEngagement * 10 : 0,
-                reachScore: !isNaN(avgEngagement) && isFinite(avgEngagement) 
-                  ? Math.round(totalFollowers * avgEngagement / 100) 
-                  : Math.round(totalFollowers * 0.087), // Default to 8.7% engagement
-                engagementTrend: 'up',
-                lastUpdated: new Date(),
-              }}
-              onMetricClick={(metric) => console.log('Metric clicked:', metric)}
-            />
-          )}
+            {/* Profile Avatar - Now inside content so it scrolls properly */}
+            <View style={styles.avatarContainer}>
+              <AvatarWithFallback 
+                source={creator.avatarUrl}
+                name={creator.name}
+                size={120}
+              />
+              {creator.verified && (
+                <View style={styles.verifiedBadge}>
+                  <MaterialIcons name="verified" size={24} color={BrandColors.primary[500]} />
+                </View>
+              )}
+            </View>
 
-          {/* Profile Hero */}
-          <View style={styles.heroSection}>
-            <AvatarWithFallback 
-              source={creator.avatarUrl}
-              name={creator.name}
-              size={120}
-            />
-            
-            <View style={styles.profileInfo}>
-              <View style={styles.nameRow}>
-                <Text style={styles.creatorName}>{creator.name}</Text>
-                {creator.verified && (
-                  <CheckBadge 
-                    width={20} 
-                    height={20} 
-                    accessibilityLabel="Verified creator"
-                    accessibilityRole="image" 
-                  />
-                )}
-              </View>
-              
+          {/* Profile Info */}
+          <View style={styles.profileInfoSection}>
+            <View style={styles.nameSection}>
+              <Text style={styles.fullName}>{creator.name}</Text>
               <Text style={styles.username}>{creator.userName}</Text>
-              
-              <View style={[styles.statsRow, isMobileScreen && styles.statsRowMobile]}>
-                <View 
-                  style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
-                  accessible={true}
-                  accessibilityLabel={`Total followers: ${formatNumber(totalFollowers)}`}
-                  accessibilityHint="Combined follower count across all social media platforms"
-                >
-                  <Text style={styles.statNumber}>{formatNumber(totalFollowers)}</Text>
-                  <Text style={styles.statLabel}>Total Followers</Text>
-                </View>
-                
-                <View 
-                  style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
-                  accessible={true}
-                  accessibilityLabel={`Average engagement rate: ${!isNaN(avgEngagement) ? avgEngagement.toFixed(1) : '0'} percent`}
-                  accessibilityHint="Average percentage of followers who interact with posts"
-                >
-                  <Text style={styles.statNumber}>
-                    {!isNaN(avgEngagement) && isFinite(avgEngagement) 
-                      ? `${avgEngagement.toFixed(1)}%` 
-                      : '0.0%'
-                    }
-                  </Text>
-                  <Text style={styles.statLabel}>Avg Engagement</Text>
-                </View>
-                
-                <View 
-                  style={[styles.statItem, isMobileScreen && styles.statItemMobile]}
-                  accessible={true}
-                  accessibilityLabel={`Rating: ${typeof creator.rating === 'number' && !isNaN(creator.rating) ? creator.rating.toFixed(1) : '0.0'} out of 5 stars`}
-                  accessibilityHint="Average rating from completed collaborations"
-                >
-                  <Text style={styles.statNumber}>
-                    {typeof creator.rating === 'number' && !isNaN(creator.rating) && isFinite(creator.rating)
-                      ? `${creator.rating.toFixed(1)}/5`
-                      : '0.0/5'
-                    }
-                  </Text>
-                  <Text style={styles.statLabel}>Rating</Text>
-                </View>
+            </View>
+            
+            {creator.bio && (
+              <Text style={styles.bio}>{creator.bio}</Text>
+            )}
+            
+            <View style={styles.metaInfo}>
+              <View style={styles.metaItem}>
+                <MaterialIcons name="location-on" size={16} color={BrandColors.neutral[500]} />
+                <Text style={styles.metaText}>{creator.location}</Text>
               </View>
-
-              {/* Categories */}
-              <View style={styles.categoriesContainer}>
-                {creator.creatorData?.categories?.map((category, index) => (
-                  <View key={index} style={styles.categoryChip}>
-                    <Text style={styles.categoryText}>{category}</Text>
-                  </View>
-                ))}
+              <View style={styles.metaItem}>
+                <MaterialIcons name="calendar-today" size={16} color={BrandColors.neutral[500]} />
+                <Text style={styles.metaText}>Joined {creator.joinedDate?.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</Text>
               </View>
+            </View>
 
-              {/* Enhanced Action Buttons with Connect/Share/Verify */}
-              <View style={styles.actionButtonsContainer}>
+            {/* Social Stats */}
+            <View style={styles.socialStats}>
+              <View style={styles.socialStatItem}>
+                <Text style={styles.socialStatValue}>{formatNumber(totalFollowers)}</Text>
+                <Text style={styles.socialStatLabel}>Followers</Text>
+              </View>
+              <View style={styles.socialStatDivider} />
+              <View style={styles.socialStatItem}>
+                <Text style={styles.socialStatValue}>
+                  {!isNaN(avgEngagement) && isFinite(avgEngagement) ? `${avgEngagement.toFixed(1)}%` : '0.0%'}
+                </Text>
+                <Text style={styles.socialStatLabel}>Engagement</Text>
+              </View>
+              <View style={styles.socialStatDivider} />
+              <View style={styles.socialStatItem}>
+                <Text style={styles.socialStatValue}>
+                  {typeof creator.rating === 'number' && !isNaN(creator.rating) && isFinite(creator.rating)
+                    ? `${creator.rating.toFixed(1)}/5`
+                    : '0.0/5'
+                  }
+                </Text>
+                <Text style={styles.socialStatLabel}>Rating</Text>
+              </View>
+            </View>
+
+            {/* Categories */}
+            <View style={styles.categoriesContainer}>
+              {creator.creatorData?.categories?.map((category, index) => (
+                <View key={index} style={styles.categoryChip}>
+                  <Text style={styles.categoryText}>{category}</Text>
+                </View>
+              ))}
+            </View>
+
+
+            {/* Action Buttons - Connect, Contact, Create Offer */}
+            <View style={styles.actionButtonsContainer}>
                 <View style={styles.primaryActionButtons}>
                   <TouchableOpacity 
                     style={[styles.primaryActionButton, styles.connectButton]}
@@ -611,16 +567,6 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                   >
                     <MaterialIcons name="qr-code" size={20} color="#fff" />
                     <Text style={styles.primaryActionText}>Connect</Text>
-                  </TouchableOpacity>
-
-                  <TouchableOpacity 
-                    style={[styles.primaryActionButton, styles.verifyButton]}
-                    onPress={() => {
-                      Alert.alert('Verification', `${creator.name} is a verified creator with authentic metrics`);
-                    }}
-                  >
-                    <MaterialIcons name="verified" size={20} color="#fff" />
-                    <Text style={styles.primaryActionText}>Verify</Text>
                   </TouchableOpacity>
                 </View>
 
@@ -657,7 +603,6 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                     height={20} 
                     accessibilityLabel="Send message icon"
                     accessibilityRole="image"
-                    aria-label="Send message icon"
                   />
                   <Text style={styles.contactText}>Contact</Text>
                 </TouchableOpacity>
@@ -682,7 +627,6 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                   </Text>
                 </TouchableOpacity>
               </View>
-              </View>
             </View>
           </View>
 
@@ -694,12 +638,14 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
             accessibilityLabel="Profile navigation tabs"
           >
             {['about', 'portfolio', 'rates'].map((tab, index) => (
-              <TouchableOpacity
+              <Pressable
                 key={tab}
-                style={({ focused }) => [
+                style={({ pressed, hovered }) => [
                   styles.tabButton, 
                   activeTab === tab && styles.activeTabButton,
-                  focused && styles.tabButtonFocused
+                  pressed && styles.tabButtonPressed,
+                  hovered && Platform.OS === 'web' && styles.tabButtonHovered,
+                  hovered && activeTab !== tab && Platform.OS === 'web' && styles.tabButtonHoveredInactive
                 ]}
                 onPress={() => setActiveTab(tab as any)}
                 accessible={true}
@@ -707,17 +653,26 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                 accessibilityState={{ selected: activeTab === tab }}
                 accessibilityLabel={`${tab.charAt(0).toUpperCase() + tab.slice(1)} tab`}
                 accessibilityHint={`Shows ${tab} information for ${creator.name}`}
-                tabIndex={activeTab === tab ? 0 : -1} // Proper tab navigation
+                tabIndex={activeTab === tab ? 0 : -1}
               >
-                <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </Text>
-              </TouchableOpacity>
+                <View style={styles.tabContentInner}>
+                  <MaterialIcons 
+                    name={tab === 'about' ? 'info-outline' : tab === 'portfolio' ? 'work-outline' : 'attach-money'} 
+                    size={18} 
+                    color={activeTab === tab ? BrandColors.primary[600] : BrandColors.neutral[600]}
+                    style={styles.tabIcon}
+                  />
+                  <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
+                  </Text>
+                </View>
+              </Pressable>
             ))}
           </View>
 
-          {/* Tab Content */}
-          {renderTabContent()}
+            {/* Tab Content */}
+            {renderTabContent()}
+          </View>
         </ScrollView>
 
         {/* Contact Modal - Simple HTML for web */}
@@ -860,87 +815,195 @@ const styles = StyleSheet.create({
   scrollContainer: {
     flex: 1,
   },
-  heroSection: {
-    alignItems: 'center',
-    paddingTop: 30,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
+  contentContainer: {
+    position: 'relative',
   },
-  profileImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 16,
+  coverSection: {
+    position: 'relative',
+    height: 200,
+    backgroundColor: BrandColors.neutral[200],
   },
-  profileInfo: {
-    alignItems: 'center',
+  coverImage: {
     width: '100%',
+    height: '100%',
   },
-  nameRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 4,
+  coverGradient: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: 16,
   },
-  creatorName: {
-    fontSize: 24,
+  avatarContainer: {
+    marginTop: -60,  // Overlap with the cover image
+    marginLeft: 24,
+    marginBottom: 16,
+    zIndex: 10,
+    elevation: 10,  // For Android
+  },
+  verifiedBadge: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: BrandColors.neutral[0],
+    borderRadius: 12,
+    padding: 2,
+  },
+  profileInfoSection: {
+    position: 'relative',
+    padding: 24,
+    paddingTop: 70,
+    backgroundColor: BrandColors.neutral[0],
+    borderBottomWidth: 1,
+    borderBottomColor: BrandColors.neutral[100],
+  },
+  nameSection: {
+    marginBottom: 12,
+  },
+  fullName: {
+    fontSize: 28,
     fontWeight: 'bold',
-    color: Color.cSK430B92950,
+    color: BrandColors.neutral[900],
+    marginBottom: 4,
   },
   username: {
     fontSize: 16,
-    color: '#666',
-    marginBottom: 20,
+    color: BrandColors.neutral[600],
+    marginBottom: 12,
   },
-  statsRow: {
+  bio: {
+    fontSize: 16,
+    lineHeight: 24,
+    color: BrandColors.neutral[700],
+    marginBottom: 16,
+  },
+  metaInfo: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    gap: 40, // Default desktop gap
-    marginBottom: 20,
     flexWrap: 'wrap',
-    paddingHorizontal: 0, // Default desktop padding
+    gap: 16,
+    marginBottom: 20,
   },
-  statsRowMobile: {
-    gap: 20, // Mobile gap
-    paddingHorizontal: 10, // Mobile padding
-  },
-  statItem: {
+  metaItem: {
+    flexDirection: 'row',
     alignItems: 'center',
-    minWidth: 100, // Default desktop width
+    gap: 6,
+  },
+  metaText: {
+    fontSize: 14,
+    color: BrandColors.neutral[600],
+  },
+  socialStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: 20,
+    marginBottom: 20,
+    backgroundColor: BrandColors.neutral[50],
+    borderRadius: 12,
+  },
+  socialStatItem: {
+    alignItems: 'center',
     flex: 1,
-    maxWidth: 140, // Default desktop max width
   },
-  statItemMobile: {
-    minWidth: 80, // Mobile width
-    maxWidth: 120, // Mobile max width
-  },
-  statNumber: {
-    fontSize: 20,
+  socialStatValue: {
+    fontSize: 24,
     fontWeight: 'bold',
-    color: Color.cSK430B92500,
+    color: BrandColors.neutral[900],
+    marginBottom: 4,
   },
-  statLabel: {
+  socialStatLabel: {
     fontSize: 12,
-    color: '#666',
-    marginTop: 2,
+    color: BrandColors.neutral[500],
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  socialStatDivider: {
+    width: 1,
+    backgroundColor: BrandColors.neutral[200],
+    marginVertical: 8,
   },
   categoriesContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
     marginBottom: 24,
-    justifyContent: 'center',
   },
   categoryChip: {
-    backgroundColor: '#e6d5ff',
+    backgroundColor: BrandColors.primary[100],
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 16,
   },
   categoryText: {
     fontSize: 12,
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[700],
     fontWeight: '500',
+  },
+  socialPlatformsSection: {
+    marginTop: 24,
+  },
+  socialPlatformsGrid: {
+    gap: 12,
+  },
+  socialPlatformCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: BrandColors.neutral[0],
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: BrandColors.neutral[200],
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  socialPlatformIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: BrandColors.neutral[50],
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  largePlatformIcon: {
+    width: 40,
+    height: 40,
+  },
+  socialPlatformInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  socialPlatformName: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: BrandColors.neutral[900],
+  },
+  socialPlatformHandle: {
+    fontSize: 14,
+    color: BrandColors.primary[600],
+    fontWeight: '500',
+  },
+  socialPlatformFollowers: {
+    fontSize: 14,
+    color: BrandColors.neutral[600],
+  },
+  socialPlatformEngagement: {
+    alignItems: 'flex-end',
+  },
+  engagementRate: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: BrandColors.semantic.success,
+  },
+  engagementLabel: {
+    fontSize: 12,
+    color: BrandColors.neutral[500],
   },
   actionButtons: {
     flexDirection: 'row',
@@ -994,41 +1057,79 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-    marginTop: 20,
-    paddingHorizontal: 4, // Add horizontal padding to prevent edge concatenation
-    gap: 4, // Add gap between tabs for modern browsers
+    backgroundColor: BrandColors.neutral[50],
+    marginTop: 24,
+    marginHorizontal: 16,
+    padding: 4,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+    gap: 4,
   },
   tabButton: {
     flex: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 16, // Increased horizontal padding for better spacing
+    paddingVertical: 12,
+    paddingHorizontal: 16,
     alignItems: 'center',
-    marginHorizontal: 8, // Increased margin between tabs to prevent concatenation
-    minWidth: 90, // Increased minimum width for better layout
-    borderRadius: 8, // Add border radius for better visual separation
+    justifyContent: 'center',
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+    minWidth: 90,
+    ...(Platform.OS === 'web' && {
+      transition: 'all 0.2s ease-in-out',
+      cursor: 'pointer',
+    }),
   },
   activeTabButton: {
-    borderBottomWidth: 2,
-    borderBottomColor: Color.cSK430B92500,
+    backgroundColor: BrandColors.neutral[0],
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 1,
   },
   tabButtonFocused: {
     ...Focus.primary,
     borderRadius: 8,
   },
   tabText: {
-    fontSize: 16,
-    color: '#666',
+    fontSize: 15,
+    color: BrandColors.neutral[600],
     textAlign: 'center',
-    letterSpacing: 0.8, // Increased letter spacing for better readability and separation
     fontWeight: '500',
-    lineHeight: 20, // Add line height for better vertical spacing
-    paddingHorizontal: 4, // Add horizontal padding to prevent text truncation
+    letterSpacing: 0.3,
+    fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
+    ...(Platform.OS === 'web' && {
+      transition: 'color 0.2s ease-in-out',
+    }),
   },
   activeTabText: {
-    color: Color.cSK430B92500,
+    color: BrandColors.primary[600],
     fontWeight: '600',
+  },
+  tabButtonPressed: {
+    opacity: 0.8,
+    transform: [{ scale: 0.98 }],
+  },
+  tabButtonHovered: {
+    backgroundColor: BrandColors.neutral[100],
+  },
+  tabButtonHoveredInactive: {
+    backgroundColor: BrandColors.neutral[100],
+  },
+  tabContentInner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabIcon: {
+    marginRight: 6,
+    ...(Platform.OS === 'web' && {
+      transition: 'color 0.2s ease-in-out',
+    }),
   },
   tabContent: {
     paddingHorizontal: 20,
@@ -1246,9 +1347,6 @@ const styles = StyleSheet.create({
   },
   connectButton: {
     backgroundColor: BrandColors.primary[400],
-  },
-  verifyButton: {
-    backgroundColor: BrandColors.semantic.success,
   },
   primaryActionText: {
     color: '#fff',

@@ -219,7 +219,7 @@ const CounterOfferPage: React.FC = () => {
     return true;
   };
 
-  const handleSubmitCounterOffer = () => {
+  const handleSubmitCounterOffer = async () => {
     if (!validateCounterOffer()) return;
     
     const amountDiff = parseFloat(counterData.amount) - originalOffer.amount;
@@ -241,25 +241,55 @@ const CounterOfferPage: React.FC = () => {
         { 
           text: 'Send Counter Offer', 
           onPress: async () => {
-            // Send notification to marketer (NOTIFY_M)
-            await notificationService.notifyMarketer('sarah-001', {
-              type: 'offer',
-              title: 'New Counter Offer Received',
-              message: `${user?.name || 'Creator'} sent a counter offer for ${originalOffer.offerType} - $${counterData.amount}`,
-              actionType: 'view_counter',
-              actionParams: { counterId: `counter-${Date.now()}`, offerId: originalOffer.id }
-            });
-            
-            Alert.alert(
-              'Counter Offer Sent!',
-              'Your counter offer has been sent to the marketer. They will review and respond within 24-48 hours. You\'ll receive a notification when they respond.',
-              [
-                { 
-                  text: 'Back to Deals', 
-                  onPress: () => router.replace('/(tabs)/deals')
-                }
-              ]
-            );
+            try {
+              // Create counter offer via API
+              const response = await fetch('/api/negotiation/counter-offer', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${user?.token || ''}`,
+                },
+                body: JSON.stringify({
+                  dealId: originalOffer.id,
+                  offerAmount: parseFloat(counterData.amount),
+                  terms: {
+                    deliveryDays: parseInt(counterData.deliveryDays),
+                    deliverables: counterData.adjustedDeliverables.filter(d => d.trim()),
+                    additionalRequirements: counterData.additionalRequirements
+                  },
+                  message: counterData.counterMessage
+                }),
+              });
+
+              const result = await response.json();
+
+              if (result.success) {
+                // Send notification to marketer (NOTIFY_M)
+                await notificationService.notifyMarketer('sarah-001', {
+                  type: 'offer',
+                  title: 'New Counter Offer Received',
+                  message: `${user?.name || 'Creator'} sent a counter offer for ${originalOffer.offerType} - $${counterData.amount}`,
+                  actionType: 'view_counter',
+                  actionParams: { counterId: result.data.counterOffer.id, offerId: originalOffer.id }
+                });
+                
+                Alert.alert(
+                  'Counter Offer Sent!',
+                  'Your counter offer has been sent to the marketer. They will review and respond within 24-48 hours. You\'ll receive a notification when they respond.',
+                  [
+                    { 
+                      text: 'Back to Deals', 
+                      onPress: () => router.replace('/(tabs)/deals')
+                    }
+                  ]
+                );
+              } else {
+                Alert.alert('Error', result.message || 'Failed to send counter offer. Please try again.');
+              }
+            } catch (error) {
+              console.error('Error submitting counter offer:', error);
+              Alert.alert('Error', 'Failed to send counter offer. Please check your connection and try again.');
+            }
           }
         }
       ]
