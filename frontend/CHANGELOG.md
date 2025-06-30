@@ -45,5 +45,30 @@ All notable changes to this project will be documented in this file.
   - Password: Individual requirement checking, strength scoring, user-friendly feedback
 - **Impact**: More robust validation with better user experience
 
+#### Deployment Scripts Consolidation
+- **Removed**: 16 duplicate deployment scripts:
+  - `auto-deploy.js`, `auto-netlify-deploy.js`
+  - `deploy.sh`, `deploy-axees.sh`, `deploy-simple.sh`
+  - `deploy-both-versions.sh`, `deploy-dual-correct.sh`, `deploy-final-dual.js`, `deploy-simple-dual.js`
+  - `deploy-to-specific-site.js`, `deploy-via-api.sh`, `deploy-with-token.js`
+  - `direct-deploy.js`, `direct-netlify-upload.js`, `force-netlify-deploy.js`
+  - `simple-deploy.js`
+- **Canonical**: `scripts/deployment/unified-deploy.js`
+- **Enhancement**: Added automatic loading of `.env.local` and `.env` files for authentication
+- **Benefits**:
+  - Single deployment entry point with all functionality
+  - Simplified authentication via `.env.local` (gitignored)
+  - Consistent deployment behavior across all environments
+  - Reduced maintenance burden (2000+ lines removed)
+- **New Workflow**:
+  1. Add `NETLIFY_AUTH_TOKEN=your-token` to `.env.local`
+  2. Run `npm run deploy`
+
 ### Summary
-This consolidation effort removed 4 duplicate implementations, reducing the codebase by approximately 300 lines while improving consistency and maintainability. All changes were tested to ensure no regressions were introduced.
+This consolidation effort removed 5 major duplicate implementations:
+- 4 code duplicates (performance, date formatting, validation, backups)
+- 16 deployment scripts consolidated into one
+- Total reduction: ~2,300 lines of code
+- Improved consistency, maintainability, and developer experience
+
+All changes were tested to ensure no regressions were introduced.
