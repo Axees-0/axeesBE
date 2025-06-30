@@ -16,6 +16,7 @@ import { Color, Focus } from '@/GlobalStyles';
 import { WebSEO } from '../web-seo';
 import { useAuth } from '@/contexts/AuthContext';
 import DesignSystem from '@/styles/DesignSystem';
+import { formatNotificationTime } from '@/utils/dateFormatters';
 
 interface Notification {
   id: string;
@@ -104,25 +105,6 @@ const NotificationsPage: React.FC = () => {
     }
   };
 
-  const formatTimestamp = (date: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-
-    if (diffMins < 60) {
-      return `${diffMins}m ago`;
-    } else if (diffHours < 24) {
-      return `${diffHours}h ago`;
-    } else if (diffDays === 1) {
-      return 'Yesterday';
-    } else if (diffDays < 7) {
-      return `${diffDays}d ago`;
-    } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
-  };
 
   const getDateGroup = (date: Date): string => {
     const now = new Date();
@@ -342,7 +324,7 @@ const NotificationsPage: React.FC = () => {
                       ]} numberOfLines={width <= 375 ? undefined : 2}>
                         {notification.message}
                       </Text>
-                      <Text style={styles.timestamp}>{formatTimestamp(notification.timestamp)}</Text>
+                      <Text style={styles.timestamp}>{formatNotificationTime(notification.timestamp)}</Text>
                     </View>
                     
                     {!notification.read && (
