@@ -1,7 +1,3 @@
-export function validateEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
 
 export function validatePhoneNumber(phone: string): boolean {
   // Basic phone validation - can be adjusted based on requirements
@@ -43,11 +39,6 @@ export function sanitizeInput(input: string): string {
   return input.trim().replace(/[<>]/g, '');
 }
 
-export function isStrongPassword(password: string): boolean {
-  // At least 8 characters, one uppercase, one lowercase, one number, one special character
-  const strongPasswordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
-  return strongPasswordRegex.test(password);
-}
 
 export function formatErrorMessage(error: any): string {
   if (typeof error === 'string') return error;
