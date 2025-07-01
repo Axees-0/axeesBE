@@ -28,6 +28,7 @@ if (Platform.OS !== "web") {
   showNotification = require("@/NotificationController").showNotification;
 }
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
+import { DiscoveryFilterProvider } from "@/contexts/DiscoveryFilterContext";
 import { useSegments } from "expo-router";
 import { WebFeatures } from "./web-features";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -168,26 +169,28 @@ export default function RootLayout() {
           <ThemeProvider
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
           >
-            <WebFeatures>
-              <Stack screenOptions={{ headerShown: false }}>
-                <Stack.Screen name="(tabs)" />
-                <Stack.Screen name="login" />
-                <Stack.Screen name="register" />
-                <Stack.Screen name="register-details" />
-                <Stack.Screen name="register-success" />
-                <Stack.Screen name="profile/[id]" />
-                <Stack.Screen name="offers" />
-                <Stack.Screen name="deals/[id]" />
-                <Stack.Screen name="deals/submit" />
-                <Stack.Screen name="deals/proof" />
-                <Stack.Screen name="chat/[id]" />
-                <Stack.Screen name="notifications/center" />
-                <Stack.Screen name="payments/marketer" />
-                <Stack.Screen name="offers/handle-counter" />
-                <Stack.Screen name="earnings" />
-              </Stack>
-              <StatusBar style="auto" />
-            </WebFeatures>
+            <DiscoveryFilterProvider>
+              <WebFeatures>
+                <Stack screenOptions={{ headerShown: false }}>
+                  <Stack.Screen name="(tabs)" />
+                  <Stack.Screen name="login" />
+                  <Stack.Screen name="register" />
+                  <Stack.Screen name="register-details" />
+                  <Stack.Screen name="register-success" />
+                  <Stack.Screen name="profile/[id]" />
+                  <Stack.Screen name="offers" />
+                  <Stack.Screen name="deals/[id]" />
+                  <Stack.Screen name="deals/submit" />
+                  <Stack.Screen name="deals/proof" />
+                  <Stack.Screen name="chat/[id]" />
+                  <Stack.Screen name="notifications/center" />
+                  <Stack.Screen name="payments/marketer" />
+                  <Stack.Screen name="offers/handle-counter" />
+                  <Stack.Screen name="earnings" />
+                </Stack>
+                <StatusBar style="auto" />
+              </WebFeatures>
+            </DiscoveryFilterProvider>
           </ThemeProvider>
         </AuthProvider>
         <Toast position="top" />

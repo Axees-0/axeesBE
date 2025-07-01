@@ -21,12 +21,7 @@ import Discoveryiconlypro from "../../assets/discovery--iconly-pro.svg";
 import Hotprice from "../../assets/hotprice.svg";
 import Message01 from "../../assets/message01.svg";
 import BellNotificationRegular from "../../assets/bell-notification.svg";
-import { MaterialIcons } from '@expo/vector-icons';
-
-// Dashboard icon component - using analytics icon for better visibility
-const DashboardIcon = ({ width = 24, height = 24 }) => (
-  <MaterialIcons name="analytics" size={Math.min(width, height)} color="#FFFFFF" />
-);
+import DashboardIcon from "../../assets/dashboard.svg";
 
 const TABS = [
   { name: "index", icon: Discoveryiconlypro, label: "Discover", route: "/" },

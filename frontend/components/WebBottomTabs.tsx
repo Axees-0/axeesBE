@@ -7,17 +7,12 @@ import Discoveryiconlypro from "../assets/discovery--iconly-pro.svg";
 import Hotprice from "../assets/hotprice.svg";
 import Message01 from "../assets/message01.svg";
 import BellNotificationRegular from "../assets/bell-notification.svg";
-import { MaterialIcons } from '@expo/vector-icons';
+import DashboardIcon from "../assets/dashboard.svg";
 import { TabButton } from "./TabButton";
 import { useWindowDimensions } from "react-native";
 import { router } from "expo-router";
 import { useUnreadMessages } from "@/hooks/messagesContext";
 // import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
-
-// Dashboard icon component - using a more distinctive icon
-const DashboardIcon = ({ width = 24, height = 24 }) => (
-  <MaterialIcons name="analytics" size={Math.min(width, height)} color="#FFFFFF" />
-);
 
 const TABS = [
   { name: "index", icon: Discoveryiconlypro, label: "Discover", route: "/" },
@@ -124,17 +119,10 @@ const WebBottomTabs = ({ activeIndex }: { activeIndex: number }) => {
           <View key={tab.name} style={styles.tabContainer}>
             <TabButton
               icon={
-                tab.name === "dashboard" ? (
-                  <DashboardIcon
-                    width={isWideScreen ? 40 : 24}
-                    height={isWideScreen ? 40 : 24}
-                  />
-                ) : (
-                  <tab.icon
-                    width={isWideScreen ? 40 : 24}
-                    height={isWideScreen ? 40 : 24}
-                  />
-                )
+                <tab.icon
+                  width={isWideScreen ? 40 : 24}
+                  height={isWideScreen ? 40 : 24}
+                />
               }
               label={tab.label}
               isActive={index === activeIndex}
