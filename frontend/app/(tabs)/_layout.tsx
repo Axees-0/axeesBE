@@ -23,9 +23,9 @@ import Message01 from "../../assets/message01.svg";
 import BellNotificationRegular from "../../assets/bell-notification.svg";
 import { MaterialIcons } from '@expo/vector-icons';
 
-// Dashboard icon component
+// Dashboard icon component - using analytics icon for better visibility
 const DashboardIcon = ({ width = 24, height = 24 }) => (
-  <MaterialIcons name="dashboard" size={Math.min(width, height)} color="#FFFFFF" />
+  <MaterialIcons name="analytics" size={Math.min(width, height)} color="#FFFFFF" />
 );
 
 const TABS = [
