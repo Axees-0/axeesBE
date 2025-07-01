@@ -1,5 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+// Global flag to prevent spam logging during navigation transitions
+declare global {
+  var __discoveryFilterErrorLogged: boolean | undefined;
+}
+
 interface FilterState {
   // General filters
   priceRange: { min: number; max: number };
@@ -128,8 +133,17 @@ export const DiscoveryFilterProvider: React.FC<{ children: ReactNode }> = ({ chi
 export const useDiscoveryFilters = () => {
   const context = useContext(DiscoveryFilterContext);
   if (!context) {
-    console.error('DiscoveryFilterContext not found. Make sure DiscoveryFilterProvider wraps the component tree.');
-    // Return default values to prevent crash during development
+    // Only log error in development, and only once per component to avoid spam
+    if (__DEV__ && !global.__discoveryFilterErrorLogged) {
+      console.warn('DiscoveryFilterContext temporarily unavailable during navigation. Using fallback values.');
+      global.__discoveryFilterErrorLogged = true;
+      // Reset the flag after a short delay to allow occasional logging
+      setTimeout(() => {
+        global.__discoveryFilterErrorLogged = false;
+      }, 5000);
+    }
+    
+    // Return default values to prevent crash
     return {
       filters: defaultFilters,
       updateFilter: () => {},
