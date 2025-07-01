@@ -258,7 +258,10 @@ function deployToNetlify(options) {
   let deployCommand = 'netlify deploy';
   if (options.prod) deployCommand += ' --prod';
   deployCommand += ` --dir=${deployDir}`;
-  if (options.site && options.site !== 'auto') {
+  
+  // Only specify site if explicitly provided and not the default
+  // Let netlify.toml handle site detection when using auth token
+  if (options.site && options.site !== 'auto' && options.site !== CONFIG.defaultSite) {
     deployCommand += ` --site=${options.site}`;
   }
 
