@@ -19,7 +19,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import CreatorDealsView from "@/components/CreatorDealsView";
 import Navbar from "@/components/web/navbar";
 import { BREAKPOINTS, isMobile, isWideScreen, isTablet, isDesktop, isUltraWide } from "@/constants/breakpoints";
-import { PerformanceUtils } from "@/utils/performance";
+import { PerformanceUtils, DemoPerformance, LayoutStability } from "@/utils/performance";
 import { WebSEO } from "../web-seo";
 import { DealSkeleton, DealMetricsSkeleton, DealActivitySkeleton } from "@/components/DealSkeleton";
 import DesignSystem from "@/styles/DesignSystem";
