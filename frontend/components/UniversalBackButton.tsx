@@ -6,13 +6,12 @@ import { BrandColors } from '@/constants/Colors';
 
 // Navigation hierarchy mapping - defines where each route should go back to
 const NAVIGATION_HIERARCHY: Record<string, string> = {
-  // Main dashboard routes go back to dashboard
-  '/analytics': '/',
-  '/campaigns': '/',
-  '/discover': '/',
-  '/payments': '/',
-  '/creative': '/',
-  '/network': '/',
+  // Main dashboard routes go back to dashboard tab
+  '/analytics': '/(tabs)/dashboard',
+  '/campaigns': '/(tabs)/dashboard',
+  '/payments': '/(tabs)/dashboard',
+  '/creative': '/(tabs)/dashboard',
+  '/network': '/(tabs)/dashboard',
   
   // Sub-routes go back to their parent
   '/campaigns/create': '/campaigns',
@@ -81,10 +80,10 @@ export const UniversalBackButton: React.FC<UniversalBackButtonProps> = ({
       return '/'; // Go to dashboard from chat
     }
     if (pathname.includes('/profile/')) {
-      return '/discover'; // Go back to discover from profile
+      return '/'; // Go back to discover tab from profile
     }
     if (pathname.includes('/channel/')) {
-      return '/discover'; // Go back to discover from channel
+      return '/'; // Go back to discover tab from channel
     }
     
     // Default fallback
