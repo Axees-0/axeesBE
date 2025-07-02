@@ -238,6 +238,40 @@ export const DemoData = {
       },
     },
     {
+      _id: 'creator-001', // Replacing Emma Thompson with Amelia Hilpert
+      name: 'Amelia Hilpert',
+      userName: 'dayana94',
+      avatarUrl: 'https://i.imghippo.com/files/ZlC5621Wbw.jpeg',
+      isActive: true,
+      userType: 'Creator',
+      bio: 'Victoria blandior totam appono acerbitas utor sequi advoco.',
+      location: 'Los Angeles, CA',
+      rating: 4.9,
+      completedDeals: 12,
+      responseTime: '1 hour',
+      joinedDate: new Date('2022-03-15'),
+      verified: true,
+      tier: 'Macro', // New field for tier
+      creatorData: {
+        totalFollowers: 3400000, // 3.4M total followers
+        platforms: [
+          { platform: 'twitter', handle: '@dayana94', followersCount: 478900, engagement: 8.9, verified: true },
+          { platform: 'instagram', handle: '@dayana94', followersCount: 1900000, engagement: 11.2 },
+          { platform: 'youtube', handle: '@dayana94', followersCount: 630500, engagement: 7.2 },
+          { platform: 'facebook', handle: 'dayana94', followersCount: 437700, engagement: 5.8 },
+        ],
+        categories: ['Racing'],
+        portfolioHighlights: ['Upgradable local capability', 'Persevering systemic knowledge user'],
+        businessVentures: ['Horizontal responsive microservice', 'Quality-focused discrete support'],
+        avgDealValue: 3200,
+        specialties: ['Racing', 'Macro Influencer', 'Brand Partnerships'],
+        listedEvents: 83,
+        combinedViews: 2600,
+        offers: 36,
+        deals: 12,
+      },
+    },
+    {
       _id: 'creator-006',
       name: 'Tyler Brooks',
       userName: '@carguytyl',

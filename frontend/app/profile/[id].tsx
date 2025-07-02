@@ -252,33 +252,32 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
         return (
           <View style={styles.tabContent}>
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Social Media Platforms</Text>
-              <View style={styles.socialPlatformsGrid}>
+              <Text style={styles.sectionTitle}>Social Links</Text>
+              <View style={[styles.socialLinksGrid, isMobileScreen && styles.socialLinksGridMobile]}>
                 {creator.creatorData?.platforms?.map((platform, index) => (
-                  <TouchableOpacity key={index} style={styles.socialPlatformCard}>
-                    <View style={styles.socialPlatformIcon}>
-                      <Image 
-                        source={getPlatformIcon(platform.platform)} 
-                        style={styles.largePlatformIcon}
-                        accessibilityLabel={`${platform.platform} platform icon`}
-                      />
+                  <View key={index} style={styles.socialLinkCard}>
+                    <View style={styles.socialLinkHeader}>
+                      <View style={styles.socialLinkIcon}>
+                        <Image 
+                          source={getPlatformIcon(platform.platform)} 
+                          style={styles.socialIcon}
+                          accessibilityLabel={`${platform.platform} platform icon`}
+                        />
+                      </View>
+                      <View style={styles.socialLinkInfo}>
+                        <Text style={styles.socialLinkHandle}>{platform.handle}</Text>
+                        <Text style={styles.socialLinkFollowers}>
+                          {formatNumber(platform.followersCount || 0)} followers
+                        </Text>
+                      </View>
+                      {platform.verified && (
+                        <MaterialIcons name="verified" size={16} color={BrandColors.primary[500]} />
+                      )}
                     </View>
-                    <View style={styles.socialPlatformInfo}>
-                      <Text style={styles.socialPlatformHandle}>{platform.handle}</Text>
-                      <Text style={styles.socialPlatformFollowers}>
-                        {formatNumber(platform.followersCount || 0)} followers
-                      </Text>
-                    </View>
-                    <View style={styles.socialPlatformEngagement}>
-                      <Text style={styles.engagementRate}>
-                        {typeof platform.engagement === 'number' && !isNaN(platform.engagement) 
-                          ? `${platform.engagement.toFixed(1)}%`
-                          : 'N/A'
-                        }
-                      </Text>
-                      <Text style={styles.engagementLabel}>engagement</Text>
-                    </View>
-                  </TouchableOpacity>
+                    <TouchableOpacity style={styles.viewButton}>
+                      <Text style={styles.viewButtonText}>View</Text>
+                    </TouchableOpacity>
+                  </View>
                 ))}
               </View>
             </View>
@@ -489,11 +488,13 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
 
             {/* Profile Avatar - Now inside content so it scrolls properly */}
             <View style={styles.avatarContainer}>
-              <AvatarWithFallback 
-                source={creator.avatarUrl}
-                name={creator.name}
-                size={120}
-              />
+              <View style={styles.avatarWrapper}>
+                <AvatarWithFallback 
+                  source={creator.avatarUrl}
+                  name={creator.name}
+                  size={125}
+                />
+              </View>
               {creator.verified && (
                 <View style={styles.verifiedBadge}>
                   <MaterialIcons name="verified" size={24} color={BrandColors.primary[500]} />
@@ -555,6 +556,53 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                   <Text style={styles.categoryText}>{category}</Text>
                 </View>
               ))}
+            </View>
+
+            {/* Tier Badge and Link */}
+            {creator.tier && (
+              <View style={styles.tierContainer}>
+                <View style={styles.tierBadge}>
+                  <Text style={styles.tierText}>{creator.tier}</Text>
+                </View>
+                <TouchableOpacity style={styles.linkButton} onPress={handleShareProfile}>
+                  <MaterialIcons name="link" size={20} color={BrandColors.primary[500]} />
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {/* Business Ventures Section */}
+            {creator.creatorData?.businessVentures && creator.creatorData.businessVentures.length > 0 && (
+              <View style={styles.businessSection}>
+                <Text style={styles.businessTitle}>Business Ventures</Text>
+                <View style={styles.businessList}>
+                  {creator.creatorData.businessVentures.map((venture, index) => (
+                    <View key={index} style={styles.businessItem}>
+                      <MaterialIcons name="business" size={16} color={BrandColors.neutral[600]} />
+                      <Text style={styles.businessText}>{venture}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            )}
+
+            {/* Stats Grid */}
+            <View style={[styles.statsGrid, isMobileScreen && styles.statsGridMobile]}>
+              <View style={[styles.statBox, isMobileScreen && styles.statBoxMobile]}>
+                <Text style={styles.statNumber}>{creator.creatorData?.listedEvents || 0}</Text>
+                <Text style={styles.statLabel}>Listed Events</Text>
+              </View>
+              <View style={[styles.statBox, isMobileScreen && styles.statBoxMobile]}>
+                <Text style={styles.statNumber}>{formatNumber(creator.creatorData?.combinedViews || 0)}</Text>
+                <Text style={styles.statLabel}>Combined Views</Text>
+              </View>
+              <View style={[styles.statBox, isMobileScreen && styles.statBoxMobile]}>
+                <Text style={styles.statNumber}>{creator.creatorData?.offers || 0}</Text>
+                <Text style={styles.statLabel}>Offers</Text>
+              </View>
+              <View style={[styles.statBox, isMobileScreen && styles.statBoxMobile]}>
+                <Text style={styles.statNumber}>{creator.creatorData?.deals || 0}</Text>
+                <Text style={styles.statLabel}>Deals</Text>
+              </View>
             </View>
 
 
@@ -628,6 +676,21 @@ const CreatorProfile: React.FC<CreatorProfileProps> = () => {
                 </TouchableOpacity>
               </View>
             </View>
+            
+            {/* Media Package Button */}
+            <TouchableOpacity 
+              style={[styles.mediaPackageButton, isMobileScreen && styles.mediaPackageButtonMobile]}
+              onPress={() => {
+                if (Platform.OS === 'web') {
+                  window.alert('Media package download feature coming soon!');
+                } else {
+                  Alert.alert('Coming Soon', 'Media package download feature coming soon!');
+                }
+              }}
+            >
+              <MaterialIcons name="file-download" size={20} color="#fff" />
+              <Text style={styles.mediaPackageText}>Media Package</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Tab Navigation */}
@@ -842,6 +905,10 @@ const styles = StyleSheet.create({
     zIndex: 10,
     elevation: 10,  // For Android
   },
+  avatarWrapper: {
+    borderRadius: 25,
+    overflow: 'hidden',
+  },
   verifiedBadge: {
     position: 'absolute',
     bottom: 0,
@@ -1004,6 +1071,30 @@ const styles = StyleSheet.create({
   engagementLabel: {
     fontSize: 12,
     color: BrandColors.neutral[500],
+  },
+  actionButtonsContainer: {
+    marginTop: 24,
+  },
+  primaryActionButtons: {
+    marginBottom: 16,
+    paddingHorizontal: 24,
+  },
+  primaryActionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+  },
+  connectButton: {
+    backgroundColor: BrandColors.primary[500],
+  },
+  primaryActionText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
   actionButtons: {
     flexDirection: 'row',
@@ -1466,6 +1557,164 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     lineHeight: 20,
+  },
+  
+  // New styles for Amelia Hilpert profile
+  tierContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 20,
+    gap: 12,
+  },
+  tierBadge: {
+    backgroundColor: BrandColors.primary[500],
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  tierText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  linkButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: BrandColors.primary[50],
+  },
+  businessSection: {
+    marginTop: 20,
+    marginBottom: 20,
+  },
+  businessTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: BrandColors.neutral[900],
+    marginBottom: 12,
+  },
+  businessList: {
+    gap: 8,
+  },
+  businessItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  businessText: {
+    fontSize: 14,
+    color: BrandColors.neutral[700],
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    marginTop: 20,
+    marginBottom: 24,
+  },
+  statBox: {
+    flex: 1,
+    minWidth: '45%',
+    backgroundColor: BrandColors.neutral[50],
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  statNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: BrandColors.primary[600],
+    marginBottom: 4,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: BrandColors.neutral[600],
+    textAlign: 'center',
+  },
+  socialLinksGrid: {
+    gap: 12,
+  },
+  socialLinkCard: {
+    backgroundColor: BrandColors.neutral[50],
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 8,
+  },
+  socialLinkHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  socialLinkIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: BrandColors.neutral[0],
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  socialIcon: {
+    width: 24,
+    height: 24,
+  },
+  socialLinkInfo: {
+    flex: 1,
+  },
+  socialLinkHandle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: BrandColors.neutral[900],
+    marginBottom: 2,
+  },
+  socialLinkFollowers: {
+    fontSize: 14,
+    color: BrandColors.neutral[600],
+  },
+  viewButton: {
+    backgroundColor: BrandColors.primary[500],
+    paddingHorizontal: 20,
+    paddingVertical: 8,
+    borderRadius: 6,
+    alignSelf: 'flex-start',
+  },
+  viewButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '600',
+  },
+  mediaPackageButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: BrandColors.neutral[900],
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: 16,
+    marginHorizontal: 24,
+  },
+  mediaPackageText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  
+  // Responsive styles
+  statsGridMobile: {
+    gap: 8,
+  },
+  statBoxMobile: {
+    minWidth: '100%',
+    marginBottom: 8,
+  },
+  socialLinksGridMobile: {
+    flexDirection: 'column',
+  },
+  mediaPackageButtonMobile: {
+    marginHorizontal: 16,
+    paddingHorizontal: 16,
   },
 });
 
