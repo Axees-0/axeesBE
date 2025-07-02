@@ -108,32 +108,6 @@ export const DemoData = {
   // High-Quality Creator Profiles - Expanded for Investor Demo
   creators: [
     {
-      _id: 'creator-001',
-      name: 'Emma Thompson',
-      userName: '@emmastyle',
-      avatarUrl: 'https://randomuser.me/api/portraits/women/1.jpg',
-      isActive: true,
-      userType: 'Creator',
-      bio: 'Fashion & Lifestyle Creator | Sustainable Fashion Advocate | Style Consultant',
-      location: 'Los Angeles, CA',
-      rating: 4.9,
-      completedDeals: 34,
-      responseTime: '1 hour',
-      joinedDate: new Date('2022-03-15'),
-      verified: true,
-      creatorData: {
-        totalFollowers: 254000,
-        platforms: [
-          { platform: 'instagram', handle: '@emmastyle', followersCount: 156000, engagement: 8.9, verified: true },
-          { platform: 'tiktok', handle: '@emmastyle', followersCount: 98000, engagement: 11.2 },
-        ],
-        categories: ['Fashion', 'Lifestyle', 'Sustainability'],
-        portfolioHighlights: ['Vogue Feature', 'NYFW 2023', 'EcoStyle Award'],
-        avgDealValue: 3200,
-        specialties: ['Sustainable Fashion', 'Style Consulting', 'Brand Partnerships'],
-      },
-    },
-    {
       _id: 'creator-002',
       name: 'Marcus Johnson',
       userName: '@techmarc',
@@ -147,6 +121,7 @@ export const DemoData = {
       responseTime: '3 hours',
       joinedDate: new Date('2021-11-22'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 279000,
         platforms: [
@@ -157,6 +132,11 @@ export const DemoData = {
         portfolioHighlights: ['CES Speaker 2023', 'Top Tech Influencer', '1M+ Monthly Views'],
         avgDealValue: 4800,
         specialties: ['Product Reviews', 'Tech Tutorials', 'Unboxing Videos'],
+        businessVentures: ['Tech consulting firm', 'Software development agency'],
+        listedEvents: 41,
+        combinedViews: 2910,
+        offers: 49,
+        deals: 24,
       },
     },
     {
@@ -173,6 +153,7 @@ export const DemoData = {
       responseTime: '30 minutes',
       joinedDate: new Date('2022-01-08'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 267000,
         platforms: [
@@ -183,6 +164,11 @@ export const DemoData = {
         portfolioHighlights: ['Nike Partnership', 'Fitness App Launch', 'TEDx Speaker'],
         avgDealValue: 2800,
         specialties: ['Workout Routines', 'Nutrition Tips', 'Wellness Coaching'],
+        businessVentures: ['Fitness app', 'Nutrition program'],
+        listedEvents: 54,
+        combinedViews: 3889,
+        offers: 24,
+        deals: 15,
       },
     },
     {
@@ -199,6 +185,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2021-09-14'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 423000,
         platforms: [
@@ -209,6 +196,11 @@ export const DemoData = {
         portfolioHighlights: ['Food Network Feature', 'Michelin Guide Contributor', 'Top Food Creator 2023'],
         avgDealValue: 3600,
         specialties: ['Recipe Creation', 'Restaurant Reviews', 'Food Photography'],
+        businessVentures: ['Restaurant partnership', 'Food product line'],
+        listedEvents: 45,
+        combinedViews: 4318,
+        offers: 32,
+        deals: 11,
       },
     },
     {
@@ -225,6 +217,7 @@ export const DemoData = {
       responseTime: '4 hours',
       joinedDate: new Date('2022-05-20'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 312000,
         platforms: [
@@ -235,10 +228,15 @@ export const DemoData = {
         portfolioHighlights: ['National Geographic Feature', 'Travel Blogger Award', '50+ Countries Visited'],
         avgDealValue: 4200,
         specialties: ['Travel Photography', 'Destination Guides', 'Adventure Content'],
+        businessVentures: ['Travel planning service', 'Tour guide business'],
+        listedEvents: 37,
+        combinedViews: 13790,
+        offers: 15,
+        deals: 14,
       },
     },
     {
-      _id: 'creator-001', // Replacing Emma Thompson with Amelia Hilpert
+      _id: 'creator-001',
       name: 'Amelia Hilpert',
       userName: 'dayana94',
       avatarUrl: 'https://i.imghippo.com/files/ZlC5621Wbw.jpeg',
@@ -285,6 +283,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2021-07-11'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 387000,
         platforms: [
@@ -295,6 +294,11 @@ export const DemoData = {
         portfolioHighlights: ['Formula Drift Partner', 'SEMA Featured Creator', 'Car & Driver Contributor'],
         avgDealValue: 5200,
         specialties: ['Car Reviews', 'Racing Content', 'Automotive News'],
+        businessVentures: ['Car accessories brand', 'Automotive content network'],
+        listedEvents: 27,
+        combinedViews: 10349,
+        offers: 27,
+        deals: 16,
       },
     },
     {
@@ -311,6 +315,7 @@ export const DemoData = {
       responseTime: '1 hour',
       joinedDate: new Date('2020-12-03'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 445000,
         platforms: [
@@ -321,6 +326,11 @@ export const DemoData = {
         portfolioHighlights: ['Sephora Partnership', 'Beauty Influencer Awards', 'Makeup Masterclass Series'],
         avgDealValue: 3800,
         specialties: ['Makeup Tutorials', 'Product Reviews', 'Skincare Routines'],
+        businessVentures: ['Cosmetics line', 'Skincare brand'],
+        listedEvents: 37,
+        combinedViews: 14480,
+        offers: 36,
+        deals: 13,
       },
     },
     {
@@ -337,6 +347,7 @@ export const DemoData = {
       responseTime: '3 hours',
       joinedDate: new Date('2021-10-17'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 512000,
         platforms: [
@@ -347,6 +358,11 @@ export const DemoData = {
         portfolioHighlights: ['ESL Tournament Commentator', 'Gaming Hardware Partner', 'Top Gaming Creator 2023'],
         avgDealValue: 4600,
         specialties: ['Game Reviews', 'Hardware Testing', 'Live Streaming'],
+        businessVentures: ['Gaming merchandise', 'Esports team'],
+        listedEvents: 37,
+        combinedViews: 28158,
+        offers: 17,
+        deals: 14,
       },
     },
     {
@@ -363,6 +379,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2022-02-28'),
       verified: true,
+      tier: 'Micro',
       creatorData: {
         totalFollowers: 234000,
         platforms: [
@@ -373,6 +390,11 @@ export const DemoData = {
         portfolioHighlights: ['HGTV Feature', 'Home & Garden Magazine', 'Interior Design Awards'],
         avgDealValue: 2900,
         specialties: ['Room Makeovers', 'DIY Projects', 'Home Styling'],
+        businessVentures: ['Home improvement courses', 'Interior design service'],
+        listedEvents: 23,
+        combinedViews: 1593,
+        offers: 18,
+        deals: 6,
       },
     },
     {
@@ -389,6 +411,7 @@ export const DemoData = {
       responseTime: '5 hours',
       joinedDate: new Date('2022-06-12'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 189000,
         platforms: [
@@ -399,6 +422,11 @@ export const DemoData = {
         portfolioHighlights: ['Outside Magazine Feature', 'REI Brand Partner', 'National Parks Ambassador'],
         avgDealValue: 3400,
         specialties: ['Hiking Guides', 'Gear Reviews', 'Nature Photography'],
+        businessVentures: ['Outdoor gear brand', 'Adventure planning service'],
+        listedEvents: 42,
+        combinedViews: 1923,
+        offers: 34,
+        deals: 19,
       },
     },
     {
@@ -415,6 +443,7 @@ export const DemoData = {
       responseTime: '1 hour',
       joinedDate: new Date('2021-04-09'),
       verified: true,
+      tier: 'Micro',
       creatorData: {
         totalFollowers: 198000,
         platforms: [
@@ -425,6 +454,11 @@ export const DemoData = {
         portfolioHighlights: ['Parenting Magazine Contributor', 'Child Development Certification', 'Family Brand Partnerships'],
         avgDealValue: 2600,
         specialties: ['Parenting Tips', 'Child Development', 'Family Activities'],
+        businessVentures: ['Parenting courses', 'Children\'s products'],
+        listedEvents: 28,
+        combinedViews: 532,
+        offers: 28,
+        deals: 11,
       },
     },
     {
@@ -441,6 +475,7 @@ export const DemoData = {
       responseTime: '4 hours',
       joinedDate: new Date('2022-08-15'),
       verified: true,
+      tier: 'Micro',
       creatorData: {
         totalFollowers: 167000,
         platforms: [
@@ -451,6 +486,11 @@ export const DemoData = {
         portfolioHighlights: ['Grammy Nominated Producer', 'Music Production Courses', 'Industry Collaborations'],
         avgDealValue: 4100,
         specialties: ['Beat Making', 'Audio Production', 'Music Education'],
+        businessVentures: ['Record label', 'Music production services'],
+        listedEvents: 26,
+        combinedViews: 3364,
+        offers: 21,
+        deals: 20,
       },
     },
     {
@@ -467,6 +507,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2021-12-07'),
       verified: true,
+      tier: 'Micro',
       creatorData: {
         totalFollowers: 223000,
         platforms: [
@@ -477,6 +518,11 @@ export const DemoData = {
         portfolioHighlights: ['Veterinary Student', 'Pet Brand Partnerships', 'Animal Rescue Advocate'],
         avgDealValue: 2400,
         specialties: ['Pet Care Tips', 'Animal Training', 'Pet Product Reviews'],
+        businessVentures: ['Pet product line', 'Pet care services'],
+        listedEvents: 37,
+        combinedViews: 2618,
+        offers: 28,
+        deals: 8,
       },
     },
     {
@@ -493,6 +539,7 @@ export const DemoData = {
       responseTime: '3 hours',
       joinedDate: new Date('2022-11-21'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 134000,
         platforms: [
@@ -503,6 +550,11 @@ export const DemoData = {
         portfolioHighlights: ['Forbes 30 Under 30', 'Business Podcast Host', 'Startup Accelerator Mentor'],
         avgDealValue: 5800,
         specialties: ['Business Strategy', 'Entrepreneurship', 'Leadership Training'],
+        businessVentures: ['Business consulting', 'Investment portfolio'],
+        listedEvents: 49,
+        combinedViews: 8197,
+        offers: 37,
+        deals: 7,
       },
     },
     {
@@ -519,6 +571,7 @@ export const DemoData = {
       responseTime: '3 hours',
       joinedDate: new Date('2022-04-18'),
       verified: true,
+      tier: 'Micro',
       creatorData: {
         totalFollowers: 178000,
         platforms: [
@@ -529,6 +582,11 @@ export const DemoData = {
         portfolioHighlights: ['Botany Degree', 'Garden Center Partnership', 'Sustainable Living Expert'],
         avgDealValue: 2700,
         specialties: ['Plant Care', 'Garden Design', 'Sustainable Practices'],
+        businessVentures: ['Plant care products', 'Online plant shop'],
+        listedEvents: 24,
+        combinedViews: 915,
+        offers: 10,
+        deals: 13,
       },
     },
     {
@@ -545,6 +603,7 @@ export const DemoData = {
       responseTime: '45 minutes',
       joinedDate: new Date('2021-08-25'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 298000,
         platforms: [
@@ -555,6 +614,11 @@ export const DemoData = {
         portfolioHighlights: ['Best-Selling Author', 'Fortune 500 Speaker', 'Top Life Coach 2023'],
         avgDealValue: 4900,
         specialties: ['Personal Growth', 'Motivational Content', 'Career Development'],
+        businessVentures: ['Fitness app', 'Nutrition program'],
+        listedEvents: 56,
+        combinedViews: 3899,
+        offers: 49,
+        deals: 12,
       },
     },
     // INTERNATIONAL CREATORS - UK
@@ -572,6 +636,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2022-09-12'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 87000,
         platforms: [
@@ -582,6 +647,11 @@ export const DemoData = {
         portfolioHighlights: ['British Vogue Feature', 'London Fashion Week', 'Vintage Style Award'],
         avgDealValue: 2100,
         specialties: ['Vintage Fashion', 'Street Style', 'British Fashion'],
+        businessVentures: ['Fashion brand collaboration', 'Clothing line'],
+        listedEvents: 49,
+        combinedViews: 1570,
+        offers: 47,
+        deals: 15,
         postingFrequency: 'Daily',
         country: 'UK',
         city: 'London',
@@ -606,6 +676,7 @@ export const DemoData = {
       responseTime: '1 hour',
       joinedDate: new Date('2021-06-18'),
       verified: true,
+      tier: 'Micro',
       creatorData: {
         totalFollowers: 156000,
         platforms: [
@@ -616,6 +687,11 @@ export const DemoData = {
         portfolioHighlights: ['BBC Food Contributor', 'Michelin Restaurant Partner', 'UK Food Awards Judge'],
         avgDealValue: 3200,
         specialties: ['Restaurant Reviews', 'British Cuisine', 'Food Photography'],
+        businessVentures: ['Restaurant partnership', 'Food product line'],
+        listedEvents: 30,
+        combinedViews: 3494,
+        offers: 34,
+        deals: 8,
         postingFrequency: 'Weekly',
         country: 'UK',
         city: 'Manchester',
@@ -641,6 +717,7 @@ export const DemoData = {
       responseTime: '3 hours',
       joinedDate: new Date('2022-01-22'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 94000,
         platforms: [
@@ -651,6 +728,11 @@ export const DemoData = {
         portfolioHighlights: ['Canadian Fitness Awards', 'Winter Olympics Feature', 'Adventure Brand Partnerships'],
         avgDealValue: 2400,
         specialties: ['Winter Fitness', 'Outdoor Workouts', 'Adventure Gear'],
+        businessVentures: ['Fitness app', 'Nutrition program'],
+        listedEvents: 61,
+        combinedViews: 4662,
+        offers: 29,
+        deals: 14,
         postingFrequency: 'Daily',
         country: 'Canada',
         city: 'Toronto',
@@ -675,6 +757,7 @@ export const DemoData = {
       responseTime: '4 hours',
       joinedDate: new Date('2022-07-08'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 78000,
         platforms: [
@@ -685,6 +768,11 @@ export const DemoData = {
         portfolioHighlights: ['McGill AI Research', 'Tech Conference Speaker', 'Bilingual Tech Content'],
         avgDealValue: 3600,
         specialties: ['AI Reviews', 'Tech Education', 'Bilingual Content'],
+        businessVentures: ['Tech consulting firm', 'Software development agency'],
+        listedEvents: 24,
+        combinedViews: 4763,
+        offers: 46,
+        deals: 19,
         postingFrequency: 'Bi-weekly',
         country: 'Canada',
         city: 'Montreal',
@@ -710,6 +798,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2021-11-15'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 203000,
         platforms: [
@@ -720,6 +809,11 @@ export const DemoData = {
         portfolioHighlights: ['Tourism Australia Partner', 'Wildlife Photography Awards', 'Great Barrier Reef Ambassador'],
         avgDealValue: 3800,
         specialties: ['Wildlife Photography', 'Adventure Travel', 'Australian Tourism'],
+        businessVentures: ['Travel planning service', 'Tour guide business'],
+        listedEvents: 42,
+        combinedViews: 3923,
+        offers: 33,
+        deals: 22,
         postingFrequency: 'Weekly',
         country: 'Australia',
         city: 'Sydney',
@@ -744,6 +838,7 @@ export const DemoData = {
       responseTime: '6 hours',
       joinedDate: new Date('2022-03-30'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 67000,
         platforms: [
@@ -754,6 +849,11 @@ export const DemoData = {
         portfolioHighlights: ['World Surf League', 'Surfboard Brand Ambassador', 'Australian Surf Champion'],
         avgDealValue: 2800,
         specialties: ['Surf Gear', 'Beach Lifestyle', 'Water Sports'],
+        businessVentures: ['Sports equipment brand', 'Training programs'],
+        listedEvents: 47,
+        combinedViews: 5528,
+        offers: 11,
+        deals: 14,
         postingFrequency: 'Daily',
         country: 'Australia',
         city: 'Gold Coast',
@@ -779,6 +879,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2021-08-14'),
       verified: true,
+      tier: 'Micro',
       creatorData: {
         totalFollowers: 128000,
         platforms: [
@@ -789,6 +890,11 @@ export const DemoData = {
         portfolioHighlights: ['EU Environmental Award', 'Sustainable Fashion Week', 'Green Living Expert'],
         avgDealValue: 3100,
         specialties: ['Sustainable Fashion', 'Zero Waste', 'Eco-Friendly Products'],
+        businessVentures: ['Home decor line', 'Lifestyle brand'],
+        listedEvents: 23,
+        combinedViews: 1793,
+        offers: 37,
+        deals: 23,
         postingFrequency: 'Weekly',
         country: 'Germany',
         city: 'Berlin',
@@ -813,6 +919,7 @@ export const DemoData = {
       responseTime: '3 hours',
       joinedDate: new Date('2022-02-11'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 145000,
         platforms: [
@@ -823,6 +930,11 @@ export const DemoData = {
         portfolioHighlights: ['Gamescom Speaker', 'ESL Tournament Host', 'Gaming Hardware Partner'],
         avgDealValue: 4200,
         specialties: ['Game Reviews', 'Live Streaming', 'Gaming Hardware'],
+        businessVentures: ['Gaming merchandise', 'Esports team'],
+        listedEvents: 26,
+        combinedViews: 3186,
+        offers: 39,
+        deals: 14,
         postingFrequency: 'Daily',
         country: 'Germany',
         city: 'Munich',
@@ -848,6 +960,7 @@ export const DemoData = {
       responseTime: '1 hour',
       joinedDate: new Date('2021-05-20'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 234000,
         platforms: [
@@ -858,6 +971,11 @@ export const DemoData = {
         portfolioHighlights: ['Paris Fashion Week', 'Chanel Partnership', 'French Elle Feature'],
         avgDealValue: 5200,
         specialties: ['Luxury Fashion', 'Parisian Style', 'Fashion Photography'],
+        businessVentures: ['Fashion brand collaboration', 'Clothing line'],
+        listedEvents: 31,
+        combinedViews: 7186,
+        offers: 12,
+        deals: 24,
         postingFrequency: 'Daily',
         country: 'France',
         city: 'Paris',
@@ -882,6 +1000,7 @@ export const DemoData = {
       responseTime: '4 hours',
       joinedDate: new Date('2021-09-05'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 112000,
         platforms: [
@@ -892,6 +1011,11 @@ export const DemoData = {
         portfolioHighlights: ['Michelin Star Restaurant', 'French Culinary Institute', 'Le Cordon Bleu Graduate'],
         avgDealValue: 3700,
         specialties: ['French Cuisine', 'Cooking Techniques', 'Wine Pairing'],
+        businessVentures: ['Restaurant partnership', 'Food product line'],
+        listedEvents: 32,
+        combinedViews: 5361,
+        offers: 14,
+        deals: 5,
         postingFrequency: 'Bi-weekly',
         country: 'France',
         city: 'Lyon',
@@ -917,6 +1041,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2021-12-18'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 189000,
         platforms: [
@@ -927,6 +1052,11 @@ export const DemoData = {
         portfolioHighlights: ['Brazilian Fitness Awards', 'Rio Beach Ambassador', 'Wellness Brand Partner'],
         avgDealValue: 2900,
         specialties: ['Beach Workouts', 'Brazilian Fitness', 'Wellness Coaching'],
+        businessVentures: ['Fitness app', 'Nutrition program'],
+        listedEvents: 63,
+        combinedViews: 5890,
+        offers: 47,
+        deals: 19,
         postingFrequency: 'Daily',
         country: 'Brazil',
         city: 'Rio de Janeiro',
@@ -951,6 +1081,7 @@ export const DemoData = {
       responseTime: '5 hours',
       joinedDate: new Date('2022-04-07'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 98000,
         platforms: [
@@ -961,6 +1092,11 @@ export const DemoData = {
         portfolioHighlights: ['Brazilian Music Awards', 'Samba School Partnership', 'Music Production Courses'],
         avgDealValue: 3400,
         specialties: ['Music Production', 'Brazilian Music', 'Audio Engineering'],
+        businessVentures: ['Record label', 'Music production services'],
+        listedEvents: 20,
+        combinedViews: 2118,
+        offers: 26,
+        deals: 21,
         postingFrequency: 'Weekly',
         country: 'Brazil',
         city: 'São Paulo',
@@ -986,6 +1122,7 @@ export const DemoData = {
       responseTime: '3 hours',
       joinedDate: new Date('2021-10-25'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 167000,
         platforms: [
@@ -996,6 +1133,11 @@ export const DemoData = {
         portfolioHighlights: ['Tokyo Fashion Week', 'Anime Expo Speaker', 'Kawaii Culture Ambassador'],
         avgDealValue: 3800,
         specialties: ['Kawaii Fashion', 'Anime Reviews', 'Japanese Culture'],
+        businessVentures: ['Home decor line', 'Lifestyle brand'],
+        listedEvents: 65,
+        combinedViews: 8404,
+        offers: 33,
+        deals: 15,
         postingFrequency: 'Daily',
         country: 'Japan',
         city: 'Tokyo',
@@ -1020,6 +1162,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2022-01-14'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 134000,
         platforms: [
@@ -1030,6 +1173,11 @@ export const DemoData = {
         portfolioHighlights: ['Sony Tech Partner', 'Robotics Conference Speaker', 'Japanese Innovation Award'],
         avgDealValue: 4600,
         specialties: ['Robotics', 'Tech Innovation', 'Japanese Technology'],
+        businessVentures: ['Tech consulting firm', 'Software development agency'],
+        listedEvents: 31,
+        combinedViews: 4431,
+        offers: 24,
+        deals: 23,
         postingFrequency: 'Bi-weekly',
         country: 'Japan',
         city: 'Osaka',
@@ -1055,6 +1203,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2021-07-22'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 201000,
         platforms: [
@@ -1065,6 +1214,11 @@ export const DemoData = {
         portfolioHighlights: ['Bollywood Film Choreographer', 'Indian Dance Academy', 'Cultural Ambassador'],
         avgDealValue: 2600,
         specialties: ['Bollywood Dance', 'Classical Indian Dance', 'Dance Education'],
+        businessVentures: ['Home decor line', 'Lifestyle brand'],
+        listedEvents: 25,
+        combinedViews: 1949,
+        offers: 27,
+        deals: 10,
         postingFrequency: 'Daily',
         country: 'India',
         city: 'Mumbai',
@@ -1089,6 +1243,7 @@ export const DemoData = {
       responseTime: '4 hours',
       joinedDate: new Date('2022-03-16'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 87000,
         platforms: [
@@ -1099,6 +1254,11 @@ export const DemoData = {
         portfolioHighlights: ['Y Combinator Mentor', 'Indian Startup Awards', 'Tech Conference Speaker'],
         avgDealValue: 4100,
         specialties: ['Startup Strategy', 'Tech Innovation', 'Business Development'],
+        businessVentures: ['Business consulting', 'Investment portfolio'],
+        listedEvents: 26,
+        combinedViews: 2106,
+        offers: 21,
+        deals: 5,
         postingFrequency: 'Weekly',
         country: 'India',
         city: 'Bangalore',
@@ -1124,6 +1284,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2021-11-08'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 156000,
         platforms: [
@@ -1134,6 +1295,11 @@ export const DemoData = {
         portfolioHighlights: ['Mexican Culinary Institute', 'Traditional Recipe Book', 'Cultural Food Ambassador'],
         avgDealValue: 2800,
         specialties: ['Mexican Cuisine', 'Traditional Recipes', 'Cooking Education'],
+        businessVentures: ['Restaurant partnership', 'Food product line'],
+        listedEvents: 46,
+        combinedViews: 3128,
+        offers: 32,
+        deals: 21,
         postingFrequency: 'Weekly',
         country: 'Mexico',
         city: 'Mexico City',
@@ -1158,6 +1324,7 @@ export const DemoData = {
       responseTime: '5 hours',
       joinedDate: new Date('2022-06-12'),
       verified: true,
+      tier: 'Micro',
       creatorData: {
         totalFollowers: 73000,
         platforms: [
@@ -1168,6 +1335,11 @@ export const DemoData = {
         portfolioHighlights: ['Mexican Art Gallery', 'Street Art Festival', 'Cultural Heritage Project'],
         avgDealValue: 2200,
         specialties: ['Street Art', 'Mexican Culture', 'Art Education'],
+        businessVentures: ['Art marketplace', 'Creative workshops'],
+        listedEvents: 24,
+        combinedViews: 3409,
+        offers: 45,
+        deals: 12,
         postingFrequency: 'Bi-weekly',
         country: 'Mexico',
         city: 'Guadalajara',
@@ -1203,6 +1375,11 @@ export const DemoData = {
         portfolioHighlights: ['Minimalist Living Blog', 'Small Space Expert', 'Sustainable Brand Partner'],
         avgDealValue: 450,
         specialties: ['Minimalist Design', 'Small Space Solutions', 'Sustainable Products'],
+        businessVentures: ['Fashion brand collaboration', 'Clothing line'],
+        listedEvents: 24,
+        combinedViews: 167,
+        offers: 22,
+        deals: 23,
         postingFrequency: 'Daily',
         country: 'USA',
         city: 'San Francisco',
@@ -1237,6 +1414,11 @@ export const DemoData = {
         portfolioHighlights: ['Portland Food Guide', 'Local Restaurant Partner', 'Community Food Awards'],
         avgDealValue: 380,
         specialties: ['Local Restaurants', 'Food Photography', 'Community Reviews'],
+        businessVentures: ['Restaurant partnership', 'Food product line'],
+        listedEvents: 31,
+        combinedViews: 294,
+        offers: 10,
+        deals: 24,
         postingFrequency: 'Daily',
         country: 'USA',
         city: 'Portland',
@@ -1262,6 +1444,7 @@ export const DemoData = {
       responseTime: '30 minutes',
       joinedDate: new Date('2020-03-15'),
       verified: true,
+      tier: 'Mega',
       creatorData: {
         totalFollowers: 2340000,
         platforms: [
@@ -1272,6 +1455,11 @@ export const DemoData = {
         portfolioHighlights: ['Vogue Cover Model', 'Paris Fashion Week Ambassador', 'Global Brand Partnerships'],
         avgDealValue: 25000,
         specialties: ['High Fashion', 'Luxury Brands', 'International Fashion'],
+        businessVentures: ['Fashion brand collaboration', 'Clothing line'],
+        listedEvents: 56,
+        combinedViews: 63070,
+        offers: 27,
+        deals: 19,
         postingFrequency: 'Daily',
         country: 'USA',
         city: 'New York',
@@ -1296,6 +1484,7 @@ export const DemoData = {
       responseTime: '1 hour',
       joinedDate: new Date('2019-08-22'),
       verified: true,
+      tier: 'Mega',
       creatorData: {
         totalFollowers: 3120000,
         platforms: [
@@ -1306,6 +1495,11 @@ export const DemoData = {
         portfolioHighlights: ['World Gaming Champion', 'Major Esports Partner', 'Gaming Industry Award'],
         avgDealValue: 35000,
         specialties: ['Live Gaming', 'Esports Tournaments', 'Gaming Hardware'],
+        businessVentures: ['Gaming merchandise', 'Esports team'],
+        listedEvents: 76,
+        combinedViews: 110259,
+        offers: 44,
+        deals: 15,
         postingFrequency: 'Daily',
         country: 'USA',
         city: 'Los Angeles',
@@ -1331,6 +1525,7 @@ export const DemoData = {
       responseTime: '2 hours',
       joinedDate: new Date('2021-04-18'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 145000,
         platforms: [
@@ -1341,6 +1536,11 @@ export const DemoData = {
         portfolioHighlights: ['Fortune 500 Consultant', 'Leadership Development Expert', 'Corporate Training'],
         avgDealValue: 5800,
         specialties: ['Leadership Development', 'Career Coaching', 'Professional Skills'],
+        businessVentures: ['Business consulting', 'Investment portfolio'],
+        listedEvents: 20,
+        combinedViews: 2575,
+        offers: 15,
+        deals: 18,
         postingFrequency: 'Weekly',
         country: 'USA',
         city: 'Chicago',
@@ -1365,6 +1565,7 @@ export const DemoData = {
       responseTime: '1 hour',
       joinedDate: new Date('2022-08-05'),
       verified: true,
+      tier: 'Macro',
       creatorData: {
         totalFollowers: 234000,
         platforms: [
@@ -1375,6 +1576,11 @@ export const DemoData = {
         portfolioHighlights: ['Snapchat Featured Creator', 'Gen Z Marketing Expert', 'Viral Content Creator'],
         avgDealValue: 3200,
         specialties: ['Short-Form Content', 'Gen Z Marketing', 'Social Media Trends'],
+        businessVentures: ['Comedy content network', 'Entertainment production'],
+        listedEvents: 63,
+        combinedViews: 9144,
+        offers: 45,
+        deals: 11,
         postingFrequency: 'Daily',
         country: 'USA',
         city: 'Miami',
