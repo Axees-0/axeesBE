@@ -20,37 +20,67 @@ import DesignSystem from '@/styles/DesignSystem';
 import { UniversalBackButton } from '@/components/UniversalBackButton';
 import { BrandColors } from '@/constants/Colors';
 import { getPlatformIcon } from '@/constants/platforms';
+import { useDiscoveryFilters } from '@/contexts/DiscoveryFilterContext';
 
 const DiscoverCreators = () => {
   const { width } = useWindowDimensions();
+  const { filters: contextFilters, updateFilter } = useDiscoveryFilters();
   
-  // Filter states
-  const [activeFilterSection, setActiveFilterSection] = useState<'filters' | 'location' | 'demographic' | 'category' | null>(null);
+  // Use context state for activeFilterSection
+  const activeFilterSection = contextFilters.activeFilterSection;
+  const setActiveFilterSection = (section: 'filters' | 'location' | 'demographic' | 'category' | null) => {
+    updateFilter('activeFilterSection', section);
+  };
   
-  // Filter options
-  const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
-  const [selectedTier] = useState<string[]>([]);
-  const [followerSize, setFollowerSize] = useState<string>('all');
-  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
-  const [postingFrequency, setPostingFrequency] = useState<string>('all');
+  // Use context for all filter states
+  const priceRange = contextFilters.priceRange;
+  const setPriceRange = (range: { min: number; max: number }) => updateFilter('priceRange', range);
+  
+  const selectedTier = contextFilters.selectedTier;
+  const setSelectedTier = (tiers: string[]) => updateFilter('selectedTier', tiers);
+  
+  const followerSize = contextFilters.followerSize;
+  const setFollowerSize = (size: string) => updateFilter('followerSize', size);
+  
+  const selectedPlatforms = contextFilters.selectedPlatforms;
+  const setSelectedPlatforms = (platforms: string[]) => updateFilter('selectedPlatforms', platforms);
+  
+  const postingFrequency = contextFilters.postingFrequency;
+  const setPostingFrequency = (frequency: string) => updateFilter('postingFrequency', frequency);
   
   // Location filters
-  const [locationType, setLocationType] = useState<'local' | 'country' | 'event'>('country');
-  const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
-  const [selectedCities, setSelectedCities] = useState<string[]>([]);
+  const locationType = contextFilters.locationType;
+  const setLocationType = (type: 'local' | 'country' | 'event') => updateFilter('locationType', type);
+  
+  const selectedCountries = contextFilters.selectedCountries;
+  const setSelectedCountries = (countries: string[]) => updateFilter('selectedCountries', countries);
+  
+  const selectedCities = contextFilters.selectedCities;
+  const setSelectedCities = (cities: string[]) => updateFilter('selectedCities', cities);
   
   // Demographic filters
-  const [genderRatio] = useState({ male: 50, female: 50 });
-  const [ageRange, setAgeRange] = useState({ min: 18, max: 65 });
-  const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['English']);
-  const [influencerAge, setInfluencerAge] = useState({ min: 18, max: 50 });
-  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
+  const genderRatio = contextFilters.genderRatio;
+  const setGenderRatio = (ratio: { male: number; female: number }) => updateFilter('genderRatio', ratio);
+  
+  const ageRange = contextFilters.ageRange;
+  const setAgeRange = (range: { min: number; max: number }) => updateFilter('ageRange', range);
+  
+  const selectedLanguages = contextFilters.selectedLanguages;
+  const setSelectedLanguages = (languages: string[]) => updateFilter('selectedLanguages', languages);
+  
+  const influencerAge = contextFilters.influencerAge;
+  const setInfluencerAge = (age: { min: number; max: number }) => updateFilter('influencerAge', age);
+  
+  const selectedGroups = contextFilters.selectedGroups;
+  const setSelectedGroups = (groups: string[]) => updateFilter('selectedGroups', groups);
   
   // Category filters
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const selectedCategories = contextFilters.selectedCategories;
+  const setSelectedCategories = (categories: string[]) => updateFilter('selectedCategories', categories);
   
   // Search
-  const [searchText, setSearchText] = useState('');
+  const searchText = contextFilters.searchText;
+  const setSearchText = (text: string) => updateFilter('searchText', text);
   
   // Selection
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());

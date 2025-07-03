@@ -1,0 +1,24 @@
+{
+  "timestamp": "2025-07-03T01:39:40.314Z",
+  "current_issue": "polite-ganache-3a4e1b.netlify.app hosts QA fixes, needed separation",
+  "deployments": {
+    "original_stable": {
+      "package": "axees-frontend-original-stable.zip",
+      "success": false,
+      "url": "Manual deployment required",
+      "description": "Original stable version (pre-QA-fixes)"
+    },
+    "qa_fixes": {
+      "package": "axees-frontend-qa-fixes.zip",
+      "success": false,
+      "url": "Manual deployment required",
+      "description": "QA fixes version (34 issues resolved)"
+    }
+  },
+  "solution_status": "partially_automated",
+  "next_steps": [
+    "Test both deployed versions",
+    "Update production references as needed",
+    "Consider which URL should be primary production"
+  ]
+}

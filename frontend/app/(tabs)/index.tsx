@@ -20,7 +20,7 @@ import DesignSystem from '@/styles/DesignSystem';
 import { BrandColors } from '@/constants/Colors';
 import { getPlatformIcon } from '@/constants/platforms';
 import { WebSEO } from '../web-seo';
-import { useDiscoveryFilters } from '@/contexts/DiscoveryFilterContext';
+import { useDiscoveryFilters, DebugPanel } from '@/contexts/DiscoveryFilterContext';
 
 const DiscoverCreators = () => {
   const { width } = useWindowDimensions();
@@ -754,6 +754,9 @@ const DiscoverCreators = () => {
             <Text style={styles.fabText}>Start Campaign ({selectedCreators.size})</Text>
           </TouchableOpacity>
         )}
+        
+        {/* Debug Panel for Development */}
+        <DebugPanel />
       </SafeAreaView>
     </>
   );
