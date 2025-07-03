@@ -39,16 +39,14 @@ export const DebugPanel: React.FC = () => {
         position: 'fixed',
         bottom: '20px',
         left: '20px',
-        zIndex: 2147483647,
+        zIndex: 1000,
         backgroundColor: '#000',
         color: '#fff',
         padding: '10px',
         borderRadius: '8px',
         cursor: 'pointer',
         fontFamily: 'monospace',
-        fontSize: '12px',
-        pointerEvents: 'auto',
-        isolation: 'isolate'
+        fontSize: '12px'
       }} onClick={() => setIsVisible(true)}>
         🐛 Debug Panel (Click to Show)
       </div>
@@ -66,12 +64,10 @@ export const DebugPanel: React.FC = () => {
       color: '#fff',
       border: '2px solid #333',
       borderRadius: '8px',
-      zIndex: 2147483647,
+      zIndex: 1000,
       fontFamily: 'monospace',
       fontSize: '11px',
-      overflow: 'hidden',
-      pointerEvents: 'auto',
-      isolation: 'isolate'
+      overflow: 'hidden'
     }}>
       <div style={{
         backgroundColor: '#333',
