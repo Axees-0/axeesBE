@@ -1,8 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * 🚀 Final Dual Deployment Script
- * Deploys both original stable and QA fixes to separate Netlify sites
+ * 🚀 Universal Deployment Script
+ * Supports both single package and dual package deployments to Netlify
+ * 
+ * Usage:
+ *   node deploy.js                    # Deploy both packages (dual mode)
+ *   node deploy.js --qa-only          # Deploy only QA fixes package
+ *   node deploy.js --stable-only      # Deploy only stable package
  */
 
 const fs = require('fs');
@@ -75,33 +80,53 @@ function deployToNetlify(packagePath, description) {
 }
 
 async function main() {
-  console.log(`${colors.cyan}🚀 Final Dual Deployment Starting...${colors.reset}\n`);
+  // Parse command line arguments
+  const args = process.argv.slice(2);
+  const qaOnly = args.includes('--qa-only');
+  const stableOnly = args.includes('--stable-only');
+  const singleMode = qaOnly || stableOnly;
+  
+  console.log(`${colors.cyan}🚀 Universal Deployment Starting...${colors.reset}\n`);
+  console.log(`Mode: ${singleMode ? (qaOnly ? 'QA Only' : 'Stable Only') : 'Dual Deployment'}\n`);
   
   // Check packages exist
   const stablePackage = 'axees-frontend-original-stable.zip';
   const qaPackage = 'axees-frontend-qa-fixes.zip';
   
-  if (!fs.existsSync(stablePackage)) {
+  // Check required packages based on mode
+  if (!qaOnly && !fs.existsSync(stablePackage)) {
     error(`Stable package not found: ${stablePackage}`);
     process.exit(1);
   }
   
-  if (!fs.existsSync(qaPackage)) {
+  if (!stableOnly && !fs.existsSync(qaPackage)) {
     error(`QA fixes package not found: ${qaPackage}`);
     process.exit(1);
   }
   
-  success('✅ Both packages found and ready for deployment');
+  if (singleMode) {
+    success(`✅ Package found and ready for deployment`);
+  } else {
+    success('✅ Both packages found and ready for deployment');
+  }
   
-  // Deploy both versions
-  info('🚀 Starting dual deployment process...');
+  // Deploy based on mode
+  info(`🚀 Starting ${singleMode ? 'single package' : 'dual'} deployment process...`);
   
-  const stableResult = deployToNetlify(stablePackage, 'Original Stable Version');
-  const qaResult = deployToNetlify(qaPackage, 'QA Fixes Version');
+  let stableResult = { success: false, skipped: true };
+  let qaResult = { success: false, skipped: true };
+  
+  if (!qaOnly) {
+    stableResult = deployToNetlify(stablePackage, 'Original Stable Version');
+  }
+  
+  if (!stableOnly) {
+    qaResult = deployToNetlify(qaPackage, 'QA Fixes Version');
+  }
   
   // Create results summary
   console.log(`\n${colors.bright}${colors.magenta}===============================================${colors.reset}`);
-  console.log(`${colors.bright}🎯 DUAL DEPLOYMENT RESULTS${colors.reset}`);
+  console.log(`${colors.bright}🎯 ${singleMode ? 'DEPLOYMENT' : 'DUAL DEPLOYMENT'} RESULTS${colors.reset}`);
   console.log(`${colors.bright}${colors.magenta}===============================================${colors.reset}\n`);
   
   // Current situation
@@ -112,28 +137,33 @@ async function main() {
   // Deployment results
   console.log(`${colors.cyan}🚀 DEPLOYMENT RESULTS:${colors.reset}\n`);
   
-  console.log(`${colors.green}a) ORIGINAL STABLE VERSION:${colors.reset}`);
-  if (stableResult.success) {
+  if (!qaOnly) {
+    console.log(`${colors.green}${singleMode ? '' : 'a) '}ORIGINAL STABLE VERSION:${colors.reset}`);
+    if (stableResult.success) {
     console.log(`   🌐 ${stableResult.url}`);
     console.log(`   📝 Original stable (commit a23d9b0)`);
     console.log(`   ✅ Status: Deployed successfully`);
   } else {
     console.log(`   ❌ Status: Deployment failed`);
     console.log(`   🔧 Action: Manual deployment required`);
+    }
   }
   
-  console.log(`\n${colors.green}b) QA FIXES VERSION:${colors.reset}`);
-  if (qaResult.success) {
+  if (!stableOnly) {
+    console.log(`\n${colors.green}${singleMode ? '' : 'b) '}QA FIXES VERSION:${colors.reset}`);
+    if (qaResult.success) {
     console.log(`   🌐 ${qaResult.url}`);
     console.log(`   📝 All 34 QA issues resolved`);
     console.log(`   ✅ Status: Deployed successfully`);
   } else {
     console.log(`   ❌ Status: Deployment failed`);
     console.log(`   🔧 Action: Manual deployment required`);
+    }
   }
   
   // Manual deployment instructions if needed
-  if (!stableResult.success || !qaResult.success) {
+  const needsManual = (!qaOnly && !stableResult.success) || (!stableOnly && !qaResult.success);
+  if (needsManual) {
     console.log(`\n${colors.yellow}📋 MANUAL DEPLOYMENT INSTRUCTIONS:${colors.reset}`);
     console.log(`\n1. Go to https://netlify.com`);
     
