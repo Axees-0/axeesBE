@@ -20,13 +20,15 @@ import { DEMO_MODE } from '@/demo/DemoMode';
 
 const LoginScreen: React.FC = () => {
   const { login } = useAuth();
-  const [email, setEmail] = useState('');
+  const [countryCode, setCountryCode] = useState('+1');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Missing Information', 'Please enter both email and password.');
+    const fullPhoneNumber = countryCode + phoneNumber;
+    if (!phoneNumber || !password) {
+      Alert.alert('Missing Information', 'Please enter both phone number and password.');
       return;
     }
 
@@ -37,28 +39,28 @@ const LoginScreen: React.FC = () => {
       if (DEMO_MODE) {
         // Check for demo credentials
         const demoUsers = {
-          'sarah@techstyle.com': {
+          '+15551234567': {
             id: 'demo-marketer-001',
-            email: 'sarah@techstyle.com',
+            phone: '+15551234567',
             name: 'Sarah Martinez',
             userType: 'marketer' as const,
             company: 'TechStyle Brand',
           },
-          'emma@creativestudio.com': {
+          '+15557654321': {
             id: 'demo-creator-001',
-            email: 'emma@creativestudio.com',
+            phone: '+15557654321',
             name: 'Emma Thompson',
             userType: 'creator' as const,
             username: '@emmastyle',
           }
         };
 
-        const user = demoUsers[email];
+        const user = demoUsers[fullPhoneNumber];
         if (user && password === 'demo123') {
           await login(user, 'demo-token');
           router.push('/(tabs)');
         } else {
-          Alert.alert('Invalid Credentials', 'Use demo credentials:\n\nMarketer: sarah@techstyle.com\nCreator: emma@creativestudio.com\nPassword: demo123');
+          Alert.alert('Invalid Credentials', 'Use demo credentials:\n\nMarketer: +1 555-123-4567\nCreator: +1 555-765-4321\nPassword: demo123');
         }
       } else {
         // Production login would go here
@@ -100,17 +102,28 @@ const LoginScreen: React.FC = () => {
           {/* Login Form */}
           <View style={styles.form}>
             <View style={styles.inputContainer}>
-              <Text style={styles.inputLabel}>Email</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Enter your email"
-                placeholderTextColor="#999"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
+              <Text style={styles.inputLabel}>Phone Number</Text>
+              <View style={styles.phoneInputContainer}>
+                <View style={styles.countryCodeContainer}>
+                  <TextInput
+                    style={styles.countryCodeInput}
+                    value={countryCode}
+                    onChangeText={setCountryCode}
+                    placeholder="+1"
+                    placeholderTextColor="#999"
+                    keyboardType="phone-pad"
+                  />
+                </View>
+                <TextInput
+                  style={styles.phoneInput}
+                  placeholder="555-123-4567"
+                  placeholderTextColor="#999"
+                  value={phoneNumber}
+                  onChangeText={setPhoneNumber}
+                  keyboardType="phone-pad"
+                  autoCorrect={false}
+                />
+              </View>
             </View>
 
             <View style={styles.inputContainer}>
@@ -149,11 +162,11 @@ const LoginScreen: React.FC = () => {
                 <Text style={styles.demoTitle}>Demo Credentials:</Text>
                 <View style={styles.demoCredential}>
                   <Text style={styles.demoLabel}>Marketer:</Text>
-                  <Text style={styles.demoValue}>sarah@techstyle.com</Text>
+                  <Text style={styles.demoValue}>+1 555-123-4567</Text>
                 </View>
                 <View style={styles.demoCredential}>
                   <Text style={styles.demoLabel}>Creator:</Text>
-                  <Text style={styles.demoValue}>emma@creativestudio.com</Text>
+                  <Text style={styles.demoValue}>+1 555-765-4321</Text>
                 </View>
                 <View style={styles.demoCredential}>
                   <Text style={styles.demoLabel}>Password:</Text>
@@ -230,6 +243,33 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
+    borderWidth: 1,
+    borderColor: BrandColors.neutral[300],
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: BrandColors.neutral[800],
+  },
+  phoneInputContainer: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  countryCodeContainer: {
+    width: 80,
+  },
+  countryCodeInput: {
+    borderWidth: 1,
+    borderColor: BrandColors.neutral[300],
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    fontSize: 16,
+    color: BrandColors.neutral[800],
+    textAlign: 'center',
+  },
+  phoneInput: {
+    flex: 1,
     borderWidth: 1,
     borderColor: BrandColors.neutral[300],
     borderRadius: 8,

@@ -7,6 +7,7 @@ import { Color } from "@/GlobalStyles";
 import { useAuth } from "@/contexts/AuthContext";
 import { router } from "expo-router";
 import DesignSystem from "@/styles/DesignSystem";
+import { formatMessageTime } from "@/utils/dateFormatters";
 
 const BREAKPOINTS = {
   mobile: 768,
@@ -71,23 +72,6 @@ const MessagesPage = () => {
     },
   ]);
   
-  const formatTime = (date: Date) => {
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
-    
-    if (diffMins < 60) {
-      return `${diffMins}m ago`;
-    } else if (diffHours < 24) {
-      return `${diffHours}h ago`;
-    } else if (diffDays === 1) {
-      return 'Yesterday';
-    } else {
-      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-    }
-  };
   
   const handleChatPress = (chat: any) => {
     // Mark as read when clicked
@@ -153,7 +137,7 @@ const MessagesPage = () => {
                     <Text style={styles.chatName}>{chat.otherUserName}</Text>
                     <Text style={styles.chatCompany}>{chat.otherUserCompany}</Text>
                   </View>
-                  <Text style={styles.chatTime}>{formatTime(chat.lastMessageTime)}</Text>
+                  <Text style={styles.chatTime}>{formatMessageTime(chat.lastMessageTime)}</Text>
                 </View>
                 
                 <Text style={styles.chatDeal}>{chat.dealTitle}</Text>

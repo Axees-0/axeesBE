@@ -6,8 +6,8 @@ import { Color } from "@/GlobalStyles";
 import Discoveryiconlypro from "../assets/discovery--iconly-pro.svg";
 import Hotprice from "../assets/hotprice.svg";
 import Message01 from "../assets/message01.svg";
-import Notification02 from "../assets/user.svg";
-import User from "../assets/user.svg";
+import BellNotificationRegular from "../assets/bell-notification.svg";
+import DashboardIcon from "../assets/dashboard.svg";
 import { TabButton } from "./TabButton";
 import { useWindowDimensions } from "react-native";
 import { router } from "expo-router";
@@ -15,11 +15,11 @@ import { useUnreadMessages } from "@/hooks/messagesContext";
 // import { useUnreadMessages } from '@/contexts/UnreadMessagesContext';
 
 const TABS = [
-  { name: "index", icon: Discoveryiconlypro, label: "Explore", route: "/" },
-  { name: "deals", icon: Hotprice, label: "Deals/Offers", route: "/deals" },
-  { name: "messages", icon: Message01, label: "Messages", route: "/messages" },
-  { name: "notifications", icon: Notification02, label: "Notifications", route: "/notifications" },
-  { name: "profile", icon: User, label: "Profile", route: "/profile" },
+  { name: "index", icon: Discoveryiconlypro, label: "Discover", route: "/" },
+  { name: "deals", icon: Hotprice, label: "Deals/Offers", route: "/(tabs)/deals" },
+  { name: "messages", icon: Message01, label: "Messages", route: "/(tabs)/messages" },
+  { name: "notifications", icon: BellNotificationRegular, label: "Notifications", route: "/(tabs)/notifications" },
+  { name: "dashboard", icon: DashboardIcon, label: "Dashboard", route: "/(tabs)/dashboard" },
 ];
 
 const WebBottomTabs = ({ activeIndex }: { activeIndex: number }) => {
@@ -112,6 +112,7 @@ const WebBottomTabs = ({ activeIndex }: { activeIndex: number }) => {
           marginHorizontal: "auto",
           width: "100%",
           position: "relative",
+          paddingHorizontal: window.width <= 768 ? 4 : 8, // Reduced padding for 5 tabs on mobile
         }}
       >
         {TABS.map((tab, index) => (

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,6 +8,8 @@ import {
   SafeAreaView,
   Platform,
   Alert,
+  ActivityIndicator,
+  RefreshControl,
 } from 'react-native';
 import { useLocalSearchParams, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -49,67 +51,151 @@ interface CounterOfferDetails {
 }
 
 const HandleCounterOfferPage: React.FC = () => {
-  const { counterId } = useLocalSearchParams();
+  const { counterId, dealId } = useLocalSearchParams();
   const isWeb = Platform?.OS === 'web';
   const { user } = useAuth();
   
-  // Demo counter offer data
-  const [counterOffer] = useState<CounterOfferDetails>({
-    id: counterId as string || 'counter-001',
-    originalOfferId: 'offer-001',
-    creator: {
-      id: 'creator-001',
-      name: 'Emma Thompson',
-      handle: '@emmastyle',
-    },
-    originalOffer: {
-      amount: 1500,
-      deliveryDays: 5,
-      offerType: 'Instagram Post Campaign',
-      deliverables: [
-        '1 Instagram feed post with 3-5 images',
-        '2-3 Instagram stories',
-        'Story highlight saved for 7 days',
-        'Caption with brand messaging and hashtags',
-        'Performance metrics after 48 hours'
-      ]
-    },
-    counterOffer: {
-      amount: 1800,
-      deliveryDays: 7,
-      adjustedDeliverables: [
-        '1 Instagram feed post with 3-5 images',
-        '2-3 Instagram stories',
-        'Story highlight saved for 7 days',
-        'Caption with brand messaging and hashtags',
-        'Performance metrics after 48 hours',
-        'Additional Instagram Reel (30-60 seconds)'
-      ],
-      message: "Thank you for considering me for this campaign! I'm excited about the opportunity to work with TechStyle Brand. Based on my experience and engagement rates (average 8.5% on similar campaigns), I believe this counter offer reflects the value I can provide. I've also included an additional Reel which typically drives 3x more engagement than static posts. Looking forward to creating amazing content together!",
-      additionalRequirements: "I'd need the products shipped at least 3 days before the content creation deadline to ensure quality shots.",
-    },
-    changes: {
-      amountDiff: 300,
-      daysDiff: 2,
-      deliverablesChanged: true,
-    },
-    submittedDate: '2024-06-18',
-  });
+  const [counterOffer, setCounterOffer] = useState<CounterOfferDetails | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  const handleAction = (action: 'accept' | 'reject' | 'negotiate') => {
+  useEffect(() => {
+    fetchCounterOfferDetails();
+  }, [counterId, dealId]);
+
+  const fetchCounterOfferDetails = async () => {
+    try {
+      setLoading(true);
+      
+      // First try to get counter offer by ID if available
+      if (counterId) {
+        const response = await fetch(`/api/negotiation/counter-offers/${counterId}`, {
+          headers: { 'Authorization': `Bearer ${user?.token || ''}` }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          setCounterOffer(formatCounterOfferData(result.data));
+          return;
+        }
+      }
+      
+      // Fallback: Get latest counter offer for deal
+      if (dealId) {
+        const response = await fetch(`/api/negotiation/deals/${dealId}/latest-counter-offer`, {
+          headers: { 'Authorization': `Bearer ${user?.token || ''}` }
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.data) {
+          setCounterOffer(formatCounterOfferData(result.data));
+        } else {
+          Alert.alert('Error', 'Counter offer not found');
+          router.back();
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error fetching counter offer:', error);
+      Alert.alert('Error', 'Failed to load counter offer details. Please try again.');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const formatCounterOfferData = (apiData: any): CounterOfferDetails => {
+    const originalOffer = apiData.originalOffer || {};
+    const counterOfferData = apiData.counterOffer || apiData;
+    
+    return {
+      id: apiData.id || counterId as string,
+      originalOfferId: apiData.originalOfferId || apiData.dealId,
+      creator: {
+        id: apiData.creator?.id || apiData.userId,
+        name: apiData.creator?.name || 'Creator',
+        handle: apiData.creator?.handle || `@${apiData.creator?.username || 'creator'}`,
+      },
+      originalOffer: {
+        amount: originalOffer.amount || apiData.originalAmount || 1500,
+        deliveryDays: originalOffer.deliveryDays || 5,
+        offerType: originalOffer.offerType || apiData.dealTitle || 'Campaign',
+        deliverables: originalOffer.deliverables || ['Original deliverables']
+      },
+      counterOffer: {
+        amount: counterOfferData.amount || apiData.offerAmount || 1800,
+        deliveryDays: counterOfferData.deliveryDays || apiData.terms?.deliveryDays || 7,
+        adjustedDeliverables: counterOfferData.adjustedDeliverables || counterOfferData.deliverables || ['Updated deliverables'],
+        message: counterOfferData.message || apiData.message || 'Counter offer message',
+        additionalRequirements: counterOfferData.additionalRequirements || apiData.terms?.additionalRequirements,
+      },
+      changes: {
+        amountDiff: (counterOfferData.amount || apiData.offerAmount || 1800) - (originalOffer.amount || apiData.originalAmount || 1500),
+        daysDiff: (counterOfferData.deliveryDays || apiData.terms?.deliveryDays || 7) - (originalOffer.deliveryDays || 5),
+        deliverablesChanged: true,
+      },
+      submittedDate: apiData.createdAt ? new Date(apiData.createdAt).toISOString().split('T')[0] : '2024-06-18',
+    };
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    fetchCounterOfferDetails();
+  };
+
+  const handleAction = async (action: 'accept' | 'reject' | 'negotiate') => {
+    if (!counterOffer) return;
+    
     switch (action) {
       case 'accept':
+        const confirmMessage = `Accept the counter offer from ${counterOffer.creator.name} for $${counterOffer.counterOffer.amount}?`;
+        
         if (isWeb) {
-          const confirmed = window.confirm(`Accept the counter offer from ${counterOffer.creator.name} for $${counterOffer.counterOffer.amount}?`);
-          if (confirmed) {
-            // Send notification and navigate
-            notificationService.notifyCreator(counterOffer.creator.id, {
-              type: 'deal',
-              title: 'Counter Offer Accepted!',
-              message: `${user?.name || user?.company || 'Marketer'} accepted your counter offer for ${counterOffer.originalOffer.offerType}`,
-              actionType: 'view_deal',
-              actionParams: { dealId: `DEAL-${Date.now()}` }
-            }).catch(console.error);
+          const confirmed = window.confirm(confirmMessage);
+          if (!confirmed) return;
+        } else {
+          const confirmed = await new Promise<boolean>((resolve) => {
+            Alert.alert(
+              'Accept Counter Offer',
+              confirmMessage,
+              [
+                { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+                { text: 'Accept', onPress: () => resolve(true) }
+              ]
+            );
+          });
+          if (!confirmed) return;
+        }
+
+        setActionLoading('accept');
+        try {
+          // Accept the counter offer via API
+          const response = await fetch(`/api/negotiation/counter-offers/${counterOffer.id}/accept`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${user?.token || ''}`,
+            },
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            // Send notification to creator
+            try {
+              await notificationService.notifyCreator(counterOffer.creator.id, {
+                type: 'deal',
+                title: 'Counter Offer Accepted!',
+                message: `${user?.name || user?.company || 'Marketer'} accepted your counter offer for ${counterOffer.originalOffer.offerType}`,
+                actionType: 'view_deal',
+                actionParams: { dealId: result.data.dealId }
+              });
+            } catch (notifError) {
+              console.log('Notification error (non-critical):', notifError);
+            }
             
             // Dispatch event to hide the banner
             if (typeof window !== 'undefined') {
@@ -118,113 +204,125 @@ const HandleCounterOfferPage: React.FC = () => {
               }));
             }
             
-            window.alert('Counter Offer Accepted! Let\'s set up milestones for this deal.');
-            router.replace({
-              pathname: '/milestones/setup',
-              params: { 
-                dealId: `DEAL-${Date.now()}`,
-                totalAmount: counterOffer.counterOffer.amount.toString(),
-                offerTitle: counterOffer.originalOffer.offerType,
-                creatorName: counterOffer.creator.name
-              }
-            });
-          }
-        } else {
-          Alert.alert(
-            'Accept Counter Offer',
-            `Accept the counter offer from ${counterOffer.creator.name} for $${counterOffer.counterOffer.amount}?`,
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { 
-              text: 'Accept', 
-              onPress: async () => {
-                // Send notification to creator (NOTIFY_C)
-                await notificationService.notifyCreator(counterOffer.creator.id, {
-                  type: 'deal',
-                  title: 'Counter Offer Accepted!',
-                  message: `${user?.name || user?.company || 'Marketer'} accepted your counter offer for ${counterOffer.originalOffer.offerType}`,
-                  actionType: 'view_deal',
-                  actionParams: { dealId: `DEAL-${Date.now()}` }
+            const successMessage = 'Counter Offer Accepted! Let\'s set up milestones for this deal.';
+            
+            if (isWeb) {
+              const setupMilestones = window.confirm(successMessage + '\n\nSet up milestones now?');
+              if (setupMilestones) {
+                router.replace({
+                  pathname: '/milestones/setup',
+                  params: { 
+                    dealId: result.data.dealId,
+                    totalAmount: counterOffer.counterOffer.amount.toString(),
+                    offerTitle: counterOffer.originalOffer.offerType,
+                    creatorName: counterOffer.creator.name
+                  }
                 });
-                
-                // Dispatch event to hide the banner
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('offerAccepted', {
-                    detail: { offerId: counterOffer.id }
-                  }));
-                }
-                
-                Alert.alert(
-                  'Counter Offer Accepted!',
-                  'Great! Let\'s set up milestones for this deal.',
-                  [
-                    { 
-                      text: 'Set Up Milestones', 
-                      onPress: () => router.replace({
-                        pathname: '/milestones/setup',
-                        params: { 
-                          dealId: `DEAL-${Date.now()}`,
-                          totalAmount: counterOffer.counterOffer.amount.toString(),
-                          offerTitle: counterOffer.originalOffer.offerType,
-                          creatorName: counterOffer.creator.name
-                        }
-                      })
-                    }
-                  ]
-                );
+              } else {
+                router.push('/deals');
               }
+            } else {
+              Alert.alert(
+                'Counter Offer Accepted!',
+                'Great! Let\'s set up milestones for this deal.',
+                [
+                  { 
+                    text: 'Set Up Milestones', 
+                    onPress: () => router.replace({
+                      pathname: '/milestones/setup',
+                      params: { 
+                        dealId: result.data.dealId,
+                        totalAmount: counterOffer.counterOffer.amount.toString(),
+                        offerTitle: counterOffer.originalOffer.offerType,
+                        creatorName: counterOffer.creator.name
+                      }
+                    })
+                  },
+                  { 
+                    text: 'View Deals', 
+                    onPress: () => router.push('/deals')
+                  }
+                ]
+              );
             }
-          ]
-        );
+          } else {
+            Alert.alert('Error', result.message || 'Failed to accept counter offer. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error accepting counter offer:', error);
+          Alert.alert('Error', 'Failed to accept counter offer. Please try again.');
+        } finally {
+          setActionLoading(null);
         }
         break;
         
       case 'reject':
+        const rejectMessage = 'Are you sure you want to reject this counter offer?';
+        
         if (isWeb) {
-          const confirmed = window.confirm('Are you sure you want to reject this counter offer?');
-          if (confirmed) {
-            // Send notification
-            notificationService.notifyCreator(counterOffer.creator.id, {
-              type: 'offer',
-              title: 'Counter Offer Declined',
-              message: `${user?.name || user?.company || 'Marketer'} declined your counter offer for ${counterOffer.originalOffer.offerType}`,
-              actionType: 'view_offer',
-              actionParams: { offerId: counterOffer.originalOfferId }
-            }).catch(console.error);
-            
-            window.alert('Counter Offer Rejected. The creator has been notified.');
-            router.push('/deals');
-          }
+          const confirmed = window.confirm(rejectMessage);
+          if (!confirmed) return;
         } else {
-          Alert.alert(
-            'Reject Counter Offer',
-            'Are you sure you want to reject this counter offer?',
-          [
-            { text: 'Cancel', style: 'cancel' },
-            { 
-              text: 'Reject', 
-              style: 'destructive',
-              onPress: async () => {
-                // Send notification to creator (NOTIFY_C)
-                await notificationService.notifyCreator(counterOffer.creator.id, {
-                  type: 'offer',
-                  title: 'Counter Offer Declined',
-                  message: `${user?.name || user?.company || 'Marketer'} declined your counter offer for ${counterOffer.originalOffer.offerType}`,
-                  actionType: 'view_offer',
-                  actionParams: { offerId: counterOffer.originalOfferId }
-                });
-                
-                Alert.alert(
-                  'Counter Offer Rejected',
-                  'The creator has been notified.',
-                  [
-                    { text: 'OK', onPress: () => router.push('/deals') }
-                  ]
-                );
-              }
+          const confirmed = await new Promise<boolean>((resolve) => {
+            Alert.alert(
+              'Reject Counter Offer',
+              rejectMessage,
+              [
+                { text: 'Cancel', style: 'cancel', onPress: () => resolve(false) },
+                { text: 'Reject', style: 'destructive', onPress: () => resolve(true) }
+              ]
+            );
+          });
+          if (!confirmed) return;
+        }
+
+        setActionLoading('reject');
+        try {
+          // Reject the counter offer via API
+          const response = await fetch(`/api/negotiation/counter-offers/${counterOffer.id}/reject`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${user?.token || ''}`,
+            },
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            // Send notification to creator
+            try {
+              await notificationService.notifyCreator(counterOffer.creator.id, {
+                type: 'offer',
+                title: 'Counter Offer Declined',
+                message: `${user?.name || user?.company || 'Marketer'} declined your counter offer for ${counterOffer.originalOffer.offerType}`,
+                actionType: 'view_offer',
+                actionParams: { offerId: counterOffer.originalOfferId }
+              });
+            } catch (notifError) {
+              console.log('Notification error (non-critical):', notifError);
             }
-          ]
-        );
+            
+            if (isWeb) {
+              window.alert('Counter Offer Rejected. The creator has been notified.');
+              router.push('/deals');
+            } else {
+              Alert.alert(
+                'Counter Offer Rejected',
+                'The creator has been notified.',
+                [
+                  { text: 'OK', onPress: () => router.push('/deals') }
+                ]
+              );
+            }
+          } else {
+            Alert.alert('Error', result.message || 'Failed to reject counter offer. Please try again.');
+          }
+        } catch (error) {
+          console.error('Error rejecting counter offer:', error);
+          Alert.alert('Error', 'Failed to reject counter offer. Please try again.');
+        } finally {
+          setActionLoading(null);
         }
         break;
         
@@ -233,13 +331,17 @@ const HandleCounterOfferPage: React.FC = () => {
           const choice = window.confirm('Continue negotiation?\n\nClick OK to open chat, or Cancel to make a counter offer.');
           if (choice) {
             // Open chat
-            notificationService.notifyCreator(counterOffer.creator.id, {
-              type: 'message',
-              title: 'Negotiation Continues',
-              message: `${user?.name || user?.company || 'Marketer'} wants to discuss your counter offer`,
-              actionType: 'open_chat',
-              actionParams: { chatId: `chat-${counterOffer.originalOfferId}` }
-            }).catch(console.error);
+            try {
+              await notificationService.notifyCreator(counterOffer.creator.id, {
+                type: 'message',
+                title: 'Negotiation Continues',
+                message: `${user?.name || user?.company || 'Marketer'} wants to discuss your counter offer`,
+                actionType: 'open_chat',
+                actionParams: { chatId: `chat-${counterOffer.originalOfferId}` }
+              });
+            } catch (notifError) {
+              console.log('Notification error (non-critical):', notifError);
+            }
             
             router.push({
               pathname: '/chat/[id]',
@@ -266,13 +368,17 @@ const HandleCounterOfferPage: React.FC = () => {
               text: 'Open Chat', 
               onPress: async () => {
                 // Send notification to creator about negotiation
-                await notificationService.notifyCreator(counterOffer.creator.id, {
-                  type: 'message',
-                  title: 'Negotiation Continues',
-                  message: `${user?.name || user?.company || 'Marketer'} wants to discuss your counter offer`,
-                  actionType: 'open_chat',
-                  actionParams: { chatId: `chat-${counterOffer.originalOfferId}` }
-                });
+                try {
+                  await notificationService.notifyCreator(counterOffer.creator.id, {
+                    type: 'message',
+                    title: 'Negotiation Continues',
+                    message: `${user?.name || user?.company || 'Marketer'} wants to discuss your counter offer`,
+                    actionType: 'open_chat',
+                    actionParams: { chatId: `chat-${counterOffer.originalOfferId}` }
+                  });
+                } catch (notifError) {
+                  console.log('Notification error (non-critical):', notifError);
+                }
                 
                 // Navigate to chat
                 router.push({
@@ -303,6 +409,8 @@ const HandleCounterOfferPage: React.FC = () => {
   };
 
   const getChangeSummary = () => {
+    if (!counterOffer) return [];
+    
     const changes = [];
     if (counterOffer.changes.amountDiff > 0) {
       changes.push(`+$${counterOffer.changes.amountDiff} increase (${((counterOffer.changes.amountDiff / counterOffer.originalOffer.amount) * 100).toFixed(0)}%)`);
@@ -315,6 +423,50 @@ const HandleCounterOfferPage: React.FC = () => {
     }
     return changes;
   };
+
+  // Loading state
+  if (loading && !counterOffer) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="auto" />
+        <View style={styles.header}>
+          <UniversalBackButton 
+            style={styles.backButton}
+            fallbackRoute="/deals"
+            iconSize={24}
+          />
+          <Text style={styles.headerTitle}>Counter Offer</Text>
+          <View style={styles.headerSpacer} />
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Color.cSK430B92500} />
+          <Text style={styles.loadingText}>Loading counter offer...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // Error state
+  if (!counterOffer) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="auto" />
+        <View style={styles.header}>
+          <UniversalBackButton 
+            style={styles.backButton}
+            fallbackRoute="/deals"
+            iconSize={24}
+          />
+          <Text style={styles.headerTitle}>Counter Offer</Text>
+          <View style={styles.headerSpacer} />
+        </View>
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyStateText}>Counter offer not found</Text>
+          <Text style={styles.emptyStateSubtext}>Please check your notifications or deals list</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <>
@@ -343,6 +495,13 @@ const HandleCounterOfferPage: React.FC = () => {
           style={styles.scrollContainer} 
           contentContainerStyle={isWeb ? { paddingBottom: 120 } : undefined}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={[Color.cSK430B92500]}
+            />
+          }
         >
           {/* Creator Info */}
           <View style={styles.creatorSection}>
@@ -438,19 +597,25 @@ const HandleCounterOfferPage: React.FC = () => {
         {/* Action Buttons */}
         <View style={styles.actionSection}>
           <TouchableOpacity 
-            style={styles.rejectButton}
+            style={[styles.rejectButton, actionLoading ? styles.disabledButton : null]}
             onPress={() => handleAction('reject')}
+            disabled={!!actionLoading}
             accessible={true}
             accessibilityRole="button"
             accessibilityLabel={`Reject counter offer from ${counterOffer.creator.name}`}
             accessibilityHint="Declines the counter offer and notifies the creator"
           >
-            <Text style={styles.rejectButtonText}>Reject</Text>
+            {actionLoading === 'reject' ? (
+              <ActivityIndicator size="small" color={BrandColors.semantic.errorDark} />
+            ) : (
+              <Text style={styles.rejectButtonText}>Reject</Text>
+            )}
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={styles.negotiateButton}
+            style={[styles.negotiateButton, actionLoading ? styles.disabledButton : null]}
             onPress={() => handleAction('negotiate')}
+            disabled={!!actionLoading}
             accessible={true}
             accessibilityRole="button"
             accessibilityLabel={`Continue negotiating with ${counterOffer.creator.name}`}
@@ -460,14 +625,19 @@ const HandleCounterOfferPage: React.FC = () => {
           </TouchableOpacity>
           
           <TouchableOpacity 
-            style={styles.acceptButton}
+            style={[styles.acceptButton, actionLoading ? styles.disabledButton : null]}
             onPress={() => handleAction('accept')}
+            disabled={!!actionLoading}
             accessible={true}
             accessibilityRole="button"
             accessibilityLabel={`Accept counter offer for $${counterOffer.counterOffer.amount}`}
             accessibilityHint="Accepts the terms and starts setting up deal milestones"
           >
-            <Text style={styles.acceptButtonText}>Accept</Text>
+            {actionLoading === 'accept' ? (
+              <ActivityIndicator size="small" color={BrandColors.neutral[0]} />
+            ) : (
+              <Text style={styles.acceptButtonText}>Accept</Text>
+            )}
           </TouchableOpacity>
         </View>
         
@@ -482,6 +652,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: BrandColors.neutral[0],
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#666',
+  },
+  emptyState: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 40,
+  },
+  emptyStateText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#666',
+    marginBottom: 8,
+  },
+  emptyStateSubtext: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
   header: {
     flexDirection: 'row',

@@ -1,35 +1,111 @@
-# Rollback Procedures - Phase 1 Practice Deployment
+# Emergency Rollback Procedures - Multi-Phase Merges
 
-## Current State Summary
+**Created:** June 28, 2025 | **Updated:** July 3, 2025  
+**Current Phase:** profile-replication-feature → galaxies-features-implementation  
 
-- **Branch**: production-baseline
-- **Last Commit**: 4591f62 - Fix discover page filter interactions and cleanup
-- **Backup Tag**: production-backup-20250703
-- **Practice Site**: axees-qa-fixes-v2
-- **Deploy ID**: 686697d0ebff2b4e3bc80c70
-- **Deploy URL**: https://686697d0ebff2b4e3bc80c70--axees-qa-fixes-v2.netlify.app
+⚠️ **USE ONLY IN EMERGENCY** - These procedures will undo merge operations
 
-## Rollback Scenarios
+## Current State Summary (Phase 3)
 
-### 1. Code Rollback (Git)
+- **Branch**: galaxies-features-implementation
+- **Active Merge**: profile-replication-feature (in progress)
+- **Last Stable Commit**: 4591f62 - Fix discover page filter interactions and cleanup
+- **Backup Tags Available**: production-backup-20250703
 
-If issues are found and you need to revert to the backup state:
+## Pre-Rollback Checklist
 
+Before executing any rollback, verify:
+- [ ] You have confirmed the issue requires a full rollback
+- [ ] Alternative fixes have been considered
+- [ ] Stakeholders have been notified
+- [ ] You have recent backups of current state
+
+## Quick Reference - Emergency Commands
+
+### 🚨 Emergency Rollback (Phase 3 - Current)
 ```bash
-# Option A: Reset to backup tag (destructive - removes commits)
+# Navigate to project
+cd /home/Mike/projects/axees/axeesBE/frontend
+
+# Abort current merge and rollback
+git merge --abort
 git reset --hard production-backup-20250703
-
-# Option B: Revert commits (preserves history)
-git revert HEAD
-git commit -m "Revert Phase 1 changes due to issues"
-
-# Option C: Create a new branch from backup
-git checkout -b rollback-branch production-backup-20250703
 ```
 
-### 2. Netlify Deployment Rollback
+### 🚨 Emergency Rollback (Phase 1 & 2)
+```bash
+# Rollback to production baseline
+git checkout production-baseline
+git reset --hard production-backup-20250703
+git push --force origin production-baseline
+```
 
-To rollback the practice site deployment:
+### ⚠️ Verify Rollback Success
+```bash
+# Check current state
+git log --oneline -5
+git status
+
+# Verify build works
+npm run build:smart
+```
+
+## Detailed Rollback Procedures
+
+### Option 1: Abort Current Merge (Recommended for Phase 3)
+
+Use this when the current merge needs to be abandoned:
+
+```bash
+# 1. Navigate to frontend directory
+cd /home/Mike/projects/axees/axeesBE/frontend
+
+# 2. Abort the merge in progress
+git merge --abort
+
+# 3. Verify clean state
+git status
+
+# 4. Reset to known good state if needed
+git reset --hard production-backup-20250703
+
+# 5. Verify build works
+npm run build:smart
+```
+
+### Option 2: Complete Branch Rollback (Previous Phases)
+
+Use this when entire merge needs to be undone:
+
+```bash
+# 1. Navigate to frontend directory
+cd /home/Mike/projects/axees/axeesBE/frontend
+
+# 2. Ensure clean working directory
+git status
+# If there are uncommitted changes:
+git add . && git commit -m "Save current work before rollback"
+
+# 3. Switch to target branch
+git checkout galaxies-features-implementation
+
+# 4. Reset to backup tag
+git reset --hard production-backup-20250703
+
+# 5. Verify rollback state
+git log --oneline -5
+echo "Expected: Should see pre-merge commits"
+
+# 6. Test build after rollback
+npm run build:smart
+
+# 7. Force push if successful (WARNING: Destructive)
+git push --force origin galaxies-features-implementation
+```
+
+### Option 3: Netlify Deployment Rollback
+
+To rollback practice site deployments:
 
 ```bash
 # List all deploys for the practice site
@@ -39,54 +115,102 @@ NETLIFY_AUTH_TOKEN=nfp_eK5CfAHbJFiSjM2p8nrJznnMAiasaUtt8c96 netlify deploys:list
 NETLIFY_AUTH_TOKEN=nfp_eK5CfAHbJFiSjM2p8nrJznnMAiasaUtt8c96 netlify deploy:restore DEPLOY_ID --site a7351308-618e-4c10-8bf1-7222e9074e2f
 ```
 
-### 3. Quick Emergency Rollback
+## Phase-Specific Rollback Information
 
-If you need to quickly restore functionality:
+### Phase 3 (Current): profile-replication-feature
+- **Merge Status**: In progress with conflicts
+- **Backup Strategy**: Merge abort + reset to production-backup-20250703
+- **Files Modified**: Admin controllers, profile components, navigation
 
+### Phase 2: investor-demo-only  
+- **Merge Commit**: 17a69cb
+- **Deploy ID**: 6866a5a564be6281e499c392
+- **Preview URL**: https://phase2--polite-ganache-3a4e1b.netlify.app
+
+### Phase 1: galaxies-features-implementation
+- **Status**: No changes merged (already up-to-date)
+- **Deploy ID**: 686699297824c05ce8cfee1e
+
+## Rollback Validation Steps
+
+After any rollback, perform these validation steps:
+
+### 1. Build Verification
 ```bash
-# 1. Checkout the backup tag
-git checkout production-backup-20250703
-
-# 2. Build the project
-npm run export:web
-
-# 3. Deploy to practice site
-cd dist
-NETLIFY_AUTH_TOKEN=nfp_eK5CfAHbJFiSjM2p8nrJznnMAiasaUtt8c96 netlify deploy --site a7351308-618e-4c10-8bf1-7222e9074e2f --dir . --prod --message "Emergency rollback to production-backup-20250703"
+npm run build:smart
+# Should complete without errors
 ```
 
-## Important Files Backup
+### 2. Component Check
+```bash
+# Verify core components exist and work
+ls -la components/
+ls -la app/profile/
 
-Key files that were modified in this phase:
-- `app/discover.tsx` - Filter interaction fixes
-- `package.json` - Dependency updates
-- Multiple archive files were removed (84MB cleanup)
+# Check for any missing files
+npm run lint
+```
 
-## Testing Before Rollback
+### 3. Functionality Test
+```bash
+# Run available tests
+npm test -- --watchAll=false --passWithNoTests
+```
 
-Before rolling back, ensure you:
-1. Document the specific issues encountered
-2. Take screenshots if UI issues
-3. Save error logs
-4. Note which functionality is broken
+## Backup Tags Available
 
-## Post-Rollback Steps
+### Current Backups:
+- `production-backup-20250703`: Pre-Phase 3 stable state
+- `pre-merge-backup-galaxies`: Pre-galaxies merge backup
+- `investor-demo-backup`: Pre-investor-demo merge backup
 
-After rollback:
-1. Verify the practice site is working correctly
-2. Update MERGE_RESULTS.md with rollback reason
-3. Create a new branch for fixing issues
-4. Plan remediation steps
+### Verification Commands
+```bash
+# Check tags exist
+git tag -l "*backup*"
 
-## Contact Information
+# View tag details
+git show production-backup-20250703 --stat
+```
 
-- Netlify Dashboard: https://app.netlify.com/teams/michael-abdo/sites
-- Practice Site ID: a7351308-618e-4c10-8bf1-7222e9074e2f
-- Auth Token Location: `.env.local`
+## Emergency Contact Information
 
-## Notes
+### If Rollback Fails
+1. **Stop immediately** - Do not continue
+2. **Document the error** - Save all error messages
+3. **Create emergency backup** of current state:
+   ```bash
+   git branch emergency-backup-$(date +%Y%m%d-%H%M%S)
+   ```
 
-- These procedures are for the PRACTICE site only
-- Production remains untouched at deployment 686466b31a5b739a56853be7
-- All changes are reversible
-- The backup tag `production-backup-20250703` preserves the pre-merge state
+### Deployment Information
+- **Netlify Dashboard**: https://app.netlify.com/teams/michael-abdo/sites
+- **Practice Site ID**: a7351308-618e-4c10-8bf1-7222e9074e2f
+- **Preview Site**: polite-ganache-3a4e1b
+- **Auth Token Location**: `.env.local`
+
+## Important Notes
+
+- **NO DEPLOYMENT TO PRODUCTION** - only preview/practice sites affected
+- Production remains stable at deployment 686466b31a5b739a56853be7  
+- All changes are reversible with backup tags
+- Rollbacks should be last resort - always try to fix forward when possible
+
+## Post-Rollback Actions
+
+### Immediate (Required)
+- [ ] Verify the practice site is working correctly
+- [ ] Update MERGE_RESULTS.md with rollback reason
+- [ ] Create a new branch for fixing issues
+- [ ] Plan remediation steps
+
+### Short-term (Within 24 hours)
+- [ ] Analyze root cause of issue that required rollback
+- [ ] Plan corrective actions
+- [ ] Document lessons learned
+- [ ] Update merge procedures if needed
+
+---
+
+**Document Updated:** July 3, 2025  
+**Tested:** All backup tags verified and accessible

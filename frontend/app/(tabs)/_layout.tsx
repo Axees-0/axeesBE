@@ -20,15 +20,15 @@ import { BrandColors } from '@/constants/Colors';
 import Discoveryiconlypro from "../../assets/discovery--iconly-pro.svg";
 import Hotprice from "../../assets/hotprice.svg";
 import Message01 from "../../assets/message01.svg";
-import BellNotificationRegular from "../../assets/user.svg";
-import User from "../../assets/user.svg";
+import BellNotificationRegular from "../../assets/bell-notification.svg";
+import DashboardIcon from "../../assets/dashboard.svg";
 
 const TABS = [
-  { name: "index", icon: Discoveryiconlypro, label: "Explore", route: "/" },
+  { name: "index", icon: Discoveryiconlypro, label: "Discover", route: "/" },
   { name: "deals", icon: Hotprice, label: "Deals/Offers", route: "/(tabs)/deals" },
   { name: "messages", icon: Message01, label: "Messages", route: "/(tabs)/messages" },
   { name: "notifications", icon: BellNotificationRegular, label: "Notifications", route: "/(tabs)/notifications" },
-  { name: "profile", icon: User, label: "Profile", route: "/(tabs)/profile" },
+  { name: "dashboard", icon: DashboardIcon, label: "Dashboard", route: "/(tabs)/dashboard" },
 ];
 
 export default function TabLayout() {
@@ -114,7 +114,7 @@ export default function TabLayout() {
               ios: insets.bottom,
               default: 20,
             }),
-            paddingHorizontal: 0,
+            paddingHorizontal: isMobile ? 4 : 8, // Reduced padding for 5 tabs on mobile
             width: "100vw",
             maxWidth: "100vw",
             position: "fixed",

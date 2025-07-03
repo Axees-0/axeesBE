@@ -27,6 +27,10 @@ import {
 } from '@expo/vector-icons';
 import DesignSystem from '@/styles/DesignSystem';
 import { BrandColors } from '@/constants/Colors';
+import { Theme } from '@/constants/Theme';
+import { ActivityFeed } from '@/components/ActivityFeed';
+import { AnalyticsWidget } from '@/components/AnalyticsWidget';
+import { Button } from '@/components/ui/Button';
 
 const Dashboard = () => {
   const { width: screenWidth } = useWindowDimensions();
@@ -53,7 +57,7 @@ const Dashboard = () => {
       title: 'Discover Creators',
       subtitle: 'Find perfect matches for your brand',
       icon: <Feather name="search" size={24} color={BrandColors.primary[500]} />,
-      route: '/discover',
+      route: '/',
       color: BrandColors.primary[500]
     },
     {
@@ -98,33 +102,6 @@ const Dashboard = () => {
     }
   ];
 
-  // Recent activity data
-  const recentActivity = [
-    {
-      id: '1',
-      type: 'campaign',
-      title: 'Summer Fashion Campaign',
-      subtitle: '12 creators responded',
-      time: '2 hours ago',
-      icon: <MaterialCommunityIcons name="tshirt-crew" size={20} color={BrandColors.semantic.success} />
-    },
-    {
-      id: '2',
-      type: 'payment',
-      title: 'Payment sent to @alexcreates',
-      subtitle: '$2,500 for Tech Review',
-      time: '5 hours ago',
-      icon: <MaterialIcons name="attach-money" size={20} color={BrandColors.semantic.info} />
-    },
-    {
-      id: '3',
-      type: 'message',
-      title: 'New message from @sophiastyle',
-      subtitle: 'Interested in beauty collab',
-      time: '1 day ago',
-      icon: <Ionicons name="chatbubble-ellipses" size={20} color={BrandColors.primary[400]} />
-    }
-  ];
 
   const handleMenuItemPress = (route: string) => {
     // Navigate to the route
@@ -160,37 +137,8 @@ const Dashboard = () => {
             </TouchableOpacity>
           </View>
 
-          {/* Stats Cards */}
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            style={styles.statsContainer}
-            contentContainerStyle={styles.statsContent}
-          >
-            <View style={[styles.statCard, { backgroundColor: BrandColors.neutral[100] }]}>
-              <MaterialCommunityIcons name="briefcase-outline" size={20} color={BrandColors.neutral[500]} />
-              <Text style={styles.statValue}>{userData.stats.totalCampaigns}</Text>
-              <Text style={styles.statLabel}>Campaigns</Text>
-            </View>
-            
-            <View style={[styles.statCard, { backgroundColor: BrandColors.primary[100] }]}>
-              <MaterialCommunityIcons name="account-group-outline" size={20} color={BrandColors.primary[400]} />
-              <Text style={styles.statValue}>{userData.stats.activeInfluencers}</Text>
-              <Text style={styles.statLabel}>Influencers</Text>
-            </View>
-            
-            <View style={[styles.statCard, { backgroundColor: BrandColors.semantic.infoLight }]}>
-              <MaterialIcons name="attach-money" size={20} color={BrandColors.semantic.info} />
-              <Text style={styles.statValue}>{userData.stats.totalSpend}</Text>
-              <Text style={styles.statLabel}>Total Spend</Text>
-            </View>
-            
-            <View style={[styles.statCard, { backgroundColor: BrandColors.semantic.successLight }]}>
-              <Ionicons name="trending-up" size={20} color={BrandColors.semantic.success} />
-              <Text style={styles.statValue}>{userData.stats.avgEngagement}</Text>
-              <Text style={styles.statLabel}>Avg Engagement</Text>
-            </View>
-          </ScrollView>
+          {/* Analytics Widget */}
+          <AnalyticsWidget defaultExpanded={false} />
         </View>
 
         {/* Search Section */}
@@ -239,56 +187,46 @@ const Dashboard = () => {
           </View>
         </View>
 
-        {/* Recent Activity */}
+        {/* Activity Feed */}
         <View style={styles.activitySection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Recent Activity</Text>
-            <TouchableOpacity>
-              <Text style={styles.viewAllLink}>View All</Text>
-            </TouchableOpacity>
-          </View>
-          
-          {recentActivity.map((activity) => (
-            <TouchableOpacity key={activity.id} style={styles.activityItem}>
-              <View style={[styles.activityIcon, { backgroundColor: BrandColors.neutral[100] }]}>
-                {activity.icon}
-              </View>
-              <View style={styles.activityContent}>
-                <Text style={styles.activityTitle}>{activity.title}</Text>
-                <Text style={styles.activitySubtitle}>{activity.subtitle}</Text>
-              </View>
-              <Text style={styles.activityTime}>{activity.time}</Text>
-            </TouchableOpacity>
-          ))}
+          <ActivityFeed 
+            maxItems={5} 
+            showViewAll={true}
+            onViewAll={() => router.push('/notifications')}
+            onActivityPress={(activity) => {
+              // Navigate based on activity type
+              if (activity.relatedType === 'deal') {
+                router.push(`/deals/${activity.relatedId}`);
+              } else if (activity.relatedType === 'campaign') {
+                router.push(`/campaigns/${activity.relatedId}`);
+              } else if (activity.relatedType === 'message') {
+                router.push('/messages');
+              }
+            }}
+          />
         </View>
 
         {/* Quick Actions */}
         <View style={styles.quickActions}>
-          <TouchableOpacity 
-            style={styles.quickActionButton}
+          <Button
+            variant="primary"
+            size="medium"
+            icon="add-circle-outline"
             onPress={() => router.push('/campaigns/create')}
-          >
-            <LinearGradient
-              colors={[BrandColors.primary[500], BrandColors.primary[400]]}
-              style={styles.quickActionGradient}
-            >
-              <Ionicons name="add-circle-outline" size={24} color={BrandColors.neutral[0]} />
-              <Text style={styles.quickActionText}>New Campaign</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
             style={styles.quickActionButton}
-            onPress={() => router.push('/discover')}
           >
-            <LinearGradient
-              colors={[BrandColors.semantic.success, BrandColors.semantic.successDark]}
-              style={styles.quickActionGradient}
-            >
-              <MaterialCommunityIcons name="account-search" size={24} color={BrandColors.neutral[0]} />
-              <Text style={styles.quickActionText}>Find Creators</Text>
-            </LinearGradient>
-          </TouchableOpacity>
+            New Campaign
+          </Button>
+          
+          <Button
+            variant="secondary"
+            size="medium"
+            icon="search"
+            onPress={() => router.push('/discover')}
+            style={styles.quickActionButton}
+          >
+            Find Creators
+          </Button>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -357,32 +295,6 @@ const styles = StyleSheet.create({
     color: BrandColors.neutral[0],
     fontSize: 10,
     fontWeight: '600',
-  },
-  statsContainer: {
-    marginHorizontal: -20,
-  },
-  statsContent: {
-    paddingHorizontal: 20,
-  },
-  statCard: {
-    padding: 16,
-    borderRadius: 12,
-    marginRight: 12,
-    minWidth: 100,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: BrandColors.neutral[900],
-    marginTop: 8,
-    fontFamily: DesignSystem.Typography.h3.fontFamily,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: BrandColors.neutral[500],
-    marginTop: 4,
-    fontFamily: DesignSystem.Typography.caption.fontFamily,
   },
   searchSection: {
     paddingHorizontal: 20,
@@ -456,53 +368,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 20,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  viewAllLink: {
-    fontSize: 14,
-    color: BrandColors.primary[500],
-    fontWeight: '500',
-    fontFamily: DesignSystem.Typography.captionMedium.fontFamily,
-  },
-  activityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: BrandColors.neutral[100],
-  },
-  activityIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  activityContent: {
-    flex: 1,
-  },
-  activityTitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: BrandColors.neutral[900],
-    marginBottom: 2,
-    fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
-  },
-  activitySubtitle: {
-    fontSize: 13,
-    color: BrandColors.neutral[500],
-    fontFamily: DesignSystem.Typography.caption.fontFamily,
-  },
-  activityTime: {
-    fontSize: 12,
-    color: BrandColors.neutral[400],
-    fontFamily: DesignSystem.Typography.small.fontFamily,
-  },
   quickActions: {
     flexDirection: 'row',
     paddingHorizontal: 20,
@@ -511,20 +376,6 @@ const styles = StyleSheet.create({
   },
   quickActionButton: {
     flex: 1,
-  },
-  quickActionGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
-    gap: 8,
-  },
-  quickActionText: {
-    color: BrandColors.neutral[0],
-    fontSize: 16,
-    fontWeight: '600',
-    fontFamily: DesignSystem.Typography.bodyMedium.fontFamily,
   },
 });
 
