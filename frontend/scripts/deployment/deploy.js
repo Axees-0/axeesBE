@@ -84,7 +84,22 @@ async function main() {
   const args = process.argv.slice(2);
   const qaOnly = args.includes('--qa-only');
   const stableOnly = args.includes('--stable-only');
+  const showHelp = args.includes('--help') || args.includes('-h');
   const singleMode = qaOnly || stableOnly;
+  
+  // Show help if requested
+  if (showHelp) {
+    console.log(`${colors.cyan}Universal Deployment Script${colors.reset}\n`);
+    console.log('Usage:');
+    console.log('  node deploy.js                    # Deploy both packages (dual mode)');
+    console.log('  node deploy.js --qa-only          # Deploy only QA fixes package');
+    console.log('  node deploy.js --stable-only      # Deploy only stable package');
+    console.log('  node deploy.js --help             # Show this help message\n');
+    console.log('Required packages:');
+    console.log('  - axees-frontend-original-stable.zip (for stable deployment)');
+    console.log('  - axees-frontend-qa-fixes.zip (for QA deployment)\n');
+    process.exit(0);
+  }
   
   console.log(`${colors.cyan}🚀 Universal Deployment Starting...${colors.reset}\n`);
   console.log(`Mode: ${singleMode ? (qaOnly ? 'QA Only' : 'Stable Only') : 'Dual Deployment'}\n`);
