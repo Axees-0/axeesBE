@@ -39,7 +39,7 @@ export const DebugPanel: React.FC = () => {
         position: 'fixed',
         bottom: '20px',
         left: '20px',
-        zIndex: 1000,
+        zIndex: 9999,
         backgroundColor: '#000',
         color: '#fff',
         padding: '10px',
@@ -64,7 +64,7 @@ export const DebugPanel: React.FC = () => {
       color: '#fff',
       border: '2px solid #333',
       borderRadius: '8px',
-      zIndex: 1000,
+      zIndex: 9999,
       fontFamily: 'monospace',
       fontSize: '11px',
       overflow: 'hidden'
