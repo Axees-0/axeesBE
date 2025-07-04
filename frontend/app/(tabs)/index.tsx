@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, createContext, useContext } from 'react';
 import { 
   View, 
   Text, 
@@ -20,7 +20,72 @@ import DesignSystem from '@/styles/DesignSystem';
 import { BrandColors } from '@/constants/Colors';
 import { getPlatformIcon } from '@/constants/platforms';
 import { WebSEO } from '../web-seo';
-import { useDiscoveryFilters, DebugPanel } from '@/contexts/DiscoveryFilterContext';
+import { DebugPanel } from '@/contexts/DiscoveryFilterContext';
+
+// ========== INLINE CONTEXT FOR DEBUGGING ==========
+const debugLogs: string[] = [];
+const addDebugLog = (message: string) => {
+  const timestamp = new Date().toLocaleTimeString();
+  const logEntry = `[${timestamp}] ${message}`;
+  debugLogs.push(logEntry);
+  console.log('🔧 INLINE DEBUG:', logEntry);
+};
+
+interface FilterState {
+  searchText: string;
+  activeFilterSection: string | null;
+}
+
+const defaultFilters: FilterState = {
+  searchText: '',
+  activeFilterSection: null,
+};
+
+interface FilterContextType {
+  filters: FilterState;
+  updateFilter: (key: keyof FilterState, value: any) => void;
+}
+
+const InlineFilterContext = createContext<FilterContextType | undefined>(undefined);
+
+const InlineFilterProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  addDebugLog('🔧 INLINE PROVIDER: Function called');
+  
+  const [filters, setFilters] = useState<FilterState>(defaultFilters);
+  addDebugLog('🔧 INLINE PROVIDER: useState initialized');
+  
+  const updateFilter = (key: keyof FilterState, value: any) => {
+    addDebugLog(`🔧 INLINE REAL updateFilter: ${String(key)} = ${JSON.stringify(value)}`);
+    setFilters(prev => ({ ...prev, [key]: value }));
+  };
+  
+  addDebugLog('🔧 INLINE PROVIDER: About to return JSX');
+  
+  return (
+    <InlineFilterContext.Provider value={{ filters, updateFilter }}>
+      {children}
+    </InlineFilterContext.Provider>
+  );
+};
+
+const useInlineFilters = () => {
+  const context = useContext(InlineFilterContext);
+  addDebugLog(`🔧 INLINE HOOK: context available: ${!!context}`);
+  
+  if (!context) {
+    addDebugLog('🔧 INLINE HOOK: FALLBACK MODE');
+    return {
+      filters: defaultFilters,
+      updateFilter: (key: any, value: any) => {
+        addDebugLog(`🔧 INLINE FALLBACK: ${key} = ${JSON.stringify(value)} (NO EFFECT)`);
+      }
+    };
+  }
+  
+  addDebugLog('🔧 INLINE HOOK: Real context returned');
+  return context;
+};
+// ========== END INLINE CONTEXT ==========
 
 const DiscoverCreators = () => {
   const { width } = useWindowDimensions();
@@ -31,7 +96,12 @@ const DiscoverCreators = () => {
     return () => console.log('🔍 DiscoverCreators component unmounted');
   }, []);
   
-  const { filters, updateFilter, resetFilters, hasActiveFilters, getActiveFilterCount } = useDiscoveryFilters();
+  const { filters, updateFilter } = useInlineFilters();
+  
+  // Simplified versions of missing functions for testing
+  const resetFilters = () => addDebugLog('🔧 INLINE resetFilters called');
+  const hasActiveFilters = () => false;
+  const getActiveFilterCount = () => 0;
   
   // Local state only for UI elements
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
@@ -1285,4 +1355,15 @@ const CreatorCard = React.memo(({
   </Pressable>
 ));
 
-export default DiscoverCreators;
+// Wrapper component with inline context
+const DiscoverCreatorsWithProvider = () => {
+  addDebugLog('🔧 WRAPPER: Component called');
+  
+  return (
+    <InlineFilterProvider>
+      <DiscoverCreators />
+    </InlineFilterProvider>
+  );
+};
+
+export default DiscoverCreatorsWithProvider;

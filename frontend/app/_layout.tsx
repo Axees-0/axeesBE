@@ -158,10 +158,14 @@ export default function RootLayout() {
     });
   }, []);
 
+  console.log('🌟 _layout.tsx: loaded =', loaded, 'error =', error);
+  
   if (!loaded && !error) {
+    console.log('🌟 _layout.tsx: Early return - fonts not loaded yet');
     return null;
   }
 
+  console.log('🌟 _layout.tsx: About to render providers');
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
