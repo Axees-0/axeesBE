@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axees - Master of Influencer Ads</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 900px;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .statement {
+            margin: 40px 0;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeInUp 0.8s ease forwards;
+        }
+        
+        .statement:nth-child(1) { animation-delay: 0.3s; }
+        .statement:nth-child(2) { animation-delay: 0.6s; }
+        .statement:nth-child(3) { animation-delay: 0.9s; }
+        
+        .company {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+        
+        .achievement {
+            font-size: 24px;
+            font-weight: 300;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Google Colors */
+        .google-statement .company {
+            background: linear-gradient(90deg, 
+                #4285F4 0%, 
+                #DB4437 25%, 
+                #F4B400 50%, 
+                #0F9D58 75%,
+                #4285F4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            background-size: 200% 100%;
+            animation: googleShimmer 3s ease-in-out infinite;
+        }
+        
+        .google-statement .achievement {
+            color: #9AA0A6;
+        }
+        
+        .google-statement .platform {
+            color: #4285F4;
+            font-weight: 500;
+        }
+        
+        /* Facebook Colors */
+        .facebook-statement .company {
+            color: #1877F2;
+            text-shadow: 0 0 30px rgba(24, 119, 242, 0.5);
+        }
+        
+        .facebook-statement .achievement {
+            color: #65676B;
+        }
+        
+        .facebook-statement .platform {
+            color: #1877F2;
+            font-weight: 500;
+        }
+        
+        /* Axees Colors */
+        .axees-statement {
+            margin-top: 60px;
+            position: relative;
+        }
+        
+        .axees-statement::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #8B5CF6, transparent);
+        }
+        
+        .axees-statement .company {
+            font-size: 64px;
+            background: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 80px rgba(139, 92, 246, 0.5);
+            animation: axeesPulse 2s ease-in-out infinite;
+        }
+        
+        .axees-statement .achievement {
+            font-size: 32px;
+            font-weight: 400;
+            color: #E0E7FF;
+            margin-top: 16px;
+        }
+        
+        .axees-statement .platform {
+            font-size: 36px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #F59E0B 0%, #EF4444 50%, #8B5CF6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline-block;
+            margin-top: 8px;
+            animation: everywhereGlow 3s ease-in-out infinite;
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes googleShimmer {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        
+        @keyframes axeesPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        @keyframes everywhereGlow {
+            0%, 100% { 
+                filter: brightness(1) drop-shadow(0 0 20px rgba(245, 158, 11, 0.5));
+            }
+            50% { 
+                filter: brightness(1.2) drop-shadow(0 0 40px rgba(139, 92, 246, 0.8));
+            }
+        }
+        
+        /* Decorative elements */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        .particle {
+            position: absolute;
+            background: #8B5CF6;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 15s infinite;
+        }
+        
+        .particle:nth-child(odd) { background: #EC4899; }
+        .particle:nth-child(3n) { background: #F59E0B; }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .company { font-size: 36px; }
+            .achievement { font-size: 18px; }
+            .axees-statement .company { font-size: 48px; }
+            .axees-statement .achievement { font-size: 24px; }
+            .axees-statement .platform { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <div class="statement google-statement">
+            <div class="company">Google</div>
+            <div class="achievement">mastered web ads — on <span class="platform">Google</span>.</div>
+        </div>
+        
+        <div class="statement facebook-statement">
+            <div class="company">Facebook</div>
+            <div class="achievement">mastered social ads — on <span class="platform">Facebook</span>.</div>
+        </div>
+        
+        <div class="statement axees-statement">
+            <div class="company">Axees</div>
+            <div class="achievement">mastered influencer ads —</div>
+            <div class="platform">everywhere.</div>
+        </div>
+    </div>
+    
+    <script>
+        // Create floating particles
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 50;
+        
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (15 + Math.random() * 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+    </script>
+</body>
+</html>

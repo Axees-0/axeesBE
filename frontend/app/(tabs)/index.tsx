@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { 
   View, 
   Text, 
@@ -24,6 +24,13 @@ import { useDiscoveryFilters, DebugPanel } from '@/contexts/DiscoveryFilterConte
 
 const DiscoverCreators = () => {
   const { width } = useWindowDimensions();
+  
+  // Debug component mount
+  useEffect(() => {
+    console.log('🔍 DiscoverCreators component mounted');
+    return () => console.log('🔍 DiscoverCreators component unmounted');
+  }, []);
+  
   const { filters, updateFilter, resetFilters, hasActiveFilters, getActiveFilterCount } = useDiscoveryFilters();
   
   // Local state only for UI elements

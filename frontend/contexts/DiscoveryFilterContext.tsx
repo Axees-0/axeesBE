@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import { Platform } from 'react-native';
 
 // Debug logging system
 const debugLogs: string[] = [];
@@ -217,10 +218,13 @@ const DiscoveryFilterContext = createContext<DiscoveryFilterContextType | undefi
 
 export const DiscoveryFilterProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   addDebugLog('🔴 DiscoveryFilterProvider function called - about to render');
+  addDebugLog(`🔴 Platform: ${Platform.OS}, isWeb: ${Platform.OS === 'web'}`);
+  addDebugLog(`🔴 window exists: ${typeof window !== 'undefined'}`);
   
   try {
     const [filters, setFilters] = useState<FilterState>(defaultFilters);
     addDebugLog('🔴 useState initialized successfully');
+    addDebugLog(`🔴 Current filters state: ${JSON.stringify(filters, null, 2)}`);
 
     // Debug logging
     addDebugLog('🔴 DiscoveryFilterProvider rendering, providing context');
@@ -274,17 +278,19 @@ export const DiscoveryFilterProvider: React.FC<{ children: ReactNode }> = ({ chi
       return count;
     };
 
+    const contextValue = { 
+      filters, 
+      updateFilter, 
+      resetFilters, 
+      hasActiveFilters,
+      getActiveFilterCount 
+    };
+    
     addDebugLog('🔴 About to return provider JSX');
+    addDebugLog(`🔴 Context value being provided: ${JSON.stringify(Object.keys(contextValue))}`);
+    
     return (
-      <DiscoveryFilterContext.Provider 
-        value={{ 
-          filters, 
-          updateFilter, 
-          resetFilters, 
-          hasActiveFilters,
-          getActiveFilterCount 
-        }}
-      >
+      <DiscoveryFilterContext.Provider value={contextValue}>
         {children}
       </DiscoveryFilterContext.Provider>
     );
@@ -298,6 +304,8 @@ export const DiscoveryFilterProvider: React.FC<{ children: ReactNode }> = ({ chi
 export const useDiscoveryFilters = () => {
   const context = useContext(DiscoveryFilterContext);
   addDebugLog(`🟡 useDiscoveryFilters called, context available: ${!!context}`);
+  addDebugLog(`🟡 Context type: ${typeof context}`);
+  addDebugLog(`🟡 Context value: ${context ? JSON.stringify(Object.keys(context)) : 'null/undefined'}`);
   
   if (!context) {
     addDebugLog('❌ CONTEXT UNAVAILABLE - returning fallback with no-op functions');
