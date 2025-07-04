@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 
 // Debug logging system
 const debugLogs: string[] = [];
@@ -18,42 +19,53 @@ const addDebugLog = (message: string) => {
 export const DebugPanel: React.FC = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [logs, setLogs] = useState<string[]>([]);
+  const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null);
 
   React.useEffect(() => {
-    // Set up the global update function
-    (window as any).updateDebugPanel = () => {
+    // Create portal container
+    if (typeof window !== 'undefined') {
+      const container = document.createElement('div');
+      container.id = 'debug-panel-portal';
+      document.body.appendChild(container);
+      setPortalContainer(container);
+      
+      // Set up the global update function
+      (window as any).updateDebugPanel = () => {
+        setLogs([...debugLogs]);
+      };
+      
+      // Initialize with existing logs
       setLogs([...debugLogs]);
-    };
-    
-    // Initialize with existing logs
-    setLogs([...debugLogs]);
-    
-    return () => {
-      delete (window as any).updateDebugPanel;
-    };
+      
+      return () => {
+        delete (window as any).updateDebugPanel;
+        document.body.removeChild(container);
+      };
+    }
   }, []);
 
-  if (!isVisible) {
-    return (
-      <div style={{
-        position: 'fixed',
-        bottom: '20px',
-        left: '20px',
-        zIndex: 9999,
-        backgroundColor: '#000',
-        color: '#fff',
-        padding: '10px',
-        borderRadius: '8px',
-        cursor: 'pointer',
-        fontFamily: 'monospace',
-        fontSize: '12px'
-      }} onClick={() => setIsVisible(true)}>
-        🐛 Debug Panel (Click to Show)
-      </div>
-    );
+  // Don't render until portal container is ready
+  if (!portalContainer || typeof window === 'undefined') {
+    return null;
   }
 
-  return (
+  const content = !isVisible ? (
+    <div style={{
+      position: 'fixed',
+      bottom: '20px',
+      left: '20px',
+      zIndex: 9999,
+      backgroundColor: '#000',
+      color: '#fff',
+      padding: '10px',
+      borderRadius: '8px',
+      cursor: 'pointer',
+      fontFamily: 'monospace',
+      fontSize: '12px'
+    }} onClick={() => setIsVisible(true)}>
+      🐛 Debug Panel (Click to Show)
+    </div>
+  ) : (
     <div style={{
       position: 'fixed',
       bottom: '20px',
@@ -134,6 +146,9 @@ export const DebugPanel: React.FC = () => {
       </div>
     </div>
   );
+
+  // Render using portal to ensure it appears above everything
+  return createPortal(content, portalContainer);
 };
 
 // Global flag to prevent spam logging during navigation transitions
