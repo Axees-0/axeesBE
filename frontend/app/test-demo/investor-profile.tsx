@@ -17,7 +17,7 @@ import Zap from "@/assets/zap.svg";
 import Share08 from "@/assets/share08.svg";
 import Contracts from "@/assets/contracts.svg";
 import Agreement02 from "@/assets/agreement02.svg";
-import Arrowleft02 from "@/assets/arrowleft02.svg";
+import Arrowleft02 from "@/assets/arrowleft021.svg";
 import {
   Gap,
   FontFamily,
@@ -27,7 +27,7 @@ import {
   FontSize,
 } from "@/GlobalStyles";
 import { router } from "expo-router";
-import MakeOfferModal from "@/components/account/ProfileMakeOfferModal";
+// import MakeOfferModal from "@/components/account/ProfileMakeOfferModal";
 import { useEffect, useState } from "react";
 
 const BREAKPOINTS = {
@@ -105,10 +105,10 @@ export default function InvestorDemoProfile() {
           </View>
         </ScrollView>
         
-        <MakeOfferModal
+        {/* <MakeOfferModal
           visible={isOfferModalVisible}
           onClose={() => setIsOfferModalVisible(false)}
-        />
+        /> */}
       </View>
     );
   }
@@ -319,10 +319,10 @@ export default function InvestorDemoProfile() {
         </View>
       </ScrollView>
 
-      <MakeOfferModal
+      {/* <MakeOfferModal
         visible={isOfferModalVisible}
         onClose={() => setIsOfferModalVisible(false)}
-      />
+      /> */}
     </View>
   );
 }

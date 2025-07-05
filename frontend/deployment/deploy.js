@@ -76,7 +76,7 @@ async function verifyDeployment(url, isProduction) {
           };
           
           fs.writeFileSync(
-            path.join('..', deployConfig.paths.deploymentStatus), 
+            path.join('.', deployConfig.paths.deploymentStatus), 
             JSON.stringify(deploymentStatus, null, 2)
           );
           
@@ -219,7 +219,7 @@ async function verifyContent(html, url) {
 function verifyBuildOutput() {
   log.header('🔍 Verifying Build Output');
   
-  const distDir = path.join('..', deployConfig.paths.distDir);
+  const distDir = path.join('.', deployConfig.paths.distDir);
   
   // Check if dist directory exists
   if (!fs.existsSync(distDir)) {
@@ -273,8 +273,9 @@ async function deploy() {
   }
   
   if (!authToken) {
-    log.error('No Netlify auth token found. Please set NETLIFY_AUTH_TOKEN');
-    process.exit(1);
+    log.warning('No Netlify auth token found in environment variables');
+    log.info('Attempting deployment with Netlify CLI authentication...');
+    // Continue without token - let Netlify CLI handle auth
   }
   
   log.info(`Site ID: ${siteId}`);
@@ -310,6 +311,12 @@ async function deploy() {
       }
     } catch (error) {
       log.error('Build failed');
+      if (error.message.includes('Unable to resolve module')) {
+        log.warning('Missing dependencies detected. This might be due to:');
+        log.warning('- Missing asset files');
+        log.warning('- Missing component imports');
+        log.warning('- Try fixing imports or use --no-build to deploy existing build');
+      }
       process.exit(1);
     }
   } else if (!options.dryRun) {
@@ -324,13 +331,23 @@ async function deploy() {
   if (!options.dryRun) {
     log.header('🚀 Deploying to Netlify');
     
-    const deployCommand = `netlify deploy ${isProductionDeploy ? '--prod' : ''} --site ${siteId} --dir ${path.join('..', deployConfig.paths.distDir)}`;
+    // Build deploy command - use alias for preview, prod flag for production
+    let deployCommand;
+    if (isProductionDeploy && siteId) {
+      deployCommand = `netlify deploy --prod --site ${siteId} --dir ${path.join('.', deployConfig.paths.distDir)}`;
+    } else if (siteId && environment === 'preview') {
+      deployCommand = `netlify deploy --alias preview --site ${siteId} --dir ${path.join('.', deployConfig.paths.distDir)}`;
+    } else if (siteId) {
+      deployCommand = `netlify deploy --site ${siteId} --dir ${path.join('.', deployConfig.paths.distDir)}`;
+    } else {
+      deployCommand = `netlify deploy --dir ${path.join('.', deployConfig.paths.distDir)}`;
+    }
     
     try {
       const result = execSync(deployCommand, {
         stdio: 'pipe',
         timeout: deployConfig.netlify.cliTimeout,
-        env: { ...process.env, NETLIFY_AUTH_TOKEN: authToken }
+        env: authToken ? { ...process.env, NETLIFY_AUTH_TOKEN: authToken } : process.env
       });
       
       log.success('Deployment completed successfully');
@@ -340,7 +357,7 @@ async function deploy() {
       const urlMatch = output.match(/https:\/\/[^\s]+/);
       if (urlMatch) {
         const deploymentUrl = urlMatch[0];
-        fs.writeFileSync(path.join('..', deployConfig.paths.deploymentUrl), deploymentUrl);
+        fs.writeFileSync(path.join('.', deployConfig.paths.deploymentUrl), deploymentUrl);
         log.info(`Deployment URL: ${deploymentUrl}`);
         
         // Verify the deployment is live

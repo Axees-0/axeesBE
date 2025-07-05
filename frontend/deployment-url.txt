@@ -1,1 +1,1 @@
-https://${NETLIFY_SITE_NAME}.netlify.app
+https://preview--polite-ganache-3a4e1b.netlify.app

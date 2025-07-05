@@ -45,7 +45,7 @@ module.exports = {
     siteIds: {
       'polite-ganache-3a4e1b': {
         name: 'production',
-        apiId: '6e93cf51-17e5-4528-8e38-7ad22c2b6b78',
+        apiId: 'e4389bf8-fc47-4c5e-9426-f11b25e5bcf3',
         url: 'https://polite-ganache-3a4e1b.netlify.app'
       }
     },
@@ -187,7 +187,12 @@ module.exports = {
 
   // Helper functions
   getSiteId(environment = 'production') {
-    return this.netlify.sites[environment] || this.netlify.sites.production;
+    const siteName = this.netlify.sites[environment] || this.netlify.sites.production;
+    // Return the UUID for the site if we have it
+    if (siteName === 'polite-ganache-3a4e1b') {
+      return 'e4389bf8-fc47-4c5e-9426-f11b25e5bcf3';
+    }
+    return siteName;
   },
 
   getBuildCommand(environment = 'production') {

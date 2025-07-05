@@ -1,0 +1,38 @@
+{
+  "url": "https://preview--polite-ganache-3a4e1b.netlify.app",
+  "isProduction": false,
+  "timestamp": "2025-07-05T18:10:19.873Z",
+  "verified": true,
+  "contentChecks": [
+    {
+      "name": "HTML Structure",
+      "passed": true,
+      "error": null
+    },
+    {
+      "name": "Title Tag",
+      "passed": true,
+      "error": null
+    },
+    {
+      "name": "Content Length",
+      "passed": true,
+      "error": null
+    },
+    {
+      "name": "No Error Pages",
+      "passed": true,
+      "error": null
+    },
+    {
+      "name": "React App Mount",
+      "passed": true,
+      "error": null
+    },
+    {
+      "name": "Axees Branding",
+      "passed": true,
+      "error": null
+    }
+  ]
+}
