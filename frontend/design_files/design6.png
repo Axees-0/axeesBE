@@ -1,0 +1,62 @@
+import React, { Fragment, useEffect, useState } from "react";
+import { useWindowDimensions, Text } from "react-native";
+
+const BREAKPOINTS = {
+  mobile: 768,
+};
+
+const ProfileScreen = () => {
+  const window = useWindowDimensions();
+  const isMobileScreen = window.width <= BREAKPOINTS.mobile;
+
+  const [MobileComponent, setMobileComponent] =
+    useState<React.ComponentType | null>(null);
+  const [WebComponent, setWebComponent] = useState<React.ComponentType | null>(
+    null
+  );
+
+  // On mount, try to dynamically import the mobile and web components
+  useEffect(() => {
+    (async () => {
+      try {
+        const mod = await import("@/components/account/mobile/UAM006MyProfile");
+        setMobileComponent(() => mod.default);
+      } catch (err) {
+        console.log("Mobile file not found or failed to import:", err);
+        setMobileComponent(null);
+      }
+
+      try {
+        const mod = await import("@/components/account/web/UAM006MyProfile");
+        setWebComponent(() => mod.default);
+      } catch (err) {
+        console.log("Web file not found or failed to import:", err);
+        setWebComponent(null);
+      }
+    })();
+  }, []);
+
+  // If we’re on a “mobile” screen width and the mobile component exists:
+  if (isMobileScreen && MobileComponent) {
+    return (
+      <Fragment>
+        <MobileComponent />
+      </Fragment>
+    );
+  }
+
+  // Otherwise if we’re on a “desktop/web” width and the web component exists:
+  if (!isMobileScreen && WebComponent) {
+    return (
+      <Fragment>
+        <WebComponent />
+      </Fragment>
+    );
+  }
+
+  // If neither file is available or doesn’t match the screen size,
+  // show fallback content:
+  return <Text>Component not found for this platform.</Text>;
+};
+
+export default ProfileScreen;

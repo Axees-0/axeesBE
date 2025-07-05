@@ -1,0 +1,204 @@
+{
+  "timestamp": "2025-07-05T02:56:25.920Z",
+  "summary": {
+    "total": 27,
+    "passed": 27,
+    "failed": 0,
+    "warnings": 0,
+    "success": true
+  },
+  "details": [
+    {
+      "timestamp": "2025-07-05T02:56:25.912Z",
+      "type": "INFO",
+      "message": "Checking required files...",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.912Z",
+      "type": "PASS",
+      "message": "File exists: app/test-demo/index.tsx",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.912Z",
+      "type": "PASS",
+      "message": "File exists: app/test-demo/investor-profile.tsx",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.913Z",
+      "type": "PASS",
+      "message": "File exists: app/test-demo/_layout.tsx",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.913Z",
+      "type": "INFO",
+      "message": "Validating investor demo profile component...",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.913Z",
+      "type": "PASS",
+      "message": "Content check passed: MrBeast profile name present",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.913Z",
+      "type": "PASS",
+      "message": "Content check passed: Correct follower count (1.1B)",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.913Z",
+      "type": "PASS",
+      "message": "Content check passed: AxeesMockup3 reference in comments",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.915Z",
+      "type": "PASS",
+      "message": "Content check passed: AxeesMockup3 style classes preserved",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.915Z",
+      "type": "PASS",
+      "message": "Content check passed: Modal integration present",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.916Z",
+      "type": "PASS",
+      "message": "Regex check passed: Responsive breakpoints configured",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.916Z",
+      "type": "INFO",
+      "message": "Validating demo routing configuration...",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.917Z",
+      "type": "PASS",
+      "message": "Content check passed: Profile route configured",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.917Z",
+      "type": "PASS",
+      "message": "Content check passed: Stack navigation setup",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.917Z",
+      "type": "PASS",
+      "message": "Content check passed: Navigation to profile configured",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.918Z",
+      "type": "PASS",
+      "message": "Content check passed: Demo index content present",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.918Z",
+      "type": "INFO",
+      "message": "Validating required assets...",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.918Z",
+      "type": "PASS",
+      "message": "File exists: assets/3.png",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.918Z",
+      "type": "PASS",
+      "message": "File exists: assets/share-08.png",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.919Z",
+      "type": "PASS",
+      "message": "File exists: assets/search01.svg",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.919Z",
+      "type": "PASS",
+      "message": "File exists: assets/zap.svg",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.919Z",
+      "type": "PASS",
+      "message": "File exists: assets/contracts.svg",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.919Z",
+      "type": "PASS",
+      "message": "File exists: assets/agreement02.svg",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.919Z",
+      "type": "PASS",
+      "message": "File exists: assets/pngclipartinstagramlogoiconotherstextphotographythumbnail-14.png",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.919Z",
+      "type": "PASS",
+      "message": "File exists: assets/pngclipartyoutubeplaybuttoncomputericonsyoutubeyoutubelogoanglerectanglethumbnail-13.png",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.920Z",
+      "type": "PASS",
+      "message": "File exists: assets/tiktok-icon.png",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.920Z",
+      "type": "PASS",
+      "message": "File exists: assets/facebook-icon.png",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.920Z",
+      "type": "INFO",
+      "message": "Validating GlobalStyles integration...",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.920Z",
+      "type": "PASS",
+      "message": "Content check passed: FontFamily export present",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.920Z",
+      "type": "PASS",
+      "message": "Content check passed: Color export present",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.920Z",
+      "type": "PASS",
+      "message": "Content check passed: Gap export present",
+      "details": null
+    },
+    {
+      "timestamp": "2025-07-05T02:56:25.920Z",
+      "type": "PASS",
+      "message": "Content check passed: Brand purple color defined",
+      "details": null
+    }
+  ]
+}

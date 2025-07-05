@@ -26,64 +26,30 @@ const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
 
-// Load environment variables from .env.local and .env files
-const dotenvFiles = ['.env.local', '.env'];
-dotenvFiles.forEach(file => {
-  const envPath = path.resolve(__dirname, '..', '..', file);
-  if (fs.existsSync(envPath)) {
-    const envContent = fs.readFileSync(envPath, 'utf8');
-    envContent.split('\n').forEach(line => {
-      const trimmed = line.trim();
-      if (trimmed && !trimmed.startsWith('#')) {
-        const [key, ...valueParts] = trimmed.split('=');
-        if (key && valueParts.length > 0) {
-          process.env[key.trim()] = valueParts.join('=').trim();
-        }
-      }
-    });
-  }
-});
+// Load centralized deployment configuration
+const deployConfig = require('../../deployment.config');
 
-// Configuration
+// Use configuration from deployment.config.js
 const CONFIG = {
-  defaultDir: 'dist',
-  defaultSite: 'polite-ganache-3a4e1b',
-  buildTimeout: 300000, // 5 minutes
-  deployTimeout: 180000, // 3 minutes
-  colors: {
-    reset: '\x1b[0m',
-    bright: '\x1b[1m',
-    red: '\x1b[31m',
-    green: '\x1b[32m',
-    yellow: '\x1b[33m',
-    blue: '\x1b[34m',
-    magenta: '\x1b[35m',
-    cyan: '\x1b[36m'
-  }
+  defaultDir: deployConfig.paths.distDir,
+  defaultSite: deployConfig.getSiteId('production'),
+  buildTimeout: deployConfig.build.timeout,
+  deployTimeout: deployConfig.netlify.cliTimeout,
+  colors: deployConfig.logging.colors
 };
 
-// Logging utilities
-const log = {
-  info: (msg) => console.log(`${CONFIG.colors.blue}[INFO]${CONFIG.colors.reset} ${msg}`),
-  success: (msg) => console.log(`${CONFIG.colors.green}[SUCCESS]${CONFIG.colors.reset} ${msg}`),
-  warning: (msg) => console.log(`${CONFIG.colors.yellow}[WARNING]${CONFIG.colors.reset} ${msg}`),
-  error: (msg) => console.log(`${CONFIG.colors.red}[ERROR]${CONFIG.colors.reset} ${msg}`),
-  header: (msg) => {
-    console.log(`\n${CONFIG.colors.cyan}${'='.repeat(50)}${CONFIG.colors.reset}`);
-    console.log(`${CONFIG.colors.cyan}${msg}${CONFIG.colors.reset}`);
-    console.log(`${CONFIG.colors.cyan}${'='.repeat(50)}${CONFIG.colors.reset}\n`);
-  }
-};
+// Use logging utilities from config
+const log = deployConfig.logging.log;
 
 // Parse command line arguments
 function parseArgs() {
   const args = process.argv.slice(2);
   const options = {
     prod: false,
-    site: CONFIG.defaultSite,
-    dir: CONFIG.defaultDir,
+    site: deployConfig.getSiteId('production'),
+    dir: deployConfig.paths.distDir,
     zip: null,
-    token: null,
+    token: deployConfig.getAuthToken(),
     build: false,
     clean: false
   };
@@ -151,19 +117,9 @@ Examples:
 `);
 }
 
-// Get Netlify token from various sources
+// Get Netlify token using centralized config
 function getNetlifyToken(providedToken) {
-  const sources = [
-    providedToken,
-    process.env.NETLIFY_AUTH_TOKEN,
-    process.env.NETLIFY_TOKEN,
-    fs.existsSync(`${process.env.HOME}/.netlify-token`) && 
-      fs.readFileSync(`${process.env.HOME}/.netlify-token`, 'utf8').trim(),
-    fs.existsSync('.netlify-token') && 
-      fs.readFileSync('.netlify-token', 'utf8').trim()
-  ].filter(Boolean);
-
-  return sources[0] || null;
+  return providedToken || deployConfig.getAuthToken();
 }
 
 // Check system resources
@@ -192,14 +148,14 @@ function buildProject(clean = false) {
     log.warning('Low memory - build may be slow');
   }
 
-  const buildCommand = clean ? 'npm run export:web:clean' : 'npm run export:web';
+  const buildCommand = clean ? deployConfig.build.commands.webClean : deployConfig.build.commands.web;
   log.info(`Running: ${buildCommand}`);
 
   try {
     execSync(buildCommand, {
       stdio: 'inherit',
       timeout: CONFIG.buildTimeout,
-      env: { ...process.env, NODE_OPTIONS: '--max-old-space-size=4096' }
+      env: { ...process.env, NODE_OPTIONS: `--max-old-space-size=${deployConfig.build.memoryLimit}` }
     });
     log.success('Build completed successfully');
     return true;

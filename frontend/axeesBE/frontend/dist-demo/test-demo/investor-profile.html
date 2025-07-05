@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MrBeast Profile - AxeesMockup3 Layout</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Inter', system-ui, sans-serif; 
+            background: #F5F5F5; 
+            min-height: 100vh;
+        }
+        
+        /* AxeesMockup3 Exact Layout Styles */
+        .frameParent {
+            position: relative;
+            background-color: #fff;
+            width: 100%;
+            min-height: 100vh;
+            overflow: hidden;
+            text-align: left;
+            font-size: 16px;
+            color: #000;
+            font-family: Inter;
+        }
+        
+        .profileHeader {
+            position: absolute;
+            top: 165px;
+            left: 50px;
+            right: 50px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+        
+        .avatarContainer {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #430B92, #6B46C1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: 700;
+        }
+        
+        .profileInfo h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 8px;
+        }
+        
+        .profileInfo .handle {
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+        
+        .profileInfo .bio {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.5;
+            max-width: 500px;
+        }
+        
+        .statsSection {
+            position: absolute;
+            top: 435px;
+            left: 50px;
+            right: 50px;
+        }
+        
+        .statsGrid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+        
+        .statCard {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .statNumber {
+            font-size: 32px;
+            font-weight: 700;
+            color: #430B92;
+            margin-bottom: 8px;
+        }
+        
+        .statLabel {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .platformsSection {
+            position: absolute;
+            top: 577px;
+            left: 50px;
+            right: 50px;
+        }
+        
+        .platformsGrid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+        
+        .platformCard {
+            background: #FFFFFF;
+            border: 1px solid #E5E7EB;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .platformIcon {
+            width: 32px;
+            height: 32px;
+            margin: 0 auto 12px;
+            background: #430B92;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+        
+        .platformName {
+            font-weight: 600;
+            color: #000;
+            margin-bottom: 4px;
+        }
+        
+        .platformFollowers {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .actionsSection {
+            position: absolute;
+            top: 931px;
+            left: 50px;
+            right: 50px;
+            display: flex;
+            gap: 16px;
+        }
+        
+        .primaryAction {
+            background: #430B92;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .primaryAction:hover {
+            background: #5B1BA8;
+            transform: translateY(-2px);
+        }
+        
+        .secondaryAction {
+            background: white;
+            color: #430B92;
+            border: 2px solid #430B92;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .secondaryAction:hover {
+            background: #F8F9FA;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .profileHeader {
+                position: relative;
+                top: 40px;
+                left: 20px;
+                right: 20px;
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .statsSection {
+                position: relative;
+                top: 60px;
+                left: 20px;
+                right: 20px;
+            }
+            
+            .statsGrid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            
+            .platformsSection {
+                position: relative;
+                top: 80px;
+                left: 20px;
+                right: 20px;
+            }
+            
+            .platformsGrid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            
+            .actionsSection {
+                position: relative;
+                top: 100px;
+                left: 20px;
+                right: 20px;
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="frameParent">
+        <!-- Profile Header Section (top: 165) -->
+        <div class="profileHeader">
+            <div class="avatarContainer">
+                MB
+            </div>
+            <div class="profileInfo">
+                <h1>Jimmy Donaldson</h1>
+                <div class="handle">@MrBeast</div>
+                <div class="bio">
+                    American YouTuber, internet personality, and entrepreneur known for expensive 
+                    stunts and philanthropy. One of the highest-paid content creators globally.
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Section (top: 435) -->
+        <div class="statsSection">
+            <div class="statsGrid">
+                <div class="statCard">
+                    <div class="statNumber">1.1B+</div>
+                    <div class="statLabel">Total Followers</div>
+                </div>
+                <div class="statCard">
+                    <div class="statNumber">328M</div>
+                    <div class="statLabel">YouTube</div>
+                </div>
+                <div class="statCard">
+                    <div class="statNumber">60M</div>
+                    <div class="statLabel">Instagram</div>
+                </div>
+                <div class="statCard">
+                    <div class="statNumber">1,200</div>
+                    <div class="statLabel">Active Offers</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Platforms Section (top: 577) -->
+        <div class="platformsSection">
+            <div class="platformsGrid">
+                <div class="platformCard">
+                    <div class="platformIcon">YT</div>
+                    <div class="platformName">YouTube</div>
+                    <div class="platformFollowers">328M subscribers</div>
+                </div>
+                <div class="platformCard">
+                    <div class="platformIcon">IG</div>
+                    <div class="platformName">Instagram</div>
+                    <div class="platformFollowers">60M followers</div>
+                </div>
+                <div class="platformCard">
+                    <div class="platformIcon">TT</div>
+                    <div class="platformName">TikTok</div>
+                    <div class="platformFollowers">104M followers</div>
+                </div>
+                <div class="platformCard">
+                    <div class="platformIcon">FB</div>
+                    <div class="platformName">Facebook</div>
+                    <div class="platformFollowers">20M followers</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Actions Section (top: 931) -->
+        <div class="actionsSection">
+            <button class="primaryAction" onclick="alert('Create Offer modal would open here')">
+                Create Offer
+            </button>
+            <button class="secondaryAction" onclick="alert('Share functionality would open here')">
+                Share Profile
+            </button>
+        </div>
+    </div>
+</body>
+</html>

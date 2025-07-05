@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axees Deployment Test - Filter Functionality</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .test-header {
+            background: #430B92;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .test-section {
+            background: #f5f5f5;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        .status {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status.success {
+            background: #4CAF50;
+            color: white;
+        }
+        .status.error {
+            background: #f44336;
+            color: white;
+        }
+        .status.warning {
+            background: #FF9800;
+            color: white;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 800px;
+            border: 2px solid #430B92;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .console-log {
+            background: #f0f0f0;
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        .console-log.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .console-log.warn {
+            background: #fff3e0;
+            color: #e65100;
+        }
+        .console-log.info {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+        .test-results {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        button {
+            background: #430B92;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #5a0fc4;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-header">
+        <h1>Axees Deployment Test - Filter Functionality</h1>
+        <p>Testing: https://polite-ganache-3a4e1b.netlify.app</p>
+        <p>Test Time: <span id="test-time"></span></p>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <button onclick="loadSite()">Load Site</button>
+        <button onclick="clearLogs()">Clear Logs</button>
+        <button onclick="testFilters()">Test Filter Interaction</button>
+        <button onclick="checkDebugPanel()">Check Debug Panel</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Site Preview</h2>
+        <div class="iframe-container">
+            <iframe id="test-iframe" src="about:blank"></iframe>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Console Output <span id="log-count" class="status warning">0 logs</span></h2>
+        <div id="console-output" class="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="test-results">
+            <p>Click "Load Site" to begin testing...</p>
+        </div>
+    </div>
+
+    <script>
+        // Set test time
+        document.getElementById('test-time').textContent = new Date().toLocaleString();
+
+        const logs = [];
+        const iframe = document.getElementById('test-iframe');
+        const consoleOutput = document.getElementById('console-output');
+        const testResults = document.getElementById('test-results');
+
+        function addLog(type, message, source = 'main') {
+            const log = {
+                type,
+                message,
+                source,
+                timestamp: new Date().toISOString()
+            };
+            logs.push(log);
+            
+            const logDiv = document.createElement('div');
+            logDiv.className = `console-log ${type}`;
+            logDiv.textContent = `[${source}] ${message}`;
+            consoleOutput.appendChild(logDiv);
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            
+            document.getElementById('log-count').textContent = `${logs.length} logs`;
+            
+            // Check for specific patterns
+            if (message.includes('INLINE PROVIDER')) {
+                addTestResult('Inline Provider Initialization', 'success', 'Found inline provider initialization log');
+            }
+            if (message.includes('INLINE HOOK')) {
+                addTestResult('Inline Hook Usage', 'success', 'Found inline hook usage log');
+            }
+            if (message.includes('useDiscoveryFilters must be used within')) {
+                addTestResult('Context Error', 'error', 'Found context provider error - fix not working!');
+            }
+        }
+
+        function clearLogs() {
+            logs.length = 0;
+            consoleOutput.innerHTML = '';
+            document.getElementById('log-count').textContent = '0 logs';
+            addLog('info', 'Logs cleared');
+        }
+
+        function loadSite() {
+            testResults.innerHTML = '<p>Loading site...</p>';
+            iframe.src = 'https://polite-ganache-3a4e1b.netlify.app';
+            
+            // Wait for iframe to load
+            iframe.onload = function() {
+                addLog('info', 'Site loaded successfully');
+                addTestResult('Site Loading', 'success', 'Site loaded without errors');
+                
+                // Try to inject console interceptor
+                try {
+                    const script = iframe.contentDocument.createElement('script');
+                    script.textContent = `
+                        // Intercept console methods
+                        const originalLog = console.log;
+                        const originalError = console.error;
+                        const originalWarn = console.warn;
+                        
+                        console.log = function(...args) {
+                            window.parent.postMessage({
+                                type: 'console',
+                                level: 'log',
+                                message: args.join(' ')
+                            }, '*');
+                            originalLog.apply(console, args);
+                        };
+                        
+                        console.error = function(...args) {
+                            window.parent.postMessage({
+                                type: 'console',
+                                level: 'error',
+                                message: args.join(' ')
+                            }, '*');
+                            originalError.apply(console, args);
+                        };
+                        
+                        console.warn = function(...args) {
+                            window.parent.postMessage({
+                                type: 'console',
+                                level: 'warn',
+                                message: args.join(' ')
+                            }, '*');
+                            originalWarn.apply(console, args);
+                        };
+                        
+                        // Check for debug panel
+                        setTimeout(() => {
+                            const debugPanel = document.querySelector('.debug-panel, [data-debug], #debug-panel');
+                            if (debugPanel) {
+                                window.parent.postMessage({
+                                    type: 'debug-panel',
+                                    found: true
+                                }, '*');
+                            } else {
+                                window.parent.postMessage({
+                                    type: 'debug-panel',
+                                    found: false
+                                }, '*');
+                            }
+                        }, 2000);
+                    `;
+                    iframe.contentDocument.head.appendChild(script);
+                    addLog('info', 'Console interceptor injected');
+                } catch (e) {
+                    addLog('error', 'Failed to inject console interceptor: ' + e.message);
+                    addTestResult('Console Interception', 'error', 'Cross-origin restrictions prevent console monitoring');
+                }
+            };
+            
+            iframe.onerror = function(e) {
+                addLog('error', 'Failed to load site: ' + e);
+                addTestResult('Site Loading', 'error', 'Failed to load site');
+            };
+        }
+
+        function testFilters() {
+            addLog('info', 'Testing filter interaction...');
+            
+            try {
+                // Try to find and click filter elements
+                const iframeDoc = iframe.contentDocument;
+                const filterButtons = iframeDoc.querySelectorAll('[data-filter], .filter-tab, .filter-button, button[aria-label*="filter"]');
+                
+                if (filterButtons.length > 0) {
+                    addTestResult('Filter Elements', 'success', `Found ${filterButtons.length} filter elements`);
+                    
+                    // Click first filter
+                    filterButtons[0].click();
+                    addLog('info', 'Clicked first filter button');
+                } else {
+                    addTestResult('Filter Elements', 'warning', 'No filter elements found on page');
+                }
+            } catch (e) {
+                addLog('error', 'Cannot interact with iframe: ' + e.message);
+                addTestResult('Filter Interaction', 'error', 'Cross-origin restrictions prevent interaction');
+            }
+        }
+
+        function checkDebugPanel() {
+            try {
+                const iframeDoc = iframe.contentDocument;
+                const debugPanel = iframeDoc.querySelector('.debug-panel, [data-debug], #debug-panel, .debug-container');
+                
+                if (debugPanel) {
+                    addTestResult('Debug Panel', 'success', 'Debug panel found on page');
+                    
+                    // Check for logs in debug panel
+                    const logs = debugPanel.querySelectorAll('.log-entry, .debug-log, [data-log]');
+                    if (logs.length > 0) {
+                        addTestResult('Debug Logs', 'success', `Found ${logs.length} debug log entries`);
+                    }
+                } else {
+                    addTestResult('Debug Panel', 'warning', 'Debug panel not found on page');
+                }
+            } catch (e) {
+                addLog('error', 'Cannot check debug panel: ' + e.message);
+            }
+        }
+
+        function addTestResult(test, status, message) {
+            const resultDiv = document.createElement('div');
+            resultDiv.innerHTML = `
+                <p>
+                    <strong>${test}:</strong>
+                    <span class="status ${status}">${status.toUpperCase()}</span>
+                    - ${message}
+                </p>
+            `;
+            testResults.appendChild(resultDiv);
+        }
+
+        // Listen for messages from iframe
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'console') {
+                addLog(event.data.level, event.data.message, 'iframe');
+            } else if (event.data.type === 'debug-panel') {
+                if (event.data.found) {
+                    addTestResult('Debug Panel Detection', 'success', 'Debug panel detected in iframe');
+                } else {
+                    addTestResult('Debug Panel Detection', 'warning', 'Debug panel not detected in iframe');
+                }
+            }
+        });
+
+        // Auto-load site on page load
+        window.addEventListener('load', function() {
+            setTimeout(loadSite, 1000);
+        });
+    </script>
+</body>
+</html>

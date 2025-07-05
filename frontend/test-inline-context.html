@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Inline Context</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-panel { 
+            position: fixed; 
+            bottom: 20px; 
+            left: 20px; 
+            background: #000; 
+            color: #fff; 
+            padding: 15px; 
+            border-radius: 8px; 
+            max-height: 300px; 
+            overflow-y: auto; 
+            width: 300px;
+            z-index: 9999;
+        }
+        .filter-button { 
+            margin: 10px; 
+            padding: 10px 20px; 
+            background: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        .filter-button:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, createContext, useContext } = React;
+
+        // Debug logging system
+        const debugLogs = [];
+        const addDebugLog = (message) => {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            debugLogs.push(logEntry);
+            console.log('🔧 INLINE DEBUG:', logEntry);
+        };
+
+        // Context setup
+        const FilterContext = createContext(undefined);
+
+        const FilterProvider = ({ children }) => {
+            addDebugLog('🔧 INLINE PROVIDER: Function called');
+            
+            const [filters, setFilters] = useState({
+                searchText: '',
+                activeFilterSection: null,
+            });
+            addDebugLog('🔧 INLINE PROVIDER: useState initialized');
+            
+            const updateFilter = (key, value) => {
+                addDebugLog(`🔧 INLINE REAL updateFilter: ${key} = ${JSON.stringify(value)}`);
+                setFilters(prev => ({ ...prev, [key]: value }));
+            };
+            
+            addDebugLog('🔧 INLINE PROVIDER: About to return JSX');
+            
+            return React.createElement(
+                FilterContext.Provider,
+                { value: { filters, updateFilter } },
+                children
+            );
+        };
+
+        const useFilters = () => {
+            const context = useContext(FilterContext);
+            addDebugLog(`🔧 INLINE HOOK: context available: ${!!context}`);
+            
+            if (!context) {
+                addDebugLog('🔧 INLINE HOOK: FALLBACK MODE');
+                return {
+                    filters: { searchText: '', activeFilterSection: null },
+                    updateFilter: (key, value) => {
+                        addDebugLog(`🔧 INLINE FALLBACK: ${key} = ${JSON.stringify(value)} (NO EFFECT)`);
+                    }
+                };
+            }
+            
+            addDebugLog('🔧 INLINE HOOK: Real context returned');
+            return context;
+        };
+
+        // Debug panel component
+        const DebugPanel = () => {
+            const [logs, setLogs] = useState([]);
+            
+            React.useEffect(() => {
+                const interval = setInterval(() => {
+                    setLogs([...debugLogs]);
+                }, 500);
+                return () => clearInterval(interval);
+            }, []);
+            
+            return React.createElement('div', {
+                className: 'debug-panel'
+            }, [
+                React.createElement('h4', { key: 'title' }, '🔧 Inline Context Debug'),
+                React.createElement('div', { key: 'logs' }, 
+                    logs.slice(-10).map((log, i) => 
+                        React.createElement('div', { key: i, style: { fontSize: '12px', marginBottom: '5px' } }, log)
+                    )
+                )
+            ]);
+        };
+
+        // Test component
+        const TestApp = () => {
+            addDebugLog('🔧 TEST APP: Component called');
+            
+            const { filters, updateFilter } = useFilters();
+            
+            const handleFilterClick = (section) => {
+                updateFilter('activeFilterSection', section);
+            };
+            
+            return React.createElement('div', null, [
+                React.createElement('h1', { key: 'title' }, 'Inline Context Test'),
+                React.createElement('p', { key: 'desc' }, 'This tests if inline React context works properly.'),
+                React.createElement('div', { key: 'buttons' }, [
+                    ['Filters', 'Location', 'Demographic', 'Category'].map(section => 
+                        React.createElement('button', {
+                            key: section,
+                            className: 'filter-button',
+                            onClick: () => handleFilterClick(section.toLowerCase())
+                        }, section)
+                    )
+                ]),
+                React.createElement('p', { key: 'status' }, 
+                    `Active Filter: ${filters.activeFilterSection || 'None'}`
+                ),
+                React.createElement(DebugPanel, { key: 'debug' })
+            ]);
+        };
+
+        // Wrapper with provider
+        const App = () => {
+            addDebugLog('🔧 WRAPPER: Component called');
+            
+            return React.createElement(FilterProvider, null,
+                React.createElement(TestApp)
+            );
+        };
+
+        // Mount the app
+        ReactDOM.render(React.createElement(App), document.getElementById('root'));
+    </script>
+</body>
+</html>
