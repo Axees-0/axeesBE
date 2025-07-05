@@ -9,7 +9,7 @@
 
 const fs = require('fs');
 const path = require('path');
-const deployConfig = require('../deployment.config');
+const deployConfig = require('./deployment.config');
 
 const log = deployConfig.logging.log;
 
@@ -109,7 +109,7 @@ function walkDirectory(dir) {
 log.header('🔄 Migrating Hardcoded Values');
 
 // Add environment variables to .env.local if not present
-const envPath = path.join(__dirname, '..', '.env.local');
+const envPath = path.join(__dirname, '..', '..', '.env.local');
 if (fs.existsSync(envPath)) {
   let envContent = fs.readFileSync(envPath, 'utf8');
   
@@ -124,7 +124,7 @@ if (fs.existsSync(envPath)) {
 
 // Process files
 log.info('Scanning for hardcoded values...');
-walkDirectory(path.join(__dirname, '..'));
+walkDirectory(path.join(__dirname, '..', '..'));
 
 // Report results
 if (changes.length > 0) {

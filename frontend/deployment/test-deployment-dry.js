@@ -6,9 +6,10 @@
  * This script tests that the DRY refactoring hasn't broken any functionality
  */
 
-const deployConfig = require('../deployment.config');
+const deployConfig = require('./deployment.config');
 const { execSync } = require('child_process');
 const fs = require('fs');
+const path = require('path');
 
 const log = deployConfig.logging.log;
 
@@ -120,9 +121,9 @@ function testDeploymentScript() {
   
   try {
     // Test dry run
-    const result = execSync('node scripts/deploy.js production --dry-run', {
+    const result = execSync('node ./deployment/deploy.js production --dry-run', {
       encoding: 'utf8',
-      cwd: process.cwd()
+      cwd: path.join(__dirname, '..')
     });
     
     if (result.includes('Dry run')) {

@@ -29,10 +29,10 @@ function loadEnvFile(filePath) {
   return {};
 }
 
-// Load environment variables in priority order
-const envLocal = loadEnvFile(path.join(__dirname, '.env.local'));
-const envProd = loadEnvFile(path.join(__dirname, '.env.production'));
-const envBase = loadEnvFile(path.join(__dirname, '.env'));
+// Load environment variables in priority order (look in parent directory)
+const envLocal = loadEnvFile(path.join(__dirname, '..', '.env.local'));
+const envProd = loadEnvFile(path.join(__dirname, '..', '.env.production'));
+const envBase = loadEnvFile(path.join(__dirname, '..', '.env'));
 
 module.exports = {
   // Netlify configuration

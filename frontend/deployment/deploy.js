@@ -14,7 +14,7 @@
  *   npm run deploy:dev       # Development deployment
  * 
  * Direct usage:
- *   node scripts/deploy.js [environment] [options]
+ *   node deployment/deploy.js [environment] [options]
  * 
  * Options:
  *   --no-build      Skip build step
@@ -23,7 +23,7 @@
  *   --production    Force deploy to production URL
  */
 
-const deployConfig = require('../deployment.config');
+const deployConfig = require('./deployment.config');
 const { execSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
@@ -76,7 +76,7 @@ async function verifyDeployment(url, isProduction) {
           };
           
           fs.writeFileSync(
-            deployConfig.paths.deploymentStatus, 
+            path.join('..', deployConfig.paths.deploymentStatus), 
             JSON.stringify(deploymentStatus, null, 2)
           );
           
@@ -219,7 +219,7 @@ async function verifyContent(html, url) {
 function verifyBuildOutput() {
   log.header('🔍 Verifying Build Output');
   
-  const distDir = deployConfig.paths.distDir;
+  const distDir = path.join('..', deployConfig.paths.distDir);
   
   // Check if dist directory exists
   if (!fs.existsSync(distDir)) {
@@ -324,7 +324,7 @@ async function deploy() {
   if (!options.dryRun) {
     log.header('🚀 Deploying to Netlify');
     
-    const deployCommand = `netlify deploy ${isProductionDeploy ? '--prod' : ''} --site ${siteId} --dir ${deployConfig.paths.distDir}`;
+    const deployCommand = `netlify deploy ${isProductionDeploy ? '--prod' : ''} --site ${siteId} --dir ${path.join('..', deployConfig.paths.distDir)}`;
     
     try {
       const result = execSync(deployCommand, {
@@ -340,7 +340,7 @@ async function deploy() {
       const urlMatch = output.match(/https:\/\/[^\s]+/);
       if (urlMatch) {
         const deploymentUrl = urlMatch[0];
-        fs.writeFileSync(deployConfig.paths.deploymentUrl, deploymentUrl);
+        fs.writeFileSync(path.join('..', deployConfig.paths.deploymentUrl), deploymentUrl);
         log.info(`Deployment URL: ${deploymentUrl}`);
         
         // Verify the deployment is live
