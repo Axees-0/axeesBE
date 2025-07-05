@@ -142,6 +142,24 @@ module.exports = {
     alternativeDirs: ['temp_build', 'dist_new2', 'dist_new', 'temp_dist']
   },
 
+  // Verification settings
+  verification: {
+    enabled: true,
+    maxRetries: 5,
+    retryDelay: 3000, // 3 seconds
+    timeout: 10000,   // 10 seconds per request
+    requiredChecks: [
+      'HTML Structure',
+      'Title Tag', 
+      'Content Length',
+      'No Error Pages'
+    ],
+    optionalChecks: [
+      'React App Mount',
+      'Axees Branding'
+    ]
+  },
+
   // Logging configuration
   logging: {
     colors: {
@@ -174,6 +192,19 @@ module.exports = {
 
   getBuildCommand(environment = 'production') {
     return this.environments[environment]?.buildCommand || this.build.commands.smart;
+  },
+
+  getExpectedUrl(environment = 'preview', deploymentId = null) {
+    const siteId = this.getSiteId(environment);
+    const envConfig = this.environments[environment];
+    
+    if (envConfig && envConfig.isProd) {
+      return `https://${siteId}.netlify.app`;
+    } else if (deploymentId) {
+      return `https://${deploymentId}--${siteId}.netlify.app`;
+    } else {
+      return `https://preview--${siteId}.netlify.app`;
+    }
   },
 
   // Export loaded environment for reference
