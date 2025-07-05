@@ -34,11 +34,39 @@ const addDebugLog = (message: string) => {
 interface FilterState {
   searchText: string;
   activeFilterSection: string | null;
+  priceRange: { min: number; max: number };
+  selectedTier: string[];
+  followerSize: string;
+  selectedPlatforms: string[];
+  postingFrequency: string;
+  locationType: 'local' | 'country' | 'event';
+  selectedCountries: string[];
+  selectedCities: string[];
+  genderRatio: { male: number; female: number };
+  ageRange: { min: number; max: number };
+  selectedLanguages: string[];
+  influencerAge: { min: number; max: number };
+  selectedGroups: string[];
+  selectedCategories: string[];
 }
 
 const defaultFilters: FilterState = {
   searchText: '',
   activeFilterSection: null,
+  priceRange: { min: 0, max: 10000 },
+  selectedTier: [],
+  followerSize: 'all',
+  selectedPlatforms: [],
+  postingFrequency: 'all',
+  locationType: 'local',
+  selectedCountries: [],
+  selectedCities: [],
+  genderRatio: { male: 50, female: 50 },
+  ageRange: { min: 18, max: 65 },
+  selectedLanguages: [],
+  influencerAge: { min: 18, max: 50 },
+  selectedGroups: [],
+  selectedCategories: [],
 };
 
 interface FilterContextType {
@@ -86,6 +114,65 @@ const useInlineFilters = () => {
   return context;
 };
 // ========== END INLINE CONTEXT ==========
+
+// Local Debug Panel for Inline Context
+const InlineDebugPanel: React.FC = () => {
+  const [isVisible, setIsVisible] = useState(true);
+  
+  if (!isVisible) {
+    return (
+      <TouchableOpacity
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          left: 20,
+          backgroundColor: '#10B981',
+          padding: 8,
+          borderRadius: 8,
+          zIndex: 9999,
+        }}
+        onPress={() => setIsVisible(true)}
+      >
+        <Text style={{ color: 'white', fontSize: 12 }}>Show Debug</Text>
+      </TouchableOpacity>
+    );
+  }
+  
+  return (
+    <View style={{
+      position: 'absolute',
+      bottom: 20,
+      left: 20,
+      backgroundColor: 'rgba(0, 0, 0, 0.9)',
+      padding: 12,
+      borderRadius: 8,
+      maxWidth: 300,
+      maxHeight: 200,
+      zIndex: 9999,
+    }}>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8 }}>
+        <Text style={{ color: '#10B981', fontWeight: 'bold', fontSize: 12 }}>
+          🔧 Inline Context Debug
+        </Text>
+        <TouchableOpacity onPress={() => setIsVisible(false)}>
+          <Text style={{ color: '#666', fontSize: 12 }}>Hide</Text>
+        </TouchableOpacity>
+      </View>
+      
+      <ScrollView style={{ maxHeight: 150 }}>
+        {debugLogs.length === 0 ? (
+          <Text style={{ color: '#666', fontSize: 11 }}>No logs yet...</Text>
+        ) : (
+          debugLogs.slice(-20).reverse().map((log, index) => (
+            <Text key={index} style={{ color: '#ccc', fontSize: 10, marginBottom: 2 }}>
+              {log}
+            </Text>
+          ))
+        )}
+      </ScrollView>
+    </View>
+  );
+};
 
 const DiscoverCreators = () => {
   const { width } = useWindowDimensions();
@@ -222,10 +309,10 @@ const DiscoverCreators = () => {
     }
 
     // Filter criteria
-    if (creator.estimatedCost < priceRange.min || creator.estimatedCost > priceRange.max) return false;
-    if (selectedTier.length > 0 && !selectedTier.includes(creator.tierCategory)) return false;
+    if (priceRange && (creator.estimatedCost < priceRange.min || creator.estimatedCost > priceRange.max)) return false;
+    if (selectedTier?.length > 0 && !selectedTier.includes(creator.tierCategory)) return false;
     // Platform filter - case-insensitive comparison (UI uses "Instagram", data uses "instagram")
-    if (selectedPlatforms.length > 0 && !creator.platforms.some(p => selectedPlatforms.some(sp => sp.toLowerCase() === p.toLowerCase()))) return false;
+    if (selectedPlatforms?.length > 0 && !creator.platforms.some(p => selectedPlatforms.some(sp => sp.toLowerCase() === p.toLowerCase()))) return false;
     
     // Follower size filter
     if (followerSize !== 'all') {
@@ -250,38 +337,39 @@ const DiscoverCreators = () => {
     if (postingFrequency !== 'all' && creator.postingFrequency.toLowerCase() !== postingFrequency.toLowerCase()) return false;
     
     // Location filters
-    if (locationType === 'country' && selectedCountries.length > 0 && !selectedCountries.includes(creator.country)) return false;
-    if (locationType === 'local' && selectedCities.length > 0 && !selectedCities.includes(creator.city)) return false;
+    if (locationType === 'country' && selectedCountries?.length > 0 && !selectedCountries.includes(creator.country)) return false;
+    if (locationType === 'local' && selectedCities?.length > 0 && !selectedCities.includes(creator.city)) return false;
     
     // Demographic filters
     // Gender ratio filter (check if creator's audience matches desired ratio within 20% tolerance)
     const genderTolerance = 20;
-    if (Math.abs(creator.audienceGender.male - genderRatio.male) > genderTolerance) {
+    if (genderRatio && creator.audienceGender && Math.abs(creator.audienceGender.male - genderRatio.male) > genderTolerance) {
       // Allow some flexibility in gender ratios
     }
     
     // Age range filter (check if creator's audience overlaps with desired range)
-    if (creator.audienceAge.max < ageRange.min || creator.audienceAge.min > ageRange.max) {
+    if (creator.audienceAge && ageRange && (creator.audienceAge.max < ageRange.min || creator.audienceAge.min > ageRange.max)) {
       // Only filter out if there's no overlap
       return false;
     }
     
     // Influencer age filter
-    if (creator.age < influencerAge.min || creator.age > influencerAge.max) return false;
+    if (influencerAge && (creator.age < influencerAge.min || creator.age > influencerAge.max)) return false;
     
     // Language filter
-    if (selectedLanguages.length > 0 && !selectedLanguages.includes(creator.language)) return false;
+    if (selectedLanguages?.length > 0 && !selectedLanguages.includes(creator.language)) return false;
     
     // Groups filter
-    if (selectedGroups.length > 0 && !selectedGroups.some(group => creator.audienceGroups.includes(group))) return false;
+    if (selectedGroups?.length > 0 && !selectedGroups.some(group => creator.audienceGroups.includes(group))) return false;
     
     // Category filter
-    if (selectedCategories.length > 0 && !creator.categories.some(cat => selectedCategories.includes(cat))) return false;
+    if (selectedCategories?.length > 0 && !creator.categories.some(cat => selectedCategories.includes(cat))) return false;
 
     return true;
   }), [
     searchText,
-    priceRange,
+    priceRange?.min,
+    priceRange?.max,
     selectedTier,
     followerSize,
     selectedPlatforms,
@@ -289,10 +377,13 @@ const DiscoverCreators = () => {
     locationType,
     selectedCountries,
     selectedCities,
-    genderRatio,
-    ageRange,
+    genderRatio?.male,
+    genderRatio?.female,
+    ageRange?.min,
+    ageRange?.max,
     selectedLanguages,
-    influencerAge,
+    influencerAge?.min,
+    influencerAge?.max,
     selectedGroups,
     selectedCategories
   ]);
@@ -324,16 +415,16 @@ const DiscoverCreators = () => {
                 <TextInput
                   style={styles.priceInput}
                   placeholder="Min"
-                  value={`$${priceRange.min}`}
-                  onChangeText={(text) => updateFilter('priceRange', {...priceRange, min: parseInt(text.replace('$', '')) || 0})}
+                  value={`$${priceRange?.min || 0}`}
+                  onChangeText={(text) => updateFilter('priceRange', {...(priceRange || { min: 0, max: 10000 }), min: parseInt(text.replace('$', '')) || 0})}
                   keyboardType="numeric"
                 />
                 <Text style={styles.priceSeparator}>-</Text>
                 <TextInput
                   style={styles.priceInput}
                   placeholder="Max"
-                  value={`$${priceRange.max}`}
-                  onChangeText={(text) => updateFilter('priceRange', {...priceRange, max: parseInt(text.replace('$', '')) || 10000})}
+                  value={`$${priceRange?.max || 10000}`}
+                  onChangeText={(text) => updateFilter('priceRange', {...(priceRange || { min: 0, max: 10000 }), max: parseInt(text.replace('$', '')) || 10000})}
                   keyboardType="numeric"
                 />
               </View>
@@ -382,18 +473,18 @@ const DiscoverCreators = () => {
                 {platforms.map(platform => (
                   <TouchableOpacity
                     key={platform}
-                    style={[styles.filterChip, selectedPlatforms.includes(platform) && styles.filterChipActive]}
+                    style={[styles.filterChip, selectedPlatforms?.includes(platform) && styles.filterChipActive]}
                     onPress={() => {
-                      if (selectedPlatforms.includes(platform)) {
+                      if (selectedPlatforms?.includes(platform)) {
                         updateFilter('selectedPlatforms', selectedPlatforms.filter(p => p !== platform));
                       } else {
-                        updateFilter('selectedPlatforms', [...selectedPlatforms, platform]);
+                        updateFilter('selectedPlatforms', [...(selectedPlatforms || []), platform]);
                       }
                     }}
                   >
                     <Image 
                       source={getPlatformIcon(platform)}
-                      style={[styles.filterChipIcon, selectedPlatforms.includes(platform) && styles.filterChipIconActive]}
+                      style={[styles.filterChipIcon, selectedPlatforms?.includes(platform) && styles.filterChipIconActive]}
                       alt={`${platform} icon`}
                     />
                   </TouchableOpacity>
@@ -431,16 +522,16 @@ const DiscoverCreators = () => {
                   {countries.map(country => (
                     <TouchableOpacity
                       key={country}
-                      style={[styles.filterChip, selectedCountries.includes(country) && styles.filterChipActive]}
+                      style={[styles.filterChip, selectedCountries?.includes(country) && styles.filterChipActive]}
                       onPress={() => {
-                        if (selectedCountries.includes(country)) {
+                        if (selectedCountries?.includes(country)) {
                           updateFilter('selectedCountries', selectedCountries.filter(c => c !== country));
                         } else {
-                          updateFilter('selectedCountries', [...selectedCountries, country]);
+                          updateFilter('selectedCountries', [...(selectedCountries || []), country]);
                         }
                       }}
                     >
-                      <Text style={[styles.filterChipText, selectedCountries.includes(country) && styles.filterChipTextActive]}>
+                      <Text style={[styles.filterChipText, selectedCountries?.includes(country) && styles.filterChipTextActive]}>
                         {country}
                       </Text>
                     </TouchableOpacity>
@@ -453,20 +544,20 @@ const DiscoverCreators = () => {
               <View style={styles.filterRow}>
                 <Text style={styles.filterLabel}>Cities</Text>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.filterOptions}>
-                  {selectedCountries.length > 0 ? 
+                  {selectedCountries?.length > 0 ? 
                     selectedCountries.flatMap(country => cities[country] || []).map(city => (
                       <TouchableOpacity
                         key={city}
-                        style={[styles.filterChip, selectedCities.includes(city) && styles.filterChipActive]}
+                        style={[styles.filterChip, selectedCities?.includes(city) && styles.filterChipActive]}
                         onPress={() => {
-                          if (selectedCities.includes(city)) {
+                          if (selectedCities?.includes(city)) {
                             updateFilter('selectedCities', selectedCities.filter(c => c !== city));
                           } else {
-                            updateFilter('selectedCities', [...selectedCities, city]);
+                            updateFilter('selectedCities', [...(selectedCities || []), city]);
                           }
                         }}
                       >
-                        <Text style={[styles.filterChipText, selectedCities.includes(city) && styles.filterChipTextActive]}>
+                        <Text style={[styles.filterChipText, selectedCities?.includes(city) && styles.filterChipTextActive]}>
                           {city}
                         </Text>
                       </TouchableOpacity>
@@ -474,16 +565,16 @@ const DiscoverCreators = () => {
                     Object.values(cities).flat().map(city => (
                       <TouchableOpacity
                         key={city}
-                        style={[styles.filterChip, selectedCities.includes(city) && styles.filterChipActive]}
+                        style={[styles.filterChip, selectedCities?.includes(city) && styles.filterChipActive]}
                         onPress={() => {
-                          if (selectedCities.includes(city)) {
+                          if (selectedCities?.includes(city)) {
                             updateFilter('selectedCities', selectedCities.filter(c => c !== city));
                           } else {
-                            updateFilter('selectedCities', [...selectedCities, city]);
+                            updateFilter('selectedCities', [...(selectedCities || []), city]);
                           }
                         }}
                       >
-                        <Text style={[styles.filterChipText, selectedCities.includes(city) && styles.filterChipTextActive]}>
+                        <Text style={[styles.filterChipText, selectedCities?.includes(city) && styles.filterChipTextActive]}>
                           {city}
                         </Text>
                       </TouchableOpacity>
@@ -501,8 +592,8 @@ const DiscoverCreators = () => {
             <View style={styles.filterRow}>
               <Text style={styles.filterLabel}>Audience Gender Ratio</Text>
               <View style={styles.genderRatio}>
-                <Text style={styles.genderText}>Male: {genderRatio.male}%</Text>
-                <Text style={styles.genderText}>Female: {genderRatio.female}%</Text>
+                <Text style={styles.genderText}>Male: {genderRatio?.male || 50}%</Text>
+                <Text style={styles.genderText}>Female: {genderRatio?.female || 50}%</Text>
               </View>
             </View>
             
@@ -512,16 +603,16 @@ const DiscoverCreators = () => {
                 <TextInput
                   style={styles.ageInput}
                   placeholder="Min"
-                  value={ageRange.min.toString()}
-                  onChangeText={(text) => updateFilter('ageRange', {...ageRange, min: parseInt(text) || 18})}
+                  value={(ageRange?.min || 18).toString()}
+                  onChangeText={(text) => updateFilter('ageRange', {...(ageRange || { min: 18, max: 65 }), min: parseInt(text) || 18})}
                   keyboardType="numeric"
                 />
                 <Text style={styles.ageSeparator}>-</Text>
                 <TextInput
                   style={styles.ageInput}
                   placeholder="Max"
-                  value={ageRange.max.toString()}
-                  onChangeText={(text) => updateFilter('ageRange', {...ageRange, max: parseInt(text) || 65})}
+                  value={(ageRange?.max || 65).toString()}
+                  onChangeText={(text) => updateFilter('ageRange', {...(ageRange || { min: 18, max: 65 }), max: parseInt(text) || 65})}
                   keyboardType="numeric"
                 />
               </View>
@@ -533,16 +624,16 @@ const DiscoverCreators = () => {
                 <TextInput
                   style={styles.ageInput}
                   placeholder="Min"
-                  value={influencerAge.min.toString()}
-                  onChangeText={(text) => updateFilter('influencerAge', {...influencerAge, min: parseInt(text) || 18})}
+                  value={(influencerAge?.min || 18).toString()}
+                  onChangeText={(text) => updateFilter('influencerAge', {...(influencerAge || { min: 18, max: 50 }), min: parseInt(text) || 18})}
                   keyboardType="numeric"
                 />
                 <Text style={styles.ageSeparator}>-</Text>
                 <TextInput
                   style={styles.ageInput}
                   placeholder="Max"
-                  value={influencerAge.max.toString()}
-                  onChangeText={(text) => updateFilter('influencerAge', {...influencerAge, max: parseInt(text) || 50})}
+                  value={(influencerAge?.max || 50).toString()}
+                  onChangeText={(text) => updateFilter('influencerAge', {...(influencerAge || { min: 18, max: 50 }), max: parseInt(text) || 50})}
                   keyboardType="numeric"
                 />
               </View>
@@ -554,16 +645,16 @@ const DiscoverCreators = () => {
                 {languages.map(language => (
                   <TouchableOpacity
                     key={language}
-                    style={[styles.filterChip, selectedLanguages.includes(language) && styles.filterChipActive]}
+                    style={[styles.filterChip, selectedLanguages?.includes(language) && styles.filterChipActive]}
                     onPress={() => {
-                      if (selectedLanguages.includes(language)) {
+                      if (selectedLanguages?.includes(language)) {
                         updateFilter('selectedLanguages', selectedLanguages.filter(l => l !== language));
                       } else {
-                        updateFilter('selectedLanguages', [...selectedLanguages, language]);
+                        updateFilter('selectedLanguages', [...(selectedLanguages || []), language]);
                       }
                     }}
                   >
-                    <Text style={[styles.filterChipText, selectedLanguages.includes(language) && styles.filterChipTextActive]}>
+                    <Text style={[styles.filterChipText, selectedLanguages?.includes(language) && styles.filterChipTextActive]}>
                       {language}
                     </Text>
                   </TouchableOpacity>
@@ -577,16 +668,16 @@ const DiscoverCreators = () => {
                 {groups.map(group => (
                   <TouchableOpacity
                     key={group}
-                    style={[styles.filterChip, selectedGroups.includes(group) && styles.filterChipActive]}
+                    style={[styles.filterChip, selectedGroups?.includes(group) && styles.filterChipActive]}
                     onPress={() => {
-                      if (selectedGroups.includes(group)) {
+                      if (selectedGroups?.includes(group)) {
                         updateFilter('selectedGroups', selectedGroups.filter(g => g !== group));
                       } else {
-                        updateFilter('selectedGroups', [...selectedGroups, group]);
+                        updateFilter('selectedGroups', [...(selectedGroups || []), group]);
                       }
                     }}
                   >
-                    <Text style={[styles.filterChipText, selectedGroups.includes(group) && styles.filterChipTextActive]}>
+                    <Text style={[styles.filterChipText, selectedGroups?.includes(group) && styles.filterChipTextActive]}>
                       {group}
                     </Text>
                   </TouchableOpacity>
@@ -603,19 +694,19 @@ const DiscoverCreators = () => {
               {categories.map(category => (
                 <TouchableOpacity
                   key={category}
-                  style={[styles.categoryCard, selectedCategories.includes(category) && styles.categoryCardActive]}
+                  style={[styles.categoryCard, selectedCategories?.includes(category) && styles.categoryCardActive]}
                   onPress={() => {
-                    if (selectedCategories.includes(category)) {
+                    if (selectedCategories?.includes(category)) {
                       updateFilter('selectedCategories', selectedCategories.filter(c => c !== category));
                     } else {
-                      updateFilter('selectedCategories', [...selectedCategories, category]);
+                      updateFilter('selectedCategories', [...(selectedCategories || []), category]);
                     }
                   }}
                 >
-                  <Text style={[styles.categoryText, selectedCategories.includes(category) && styles.categoryTextActive]}>
+                  <Text style={[styles.categoryText, selectedCategories?.includes(category) && styles.categoryTextActive]}>
                     {category}
                   </Text>
-                  {selectedCategories.includes(category) && (
+                  {selectedCategories?.includes(category) && (
                     <Ionicons name="checkmark-circle" size={20} color={BrandColors.semantic.success} style={styles.categoryCheck} />
                   )}
                 </TouchableOpacity>
@@ -833,7 +924,7 @@ const DiscoverCreators = () => {
         )}
         
         {/* Debug Panel for Development */}
-        <DebugPanel />
+        <InlineDebugPanel />
       </SafeAreaView>
     </>
   );
