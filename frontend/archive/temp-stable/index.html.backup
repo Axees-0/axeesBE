@@ -96,7 +96,7 @@
         </div>
         
         <div class="links">
-            <a href="https://${NETLIFY_SITE_NAME}.netlify.app" class="link">Current Live Site</a>
+            <a href="https://polite-ganache-3a4e1b.netlify.app" class="link">Current Live Site</a>
             <a href="#" class="link" onclick="alert('This is the stable version package!')">This Version</a>
         </div>
         
@@ -117,7 +117,7 @@
         // Simple redirect functionality if needed
         function redirectToLatest() {
             if (confirm('Redirect to the latest QA fixes version?')) {
-                window.open('https://${NETLIFY_SITE_NAME}.netlify.app', '_blank');
+                window.open('https://polite-ganache-3a4e1b.netlify.app', '_blank');
             }
         }
         

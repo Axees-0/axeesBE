@@ -5,7 +5,7 @@ This guide provides step-by-step instructions for validating all features after 
 
 ## 🔗 Deployment URL
 - Preview: https://axees-preview.netlify.app
-- Main: https://${NETLIFY_SITE_NAME}.netlify.app
+- Main: https://polite-ganache-3a4e1b.netlify.app
 
 ## ✅ Test Checklist
 

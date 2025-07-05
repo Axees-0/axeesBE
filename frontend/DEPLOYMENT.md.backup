@@ -112,7 +112,7 @@ All deployment settings are centralized in `deployment.config.js`:
 module.exports = {
   netlify: {
     sites: {
-      production: '${NETLIFY_SITE_NAME}',
+      production: 'polite-ganache-3a4e1b',
       staging: null,  // Configure your staging site ID
       development: null
     }
@@ -194,7 +194,7 @@ Don't forget to add `NETLIFY_AUTH_TOKEN` to your repository secrets!
 ### Check Deployment Status
 ```bash
 # View recent deploys
-netlify deploys --site ${NETLIFY_SITE_NAME}
+netlify deploys --site polite-ganache-3a4e1b
 
 # View deployment logs
 netlify deploy --prod --dir=dist --debug

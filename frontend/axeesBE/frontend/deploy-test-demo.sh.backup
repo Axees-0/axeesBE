@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Deploy Test Demo with Unique Deployment ID
-# Creates a deployment URL in format: https://deploymentid-${NETLIFY_SITE_NAME}.netlify.app/
+# Creates a deployment URL in format: https://deploymentid-polite-ganache-3a4e1b.netlify.app/
 
 set -e
 
@@ -14,7 +14,7 @@ DEMO_BUILD_DIR="dist-test-demo-${DEPLOYMENT_ID}"
 echo "📋 Deployment Configuration:"
 echo "  • Deployment ID: $DEPLOYMENT_ID"
 echo "  • Build Directory: $DEMO_BUILD_DIR"
-echo "  • Target URL Format: https://${DEPLOYMENT_ID}-${NETLIFY_SITE_NAME}.netlify.app/"
+echo "  • Target URL Format: https://${DEPLOYMENT_ID}-polite-ganache-3a4e1b.netlify.app/"
 
 # Create dedicated build directory for this deployment
 echo "🏗️  Creating dedicated build..."

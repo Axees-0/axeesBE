@@ -143,7 +143,7 @@ function testHardcodedValues() {
   
   try {
     const searchResult = execSync(
-      "grep -r require('./deployment.config').getSiteId('production') --include='*.js' --include='*.ts' --exclude-dir=node_modules --exclude-dir=.git --exclude=deployment.config.js . || true",
+      "grep -r 'polite-ganache-3a4e1b' --include='*.js' --include='*.ts' --exclude-dir=node_modules --exclude-dir=.git --exclude=deployment.config.js . || true",
       { encoding: 'utf8', cwd: process.cwd() }
     );
     

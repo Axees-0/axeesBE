@@ -12,9 +12,9 @@ The deployment pipeline was broken due to permission errors in the `dist` direct
 4. **Fixed Permission Issues**: Corrected `.netlify` directory permissions
 
 ### Deployment Details
-- **Production URL**: https://${NETLIFY_SITE_NAME}.netlify.app
+- **Production URL**: https://polite-ganache-3a4e1b.netlify.app
 - **Deploy ID**: 686427f196b18d0d634542d8
-- **Unique Deploy URL**: https://686427f196b18d0d634542d8--${NETLIFY_SITE_NAME}.netlify.app
+- **Unique Deploy URL**: https://686427f196b18d0d634542d8--polite-ganache-3a4e1b.netlify.app
 - **Source Directory**: temp_build (with latest navigation changes)
 
 ### Verified Changes
@@ -41,6 +41,6 @@ The deployment pipeline was broken due to permission errors in the `dist` direct
    ```
 
 ### Build Logs
-- Build logs: https://app.netlify.com/projects/${NETLIFY_SITE_NAME}/deploys/686427f196b18d0d634542d8
-- Function logs: https://app.netlify.com/projects/${NETLIFY_SITE_NAME}/logs/functions
-- Edge function logs: https://app.netlify.com/projects/${NETLIFY_SITE_NAME}/logs/edge-functions
+- Build logs: https://app.netlify.com/projects/polite-ganache-3a4e1b/deploys/686427f196b18d0d634542d8
+- Function logs: https://app.netlify.com/projects/polite-ganache-3a4e1b/logs/functions
+- Edge function logs: https://app.netlify.com/projects/polite-ganache-3a4e1b/logs/edge-functions

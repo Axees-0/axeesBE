@@ -19,7 +19,7 @@
     </div>
     
     <h2>Live Demo Frame:</h2>
-    <iframe src="https://${NETLIFY_SITE_NAME}.netlify.app" id="demo-frame"></iframe>
+    <iframe src="https://polite-ganache-3a4e1b.netlify.app" id="demo-frame"></iframe>
     
     <script>
         const results = document.getElementById('test-results');
@@ -91,7 +91,7 @@
         
         // Add current timestamp
         addTestResult(`🕒 Test initiated at: ${new Date().toLocaleString()}`, 'pass');
-        addTestResult(`🌐 Testing URL: https://${NETLIFY_SITE_NAME}.netlify.app`, 'pass');
+        addTestResult(`🌐 Testing URL: https://polite-ganache-3a4e1b.netlify.app`, 'pass');
     </script>
 </body>
 </html>

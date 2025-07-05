@@ -70,17 +70,26 @@ module.exports = {
     production: {
       siteId: 'polite-ganache-3a4e1b',
       branch: 'main',
-      buildCommand: 'npm run build:smart'
+      buildCommand: 'npm run build:smart',
+      isProd: true  // Only production deploys to prod URL
+    },
+    preview: {
+      siteId: 'polite-ganache-3a4e1b',
+      branch: 'preview',
+      buildCommand: 'npm run build:smart',
+      isProd: false  // Deploy to preview URL
     },
     staging: {
       siteId: null,
       branch: 'staging',
-      buildCommand: 'npm run export:web'
+      buildCommand: 'npm run export:web',
+      isProd: false
     },
     development: {
       siteId: null,
       branch: 'develop',
-      buildCommand: 'npm run export:web'
+      buildCommand: 'npm run export:web',
+      isProd: false
     }
   },
 
@@ -101,19 +110,24 @@ module.exports = {
   presets: {
     quick: {
       build: false,
-      prod: true,
+      prod: false,  // Changed: default to preview
       timeout: 60000
     },
     full: {
       build: true,
       clean: true,
-      prod: true,
+      prod: false,  // Changed: default to preview
       timeout: 480000
     },
-    test: {
+    preview: {
       build: true,
       prod: false,
       timeout: 120000
+    },
+    production: {
+      build: true,
+      prod: true,
+      timeout: 480000
     }
   },
 

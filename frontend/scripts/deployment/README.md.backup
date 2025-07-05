@@ -43,7 +43,7 @@ Supports alternative deployment platforms:
 ## Specialized Scripts
 
 ### `deploy-to-specific-site.js`
-Deploys to a specific Netlify site ID (${NETLIFY_SITE_NAME}).
+Deploys to a specific Netlify site ID (polite-ganache-3a4e1b).
 
 ### `force-netlify-deploy.js`
 Attempts multiple deployment methods - useful for troubleshooting.

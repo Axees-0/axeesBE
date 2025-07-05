@@ -5,7 +5,7 @@
 You now have **TWO deployment options** ready:
 
 ### **a) ORIGINAL STABLE VERSION** (before QA fixes)
-- **Current Location**: https://${NETLIFY_SITE_NAME}.netlify.app  
+- **Current Location**: https://polite-ganache-3a4e1b.netlify.app  
 - **Status**: ✅ Already deployed and working
 - **Purpose**: Production/Stable version
 
@@ -31,7 +31,7 @@ After deployment, you'll have:
 
 | Version | URL | Purpose |
 |---------|-----|---------|
-| **Original Stable** | https://${NETLIFY_SITE_NAME}.netlify.app | Production |
+| **Original Stable** | https://polite-ganache-3a4e1b.netlify.app | Production |
 | **New QA Fixes** | `https://[new-random-name].netlify.app` | Development |
 
 ---

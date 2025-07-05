@@ -61,5 +61,5 @@ The build timeout could be due to:
 If you have a previous working build in `dist/` or can get one:
 ```bash
 # Deploy directly with netlify CLI
-npx netlify deploy --dir=dist --prod --site=${NETLIFY_SITE_NAME}
+npx netlify deploy --dir=dist --prod --site=polite-ganache-3a4e1b
 ```

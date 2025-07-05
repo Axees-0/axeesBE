@@ -2,7 +2,7 @@
 
 ## 📊 **Current Problem Analysis**
 
-**Issue:** `https://${NETLIFY_SITE_NAME}.netlify.app` currently hosts the QA fixes version, but you need BOTH versions on separate URLs.
+**Issue:** `https://polite-ganache-3a4e1b.netlify.app` currently hosts the QA fixes version, but you need BOTH versions on separate URLs.
 
 **Solution:** Deploy both versions to completely separate Netlify sites.
 
@@ -64,7 +64,7 @@ node deploy-final-dual.js
 - **Status:** Fully enhanced with accessibility and UX improvements
 
 ### **c) Current Site**
-- **URL:** `https://${NETLIFY_SITE_NAME}.netlify.app` 
+- **URL:** `https://polite-ganache-3a4e1b.netlify.app` 
 - **Current Content:** QA fixes version
 - **Status:** Can be reassigned or kept as backup
 
@@ -108,7 +108,7 @@ After deployment, you will have:
 
 1. Original Stable (NEW)    → https://[stable-domain].netlify.app
 2. QA Fixes Dev (NEW)       → https://[qa-domain].netlify.app  
-3. Current (EXISTING)       → https://${NETLIFY_SITE_NAME}.netlify.app
+3. Current (EXISTING)       → https://polite-ganache-3a4e1b.netlify.app
 ```
 
 **✅ Problem Solved:** You now have both original stable and QA fixes versions on separate URLs, exactly as requested!

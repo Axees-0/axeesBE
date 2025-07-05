@@ -23,7 +23,7 @@ const { execSync } = require('child_process');
 const CONFIG = {
   defaultDir: 'temp_build',
   alternativeDirs: ['temp_build', 'dist_new2', 'dist_new', 'temp_dist'],
-  prodSite: require('./deployment.config').getSiteId('production'),
+  prodSite: 'polite-ganache-3a4e1b',
   colors: {
     reset: '\x1b[0m',
     bright: '\x1b[1m',

@@ -59,14 +59,14 @@
 <body>
     <div class="test-header">
         <h1>🎯 Axees Demo Visual Verification</h1>
-        <p>Live Testing: <a href="https://${NETLIFY_SITE_NAME}.netlify.app" target="_blank" style="color: white;">https://${NETLIFY_SITE_NAME}.netlify.app</a></p>
+        <p>Live Testing: <a href="https://polite-ganache-3a4e1b.netlify.app" target="_blank" style="color: white;">https://polite-ganache-3a4e1b.netlify.app</a></p>
     </div>
 
     <div class="test-grid">
         <div class="test-section">
             <h3>📱 Mobile View (390px)</h3>
             <iframe 
-                src="https://${NETLIFY_SITE_NAME}.netlify.app" 
+                src="https://polite-ganache-3a4e1b.netlify.app" 
                 style="width: 390px; height: 844px;"
                 id="mobile-frame">
             </iframe>
@@ -75,7 +75,7 @@
         <div class="test-section">
             <h3>💻 Desktop View (1200px)</h3>
             <iframe 
-                src="https://${NETLIFY_SITE_NAME}.netlify.app" 
+                src="https://polite-ganache-3a4e1b.netlify.app" 
                 style="width: 100%; height: 800px;"
                 id="desktop-frame">
             </iframe>

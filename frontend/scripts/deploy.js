@@ -7,8 +7,9 @@
  * It uses deployment.config.js for all configuration.
  * 
  * Usage:
- *   npm run deploy           # Production deployment with build
- *   npm run deploy:quick     # Production deployment without build
+ *   npm run deploy           # Preview deployment with build (default)
+ *   npm run deploy:quick     # Preview deployment without build
+ *   npm run deploy:prod      # Production deployment
  *   npm run deploy:staging   # Staging deployment
  *   npm run deploy:dev       # Development deployment
  * 
@@ -19,6 +20,7 @@
  *   --no-build      Skip build step
  *   --clean         Clean build
  *   --dry-run       Show what would be deployed without deploying
+ *   --production    Force deploy to production URL
  */
 
 const deployConfig = require('../deployment.config');
@@ -28,11 +30,12 @@ const path = require('path');
 
 // Parse command line arguments
 const args = process.argv.slice(2);
-const environment = args[0] || 'production';
+const environment = args[0] || 'preview';  // Changed: default to preview
 const options = {
   build: !args.includes('--no-build'),
   clean: args.includes('--clean'),
-  dryRun: args.includes('--dry-run')
+  dryRun: args.includes('--dry-run'),
+  forceProduction: args.includes('--production') || environment === 'production'
 };
 
 // Use logging from config
@@ -46,6 +49,8 @@ async function deploy() {
   const siteId = deployConfig.getSiteId(environment);
   const buildCommand = deployConfig.getBuildCommand(environment);
   const authToken = deployConfig.getAuthToken();
+  const envConfig = deployConfig.environments[environment];
+  const isProductionDeploy = options.forceProduction || (envConfig && envConfig.isProd);
   
   if (!siteId) {
     log.error(`No site ID configured for environment: ${environment}`);
@@ -58,6 +63,8 @@ async function deploy() {
   }
   
   log.info(`Site ID: ${siteId}`);
+  log.info(`Environment: ${environment}`);
+  log.info(`Deploy Target: ${isProductionDeploy ? 'Production URL' : 'Preview URL'}`);
   log.info(`Build: ${options.build ? 'Yes' : 'No'}`);
   log.info(`Clean: ${options.clean ? 'Yes' : 'No'}`);
   log.info(`Dry Run: ${options.dryRun ? 'Yes' : 'No'}`);
@@ -90,7 +97,7 @@ async function deploy() {
   if (!options.dryRun) {
     log.header('🚀 Deploying to Netlify');
     
-    const deployCommand = `netlify deploy --prod --site ${siteId} --dir ${deployConfig.paths.distDir}`;
+    const deployCommand = `netlify deploy ${isProductionDeploy ? '--prod' : ''} --site ${siteId} --dir ${deployConfig.paths.distDir}`;
     
     try {
       const result = execSync(deployCommand, {

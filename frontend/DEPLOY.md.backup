@@ -38,12 +38,12 @@ npx netlify deploy --dir=dist --prod
 #### Option B: Using Netlify Dashboard
 
 1. Go to https://app.netlify.com
-2. Navigate to your site: ${NETLIFY_SITE_NAME}
+2. Navigate to your site: polite-ganache-3a4e1b
 3. Drag and drop the `dist` folder onto the deployment area
 
 ### 3. Verify Deployment
 
-Your site will be live at: https://${NETLIFY_SITE_NAME}.netlify.app
+Your site will be live at: https://polite-ganache-3a4e1b.netlify.app
 
 ## What's Changed
 

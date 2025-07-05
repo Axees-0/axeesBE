@@ -99,7 +99,7 @@
 <body>
     <div class="test-header">
         <h1>Axees Deployment Test - Filter Functionality</h1>
-        <p>Testing: https://${NETLIFY_SITE_NAME}.netlify.app</p>
+        <p>Testing: https://polite-ganache-3a4e1b.netlify.app</p>
         <p>Test Time: <span id="test-time"></span></p>
     </div>
 
@@ -177,7 +177,7 @@
 
         function loadSite() {
             testResults.innerHTML = '<p>Loading site...</p>';
-            iframe.src = 'https://${NETLIFY_SITE_NAME}.netlify.app';
+            iframe.src = 'https://polite-ganache-3a4e1b.netlify.app';
             
             // Wait for iframe to load
             iframe.onload = function() {

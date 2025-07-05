@@ -2,7 +2,7 @@
 ## Navy SEAL-Level Quality Assurance
 
 **MISSION**: Identify every single point of failure in the investor demo
-**URL**: https://${NETLIFY_SITE_NAME}.netlify.app
+**URL**: https://polite-ganache-3a4e1b.netlify.app
 **TOLERANCE**: Zero defects acceptable
 
 ---
@@ -30,7 +30,7 @@
 ### **PHASE 1: INITIAL LOAD ASSESSMENT**
 
 #### 🎬 Page Load Test
-- [ ] Navigate to https://${NETLIFY_SITE_NAME}.netlify.app
+- [ ] Navigate to https://polite-ganache-3a4e1b.netlify.app
 - [ ] ⏱️ Record load time: _______ seconds
 - [ ] ✅ React app mounts (content appears in #root)
 - [ ] ✅ No console errors (F12 → Console)

@@ -125,7 +125,7 @@ NETLIFY_AUTH_TOKEN=nfp_eK5CfAHbJFiSjM2p8nrJznnMAiasaUtt8c96 netlify deploy:resto
 ### Phase 2: investor-demo-only  
 - **Merge Commit**: 17a69cb
 - **Deploy ID**: 6866a5a564be6281e499c392
-- **Preview URL**: https://phase2--${NETLIFY_SITE_NAME}.netlify.app
+- **Preview URL**: https://phase2--polite-ganache-3a4e1b.netlify.app
 
 ### Phase 1: galaxies-features-implementation
 - **Status**: No changes merged (already up-to-date)
@@ -186,7 +186,7 @@ git show production-backup-20250703 --stat
 ### Deployment Information
 - **Netlify Dashboard**: https://app.netlify.com/teams/michael-abdo/sites
 - **Practice Site ID**: a7351308-618e-4c10-8bf1-7222e9074e2f
-- **Preview Site**: ${NETLIFY_SITE_NAME}
+- **Preview Site**: polite-ganache-3a4e1b
 - **Auth Token Location**: `.env.local`
 
 ## Important Notes

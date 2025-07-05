@@ -81,7 +81,7 @@ const filteredCreators = useMemo(() => creators.filter(...), [dependencies]);
 
 ## Deployment Status
 - All changes deployed successfully
-- Production URL: https://${NETLIFY_SITE_NAME}.netlify.app
+- Production URL: https://polite-ganache-3a4e1b.netlify.app
 - Navigation restructure live with:
   - Discover as home page
   - 5-tab navigation

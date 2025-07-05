@@ -1,7 +1,7 @@
 # Deployment Test Results - Filter Functionality Fix
 
 ## Deployment Information
-- **URL**: https://${NETLIFY_SITE_NAME}.netlify.app
+- **URL**: https://polite-ganache-3a4e1b.netlify.app
 - **Deployment Time**: Fri Jul 4 23:23:35 UTC 2025
 - **Build System**: Expo Web with Webpack
 - **Deploy Tool**: Netlify CLI
@@ -66,7 +66,7 @@ Due to browser security:
 - Manual testing on the actual site recommended
 
 ### Manual Testing Steps
-1. Visit https://${NETLIFY_SITE_NAME}.netlify.app
+1. Visit https://polite-ganache-3a4e1b.netlify.app
 2. Navigate to discover/home page
 3. Click on filter tabs
 4. Check browser console for debug logs

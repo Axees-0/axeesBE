@@ -5,7 +5,7 @@
 ### **Fix 1: White Screen (React App Not Loading)**
 ```bash
 # Quick diagnosis
-curl -s "https://${NETLIFY_SITE_NAME}.netlify.app/" | grep "entry-"
+curl -s "https://polite-ganache-3a4e1b.netlify.app/" | grep "entry-"
 
 # If JavaScript bundle missing/broken:
 cd /home/Mike/projects/axees/axeesBE/frontend
@@ -140,20 +140,20 @@ cp EMERGENCY_BACKUP.html dist/index.html
 netlify deploy --dir=dist --prod
 
 # Verify deployment
-curl -I https://${NETLIFY_SITE_NAME}.netlify.app
+curl -I https://polite-ganache-3a4e1b.netlify.app
 ```
 
 ## **TESTING COMMANDS**
 
 ```bash
 # Quick smoke test
-curl -s "https://${NETLIFY_SITE_NAME}.netlify.app/" | grep -E "(axees|creator|demo)" | head -5
+curl -s "https://polite-ganache-3a4e1b.netlify.app/" | grep -E "(axees|creator|demo)" | head -5
 
 # Check for errors
-curl -s "https://${NETLIFY_SITE_NAME}.netlify.app/" | grep -i error
+curl -s "https://polite-ganache-3a4e1b.netlify.app/" | grep -i error
 
 # Verify JavaScript loads
-curl -I "https://${NETLIFY_SITE_NAME}.netlify.app/_expo/static/js/web/entry-*.js"
+curl -I "https://polite-ganache-3a4e1b.netlify.app/_expo/static/js/web/entry-*.js"
 ```
 
 ---
