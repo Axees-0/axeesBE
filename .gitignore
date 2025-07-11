@@ -69,3 +69,5 @@ test-otp-detailed.jsnode_modules/mongodb-memory-server/mongodb-binaries/
 
 # Local Netlify folder
 .netlify
+frontend/.expo
+frontend/package-lock.json
